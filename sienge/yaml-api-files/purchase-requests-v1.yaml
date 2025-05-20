@@ -1,0 +1,1033 @@
+swagger: "2.0"
+info:
+  description: >-
+    API que permite a um solicitante realizar o cadastro de uma solicitação de
+    compra para uma obra já existente.
+  version: "1.0"
+  title: Solicitações de Compra
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+paths:
+  "/purchase-requests/{purchaseRequestId}":
+    get:
+      operationId: getPuchaseRequestsId
+      tags:
+        - Solicitação de Compras
+      summary: Consulta solicitação de compra
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseRequestId
+          in: path
+          description: Id da Solicitação de Compra
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PurchaseRequest"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/purchase-requests/{purchaseRequestId}/authorize":
+    patch:
+      operationId: patchPuchaseRequestsIdAuthorize
+      tags:
+        - Solicitação de Compras
+      summary: Autoriza todos os itens de uma solicitação que estão aguardando autorização
+      description: >-
+        As notificações serão enviadas somente se a opção "Sempre enviar aviso ao solicitante" estiver ativada.
+        Se o acordo de preços estiver configurado e ativo, o sistema gerará pedidos ou contratos com base nos itens autorizados.
+        Caso ocorra uma exceção no fluxo de geração de pedidos ou contratos, os itens da solicitação deverão permanecer autorizados.
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseRequestId
+          in: path
+          description: Id da Solicitação de Compra
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PurchaseRequestaAthorizeResponse"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: Não foi possível autorizar os itens da solicitação
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/purchase-requests/{purchaseRequestId}/disapproval":
+    patch:
+      operationId: patchPuchaseRequestsIdDisapproval
+      tags:
+        - Solicitação de Compras
+      summary: Reprova todos os itens de uma solicitação que estão aguardando autorização
+      description: Somente irá enviar as notificações caso esteja configurado para 'Sempre enviar aviso ao solicitante'
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseRequestId
+          in: path
+          description: Id da Solicitação de Compra
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "204":
+          description: Operação bem sucedida
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: Não foi possível reprovar os itens da solicitação
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/purchase-requests":
+    post:
+      operationId: postPuchaseRequests
+      tags:
+        - Solicitação de Compras
+      summary: Cria uma solicitação de compra para uma obra já existente
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Solicitação de compra a ser cadastrada
+          required: true
+          schema:
+            $ref: "#/definitions/PurchaseRequest"
+      responses:
+        "201":
+          description: Solicitação cadastrada
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/purchase-requests/all/items":
+    get:
+      operationId: getPuchaseRequestsAllItems
+      tags:
+        - Item de Solicitação de Compra
+      summary: Consulta itens de solicitação de compra
+      consumes:
+        - application/json
+      parameters:
+        - in: query
+          name: purchaseRequestId
+          description: Id da Solicitação de Compra
+          required: false
+          type: integer
+          format: int32
+        - in: query
+          name: startDate
+          required: false
+          description: >-
+            Data de início da busca (data da solicitação) no formato: yyyy-MM-dd.
+            Exemplo: 2018-04-01
+          type: string
+        - in: query
+          name: endDate
+          required: false
+          description: >-
+            Data de fim da busca (data da solicitação) no formato: yyyy-MM-dd.
+            Exemplo: 2018-04-21
+          type: string
+        - in: query
+          name: buildingId
+          required: false
+          description: Id da obra
+          type: integer
+        - in: query
+          name: requesterUser
+          required: false
+          description: Id do solicitante (Usuário do Sienge)
+          type: string
+        - in: query
+          name: authorized
+          required: false
+          description: >-
+            Para retornar apenas itens de solicitação de compra autorizados
+            informe o valor "true" e para itens de solicitação de compra desautorizados
+            informe "false". Caso não seja informado retornará ambos
+          type: boolean
+        - in: query
+          name: disapproved
+          required: false
+          description: >-
+            Para retornar apenas itens de solicitação de compra reprovados
+            informe o valor "true" e para itens de solicitação de compra que não foram
+            reprovados informe "false". Caso não seja informado retornará ambos
+          type: boolean
+        - in: query
+          name: limit
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - in: query
+          name: offset
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - in: query
+          name: purchaseRequestConsistency
+          required: false
+          type: string
+          enum:
+            - IN_INCLUSION
+            - CONSISTENT
+            - INCONSISTENT
+          description: >
+            Status da situação de consistência da Solicitação de Compra.
+             * IN_INCLUSION - Em inclusão,
+             * CONSISTENT - Consistente,
+             * INCONSISTENT - Inconsistente
+        - in: query
+          name: purchaseRequestStatus
+          required: false
+          enum:
+            - PENDING
+            - PARTIALLY_ATTENDED
+            - FULLY_ATTENDED
+            - CANCELED
+          description: >
+            Status da situação da Solicitação de Compra.
+             * PENDING - Pendente,
+             * PARTIALLY_ATTENDED - Parcialmente atendida,
+             * FULLY_ATTENDED - Totalmente atendida,
+             * CANCELED - Cancelada
+          type: string
+        - in: query
+          name: withOpenQuantity
+          required: false
+          description: >-
+            Para retornar apenas itens de solicitação de compra com saldo em aberto
+            informe o valor "true". Para itens de solicitação sem saldo informe o valor
+            "false".
+          type: boolean
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PaginatedResponseOfPurchaseRequestItem"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/purchase-requests/{purchaseRequestId}/items/{purchaseRequestItemNumber}/buildings-appropriations":
+    get:
+      operationId: getPuchaseRequestsIdItemsIdBuildingsAppropriations
+      tags:
+        - Item de Solicitação de Compra
+      summary: Consulta apropriações de um item da solicitação de compra existente
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseRequestId
+          in: path
+          description: Id da Solicitação
+          required: true
+          type: integer
+          format: int32
+        - name: purchaseRequestItemNumber
+          in: path
+          description: Id do item da Solicitação
+          required: true
+          type: integer
+          format: int32
+        - in: query
+          name: limit
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - in: query
+          name: offset
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0
+          required: false
+          type: integer
+          default: 0
+          format: int32
+
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PaginatedResponseOfBuildingAppropriation"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/purchase-requests/{purchaseRequestId}/items/{purchaseRequestItemNumber}/delivery-requirements":
+    get:
+      operationId: getPuchaseRequestsIdItemsIdDeliveryRequirements
+      tags:
+        - Item de Solicitação de Compra
+      summary: Consulta entregas de um item da solicitação de compra existente
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseRequestId
+          in: path
+          description: Id da Solicitação
+          required: true
+          type: integer
+          format: int32
+        - name: purchaseRequestItemNumber
+          in: path
+          description: Id do item da Solicitação
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PaginatedResponseOfDeliveryRequirement"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/purchase-requests/{purchaseRequestId}/items":
+    post:
+      operationId: postPuchaseRequestsIdItems
+      tags:
+        - Item de Solicitação de Compra
+      summary: Cria itens para uma solicitação de compra existente
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseRequestId
+          in: path
+          description: Id da Solicitação
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Item de Solicitação de compra a ser cadastrada
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/PurchaseRequestItemInsert"
+      responses:
+        "201":
+          description: Item de solicitação cadastrada
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/purchase-requests/{purchaseRequestId}/items/{purchaseRequestItemNumber}/authorize":
+    patch:
+      operationId: patchPuchaseRequestsIdItemsIdAuthorize
+      tags:
+        - Item de Solicitação de Compra
+      summary: Autoriza um item de uma solicitação que está aguardando autorização
+      description: Somente irá enviar as notificações caso esteja configurado para 'Sempre enviar aviso ao solicitante'
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseRequestId
+          in: path
+          description: Id da Solicitação de Compra
+          required: true
+          type: integer
+          format: int32
+        - name: purchaseRequestItemNumber
+          in: path
+          description: Id do item da Solicitação
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "204":
+          description: Operação bem sucedida
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: Não foi possível autorizar o item da solicitação
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/purchase-requests/{purchaseRequestId}/items/{purchaseRequestItemNumber}/disapproval":
+    patch:
+      operationId: patchPuchaseRequestsIdItemsIdDisapproval
+      tags:
+        - Item de Solicitação de Compra
+      summary: Reprova um item de uma solicitação que está aguardando autorização
+      description: Somente irá enviar as notificações caso esteja configurado para 'Sempre enviar aviso ao solicitante'
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseRequestId
+          in: path
+          description: Id da Solicitação de Compra
+          required: true
+          type: integer
+          format: int32
+        - name: purchaseRequestItemNumber
+          in: path
+          description: Id do item da Solicitação
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "204":
+          description: Operação bem sucedida
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: Não foi possível autorizar o item da solicitação
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/purchase-requests/{purchaseRequestId}/attachments":
+    get:
+      operationId: getPuchaseRequestsIdAttachments
+      tags:
+        - Anexos
+      summary: Consulta de anexos da solicitação de compra
+      produces:
+        - application/json
+      parameters:
+        - name: purchaseRequestId
+          in: path
+          description: Id da Solicitação de Compra
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: "Operação bem sucedida"
+          schema:
+            $ref: "#/definitions/PaginatedResponseOfPurchaseRequestAttachment"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/purchase-requests/{purchaseRequestId}/attachments/{attachmentNumber}":
+    get:
+      operationId: getPuchaseRequestsIdAttachmentsId
+      tags:
+        - Anexos
+      summary: Download do anexo da solicitação de compra
+      produces:
+        - file
+        - application/json
+      parameters:
+        - name: purchaseRequestId
+          in: path
+          description: Id da solicitação de Compra
+          required: true
+          type: integer
+          format: int32
+        - name: attachmentNumber
+          in: path
+          description: Id do anexo da solicitação de compra
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Anexo encontrado
+          schema:
+            type: file
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  PurchaseRequest:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        example: 2104
+        description: >-
+          Número da solicitação. Este é um campo opcional, caso não seja
+          informado, o sistema gera automaticamente o número
+      buildingId:
+        type: integer
+        format: int32
+        example: 300
+        description: Código da obra da solicitação
+      departamentId:
+        type: integer
+        format: int32
+        example: 5
+        description: Id do departamento
+      requesterUser:
+        type: string
+        example: "USER"
+        description: Usuário solicitante
+      requestDate:
+        type: string
+        format: date
+        example: "2018-01-03"
+        description: >-
+          Data da solicitação no formato ISO 8601 com a máscara: yyyy-MM-dd,
+          exemplo: 2018-01-03
+      notes:
+        type: string
+        example: "Annotation"
+        description: >-
+          Observação da solicitação com restrição de 4000 caracteres.
+      status:
+        type: string
+        example: PENDING
+        readOnly: true
+        description: |
+          As situações do item de solicitação de compra são:
+            * `PENDING` - Pendente
+            * `PARTIALLY_ATTENDED` - Parcialmente atendido
+            * `FULLY_ATTENDED` - Totalmente atendido
+            * `CANCELED` - Cancelado
+      consitent:
+        type: string
+        example: CONSISTENT
+        readOnly: true
+        description: |
+          Os estados de consistência do item de solicitação de compra são:
+            * `IN_INCLUSION` - Em inclusão,
+            * `CONSISTENT` - Consistente,
+            * `INCONSISTENT` - Inconsistente,
+      createdBy:
+        type: string
+        example: "USER"
+        description: >-
+          Usuário responsável pelo cadastro da solicitação nas informações de controle.
+          Este usuário deve ter permissão na obra da solicitação.
+          Campo foi renomeado a partir do campo 'registrantUser'
+      createdAt:
+        type: string
+        example: "2018-03-11T14:20:00.000-03:00"
+        readOnly: true
+        description: >-
+          Data de criação da solicitação de compra nas informações de controle no formato
+          yyyy-MM-dd'T'HH:mm:ss.SSSXXX.
+      modifiedBy:
+        type: string
+        example: "ANOTHERUSER"
+        readOnly: true
+        description: >-
+          Usuário que modificou a solicitação de compra nas informações de controle
+      modifiedAt:
+        type: string
+        example: "2018-04-02T18:20:00.000-03:00"
+        readOnly: true
+        description: >-
+          Data de modificação da solicitação de compra nas informações de controle no
+          formato yyyy-MM-dd'T'HH:mm:ss.SSSXXX.
+      purchaseProcessCarriedOutByBuildingFlag:
+        type: boolean
+        example: true
+        readOnly: true
+        description: >-
+          Retorna verdadeiro se a flag 'Processo de compra será realizado pela própria obra'
+          estiver marcada. Do contrário, retorna falso.
+  PaginatedResponseOfPurchaseRequestItem:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: >-
+          Lista de itens de solicitação de compra retornadas como
+          resultado da requisição
+        items:
+          $ref: "#/definitions/PurchaseRequestItem"
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          type: object
+          properties:
+            rel:
+              type: string
+              description: Nome da recurso associado
+              example: delivery-requirements
+            href:
+              type: string
+              description: URL do recurso associado
+              example: "https://../v1/purchase-requests/622/items/1/delivery-requirements"
+  PurchaseRequestItem:
+    type: object
+    readOnly: true
+    properties:
+      purchaseRequestId:
+        type: integer
+        format: int32
+        example: 19
+        description: Código da solicitação
+      itemNumber:
+        type: integer
+        format: int32
+        example: 19
+        description: Número do item do insumo na lista da solicitação
+      productId:
+        type: integer
+        format: int32
+        example: 1001
+        description: Código do insumo
+      productDescription:
+        type: string
+        example: Descrição do insumo
+        description: >-
+          Descrição do insumo com restrição de 300 caracteres.
+      detailId:
+        type: integer
+        format: int32
+        example: 2
+        description: Código do detalhe
+      detailDescription:
+        type: string
+        example: Descrição do detalhe do insumo.
+        description: >-
+          Descrição do detalhe do insumo com restrição de 4000 caracteres.
+      trademarkId:
+        type: integer
+        format: int32
+        example: 3
+        description: Código da marca
+      trademarkDescription:
+        type: string
+        example: Descrição do código da marca
+        description: >-
+          Descrição do código da marca com restrição de 50 caracteres.
+      quantity:
+        type: number
+        format: double
+        example: 15
+        description: Quantidade
+      unitySymbol:
+        type: string
+        example: un
+        description: Unidade de medida
+      notes:
+        type: string
+        example: Descrição do item
+        description: >-
+          Observação do item de solicitação com restrição de 4000 caracteres.
+      authorized:
+        type: boolean
+        example: true
+        description: >-
+          Retornará verdadeiro se item de solicitação de compra estiver autorizado, caso
+          contrário retornará falso.
+      disapproved:
+        type: boolean
+        example: false
+        description: >-
+          Retornará verdadeiro se item de solicitação de compra estiver reprovado, caso
+          contrário retornará falso.
+      competenceLevel:
+        type: integer
+        format: int32
+        example: 0
+        description: >-
+          Nível da alçada de autorização do item de solicitação, retornando os seguintes valores: '0' quando não possuir autorização em nenhuma alçada. '1' quando estiver autorizado em primeira alçada. '2' quando estiver autorizado em segunda alçada. Vazio quando não estiver em processo de autorização.
+      estimatedDeliveryTime:
+        type: integer
+        format: int32
+        example: 5
+        description: >-
+          Tempo de entrega estimado do insumo.
+      disapprovalReason:
+        type: integer
+        example: 2
+        description: >-
+          Valor que represente os motivos de desautorização do insumo na solicitação conforme a seguir:
+            - "0" quando estiver desautorizado apenas pelo motivo "usuário que cadastrou o insumo não tem permissão para gerar solicitações de compra autorizadas";
+            - "1" quando estiver desautorizado apenas pelo motivo "usuário que cadastrou o insumo não tem permissão para solicitar insumos com quantidade acima da quantidade orçada";
+            - "2" quando estiver desautorizado pelos dois motivos acima;
+            - Vazio quando não estiver em processo de autorização (sem motivo de desautorização).
+      tenantUrl:
+        type: string
+        description: URL do recurso associado
+        example: "https://api.sienge.com.br/dev.local/sienge/public/api"
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          type: object
+          properties:
+            rel:
+              type: string
+              description: Nome da recurso associado
+              example: delivery-requirements
+            href:
+              type: string
+              description: URL do recurso associado
+              example: "https://api.sienge.com.br/dev.local/sienge/public/api/v1/purchase-requests/19/items/1/delivery-requirements"
+  PurchaseRequestItemInsert:
+    type: object
+    required:
+      - productId
+      - quantity
+      - unitySymbol
+      - buildingsApropriations
+      - deliveryRequirements
+    properties:
+      productId:
+        type: integer
+        format: int32
+        example: 1002
+        description: Código do insumo
+      detailId:
+        type: integer
+        format: int32
+        example: 1
+        description: Código do detalhe
+      trademarkId:
+        type: integer
+        format: int32
+        example: 2
+        description: Código da marca
+      quantity:
+        type: number
+        format: double
+        example: 80
+        description: Quantidade
+      unitySymbol:
+        type: string
+        description: Unidade de medida
+      notes:
+        type: string
+        description: >-
+          Observação do item de solicitação com restrição de 4000 caracteres.
+      disapprovedWhenRegistered:
+        type: boolean
+        description: >-
+          Para criar um item desautorizado informe o valor "true" e para criar um item autorizado não incluir esse campo na request ou informe "false".
+      buildingsApropriations:
+        type: array
+        description: >-
+          Apropriações (Obrigatório para Níveis de Apropriação diferente de "Obra".)
+        items:
+          $ref: "#/definitions/BuildingApropriation"
+      deliveryRequirements:
+        type: array
+        description: Entregas
+        items:
+          $ref: "#/definitions/DeliveryRequirement"
+  BuildingApropriation:
+    type: object
+    required:
+      - buildingUnitId
+      - costEstimationItemReference
+      - percentage
+    properties:
+      buildingUnitId:
+        type: integer
+        format: int32
+        example: 1
+        description: Código da unidade construtiva da obra da solicitação
+      costEstimationItemReference:
+        type: string
+        example: 00.001.003.001
+        description: Referência do Item do orçamento
+      percentage:
+        type: number
+        format: double
+        example: 100
+        maximum: 100
+        description: Percentual apropriado da quantidade do item
+  PaginatedResponseOfDeliveryRequirement:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: >-
+          Lista de necessidades de entregas de um item de solicitação de compra
+          retornadas como resultado da requisição
+        items:
+          $ref: "#/definitions/DeliveryRequirement"
+  DeliveryRequirement:
+    type: object
+    required:
+      - requirementDate
+      - requirementQuantity
+    properties:
+      deliveryRequirementNumber:
+        type: number
+        format: int32
+        readOnly: true
+        example: 1
+        description: Número da necessidade da entrega
+      requirementDate:
+        type: string
+        format: date
+        example: "2018-01-03"
+        description: "Data da necessidade no formato ISO 8601 com a máscara: yyyy-MM-dd"
+      requirementQuantity:
+        type: number
+        format: double
+        example: 80
+        description: Quantidade necessitada
+      attendedQuantity:
+        type: number
+        format: double
+        readOnly: true
+        example: 15
+        description: Quantidade atendida
+      openQuantity:
+        type: boolean
+        readOnly: true
+        example: false
+        description: >-
+          Saldo da entrega
+
+          Caso for verdadeiro, a diferença entre requirementQuantity e attendedQuantity
+          será o saldo. Caso falso, significa que o saldo foi cancelado.
+  PaginatedResponseOfBuildingAppropriation:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: >-
+          Lista de apropriações de um item de solicitação de compra
+          retornadas como resultado da requisição
+        items:
+          $ref: "#/definitions/BuildingApropriation"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int32
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao desenvolvedor consumidor da API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API
+  PaginatedResponseOfPurchaseRequestAttachment:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: "Lista de anexos da solicitação de compra retornadas como resultado da requisição"
+        items:
+          $ref: "#/definitions/PurchaseRequestAttachment"
+  PurchaseRequestAttachment:
+    type: object
+    properties:
+      purchaseRequestId:
+        type: integer
+        format: int64
+        example: 5760
+        description: >-
+          Id da solicitação de compra
+      attachmentNumber:
+        type: integer
+        format: int64
+        example: 4
+        description: >-
+          Número do anexo da solicitação de compra
+      name:
+        type: string
+        example: "document.pdf"
+        description: >-
+          Nome do anexo da solicitação de compra
+      description:
+        type: string
+        example: "Document Escaneado 01/08/2019"
+        description: >-
+          Descrição do anexo da solicitação de compra
+  PurchaseRequestaAthorizeResponse:
+    type: object
+    properties:
+      status:
+        type: string
+        example: "sucesso_parcial"
+      message:
+        type: string
+        example: "Solicitação autorizadaa com sucesso. Há insumos com acordo de preço definido onde não foi possível realizar a geração do pedido/contrato. Consulte o relatório de Relação de Solicitações e confira os itens não atendidos na data desta autorização."

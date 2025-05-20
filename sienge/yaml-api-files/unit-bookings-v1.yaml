@@ -1,0 +1,127 @@
+swagger: "2.0"
+info:
+  description: "API para inclusão de reservas de unidades."
+  version: "1.0"
+  title: Reservas de Unidades
+host: "api.sienge.com.br"
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: "Reserva de Unidades"
+    description: "API de Reservas de Unidades"
+schemes:
+  - "https"
+securityDefinitions:
+  basicAuth:
+    type: "basic"
+    description: "HTTP Basic Authentication. Works over `HTTP` and `HTTPS`"
+security:
+  - basicAuth: []
+paths:
+  /unit-bookings:
+    post:
+      operationId: postUnitBookings
+      tags:
+        - "Reserva de Unidades"
+      summary: "Reserva uma unidade."
+      consumes:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Reserva de unidade para inserção"
+          required: true
+          schema:
+            $ref: "#/definitions/UnitBooking"
+      responses:
+        "201":
+          description: "Reserva de unidade criada"
+        "400":
+          description: "Requisição mal formada"
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: "Erro interno no servidor"
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  /unit-bookings/units/{id}/deactivate:
+    patch:
+      tags:
+        - "Reserva de Unidades"
+      summary: "Inativa a reserva da unidade."
+      operationId: updateUnitBooking
+      parameters:
+        - name: id
+          in: path
+          description: Id unidade.
+          required: true
+          type: integer
+          format: int32
+      consumes:
+        - "application/json"
+      responses:
+        "204":
+          description: "Reserva de unidade inativada"
+        "400":
+          description: "Requisição mal formada"
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: "Erro interno no servidor"
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  UnitBooking:
+    type: "object"
+    required:
+      - "enterpriseId"
+      - "unitId"
+      - "brokerId"
+    properties:
+      enterpriseId:
+        type: "integer"
+        format: "int32"
+        description: "Código do empreendimento."
+      unitId:
+        type: "integer"
+        format: "int32"
+        description: >-
+          Código da unidade que será reservada. </br>
+          Esta unidade deve pertencer ao empreendimento da reserva.
+      brokerId:
+        type: "integer"
+        format: "int32"
+        description: "Código do corretor."
+      customerId:
+        type: "integer"
+        format: "int32"
+        description: >-
+          Código do cliente que está reservando a unidade. </br>
+          Caso o parâmetro 344 do Sienge estiver ativo, este campo torna-se
+          obrigatório.=
+      validityDate:
+        type: "string"
+        format: "date (Formato ISO 8601: yyyy-MM-dd)"
+        description: >-
+          Data de validade da reserva. </br>
+          Caso não informada, será considerado os parâmetros 449 e 1057 do Sienge para o cálculo da data. </br>
+          O parâmetro 449 indica a quantidade de dias em que a unidade ficará reservada. </br>
+          O parâmetro 1057 indica se serão considerados dias úteis para o cálculo da data de validade.
+        example: "2020-01-01"
+      note:
+        type: "string"
+        maxLength: 1000
+        description: "Observações referentes à reserva"
+  ResponseMessage:
+    type: "object"
+    properties:
+      status:
+        type: "integer"
+        description: "Status Http"
+      developerMessage:
+        type: "string"
+        description: "Mensagem de resposta para análise do desenvolvedor."
+        example: "Developer description message"
+      clientMessage:
+        type: "string"
+        description: "Mensagem de resposta para o usuário."
+        example: "Client description message."

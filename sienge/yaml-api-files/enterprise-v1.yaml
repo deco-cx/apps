@@ -1,0 +1,601 @@
+swagger: "2.0"
+info:
+  description: API de empreendimentos.
+  version: 1.0.0
+  title: Empreendimentos (Obras)
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Enterprises
+    description: API para listagem de empreendimentos
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  "/enterprises/{enterpriseId}":
+    get:
+      tags:
+        - enterprises
+      summary: Busca o empreendimento no Sienge
+      operationId: getEnterprisesId
+      parameters:
+        - name: enterpriseId
+          in: path
+          description: Código do empreendimento a ser apresentado
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Empreendimento encontrado
+          schema:
+            $ref: "#/definitions/DetailedEnterprise"
+        "404":
+          description: Empreendimento não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  /enterprises:
+    get:
+      tags:
+        - enterprises
+      summary: Busca uma lista de empreendimentos
+      operationId: getEnterprises
+      parameters:
+        - name: companyId
+          in: query
+          description: "Código empresa do centro de custo."
+          required: false
+          type: integer
+        - name: type
+          in: query
+          description: >-
+            Tipo do empreendimento, em que:
+              - 1: Obra e Centro de custo
+              - 2: Obra
+              - 3: Centro de custo
+              - 4: Centro de custo associado a obra
+          enum: [1, 2, 3, 4]
+          required: false
+          type: integer
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: receivableRegister
+          in: query
+          description: >-
+            Filtro de registro de recebíveis.
+          enum: [B3, CERC]
+          required: false
+          type: string
+        - name: onlyBuildingsEnabledForIntegration
+          in: query
+          description: Retornar apenas obras habilitadas para integração orçamentária
+          required: false
+          type: boolean
+          default: false
+          format: bool
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Empreendimento encontrado
+          schema:
+            $ref: "#/definitions/GetResponseDocument"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/enterprises/{enterpriseId}/groupings":
+    get:
+      tags:
+        - Agrupamentos de unidades
+      summary: Busca valores dos agrupamentos no Sienge
+      operationId: getEnterpriseGroupings
+      parameters:
+        - name: enterpriseId
+          in: path
+          description: Código do empreendimento a ser apresentado
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Unidade encontrada
+          schema:
+            $ref: "#/definitions/UnitGroupings"
+        "404":
+          description: Unidade não encontrada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  DetailedEnterprise:
+    allOf:
+      - $ref: "#/definitions/Enterprise"
+      - type: object
+        properties:
+          addressDetails:
+            type: object
+            description: Detalhes do endereço
+            properties:
+              streetName:
+                type: string
+                description: Logradouro do endereço
+              number:
+                type: string
+                description: Número do endereço
+              complement:
+                type: string
+                description: Complemento do endereço
+              neighborhood:
+                type: string
+                description: Bairro do endereço
+              city:
+                type: string
+                description: Cidade do endereço
+              state:
+                type: string
+                description: Sigla do estado do endereço
+              zipCode:
+                type: string
+                description: CEP do endereço
+          buildingCostEstimationStatus:
+            type: string
+            description: >-
+              Situação do orçamento, em que:
+                - 'OPENED': Aberto
+                - 'CLOSED': Fechado
+            enum: [OPENED, CLOSED]
+            example: OPENED
+          buildingStatus:
+            type: string
+            description: >-
+              Situação da obra, em que:
+                - 'COST_ESTIMATING': Orçamento
+                - 'IN_PROGRESS': Em andamento
+                - 'FINISHED_WITH_FINANCIAL_PENDENCIES': Encerrada com pendências financeiras
+                - 'FINISHED_WITHOUT_FINANCIAL_PENDENCIES': Encerrada sem pendências
+            enum: [
+              COST_ESTIMATING,
+              IN_PROGRESS,
+              FINISHED_WITH_FINANCIAL_PENDENCIES,
+              FINISHED_WITHOUT_FINANCIAL_PENDENCIES,
+            ]
+            example: COST_ESTIMATING
+          buildingAppropriationLevel:
+            type: string
+            description: >-
+              Nível de apropriação da obra, em que:
+                - 0: Obra
+                - 1: Célula construtiva
+                - 2: Etapa
+                - 3: Subetapa
+                - 4: Serviço
+            enum: ["0", "1", "2", "3", "4"]
+            example: "4"
+          buildingEnabledForIntegration:
+            type: boolean
+            description: Obra habilitada para integração orçamentária
+            example: true
+          constructionDetails:
+            type: object
+            description: Detalhes da obra
+            properties:
+              technicalManager:
+                type: string
+                description: Nome do responsável técnico
+              numberOfFloors:
+                type: integer
+                description: Número de pavimentos
+              totalArea:
+                type: number
+                description: Área total
+              landArea:
+                type: number
+                description: Área do terreno
+              startDate:
+                type: string
+                format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+                description: Data de início da obra
+              endDate:
+                type: string
+                format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+                description: Data de fim da obra
+          salesDetails:
+            type: object
+            description: Detalhes sobre as vendas do empreendimento
+            properties:
+              keysDelivery:
+                type: string
+                format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+                description: Data de entrega das chaves.
+              generalSalesValue:
+                type: number
+                description: Valor geral de vendas
+              layout:
+                type: string
+                description: >-
+                  Orientação do empreendimento, em que:
+                    - H: Horizontal
+                    - V: Vertical
+                enum: ["H", "V"]
+              realEstateRegistrationNumber:
+                type: string
+                description: Número da matrícula do empreendimento
+              realEstateRegistrationDigit:
+                type: string
+                description: Dígito da matrícula do empreendimento
+              nationalRealEstateCode:
+                type: string
+                description: CNS do cartório
+              realEstateUse:
+                type: string
+                description: >-
+                  Tipo de uso do empreendimento, em que:
+                    - 0: Não Residencial
+                    - 1: Residencial
+                    - 2: Misto
+                enum: ["0", "1", "2"]
+              realEstateType:
+                type: string
+                description: >-
+                  Tipo de implantação do empreendimento, em que:
+                    - 0: Condomínio
+                    - 1: Aberto
+                enum: ["0", "1"]
+              recordRealEstateNumber:
+                type: string
+                description: Número do registro de averbação da incorporação do empreendimento
+              recordRealEstateDate:
+                type: string
+                format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+                description: Data do registro de averbação da incorporação do empreendimento
+              recordSeggregateEstateNumber:
+                type: string
+                description: Número do registro de averbação do patrimônio de afetação do empreendimento
+              recordSeggregateEstateDate:
+                type: string
+                format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+                description: Data do registro de averbação do patrimônio de afetação do empreendimento
+              geographicUrl:
+                type: string
+                description: Link do local geográfico do empreendimento
+              commomAreas:
+                type: string
+                description: Descrição das áreas comuns do empreendimento
+              realEstateUrl:
+                type: string
+                description: Url do site do empreendimento
+              realEstateLocation:
+                type: string
+                description: Local de implantação do empreendimento
+              realEstateClassification:
+                type: string
+                description: Descrição da classificação do empreendimento
+              realEstateTargetAudience:
+                type: string
+                description: Descrição do público alvo do empreendimento
+              account:
+                type: string
+                description: Domícilio bancário do empreendimento
+              validationPartner:
+                type: object
+                description: Dados da validação do parceiro
+                properties:
+                  cnpj:
+                    type: string
+                    description: CNPJ do parceiro de validação
+                  realEstateSales:
+                    type: string
+                    description: >-
+                      Indica se possui o tipo de validação de formalização das vendas e suas movimentações, em que:
+                        - S: Sim
+                        - N: Não
+                    enum: ["S", "N"]
+                  realEstateBankMovement:
+                    type: string
+                    description: >-
+                      Indica se possui o tipo de validação de conciliação e cobrança, em que:
+                        - S: Sim
+                        - N: Não
+                    enum: ["S", "N"]
+                  realEstateAccountancy:
+                    type: string
+                    description: >-
+                      Indica se possui o tipo de validação de contabilidade, em que:
+                        - S: Sim
+                        - N: Não
+                    enum: ["S", "N"]
+                  realEstateBuilding:
+                    type: string
+                    description: >-
+                      Indica se possui o tipo de validação de obra, em que:
+                        - S: Sim
+                        - N: Não
+                    enum: ["S", "N"]
+                  realEstateLocalStock:
+                    type: string
+                    description: >-
+                      Indica se possui o tipo de validação de estoque físico, em que:
+                        - S: Sim
+                        - N: Não
+                    enum: ["S", "N"]
+          accountable:
+            type: object
+            description: Contato
+            properties:
+              name:
+                type: string
+                description: Nome do responsável
+                example: "Usuário Sienge"
+              cpf:
+                type: string
+                description: CPF do responsável
+                example: "12345628963"
+              phone:
+                type: string
+                description: Telefone do responsável
+                example: "(11)33337899"
+              cellphone:
+                type: string
+                description: Celular do responsável
+                example: "(11)99997899"
+              email:
+                type: string
+                description: E-mail do responsável
+                example: "email@sienge.com"
+          associatedBuilding:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: Código da obra associada
+                example: 12
+              description:
+                type: string
+                description: Descrição da obra associada
+                example: "Obra Associada Sienge"
+          associatedCostCenters:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: Código do centro de custo associado
+                  example: 15
+                name:
+                  type: string
+                  description: Descrição do centro de custo associado
+                  example: Centro de Custo Associado
+                companyId:
+                  type: integer
+                  description: Código da empresa
+                  example: 13
+                companyName:
+                  type: string
+                  description: Descrição da empresa
+                  example: Empresa
+  GetResponseDocument:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de Empresas retornadas como resultado da pesquisa
+        items:
+          $ref: "#/definitions/Enterprise"
+  Enterprise:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código do empreendimento
+      name:
+        type: string
+        description: Nome do empreendimento
+      commercialName:
+        type: string
+        description: Nome comercial do empreendimento
+      enterpriseObservation:
+        type: string
+        description: Observação do empreendimento
+      cnpj:
+        type: string
+        description: CNPJ do empreendimento
+      type:
+        type: string
+        description: >-
+          Tipo do empreendimento, em que:
+            - 1: Obra e Centro de custo
+            - 2: Obra
+            - 3: Centro de custo
+            - 4: Centro de custo associado a obra
+        enum: ["1", "2", "3", "4"]
+        example: "1"
+      adress:
+        type: string
+        description: Endereço completo do empreendimento
+      creationDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        description: Data de cadastramento
+      modificationDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        description: Data da última alteração do cadastro
+      createdBy:
+        type: string
+        description: Usuário que cadastrou o empreendimento
+      modifiedBy:
+        type: string
+        description: Último usuário que alterou o cadastro do empreendimento
+      companyId:
+        type: integer
+        format: int32
+        description: Código da empresa
+      companyName:
+        type: string
+        description: Nome da empresa
+      costDatabaseId:
+        type: integer
+        format: int32
+        description: Código da tabela do custos unitários
+      costDatabaseDescription:
+        type: string
+        description: Descrição da tabela do custos unitários
+      buildingTypeId:
+        type: integer
+        format: int32
+        description: Código do Tipo de obra
+      buildingTypeDescription:
+        type: string
+        description: Descrição do tipo de obra
+  UnitGroupings:
+    type: array
+    description: Descrição dos agrupamentos de unidade
+    items:
+      type: object
+      properties:
+        unitGroupingDescription:
+          type: string
+          description: Descrição do agrupamento
+        unitGroupingId:
+          type: integer
+          format: int32
+          description: ID de agrupamento de unidade
+        enterpriseId:
+          type: integer
+          format: int32
+          description: Código do empreendimento
+        orderNumber:
+          type: integer
+          format: int32
+          description: Ordem numérica
+        valueGroupings:
+          type: array
+          description: Detalhes do valor de agrupamento
+          items:
+            $ref: "#/definitions/ValueGrouping"
+  ValueGrouping:
+    type: object
+    description: Valores do agrupamento
+    properties:
+      expectedOccupancyDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2023-01-01)"
+        description: Data de Ocupação Prevista
+      legalOccupancyDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2023-01-01)"
+        description: Data de ocupação legal
+      realOccupancyDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2023-01-01)"
+        description: Data de ocupação real
+      releaseDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2023-01-01)"
+        description: Data do lançamento
+      dateEvolutionWork:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2023-01-01)"
+        description: Data base da evolução da obra
+      numberFloors:
+        type: integer
+        format: int32
+        description: Quantidade de Pavimentos
+      orderNumber:
+        type: integer
+        format: int32
+        description: Ordem numérica
+      workProgressPercentage:
+        type: number
+        format: double
+        description: Evolução total da obra
+      valueGroupingDescription:
+        type: integer
+        format: int32
+        description: Descrição do valor de agrupamento
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para analise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.

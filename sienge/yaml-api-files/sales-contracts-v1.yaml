@@ -1,0 +1,1740 @@
+swagger: "2.0"
+info:
+  description: API de Consulta, inclusão e exclusão de contratos.
+  version: "1.0"
+  title: Contratos de Vendas
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Contrato
+    description: API para contratos de vendas.
+  - name: Anexos do Contrato
+    description: API para anexos do contrato.
+  - name: Avalistas
+    description: API para avalistas do contrato.
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /sales-contracts:
+    get:
+      tags:
+        - Contrato
+      summary: >-
+        Busca uma lista de contratos de vendas ordenados pelo código do contrato
+        de forma decrescente.
+      operationId: loadSalesContracts
+      parameters:
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: customerId
+          in: query
+          description: Código do cliente do contrato.
+          required: false
+          type: integer
+          format: int32
+        - name: companyId
+          in: query
+          description: Código da empresa
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: enterpriseId
+          in: query
+          description: >-
+            Id do empreendimento
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: enterpriseName
+          in: query
+          description: >-
+            Nome do empreendimento
+          required: false
+          type: string
+        - name: externalId
+          in: query
+          description: >-
+            Identificador externo
+          required: false
+          type: string
+        - name: unitId
+          in: query
+          description: >-
+            Código da unidade
+          required: false
+          type: integer
+          format: int32
+        - name: number
+          in: query
+          description: >-
+            Número do contrato
+          required: false
+          type: string
+        - name: situation
+          in: query
+          description: >-
+            Situação do contrato:
+              * `0` - Solicitado
+              * `1` - Autorizado
+              * `2` - Emitido
+              * `3` - Cancelado
+          required: false
+          collectionFormat: csv
+          type: array
+          items:
+            type: string
+            enum: [0, 1, 2, 3]
+        - name: createdAfter
+          in: query
+          description: >-
+            Data inicial para filtrar contratos pela data em que foram cadastrados. Formato: yyyy-MM-dd.
+          required: false
+          type: string
+        - name: createdBefore
+          in: query
+          description: >-
+            Data final para filtrar contratos pela data em que foram cadastrados. Formato: yyyy-MM-dd.
+          required: false
+          type: string
+        - name: modifiedAfter
+          in: query
+          description: >-
+            Data inicial para filtrar contratos pela data da última atualização. Formato: yyyy-MM-dd.
+          required: false
+          type: string
+        - name: modifiedBefore
+          in: query
+          description: >-
+            Data final para filtrar contratos pela data da última atualização. Formato: yyyy-MM-dd.
+          required: false
+          type: string
+        - name: onlyContractsWithoutCommission
+          in: query
+          description: >-
+            Considerar somente contratos sem comissão de venda.
+          required: false
+          default: false
+          type: boolean
+        - name: initialIssueDate
+          in: query
+          description: >-
+            Filtro para consultar contratos a partir da data de emissão informada. Formato: yyyy-MM-dd.
+          required: false
+          type: string
+        - name: finalIssueDate
+          in: query
+          description: >-
+            Filtro para consultar contratos até a data de emissão informada. Formato: yyyy-MM-dd.
+          required: false
+          type: string
+        - name: initialCancelDate
+          in: query
+          description: >-
+            Filtro para consultar contratos distratados a partir da data de distrato informada. Formato: yyyy-MM-dd.
+          required: false
+          type: string
+        - name: finalCancelDate
+          in: query
+          description: >-
+            Filtro para consultar contratos distratados até a da data de distrato informada. Formato: yyyy-MM-dd.
+          required: false
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Contratos encontrados
+          schema:
+            $ref: "#/definitions/SalesContractsGet"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    post:
+      tags:
+        - Contrato
+      summary: Persiste um contrato de vendas.
+      operationId: insertSalesContract
+      parameters:
+        - in: body
+          name: body
+          description: Objeto para criação do contrato
+          required: true
+          schema:
+            $ref: "#/definitions/SalesContractInsert"
+      responses:
+        "201":
+          description: Contrato criado
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/sales-contracts/{id}":
+    delete:
+      tags:
+        - Contrato
+      summary: Exclui um contrato de vendas.
+      operationId: deleteSalesContract
+      parameters:
+        - name: id
+          in: path
+          description: Id do contrato de vendas.
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "204":
+          description: Contrato excluído
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    get:
+      tags:
+        - Contrato
+      summary: Busca um contrato de vendas.
+      operationId: loadSalesContract
+      parameters:
+        - name: id
+          in: path
+          description: Id do contrato de vendas.
+          required: true
+          type: integer
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Contrato encontrado
+          schema:
+            $ref: "#/definitions/SalesContractGet"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    patch:
+      tags:
+        - Contrato
+      summary: Atualiza dados de contratos.
+      operationId: updateSalesContract
+      parameters:
+        - name: id
+          in: path
+          description: Id do contrato de vendas.
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto com informações para atualização do contrato
+          required: true
+          schema:
+            $ref: "#/definitions/SalesContractUpdate"
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Contrato atualizado
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/sales-contracts/{id}/attachments":
+    post:
+      tags:
+        - Anexos do Contrato
+      summary: Inclui um anexo ao contrato.
+      operationId: insertSalesContractAttachment
+      parameters:
+        - name: id
+          in: path
+          description: Id do contrato de vendas.
+          required: true
+          type: integer
+          format: int32
+        - name: description
+          in: query
+          description: >-
+            Descrição do anexo. Exemplo: "Contrato de compra e venda".
+          required: true
+          type: string
+        - name: file
+          in: formData
+          description: >-
+            Arquivo para inserção | Tamanho máximo: 70 MB | Tamanho máximo do nome do arquivo: 100 caracteres | Somente 1 Anexo por requisição. Caso seja enviado mais de 1 Anexo, o Sienge vai aceitar somente o primeiro selecionado.
+          required: true
+          type: file
+      produces:
+        - application/json
+      consumes:
+        - multipart/form-data
+      responses:
+        "201":
+          description: Anexo inserido com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "422":
+          description: |
+            Entidade não processável.
+
+
+            Ocorreu algum erro semântico que impede a criação do anexo do contrato. Alguns exemplos dessas validações (podem haver outros) são:
+            * Contrato com ID informado não encontrado;
+            * Nome do anexo (contando com extensão) maior que 100 caracteres;
+            * Descrição vazia ou maior que 500 caracteres;
+            * Anexo maior que 70 MB;
+            * Tentativa de inserção de anexo no contrato quando o mesmo está emitido e o parâmetro 500 não permite alteração no contrato/anexos;
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    get:
+      tags:
+        - Anexos do Contrato
+      summary: Busca as informações dos anexos do contrato
+      operationId: getSalesContractAttachments
+      parameters:
+        - name: id
+          in: path
+          description: Número do contrato
+          required: true
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Foi encontrado anexos para o contrato, caso retorne vazio foi encontrado apenas o contrato.
+          schema:
+            $ref: "#/definitions/GetResponseSalesContractAttachments"
+        "404":
+          description: Anexos inexistentes
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/sales-contracts/{id}/attachments/{attachmentId}":
+    get:
+      tags:
+        - Anexos do Contrato
+      summary: Download de anexo do contrato
+      operationId: downloadSalesContractAttachment
+      parameters:
+        - name: id
+          in: path
+          description: Número do contrato
+          required: true
+          type: integer
+          format: int32
+        - name: attachmentId
+          in: path
+          description: ID do anexo
+          required: true
+          type: integer
+          format: int32
+      produces:
+        - application/json
+        - file
+      responses:
+        "200":
+          description: Anexo encontrado
+          schema:
+            type: file
+        "404":
+          description: Anexo ou contrato não foram encontrados
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/sales-contracts/{id}/guarantors":
+    get:
+      tags:
+        - Avalistas
+      summary: >-
+        Busca uma lista dos avalistas do contrato de vendas ordenados pelo
+        código do avalista de forma decrescente.
+      operationId: loadGuarantorsSalesContract
+      parameters:
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: id
+          in: path
+          description: Id do contrato de vendas.
+          required: true
+          type: integer
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Avalistas encontrados
+          schema:
+            $ref: "#/definitions/SalesContractGuarantors"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Contrato ou Avalistas não encontrados
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    post:
+      tags:
+        - Avalistas
+      summary: Inclui avalistas ao contrato.
+      operationId: insertGuarantors
+      parameters:
+        - name: id
+          in: path
+          description: Id do contrato de vendas.
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para criação dos avalistas.
+          required: true
+          schema:
+            $ref: "#/definitions/GuarantorsInsert"
+      responses:
+        "201":
+          description: Avalista criado.
+        "400":
+          description: Requisição mal formada.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/sales-contracts/{id}/guarantors/{guarantorId}":
+    get:
+      tags:
+        - Avalistas
+      summary: >-
+        Busca um avalista no contrato de venda.
+      operationId: loadGuarantorById
+      parameters:
+        - name: id
+          in: path
+          description: Id do contrato de vendas.
+          required: true
+          type: integer
+          format: int32
+        - name: guarantorId
+          in: path
+          description: Id do avalista.
+          required: true
+          type: integer
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Avalista encontrado
+          schema:
+            $ref: "#/definitions/Guarantor"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    patch:
+      tags:
+        - Avalistas
+      summary: Atualiza informações de avalistas do contrato.
+      operationId: updateGuarantors
+      parameters:
+        - name: id
+          in: path
+          description: Id do contrato de vendas.
+          required: true
+          type: integer
+          format: int32
+        - name: guarantorId
+          in: path
+          description: Id do avalista.
+          required: true
+          type: integer
+          format: int32
+        - name: body
+          in: body
+          description: Objeto com informações para atualização do avalista. Se você não quiser atualizar um campo, não insira no objeto. Se quiser remover o conteúdo de um campo, envie uma string vazia como valor do campo. Campos não enviados ou nulos serão ignorados. Campos obrigatórios não podem ser removidos, apenas atualizados.
+          required: true
+          schema:
+            $ref: "#/definitions/GuarantorsUpdate"
+      responses:
+        "204":
+          description: Avalista atualizado.
+        "400":
+          description: Requisição mal formada.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/sales-contracts/{id}/guarantors/{guarantorId}/phones":
+    put:
+      tags:
+        - Avalistas
+      summary: Sobrescreve a lista de telefones do avalista.
+      operationId: updateGuarantorPhones
+      parameters:
+        - name: id
+          in: path
+          description: Id do contrato de vendas.
+          required: true
+          type: integer
+          format: int32
+        - name: guarantorId
+          in: path
+          description: Id do avalista.
+          required: true
+          type: integer
+          format: int32
+        - name: body
+          in: body
+          description: Objeto para atualizar telefones do avalista. Esta ação apagará os telefones existentes no cadastro e irá registrar os telefones enviados nessa requisição.
+          required: true
+          schema:
+            $ref: "#/definitions/GuarantorsPhoneUpdate"
+      responses:
+        "204":
+          description: Telefones do avalista atualizados.
+        "400":
+          description: Requisição mal formada.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/sales-contracts/{id}/cancellation":
+    post:
+      tags:
+        - Contrato
+      summary: Cancela um contrato de venda.
+      operationId: cancellation
+      parameters:
+        - name: id
+          in: path
+          description: Id do contrato de vendas.
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para informações do cancelamento do contrato
+          required: true
+          schema:
+            $ref: "#/definitions/SalesContractCancellation"
+      responses:
+        "201":
+          description: Contrato cancelado
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  SalesContractGet:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Id do contrato de vendas
+      companyId:
+        type: integer
+        format: int32
+        description: Código da empresa
+      internalCompanyId:
+        type: integer
+        format: int32
+        description: Código interno da empresa
+      companyName:
+        type: string
+        description: Nome da empresa
+      enterpriseId:
+        type: integer
+        format: int32
+        description: Código do empreendimento
+      internalEnterpriseId:
+        type: integer
+        format: int32
+        description: Código interno do empreendimento
+      enterpriseName:
+        type: string
+        description: Nome do empreendimento
+      receivableBillId:
+        type: integer
+        format: int32
+        description: Número do título a receber
+      cancellationPayableBillId:
+        type: integer
+        format: int32
+        description: Número do título a pagar do distrato
+      contractDate:
+        type: string
+        description: Data do contrato
+      issueDate:
+        type: string
+        description: Data de emissão do contrato
+      accountingDate:
+        type: string
+        description: Data contábil. Formato YYYY-MM-DD. Exemplo -> 1994-01-13.
+      expectedDeliveryDate:
+        type: string
+        description: Data de previsão de entrega. Formato YYYY-MM-DD. Exemplo -> 1994-01-13.
+      keysDeliveredAt:
+        type: string
+        description: Data de entrega. Formato YYYY-MM-DD. Exemplo -> 1994-01-13.
+      number:
+        type: string
+        description: Número do contrato
+      externalId:
+        type: string
+        description: Identificador externo
+      correctionType:
+        type: string
+        description: Tipo de correção
+      situation:
+        type: string
+        description: Situação do contrato
+      discountType:
+        type: string
+        description: Tipo de desconto do contrato
+      discountPercentage:
+        type: number
+        description: Percentual de desconto do contrato
+      value:
+        type: number
+        description: Valor do contrato
+      totalSellingValue:
+        type: number
+        description: Valor total de venda
+      cancellationDate:
+        type: string
+        description: >-
+          Data de cancelamento do contrato. Formato YYYY-MM-DD. Exemplo ->
+          1990-12-25.
+      totalCancellationAmount:
+        type: number
+        description: Valor total do título a pagar do distrato
+      cancellationReason:
+        type: string
+        description: Descrição do motivo de cancelamento.
+      financialInstitutionNumber:
+        type: string
+        description: Número da instituição financeira
+      financialInstitutionDate:
+        type: string
+        description: Data da instituição financeira. Formato YYYY-MM-DD. Exemplo -> 1994-01-13.
+      proRataIndexer:
+        type: integer
+        format: int32
+        description: Código do indexador de pró-rata. Usado apenas para acréscimo de mora mensal.
+      interestType:
+        type: string
+        description: >-
+          Tipo de juros para acréscimos de mora. Valores possíveis: 'C' - Composto ou 'S' - Simples. Usado apenas para acréscimo de mora mensal.
+      interestPercentage:
+        type: number
+        format: double
+        description: Percentual de juros ao mês para acréscimos de mora. Usado apenas para acréscimo de mora mensal.
+      fineRate:
+        type: number
+        format: double
+        description: Percentual de multa para acréscimo de mora. Usado apenas para acréscimo de mora mensal.
+      lateInterestCalculationType:
+        type: string
+        description: >-
+          Tipo de cálculo de acréscimos de mora. Valores possíveis: 'M' - Mensal ou 'D' - Diário.
+      dailyLateInterestValue:
+        type: number
+        format: double
+        description: Valor de mora diário em reais.
+      containsRemadeInstallments:
+        type: boolean
+        description: Indica se o título do contrato possui um reparcelamento financeiro.
+      specialClause:
+        type: string
+        description: Cláusula especial.
+      salesContractCustomers:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            description: Id do cliente do contrato
+          name:
+            type: boolean
+            description: Nome do cliente
+          main:
+            type: boolean
+            description: True se o cliente for principal
+          spouse:
+            type: boolean
+            description: True se o cliente for cônjuge
+          participationPercentage:
+            type: number
+            description: Percentual de participação do cliente
+      salesContractUnits:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            description: Id da unidade
+          main:
+            type: boolean
+            description: True se a unidade for principal
+          name:
+            type: string
+            description: Nome da unidade
+          participationPercentage:
+            type: number
+            description: Percentual de participação da unidade
+      paymentConditions:
+        type: object
+        properties:
+          bearerName:
+            type: string
+            description: Nome do portador.
+          indexerName:
+            type: string
+            description: Nome do indexador.
+          conditionTypeId:
+            type: string
+            description: Código do tipo de condição de pagamento.
+          conditionTypeName:
+            type: string
+            description: Nome do tipo de condição de pagamento.
+          interestType:
+            type: string
+            description: Tipo de juros 'N' - nenhum,'P' - PRICE ,'A' - SAC,'S' - simples,'C' - composto ou 'F' - fixo.
+          matchMaturities:
+            type: string
+            description: Coincidir vencimentos com outras parcelas, 'S' ou 'N'.
+          installmentsNumber:
+            type: integer
+            format: int32
+            description: Quantidade de parcelas.
+          openInstallmentsNumber:
+            type: integer
+            format: int32
+            description: Número de parcelas em aberto.
+          bearerId:
+            type: integer
+            format: int32
+            description: Código do portador.
+          indexerId:
+            type: integer
+            format: int32
+            description: Código do indexador.
+          monthsGracePeriod:
+            type: integer
+            format: int32
+            description: Quantidade de meses de carência.
+          firstPayment:
+            type: string
+            description: Data do primeiro vencimento. Formato YYYY-MM-DD. Exemplo >- 1990-12-25.
+          baseDate:
+            type: string
+            description: Data base. Formato YYYY-MM-DD. Exemplo >- 1990-12-25.
+          baseDateInterest:
+            type: string
+            description: Data base de juros. Formato YYYY-MM-DD. Exemplo -> 1990-12-25 .
+          totalValue:
+            type: number
+            format: double
+            description: Valor total da Condição.
+          outstandingBalance:
+            type: number
+            format: double
+            description: Valor em aberto.
+          interestPercentage:
+            type: number
+            format: double
+            description: Porcentagem de juros.
+          totalValueInterest:
+            type: number
+            format: double
+            description: Valor total de juros.
+          amountPaid:
+            type: number
+            format: double
+            description: Valor pago.
+          sequenceId:
+            type: number
+            format: double
+            description: ID da sequência.
+      brokers:
+        type: object
+        properties:
+          id:
+            type: number
+            description: Id do corretor
+          main:
+            type: boolean
+            description: True se o corretor for o principal
+      linkedCommissions:
+        type: object
+        properties:
+          totalCommission:
+            type: number
+            description: Total de comissão de venda
+          totalCommissionAmount:
+            type: number
+            format: double
+            description: Valor total de comissões de venda
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/Link"
+  SalesContractsGet:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de contratos retornados como resultado da pesquisa.
+        items:
+          $ref: "#/definitions/SalesContractGet"
+  SalesContractGuarantors:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de avalistas do contrato retornados como resultado da pesquisa.
+        items:
+          $ref: "#/definitions/Guarantor"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada.
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor.
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário.
+        example: Client description message.
+  Link:
+    type: object
+    properties:
+      rel:
+        type: string
+        description: Nome da recurso associado
+        example: guarantors
+      href:
+        type: string
+        description: URL do recurso associado
+        example: "http://../v1/sales-contracts/1/guarantors"
+  Guarantor:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nome do avalista
+      cnpj:
+        type: string
+        description: CNPJ do avalista
+      cpf:
+        type: string
+        description: CPF do avalista
+      nationality:
+        type: string
+        description: Nacionalidade
+      numberIdentityCard:
+        type: string
+        description: RG
+      profession:
+        type: string
+        description: Profissão
+      civilStatus:
+        type: string
+        description: Estado civil
+      email:
+        type: string
+        description: Endereço eletrônico (e-mail).
+      birthDate:
+        type: string
+        description: Data de nascimento. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+      address:
+        $ref: "#/definitions/Address"
+      spouse:
+        $ref: "#/definitions/GuarantorSpouse"
+      phones:
+        type: array
+        items:
+          $ref: "#/definitions/GuarantorPhones"
+  Address:
+    type: object
+    properties:
+      city:
+        type: string
+        description: Município
+      complement:
+        type: string
+        description: Complemento
+      neighborhood:
+        type: string
+        description: Bairro
+      number:
+        type: string
+        description: Número
+      state:
+        type: string
+        description: Estado
+      streetName:
+        type: string
+        description: Endereço
+      zipCode:
+        type: string
+        description: CEP
+  GuarantorSpouse:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nome
+      cpf:
+        type: string
+        description: Número de CPF
+      numberIdentityCard:
+        type: string
+        description: Número de Identidade (RG)
+      email:
+        type: string
+        description: Endereço eletrônico (e-mail)
+      birthDate:
+        type: string
+        description: Data de nascimento
+      address:
+        $ref: "#/definitions/Address"
+  GuarantorPhones:
+    type: object
+    properties:
+      number:
+        type: string
+        description: Número de telefone completo.
+      main:
+        type: boolean
+        description: True quando o telefone for principal.
+      type:
+        type: string
+        description: Tipo de telefone.
+      note:
+        type: string
+        description: Observação do telefone.
+  SalesContractInsert:
+    type: object
+    properties:
+      enterpriseId:
+        type: integer
+        format: int32
+        description: Código do empreendimento ao qual o contrato será vinculado.
+      externalId:
+        type: string
+        description: "Identificador externo do contrato, gerado por outro sistema."
+      number:
+        type: string
+        description: Número do contrato.
+      contractDate:
+        type: string
+        description: Data do contrato. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+      expectedDeliveryDate:
+        type: string
+        description: |
+          Data de previsão de entrega. Formato YYYY-MM-DD. Exemplo -> 1990-12-25. Este é um campo novo que passará a ser obrigatório.
+      keysDeliveredAt:
+        type: string
+        description: |
+          Data de entrega de chaves. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+          Este campo era usado como data de previsão de entrega e passará a ser utilizado para a data de entrega de chaves.
+          Caso o json contenha apenas este campo, continuará sendo preenchido como data de previsão de entrega, não preenchendo a data de entrega de chaves.
+          A data informada neste campo será preenchida como data de entrega de chaves, apenas quando o campo 'expectedDeliveryDate' estiver preenchido.
+          Este comportamento foi adotado por se tratar de um campo obrigatório no cadastro de contrato.'
+      accountingDate:
+        type: string
+        description: Data contábil. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+      readjustAfterOf:
+        type: string
+        description: >-
+          Corrigir parcelas a partir. Informar quando o campo 'correctionType'
+          for 'A' .Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+      saleType:
+        type: string
+        description: >-
+          Tipo do contrato. Valores aceitos 'C' - Contrato, 'A' - Alienação Fiduciária, 'P' - Permuta.
+      correctionType:
+        type: string
+        description: 'Tipo de correção. Valores aceitos ''A'' - Anual, ''M'' - Mensal.'
+      anualCorrectionType:
+        type: string
+        description: >-
+          Tipo de correção anual. Valores aceitos 'A' - Aniversário, 'F' - Fixa, 'M' - Mensal e 'P' - Programada.
+      generateResidue:
+        type: string
+        description: >-
+          Gerar resíduo. Valores aceitos 'S' - Sim, 'N' - Não. (Campo pode ser informado quando 'correctionType' for 'A').
+      diluteResidue:
+        type: string
+        description: >-
+          Diluir valor do resíduo. Valores aceitos 'S' - Anual, 'N' - Não.
+          (Campo pode ser informado quando 'correctionType' for 'A' e o campo 'generateResidue' for 'S').
+      financialPlanAccount:
+        type: string
+        description: Conta do plano financeiro. Informar apenas números. Exemplo -> 10101 .
+      value:
+        type: number
+        description: Valor total do contrato. Formato -> 80000.00
+      totalSellingValue:
+        type: number
+        description: Preço total de venda. Formato -> 80000.00
+      note:
+        type: string
+        description: >-
+          Observação do contrato. Texto livre com tamanho máximo aceito de 3800 caracteres.
+      readjustEach:
+        type: integer
+        format: int32
+        description: >-
+          Corrigir parcelas a cada. Número de meses para correção dos valores
+          das parcelas do contrato. Informar entre 1 e 12 . Exemplo -> (12 para
+          um contrato com correção anual e 1 para contrato com correção mensal).
+      readjustMonth:
+        type: integer
+        format: int32
+        description: >-
+          Mês de reajuste. Informar o número correspondente ao mês de correção.
+          Campo pode ser informado quando o campo 'anualCorrectionType' for 'P',
+          Valores aceitos de 1 a 12, valor padrão 1 .
+      lateInterestDaily:
+        type: boolean
+        description: >-
+          Indica o tipo de cálculo de acréscimo de mora. Informe 'true' para ('D' - Diário) ou 'false' para ('M' - Mensal).<br>
+          Caso não informado, por padrão, o tipo de cálculo de acréscimo de juros moratórios será (Mensal).<br>
+          Os campos considerados para o cálculo serão os referentes ao tipo de cálculo de juros moratórios informado através deste campo.
+      proRataIndexer:
+        type: integer
+        format: int32
+        description: Código do indexador de pró-rata. Usado apenas para acréscimo de mora mensal.
+      interestType:
+        type: string
+        description: >-
+          Tipo de juros para acréscimos de mora. Valores aceitos: 'C' - Composto, 'S' - Simples. Caso não informado, por padrão, o tipo de juros será considerado ('S' - Simples). Usado apenas para acréscimo de mora mensal.
+      interestPercentage:
+        type: number
+        format: double
+        description: Percentual/taxa de juros ao mês para acréscimos de mora. Usado apenas para acréscimo de mora mensal.
+      fineRate:
+        type: number
+        format: double
+        description: Percentual de multa para acréscimo de mora. Usado apenas para acréscimo de mora mensal.
+      dailyLateInterestValue:
+        type: number
+        format: double
+        description: Valor de mora diário em reais. Usado apenas para acréscimo de mora diário.
+      housingProgram:
+        type: string
+        description: >-
+          Programa habitacional. Valores aceitos 'S' - Sim, 'N' - Não.
+      discountType:
+        type: string
+        description: >-
+          Tipo de desconto do contrato. Valores aceitos 'A' - Anual, 'D' - Diário, 'F' - Fixo, 'M' - Mensal.
+      discountPercentage:
+        type: number
+        format: double
+        description: Percentual de desconto do contrato.
+      specialClause:
+        type: string
+        description: Cláusula especial. Texto livre com tamanho máximo aceito de 3800 caracteres.
+      paymentConditions:
+        type: array
+        description: Condições de pagamento do contrato.
+        items:
+          $ref: "#/definitions/PaymentConditionsInsert"
+      salesContractCustomers:
+        type: array
+        description: Clientes do contrato.
+        items:
+          $ref: "#/definitions/SalesContractCustomersInsert"
+      salesContractUnits:
+        type: array
+        description: Clientes do contrato.
+        items:
+          $ref: "#/definitions/SalesContractUnitsInsert"
+      brokers:
+        type: array
+        description: Corretores do contrato.
+        items:
+          $ref: "#/definitions/BrokersInsert"
+      salesContractGuarantors:
+        type: array
+        description: Avalistas do contrato.
+        items:
+          $ref: "#/definitions/SalesContractGuarantorsInsert"
+  PaymentConditionsInsert:
+    type: object
+    description: Informações da condição de pagamento do contrato
+    properties:
+      conditionTypeId:
+        type: string
+        description: >-
+          Código da condição de pagamento. Exemplo -> 'PM' para indicar parcelas
+          mensais.
+      installmentsNumber:
+        type: integer
+        format: int32
+        description: Quantidade de parcelas.
+      firstPayment:
+        type: string
+        description: Primeiro vencimento. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+      totalValue:
+        type: number
+        description: Valor total da condição. Formato -> 80000.00
+      matchMaturities:
+        type: string
+        description: >-
+          Coincidir vencimentos com outras parcelas. Informar 'S' ou 'N', caso
+          não seja informado o valor default será 'N'.
+      bearerId:
+        type: integer
+        format: int32
+        description: Código do portador.
+      indexerId:
+        type: integer
+        format: int32
+        description: Código do indexador.
+      baseDate:
+        type: string
+        description: Data base. Formato YYYY-MM-DD. Exemplo >- 1990-12-25.
+      interestType:
+        type: string
+        description: >-
+          Tipo de juros. Valores aceitos 'N' - nenhum,'P' - PRICE ,'A' - SAC,'S'
+          - simples,'C' - composto ou 'U' - anual.
+          Caso o percentual informado for zero ou nulo, o tipo de juros automaticamente será reconhecido como "Nenhum".
+      interestPercentage:
+        type: number
+        description: >-
+          Percentual de juros. Formato -> 1.00.
+          Caso o percentual informado for zero ou nulo, o tipo de juros automaticamente será reconhecido como "Nenhum".
+      monthsGracePeriod:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade de meses de carência. Informar um número correspondente a
+          carência para cobrança de juros.
+      baseDateInterest:
+        type: string
+        description: Data base de juros. Formato YYYY-MM-DD. Exemplo -> 1990-12-25 .
+  SalesContractCustomersInsert:
+    type: object
+    description: Informações do cliente do contrato.
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código do cliente.
+      main:
+        type: boolean
+        description: Cliente principal.
+      participationPercentage:
+        type: number
+        description: Percentual de participação. Formato >- 1.00
+      safePercentage:
+        type: number
+        description: Percentual de seguro. Formato >- 1.00
+      participationPercentageSpouse:
+        type: number
+        description: >-
+          Percentual de participação do cônjuge. Formato >- 1.00
+  SalesContractUnitsInsert:
+    type: object
+    description: Informações sobre a unidade do contrato.
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Id da unidade.
+      main:
+        type: boolean
+        description: Unidade principal.
+      participationPercentage:
+        type: number
+        description: Percentual de participação. Formato >- 1.00
+  BrokersInsert:
+    type: object
+    description: Informações sobre o corretor do contrato.
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código do corretor.
+      main:
+        type: boolean
+        description: Corretor principal.
+  SalesContractGuarantorsInsert:
+    type: object
+    description: Informações sobre o avalista do contrato.
+    required:
+      - name
+      - professionId
+      - civilStatusId
+    properties:
+      name:
+        type: string
+        description: Nome do avalista
+        maxLength: 40
+      cnpj:
+        type: string
+        description: CNPJ do avalista. Formato NNNNNNNNNNNNNN (somente números). Exemplo ->
+          87389750000185. Informar quando pessoa jurídica.
+      cpf:
+        type: string
+        description: CPF do avalista. Formato NNNNNNNNNNN (somente números). Exemplo ->
+          41833114035. Informar quando pessoa física.
+      nationality:
+        type: string
+        description: Nacionalidade.
+        maxLength: 40
+      numberIdentityCard:
+        type: string
+        description: Número da carteira de identidade (RG). Informar quando pessoa física.
+        maxLength: 20
+      professionId:
+        type: integer
+        format: int32
+        description: Código da profissão do avalista. Informar quando pessoa física.
+      civilStatusId:
+        type: integer
+        format: int32
+        description: Código do estado civil. Informar quando pessoa física.
+      birthDate:
+        type: string
+        description: Data de nascimento. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+      email:
+        type: string
+        description: Endereço eletrônico (e-mail).
+      address:
+        $ref: "#/definitions/AddressInsert"
+      spouse:
+        $ref: "#/definitions/GuarantorSpouseInsert"
+      phones:
+        type: array
+        description: Telefones do avalista do contrato.
+        items:
+          $ref: "#/definitions/GuarantorPhoneInsert"
+  GuarantorsInsert:
+    type: array
+    description: Avalistas do contrato.
+    items:
+      $ref: "#/definitions/GuarantorInsert"
+  GuarantorInsert:
+    type: object
+    description: Informações sobre o avalista do contrato.
+    required:
+      - name
+      - professionId
+      - civilStatusId
+      - cnpj
+      - cpf
+    properties:
+      name:
+        type: string
+        description: Nome do avalista
+        maxLength: 40
+      cnpj:
+        type: string
+        description: CNPJ do avalista. Formato NNNNNNNNNNNNNN (somente números). Exemplo ->
+          87389750000185. Informar quando pessoa jurídica. Obrigatório quando CPF não informado.
+      cpf:
+        type: string
+        description: CPF do avalista. Formato NNNNNNNNNNN (somente números). Exemplo ->
+          41833114035. Informar quando pessoa física. Obrigatório quando CNPJ não informado.
+      nationality:
+        type: string
+        description: Nacionalidade.
+        maxLength: 40
+      numberIdentityCard:
+        type: string
+        description: Número da carteira de identidade (RG). Informar quando pessoa física.
+        maxLength: 20
+      professionId:
+        type: integer
+        format: int32
+        description: Código da profissão do avalista. Informar quando pessoa física.
+      civilStatusId:
+        type: integer
+        format: int32
+        description: Código do estado civil. Informar quando pessoa física.
+      birthDate:
+        type: string
+        description: Data de nascimento. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+      email:
+        type: string
+        description: Endereço eletrônico (e-mail).
+      address:
+        $ref: "#/definitions/AddressInsert"
+      spouse:
+        $ref: "#/definitions/GuarantorSpouseInsert"
+      phones:
+        type: array
+        description: Telefones do avalista do contrato.
+        items:
+          $ref: "#/definitions/GuarantorPhoneInsert"
+  GuarantorsUpdate:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nome do avalista
+        maxLength: 40
+      cnpj:
+        type: string
+        description: CNPJ do avalista. Formato NNNNNNNNNNNNNN (somente números). Exemplo ->
+          87389750000185. Informar quando pessoa jurídica. Obrigatório quando CPF não informado.
+      cpf:
+        type: string
+        description: CPF do avalista. Formato NNNNNNNNNNN (somente números). Exemplo ->
+          41833114035. Informar quando pessoa física. Obrigatório quando CNPJ não informado.
+      nationality:
+        type: string
+        description: Nacionalidade.
+        maxLength: 40
+      numberIdentityCard:
+        type: string
+        description: Número da carteira de identidade (RG). Informar quando pessoa física.
+        maxLength: 20
+      professionId:
+        type: integer
+        format: int32
+        description: Código da profissão do avalista. Informar quando pessoa física.
+      civilStatusId:
+        type: integer
+        format: int32
+        description: Código do estado civil. Informar quando pessoa física.
+      birthDate:
+        type: string
+        description: Data de nascimento. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+      email:
+        type: string
+        description: Endereço eletrônico (e-mail).
+      lgpd:
+        $ref: "#/definitions/GuarantorLgpd"
+      address:
+        $ref: "#/definitions/AddressUpdate"
+      spouse:
+        $ref: "#/definitions/GuarantorSpouseUpdate"
+  GuarantorLgpd:
+    type: object
+    properties:
+      consent:
+        type: string
+        description: Consentimento à LGPD. Opções válidas são "SIM" e "NAO".
+        enum: ["SIM", "NAO"]
+      details:
+        type: string
+        description: Detalhes da LGPD.
+        maxLength: 1000
+  GuarantorsPhoneUpdate:
+    type: array
+    description: Telefones do avalista.
+    items:
+      $ref: "#/definitions/GuarantorPhoneInsert"
+  AddressInsert:
+    type: object
+    required:
+      - cityId
+    properties:
+      cityId:
+        type: integer
+        format: int32
+        description: Código do município do endereço.
+      complement:
+        type: string
+        description: Complemento do endereço.
+        maxLength: 40
+      neighborhood:
+        type: string
+        description: Bairro do endereço.
+        maxLength: 40
+      number:
+        type: string
+        description: Número do endereço.
+        maxLength: 10
+      streetName:
+        type: string
+        description: Logradouro do endereço.
+        maxLength: 80
+      zipCode:
+        type: string
+        description: "Código de endereçamento postal (CEP) do endereço | Formato: NNNNN-NNN (Exemplo: 83820-449)"
+        maxLength: 9
+  AddressUpdate:
+    type: object
+    properties:
+      cityId:
+        type: integer
+        format: int32
+        description: Código do município do endereço.
+      complement:
+        type: string
+        description: Complemento do endereço.
+        maxLength: 40
+      neighborhood:
+        type: string
+        description: Bairro do endereço.
+        maxLength: 40
+      number:
+        type: string
+        description: Número do endereço.
+        maxLength: 10
+      streetName:
+        type: string
+        description: Logradouro do endereço.
+        maxLength: 80
+      zipCode:
+        type: string
+        description: "Código de endereçamento postal (CEP) do endereço | Formato: NNNNN-NNN (Exemplo: 83820-449)"
+        maxLength: 9
+  GuarantorSpouseInsert:
+    type: object
+    description: Cônjuge do Avalista.
+    properties:
+      name:
+        type: string
+        description: Nome do cônjuge.
+        maxLength: 50
+      cpf:
+        type: string
+        description: Número de CPF. Formato 000.000.000-00.
+      numberIdentityCard:
+        type: string
+        description: Número de Identidade (RG).
+        maxLength: 20
+      email:
+        type: string
+        description: Endereço eletrônico (e-mail).
+        maxLength: 100
+      birthDate:
+        type: string
+        description: Data de nascimento. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+      address:
+        $ref: "#/definitions/GuarantorSpouseAddressInsert"
+  GuarantorSpouseAddressInsert:
+    type: object
+    properties:
+      cityId:
+        type: integer
+        format: int32
+        description: Código do município do endereço.
+      complement:
+        type: string
+        description: Complemento do endereço.
+        maxLength: 40
+      neighborhood:
+        type: string
+        description: Bairro do endereço.
+        maxLength: 40
+      number:
+        type: string
+        description: Número do endereço.
+        maxLength: 10
+      streetName:
+        type: string
+        description: Logradouro do endereço.
+        maxLength: 80
+      zipCode:
+        type: string
+        description: "Código de endereçamento postal (CEP) do endereço | Formato: NNNNN-NNN (Exemplo: 83820-449)"
+        maxLength: 9
+  GuarantorSpouseUpdate:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nome do cônjuge.
+        maxLength: 50
+      cpf:
+        type: string
+        description: Número de CPF. Formato 000.000.000-00.
+      numberIdentityCard:
+        type: string
+        description: Número de Identidade (RG).
+        maxLength: 20
+      email:
+        type: string
+        description: Endereço eletrônico (e-mail).
+        maxLength: 100
+      birthDate:
+        type: string
+        description: Data de nascimento. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+      address:
+        $ref: "#/definitions/AddressUpdate"
+  GuarantorPhoneInsert:
+    type: object
+    properties:
+      number:
+        type: string
+        description: Número de telefone. Formato DDDNNNNNNNNN. Exemplo -> 048912345678
+      main:
+        type: boolean
+        description: True quando o telefone for principal. Deve ser informado um telefone
+          como principal.
+      type:
+        type: string
+        description: Tipo de telefone. Informar CE para celular, CO para comercial ou RE
+          para residencial.
+      note:
+        type: string
+        description: Observação do telefone.
+        maximum: 40
+  SalesContractCancellation:
+    type: object
+    required:
+      - date
+      - reason
+      - subType
+    properties:
+      date:
+        type: string
+        description: Data do cancelamento. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+      reason:
+        type: string
+        description: Motivo de cancelamento do contrato.
+      subType:
+        type: string
+        description: 'Subtipo de cancelamento. Valores aceitos: ''I'' - Interno, ''X'' - Notificação cartório, ''J'' - Notificação escritório, ''E'' - Edital. <br>(Informar um subtipo apenas quando a categoria do empreendimento for do tipo ''Loteamento'')'
+  SalesContractUpdate:
+    type: object
+    properties:
+      financialInstitutionNumber:
+        type: string
+        description: Número da instituição financeira
+      financialInstitutionDate:
+        type: string
+        description: Data da instituição financeira. Formato YYYY-MM-DD. Exemplo -> 1994-01-13.
+      keysDeliveredAt:
+        type: string
+        description: Data da entrega de chaves. Formato YYYY-MM-DD. Exemplo -> 1994-01-13.
+      registerPropertyDate:
+        type: string
+        description: Data do registro do imóvel. Formato YYYY-MM-DD. Exemplo -> 1994-01-13.
+      sellingCategory:
+        type: string
+        description: Categoria de venda.
+      financingStatus:
+        type: string
+        description: Situação do financiamento.
+      contractDate:
+        type: string
+        description: Data do contrato. Formato YYYY-MM-DD. Exemplo -> 1994-01-13.
+      accountingDate:
+        type: string
+        description: Data contábil. Formato YYYY-MM-DD. Exemplo -> 1994-01-13.
+      specialClause:
+        type: string
+        description: Cláusula especial. Texto livre com tamanho máximo aceito de 3800 caracteres.
+  GetResponseSalesContractAttachments:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de anexos do contrato
+        items:
+          $ref: "#/definitions/SalesContractAttachment"
+  SalesContractAttachment:
+    type: object
+    properties:
+      attachmentid:
+        type: integer
+        format: int32
+        description: "ID do anexo | Exemplo: 1"
+        example: 1
+      name:
+        type: string
+        description: "Nome do arquivo | Exemplo: arquivo.pdf"
+        example: arquivo.pdf
+        maxLength: 100
+      description:
+        type: string
+        description: "Descrição do anexo | Exemplo: Contrato Documento"
+        example: Contrato Documento
+        maxLength: 500
+      size:
+        type: integer
+        format: int32
+        description: "Tamanho do arquivo em bytes | Exemplo: 320123"
+      contentType:
+        type: string
+        description: "Tipo do arquivo (MimeType) | Exemplo: application/pdf"
+        example: application/pdf
+      links:
+        type: array
+        description: Link para realizar o download do arquivo
+        items:
+          $ref: "#/definitions/LinkAttachment"
+  LinkAttachment:
+    type: object
+    properties:
+      rel:
+        type: string
+        description: Nome da recurso associado
+        example: contentDownloadLink
+      href:
+        type: string
+        description: URL do recurso associado
+        example: "http://../v1/sales-contracts/1202/attachments/1"

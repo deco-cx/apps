@@ -1,0 +1,121 @@
+swagger: "2.0"
+info:
+  description: API de geração do total do saldo devedor presente do cliente
+  version: 1.0.0
+  title: Saldo Devedor Presente do Cliente (Total)
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Total saldo devedor presente
+    description: API de geração do total do saldo devedor presente do cliente
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /total-current-debit-balance:
+    get:
+      tags:
+        - Total saldo devedor presente
+      summary: >-
+        Gera as informações referentes ao total do saldo devedor presente do cliente informado.
+      operationId: getTotalCurrentDebitBalance
+      produces:
+        - application/json
+      parameters:
+        - name: cpf
+          required: false
+          in: query
+          description: >-
+            CPF do cliente físico sem formatação (somente números). Exemplo:77415844483. CNPJ e CPF são mutualmente excludentes.
+          type: string
+        - name: cnpj
+          required: false
+          in: query
+          description: >-
+            CNPJ do cliente jurídico sem formatação(somente números). Exemplo: 21427113000148. CNPJ e CPF são mutualmente excludentes.
+          type: string
+        - name: correctionDate
+          required: false
+          in: query
+          description: >-
+            Correção até.
+            Corrige o saldo devedor do cliente até a data informada.
+            Se o parâmetro não for fornecido, será considerada a data atual.
+          format: yyyy-MM-dd
+          type: string
+        - name: conditionIdIn
+          required: false
+          in: query
+          description: >-
+            Id das condições de pagamento para incluir na consulta (Exemplo: AT, PM) |
+            Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com as mesmas condições de pagamento informadas no parâmetro.
+          type: array
+          items:
+            type: string
+        - name: conditionIdNotIn
+          required: false
+          in: query
+          description: >-
+            Id das condições de pagamento para excluir da consulta (Exemplo: AT, PM) |
+            Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com condições de pagamento diferentes das informadas no parâmetro. | Obs: O parâmetro 'conditionIdIn' tem prioridade sobre este, caso sejam preenchidos os parâmetros 'conditionIdIn' e 'conditionIdNotIn', será aplicado o filtro do parâmetro 'conditionIdIn' e ignorada a informação preenchida no parâmetro 'conditionIdNotIn'.
+          type: array
+          items:
+            type: string
+        - name: receivableBillsIds
+          required: false
+          in: query
+          description: >-
+            Lista com os números dos títulos a serem considerados no cálculo.
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Total do saldo devedor presente gerado
+          schema:
+            $ref: "#/definitions/TotalSaldoDevedor"
+        "404":
+          description: Cliente físico ou jurídico inválido
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  TotalSaldoDevedor:
+    type: object
+    properties:
+      totalOriginalValue:
+        type: number
+        format: double
+        description: Total do valor original
+      totalAdjustedValue:
+        type: number
+        format: double
+        description: Total do valor corrigido
+      totalAdditionalValue:
+        type: number
+        format: double
+        description: Total do valor com acréscimos
+      totalCurrentDebitBalanceValue:
+        type: number
+        format: double
+        description: Total do saldo de débito atual
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário

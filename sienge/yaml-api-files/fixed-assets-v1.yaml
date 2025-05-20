@@ -1,0 +1,260 @@
+swagger: "2.0"
+info:
+  description: API de listagem de bens imóveis
+  version: "1.0"
+  title: Bens imóveis
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Bens imóveis
+    description: API de listagem de bens imóveis
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /patrimony/fixed:
+    get:
+      operationId: getPatrimonyFixed
+      tags:
+        - Bens imóveis
+      description: Lista os bens ordenados por código do patrimônio.
+      produces:
+        - application/json
+      parameters:
+        - name: patrimonyId
+          in: query
+          type: integer
+          description: Código do patrimônio.
+        - name: costCenter
+          in: query
+          type: string
+          description: Empreendimento/Centro de custo
+        - name: detail
+          in: query
+          type: string
+          description: Detalhamento
+        - name: situation
+          in: query
+          type: string
+          enum: [A, B]
+          description: Situação do bem podendo ser A - Ativo ou B - Baixados
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/PaginationResult"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  PaginationResult:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista dos bens retornados como resultado da pesquisa
+        items:
+          $ref: "#/definitions/FixedAssets"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API
+  FixedAssets:
+    type: object
+    properties:
+      patrimonyId:
+        type: integer
+        description: Código do patrimônio
+        example: 10
+      detail:
+        type: string
+        description: Detalhamento
+        example: Detalhe do bem
+      observation:
+        type: string
+        description: Observação
+      costCenter:
+        type: integer
+        description: Centro de custo
+        example: 5
+      situation:
+        type: string
+        description: Situação do bem
+        example: A
+      preservation:
+        type: string
+        description: Estado de conservação
+      propertyRegistration:
+        type: string
+        description: Matrícula do imóvel
+        example: "55665d511aa"
+      landRegistration:
+        type: string
+        description: Local de registro
+        example: "Local XYZ"
+      previousOswner:
+        type: string
+        description: Proprietário anterior
+        example: "Nome do proprietário anterior"
+      privateArea:
+        type: number
+        description: Área privativa
+        example: 450
+      commonArea:
+        type: number
+        description: Área comum
+        example: 200
+      address:
+        type: string
+        description: Endereço
+        example: "Rua XYZ"
+      addressNumber:
+        type: string
+        description: Número
+        example: "90"
+      addressComplement:
+        type: string
+        description: Complemento
+        example: "Apto 5"
+      neighborhood:
+        type: string
+        description: Bairro
+        example: "Centro"
+      city:
+        type: string
+        description: Cidade
+        example: "Florianópolis"
+      postalCode:
+        type: string
+        description: CEP
+        example: "88132770"
+      incorporationForm:
+        type: string
+        description: Forma de incorporação
+        example: Compra
+      incorporationDate:
+        type: string
+        description: Data da incorporação
+        example: 2021-01-05
+      incorporationValue:
+        type: number
+        description: Valor da incorporação
+        example: 5000
+      accountancyIncorporationAccount:
+        type: string
+        description: Conta de incorporação
+        example: 1.01.02.01
+      accountancyIdentity:
+        type: string
+        description: Identificação
+        example: Máquinas
+      accountancyOrigin:
+        type: string
+        description: Origem
+        example: Aquisição no Mercado Interno
+      accountancyUsageIndicator:
+        type: string
+        description: Indicador da utilização
+        example: Produção de Bens Destinados a Venda
+      depreciationInitialDate:
+        type: string
+        description: Data de início da depreciação
+        example: 2020-11-10
+      depreciationDebitAccount:
+        type: string
+        description: Despesa de depreciação (Débito)
+        example: 1.01.02.01
+      depreciationCreditAccount:
+        type: string
+        description: Depreciação acumulada (Crédito)
+        example: 1.01.02.01
+      depreciationValue:
+        type: integer
+        description: Depreciação (%)
+        example: 32
+      depreciationLastDate:
+        type: string
+        description: Data da última depreciação
+        example: 2022-02-01
+      depreciationActualValue:
+        type: number
+        description: Valor atual da depreciação
+        example: 600.50

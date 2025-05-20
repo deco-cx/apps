@@ -1,0 +1,460 @@
+swagger: "2.0"
+info:
+  description: API de Locação de Imóveis.
+  version: 1.0.0
+  title: Locação de Imóveis
+host: api.sienge.com.br
+basePath: "/{subdomain-do-cliente}/public/api/v1"
+tags:
+  - name: Locação de Imóveis
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /property-rental:
+    get:
+      tags:
+        - Locação de Imóveis
+      summary: Lista de locação de imóveis.
+      operationId: get
+      parameters:
+        - in: query
+          name: offset
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - in: query
+          name: limit
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: contractSeqId
+          in: query
+          type: integer
+          required: false
+          description: "Filtrar por código sequencial do contrato"
+        - name: companyId
+          in: query
+          type: integer
+          required: false
+          description: "Filtrar por código da empresa"
+        - name: enterpriseId
+          in: query
+          type: integer
+          required: false
+          description: "Filtrar por código de empreendimento"
+        - name: rentalContractNumber
+          in: query
+          type: string
+          required: false
+          description: "Filtrar por código do contrato"
+        - name: unitId
+          in: query
+          type: integer
+          required: false
+          description: "Filtrar por código da unidade"
+        - name: customerId
+          in: query
+          type: integer
+          required: false
+          description: "Filtrar por código do cliente"
+        - name: situation
+          in: query
+          type: string
+          enum: [SOLICITADO, AUTORIZADO, EMITIDO, FINALIZADO, CANCELADO]
+          required: false
+          description: "Filtrar por situação"
+          items:
+            enum: [SOLICITADO, AUTORIZADO, EMITIDO, FINALIZADO, CANCELADO]
+      responses:
+        "200":
+          description: Lista de contrato de locação de imóveis
+          schema:
+            $ref: "#/definitions/ListPropertyRental"
+    post:
+      tags:
+        - Locação de Imóveis
+      summary: Cria contrato de locação de imóveis.
+      operationId: post
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: "#/definitions/BodyPostPorpertyRental"
+      responses:
+        "201":
+          description: Contrato criado
+definitions:
+  BodyPostPorpertyRental:
+    type: object
+    required: [
+      companyId,
+      enterpriseId,
+      rentalContractNumber,
+      paymentCategoriesId,
+      contractDate,
+      accountDate,
+      initialRentalDate,
+      finalRentalDate,
+      paymentCondition,
+      rentalContractUnits,
+      rentalContractCustomers,
+    ]
+    properties:
+      companyId:
+        type: integer
+        format: int32
+        description: Código da empresa.
+      enterpriseId:
+        type: integer
+        format: int32
+        description: Código do empreendimento.
+      rentalContractNumber:
+        type: string
+        maxLength: 12
+        description: Número do contrato.
+      paymentCategoriesId:
+        type: string
+        description: Plano financeiro.
+      contractDate:
+        type: string
+        description: Data do contrato.
+      accountDate:
+        type: string
+        description: Data contábil.
+      initialRentalDate:
+        type: string
+        description: Data inicial do contrato.
+      finalRentalDate:
+        type: string
+        description: Data final do contrato.
+      allowReadjustment:
+        type: boolean
+        description: Editar Reajuste.
+      allowEditInstallment:
+        type: boolean
+        description: Editar Parcelas.
+      note:
+        type: string
+        maxLength: 4000
+        description: Observação.
+      paymentCondition:
+        type: object
+        required: [
+          conditionTypeId,
+          installmentBaseValue,
+          installmentsNumber,
+          firstPayment,
+          bearerId,
+        ]
+        properties:
+          conditionTypeId:
+            type: string
+            description: Tipo de condição.
+          installmentBaseValue:
+            type: number
+            description: Valor da parcela.
+          installmentsNumber:
+            type: integer
+            description: Quantidade de parcelas.
+          firstPayment:
+            type: string
+            description: Data do primeiro vencimento.
+          bearerId:
+            type: integer
+            description: Código do portador.
+      installments:
+        type: array
+        items:
+          type: object
+          required: [dueDate, amount]
+          properties:
+            amount:
+              type: number
+              description: Valor da parcela.
+            dueDate:
+              type: string
+              description: Data de vencimento.
+      readjustment:
+        type: object
+        properties:
+          indexerId:
+            type: integer
+            description: Código do indexador.
+          baseDate:
+            type: string
+            description: Data base do reajuste.
+          frequencyFromFirstPayment:
+            type: boolean
+            description: Considerar frequência de reajuste das parcelas a partir da data do primeiro vencimento.
+          frequencyReadjustmentMonths:
+            type: integer
+            description: Frequência de reajuste em meses
+          formOfReajustment:
+            type: string
+            enum: [MANUAL, AUTOMATICO]
+            description: Forma de reajuste.
+          readjustmentType:
+            type: string
+            enum: [VARIACAO_INDEXADOR, PERCENTUAL_FIXO]
+            description: Tipo de reajuste.
+          fixPercentage:
+            type: number
+            description: Percentual fixo (É obrigatório quando readjustmentType for igual a PERCENTUAL_FIXO).
+      units:
+        type: array
+        items:
+          type: object
+          required: [id, participationPercentage, main]
+          properties:
+            id:
+              type: integer
+              description: Código da unidade.
+            participationPercentage:
+              type: number
+              description: Percentual de participação.
+            main:
+              type: boolean
+              description: Unidade principal.
+      customers:
+        type: array
+        items:
+          type: object
+          required: [id, participationPercentage, main]
+          properties:
+            id:
+              type: integer
+              description: Código do cliente.
+            participationPercentage:
+              type: number
+              description: Percentual de participação.
+            main:
+              type: boolean
+              description: Cliente principal.
+  ListPropertyRental:
+    type: object
+    properties:
+      resultSetMetadata:
+        type: object
+        properties:
+          count:
+            type: integer
+            format: int32
+          offset:
+            type: integer
+            format: int32
+          limit:
+            type: integer
+            format: int32
+      results:
+        type: array
+        items:
+          type: object
+          properties:
+            contractSeqId:
+              type: integer
+              format: int32
+              description: Código do contrato.
+            companyId:
+              type: integer
+              format: int32
+              description: Código da empresa.
+            enterpriseId:
+              type: integer
+              format: int32
+              description: Código do empreendimento.
+            rentalContractNumber:
+              type: string
+              description: Número do contrato.
+            paymentCategoriesId:
+              type: string
+              description: Plano financeiro.
+            contractDate:
+              type: string
+              description: Data do contrato.
+            accountDate:
+              type: string
+              description: Data contábil.
+            initialRentalDate:
+              type: string
+              description: Período inicial de locação.
+            finalRentalDate:
+              type: string
+              description: Período final de locação.
+            terminatedDate:
+              type: string
+              description: Data de encerramento da locação.
+            cancelatedDate:
+              type: string
+              description: Data de cancelamento d locação.
+            rentalTime:
+              type: integer
+              description: Número de meses da locação.
+            note:
+              type: string
+              description: Observação.
+            receivableBillId:
+              type: integer
+              description: Código do título.
+            situation:
+              type: string
+              description: Situação
+            rentalContractUnits:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int32
+                    description: Código da unidade.
+                  name:
+                    type: string
+                    description: Nome da unidade.
+                  participationPercentage:
+                    type: number
+                    description: Percentual de participação.
+                  main:
+                    type: boolean
+                    description: Unidade principal.
+            rentalContractCustomers:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int32
+                    description: Código do cliente.
+                  name:
+                    type: string
+                    description: Nome do cliente.
+                  participationPercentage:
+                    type: number
+                    description: Percentual de participação.
+                  main:
+                    type: boolean
+                    description: Cliente principal.
+            paymentCondition:
+              type: object
+              properties:
+                conditionTypeId:
+                  type: string
+                  description: Código do tipo de condição.
+                conditionTypeName:
+                  type: string
+                  description: Tipo de condição.
+                installmentBaseValue:
+                  type: number
+                  description: Valor base das parcelas.
+                installmentsNumber:
+                  type: integer
+                  description: Número de parcelas.
+                totalValue:
+                  type: number
+                  description: Valor total das parcelas.
+                firstPayment:
+                  type: string
+                  description: Data do primeiro vencimento.
+                bearerId:
+                  type: integer
+                  description: Código do portador.
+            contractReadjustmentInformation:
+              type: object
+              properties:
+                indexerId:
+                  type: integer
+                  description: Código do indexador.
+                baseDate:
+                  type: string
+                  description: Data base reajuste .
+                lastReadjustmentDate:
+                  type: string
+                  description: Data último reajuste.
+                frequencyFromFirstPayment:
+                  type: boolean
+                  description: Flag frequência a partir do primeiro vencimento.
+                frequencyReadjustmentMonths:
+                  type: integer
+                  description: Meses da frequência de reajuste.
+                readjustmentType:
+                  type: string
+                  description: Tipo de reajuste.
+                formOfReajustment:
+                  type: string
+                  description: Forma de reajuste.
+                fixPercentage:
+                  type: number
+                  description: Percentual de reajuste.
+            contractTermination:
+              type: object
+              properties:
+                terminationType:
+                  type: string
+                  description: Tipo de encerramento - Manual ou Automático.
+                applyContractTerminationClause:
+                  type: boolean
+                  description: Aplicar cláusula de rescisão contratual.
+                fineApplicationMonths:
+                  type: integer
+                  description: Número de meses para a aplicação de multa.
+                fineValue:
+                  type: number
+                  description: Valor da multa.
+            additions:
+              type: object
+              properties:
+                lateInterestCalculationType:
+                  type: string
+                  description: Tipo de acréscimo.
+                dailyLateInterestValue:
+                  type: number
+                  description: Valor da mora dia.
+                proRataIndexer:
+                  type: integer
+                  description: Indexador pro rata.
+                interestPercentage:
+                  type: number
+                  description: Taxa de juros.
+                interestType:
+                  type: string
+                  description: Tipo de juros.
+                fineRate:
+                  type: number
+                  description: Percentual de multa.
+                fineValueWithInterestRate:
+                  type: boolean
+                  description: Cálculo sobre o valor corrigido + valor dos juros.
+                insurance:
+                  type: string
+                  description: Tipo de seguro.
+                insuranceValue:
+                  type: number
+                  description: Valor do seguro.
+                administrateTax:
+                  type: number
+                  description: Valor da taxa administrativa.
+            discount:
+              type: object
+              properties:
+                discountType:
+                  type: string
+                  description: Tipo de desconto.
+                discountPercentage:
+                  type: number
+                  description: Percentual de desconto.

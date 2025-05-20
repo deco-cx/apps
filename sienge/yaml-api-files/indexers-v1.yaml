@@ -1,0 +1,138 @@
+swagger: "2.0"
+info:
+  description: API de indexadores.
+  version: 1.0.0
+  title: Indexadores
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /indexers:
+    get:
+      tags:
+        - Indexadores
+      summary: Busca uma lista de indexadores
+      operationId: getIndexers
+      parameters:
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default são 100 e o valor máximo permitdo são 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default são 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Indexadores encontrados
+          schema:
+            $ref: "#/definitions/GetResponseDocument"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  Indexer:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código
+      name:
+        type: string
+        description: Nome
+      revenueRetroactivity:
+        type: number
+        description: Retroatividade de receitas
+      lastValue:
+        type: object
+        description: Último valor de indexador cadastrado
+        properties:
+          date:
+            type: string
+            description: Data
+          value:
+            type: number
+            description: Valor
+          percentage:
+            type: number
+            description: Percentual
+  GetResponseDocument:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de indexadores retornados como resultado da pesquisa
+        items:
+          $ref: "#/definitions/Indexer"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default são 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade mÃ¡xima de resultados da pesquisa a serem retornados. Valor
+          default são 100 e o valor máximo permitdo são 200.
+        minimum: 1
+        maximum: 200
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.

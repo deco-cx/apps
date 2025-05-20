@@ -1,0 +1,403 @@
+swagger: "2.0"
+info:
+  description: API de geração do saldo devedor presente do cliente
+  version: 1.0.0
+  title: Geração do Saldo Devedor Presente do Cliente
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Saldo devedor presente
+    description: API de geração do saldo devedor presente do cliente
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /current-debit-balance:
+    get:
+      tags:
+        - Saldo devedor presente
+      summary: >-
+        Gera as informações referentes ao saldo devedor presente do cliente informado.
+      operationId: getCurrentDebtiBalance
+      produces:
+        - application/json
+      parameters:
+        - name: cpf
+          in: query
+          description: >-
+            CPF do cliente físico sem formatação (somente números). Possui precedência sobre o parâmetro <code>cnpj</code>.<br>
+            <b>Exemplo</b>:77415844483
+          required: false
+          type: string
+        - name: cnpj
+          in: query
+          description: >-
+            CNPJ do cliente jurídico sem formatação (somente números). Ignorado quando o parãmetro <code>cpf</code> está preenchido.<br>
+            <b>Exemplo</b>:21427113000148
+          required: false
+          type: string
+        - name: dueDateStart
+          in: query
+          type: string
+          format: date
+          required: false
+          description: Data inicial de vencimento das parcelas.<br>
+            (yyyy-MM-dd)
+        - name: dueDateEnd
+          in: query
+          type: string
+          format: date
+          required: false
+          description: Data final de vencimento das parcelas.<br>
+            (yyyy-MM-dd)
+        - name: generatedBoleto
+          in: query
+          type: boolean
+          required: false
+          description: Filtra as parcelas que possuem boletos gerados (<code>true</code>) ou que não possuem nenhum boleto gerado (<code>false</code>).
+        - name: numberTitle
+          in: query
+          type: integer
+          required: false
+          description: Filtra as parcelas pelo Número do Titulo enviado.
+        - name: correctionDate
+          in: query
+          description: Data para correção do indexador. Se o parâmetro não for fornecido, será considerada a data atual.
+          required: false
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-06-30)"
+        - name: correctAnnualInstallment
+          in: query
+          type: string
+          required: false
+          description: Para aplicar o cálculo de correção anual enviar esse parametro com o valor <code>"S"</code>
+          default: <code>"N"</code>
+        - name: conditionIdIn
+          required: false
+          in: query
+          description: >-
+            Id das condições de pagamento para incluir na consulta (Exemplo: AT, PM) |
+            Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com as mesmas condições de pagamento informadas no parâmetro.
+          type: array
+          items:
+            type: string
+        - name: conditionIdNotIn
+          required: false
+          in: query
+          description: >-
+            Id das condições de pagamento para excluir da consulta (Exemplo: AT, PM) |
+            Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com condições de pagamento diferentes das informadas no parâmetro. | Obs: O parâmetro 'conditionIdIn' tem prioridade sobre este, caso sejam preenchidos os parâmetros 'conditionIdIn' e 'conditionIdNotIn', será aplicado o filtro do parâmetro 'conditionIdIn' e ignorada a informação preenchida no parâmetro 'conditionIdNotIn'.
+          type: array
+          items:
+            type: string
+        - name: costCenterIdIn
+          required: false
+          in: query
+          description: >-
+            Id dos centros de custo para incluir na consulta (Exemplo: 1,2,3) |
+            Preenchendo este parâmetro, serão considerados somente os centros de custo cadastrados com os mesmos códigos informados no parâmetro.
+          type: array
+          items:
+            type: integer
+        - name: costCenterIdNotIn
+          required: false
+          in: query
+          description: >-
+            Id dos centros de custo para excluir da consulta (Exemplo: 1,2,3) |
+            Preenchendo este parâmetro, serão considerados somente os centros de custo cadastrados com os códigos diferentes dos informados no parâmetro. | Obs: O parâmetro 'costCenterIdIn' tem prioridade sobre este, ou seja, caso sejam preenchidos os parâmetros 'costCenterIdIn' e 'costCenterIdNotIn', será aplicado o filtro do parâmetro 'costCenterIdIn' e ignorada a informação preenchida no parâmetro 'costCenterIdNotIn'.
+          type: array
+          items:
+            type: integer
+        - name: unitNumber
+          in: query
+          type: string
+          required: false
+          description: Número da unidade. Caso os filtros costCenterIdIn e costCenterIdNotIn sejam preenchidos considera se a unidade informada pertence a lista de centros de custo.
+      responses:
+        "200":
+          description: Saldo devedor presente gerado
+          schema:
+            $ref: "#/definitions/SaldoDevedor"
+        "404":
+          description: Cliente físico ou jurídico invÃ¡lido
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  /current-debit-balance/pdf:
+    get:
+      tags:
+        - Saldo devedor presente
+      summary: >-
+        Gera o link para o download do PDF referente ao Saldo Devedor Presente do cliente. O link expira em 5 minutos.
+      operationId: linkCurrentDebitBalance
+      produces:
+        - application/json
+      parameters:
+        - name: customerId
+          required: true
+          in: query
+          description: >-
+            Código do cliente
+          type: integer
+        - name: numberTitle
+          in: query
+          type: integer
+          required: false
+          description: Filtra as parcelas pelo Número do Titulo enviado.
+        - name: unitNumber
+          in: query
+          type: string
+          required: false
+          description: Número da unidade.
+        - name: correctionDate
+          in: query
+          description: Data para correção do indexador. Se o parâmetro não for fornecido, será considerada a data atual.
+          required: false
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-06-30)"
+        - name: conditionIdIn
+          required: false
+          in: query
+          description: >-
+            Id das condições de pagamento para incluir na consulta (Exemplo: AT, PM) |
+            Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com as mesmas condições de pagamento informadas no parâmetro.
+          type: array
+          items:
+            type: string
+        - name: conditionIdNotIn
+          required: false
+          in: query
+          description: >-
+            Id das condições de pagamento para excluir da consulta (Exemplo: AT, PM) |
+            Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com condições de pagamento diferentes das informadas no parâmetro. | Obs: O parâmetro 'conditionIdIn' tem prioridade sobre este, caso sejam preenchidos os parâmetros 'conditionIdIn' e 'conditionIdNotIn', será aplicado o filtro do parâmetro 'conditionIdIn' e ignorada a informação preenchida no parâmetro 'conditionIdNotIn'.
+          type: array
+          items:
+            type: string
+        - name: customerPortalBills
+          required: false
+          in: query
+          description: >-
+            Flag utilizada para indicar se serão apresentadas apenas as parcelas com origem Comercial e Locações e com documento "CT". | Obs: Caso não seja informado, considerado verdadeiro.
+          type: boolean
+        - name: documentIdIn
+          required: false
+          in: query
+          description: >-
+            Id dos documentos para incluir na consulta (Exemplo: CT, NF) |
+            Preenchendo este parâmetro serão considerados somente os títulos cadastrados com um dos documentos informados neste parâmetro.
+          type: array
+          items:
+            type: string
+        - name: documentIdNotIn
+          required: false
+          in: query
+          description: >-
+            Id dos documentos para excluir da consulta (Exemplo: CT, NF) |
+            Preenchendo este parâmetro serão considerados somente os títulos cadastrados com o documento diferente das informadas no parâmetro. | Obs: O parâmetro 'customerPortalBills' tem prioridade sobre este, caso seja preenchido o parâmetros 'customerPortalBills' com o valor falso, será aplicado o filtro do parâmetro 'documentIdIn' incluindo os documentos 'CT' e ignorada a informação preenchida no parâmetro 'documentIdNotIn'.
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Saldo devedor presente gerado com sucesso
+          schema:
+            $ref: "#/definitions/Results"
+        "404":
+          description: Saldo devedor presente não gerado
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+
+definitions:
+  SaldoDevedor:
+    type: object
+    properties:
+      billReceivableId:
+        type: integer
+      documentId:
+        type: string
+        description: exemplo. ('CT')
+      paidInstallments:
+        type: array
+        items:
+          $ref: "#/definitions/PaidInstallmentInsert"
+        description: Parcelas pagas
+      dueInstallments:
+        type: array
+        items:
+          $ref: "#/definitions/InstallmentInsert"
+        description: Parcelas não pagas
+      payableInstallments:
+        type: array
+        items:
+          $ref: "#/definitions/InstallmentInsert"
+        description: Parcelas a pagar
+  InstallmentInsert:
+    type: object
+    properties:
+      installmentId:
+        type: integer
+        format: int32
+        description: Código da parcela
+      currentBalance:
+        type: number
+        format: double
+        description: Valor atual
+      latePaymentInterest:
+        type: number
+        format: double
+        description: Percentual de encargos de mora (multa + juros)
+      adjustedValue:
+        type: number
+        format: double
+        description: Valor corrigido
+      additionalValue:
+        type: number
+        format: double
+        description: Valor do acréscimo
+      originalValue:
+        type: number
+        format: double
+        description: Valor original
+      monetaryCorrectionValue:
+        type: number
+        format: double
+        description: Valor da correção monetária da parcela.
+      conditionType:
+        type: string
+        description: Tipo de condição da Parcela.
+      indexerCode:
+        type: integer
+        description: Código do indexador.
+      indexerName:
+        type: string
+        description: Nome do indexador.
+      baseDateOfCorrection:
+        type: string
+        description: Data base da correção monetária
+      indexerValueBaseDate:
+        type: number
+        format: double
+        description: Valor do indexador na data base.
+      indexerValueCalculationDate:
+        type: number
+        format: double
+        description: Valor do indexador na data cálculo.
+      installmentNumber:
+        type: string
+        description: Numero "sequencial" das parcelas 1, 2, 3, ou por "Condição de Pagamento" 1/2, 2/2... (Resultado será apresentado conforme Parâmetro 651).
+
+  PaidInstallmentInsert:
+    type: object
+    properties:
+      installmentId:
+        type: integer
+        format: int32
+        description: Código da parcela
+      currentBalance:
+        type: number
+        format: double
+        description: Valor atual
+      latePaymentInterest:
+        type: number
+        format: double
+        description: Percentual de encargos de mora (multa + juros)
+      adjustedValue:
+        type: number
+        format: double
+        description: Valor corrigido
+      additionalValue:
+        type: number
+        format: double
+        description: Valor do acréscimo
+      originalValue:
+        type: number
+        format: double
+        description: Valor original
+      monetaryCorrectionValue:
+        type: number
+        format: double
+        description: Valor da correção monetária da parcela.
+      conditionType:
+        type: string
+        description: Tipo de condição da Parcela.
+      indexerCode:
+        type: integer
+        description: Código do indexador.
+      indexerName:
+        type: string
+        description: Nome do indexador.
+      baseDateOfCorrection:
+        type: string
+        description: Data base da correção monetária
+      indexerValueBaseDate:
+        type: number
+        format: double
+        description: Valor do indexador na data base.
+      installmentNumber:
+        type: string
+        description: Numero "sequencial" das parcelas 1, 2, 3, ou por "Condição de Pagamento" 1/2, 2/2... (Resultado será apresentado conforme Parâmetro 651).
+      receipts:
+        type: array
+        items:
+          $ref: "#/definitions/Receipt"
+
+  Receipt:
+    type: object
+    properties:
+      receiptId:
+        type: integer
+        format: int32
+        description: Código do recebimento
+      receiptDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd)"
+        description: Data de recebimento
+        example: "2018-12-22"
+      receiptValue:
+        type: number
+        format: double
+        description: Valor do recebimento
+      monetaryCorrectionValue:
+        type: number
+        format: double
+        description: Valor da correção monetária da baixa
+      calculationDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd)"
+        description: Data de recebimento
+        example: "2020-08-01"
+      indexerValueCalculationDate:
+        type: number
+        format: double
+        description: Valor do indexador na data cálculo.
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+
+  Results:
+    type: object
+    properties:
+      urlReport:
+        type: string
+        description: Url para download do PDF referente ao Saldo Devedor.

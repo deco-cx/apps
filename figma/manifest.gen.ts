@@ -2,23 +2,21 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/components.ts";
-import * as $$$1 from "./loaders/image-fills.ts";
-import * as $$$2 from "./loaders/images.ts";
-import * as $$$3 from "./loaders/nodes.ts";
-import * as $$$4 from "./loaders/profile.ts";
-import * as $$$5 from "./loaders/simplified-nodes.ts";
-import * as $$$6 from "./loaders/simplified.ts";
+import * as $$$0 from "./loaders/getComponents.ts";
+import * as $$$1 from "./loaders/getImagesToFills.ts";
+import * as $$$2 from "./loaders/getNodes.ts";
+import * as $$$3 from "./loaders/getSimplifiedNodes.ts";
+import * as $$$4 from "./loaders/getSpecificnNodeimage.ts";
+import * as $$$5 from "./loaders/simplified.ts";
 
 const manifest = {
   "loaders": {
-    "figma/loaders/components.ts": $$$0,
-    "figma/loaders/image-fills.ts": $$$1,
-    "figma/loaders/images.ts": $$$2,
-    "figma/loaders/nodes.ts": $$$3,
-    "figma/loaders/profile.ts": $$$4,
-    "figma/loaders/simplified-nodes.ts": $$$5,
-    "figma/loaders/simplified.ts": $$$6,
+    "figma/loaders/getComponents.ts": $$$0,
+    "figma/loaders/getImagesToFills.ts": $$$1,
+    "figma/loaders/getNodes.ts": $$$2,
+    "figma/loaders/getSimplifiedNodes.ts": $$$3,
+    "figma/loaders/getSpecificnNodeimage.ts": $$$4,
+    "figma/loaders/simplified.ts": $$$5,
   },
   "name": "figma",
   "baseUrl": import.meta.url,
