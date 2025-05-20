@@ -167,14 +167,14 @@ export default async function action(
       message: "Transmissão criada com sucesso",
       broadcast,
     };
-  } catch (error) {
-    console.error("Erro ao criar transmissão:", error);
+  } catch (error: unknown) {
+    let message = "Erro desconhecido";
+    if (error instanceof Error) {
+      message = error.message;
+    }
     return {
       success: false,
-      message: `Erro ao criar transmissão: ${
-        error.message || "Erro desconhecido"
-      }`,
-      error,
+      message,
     };
   }
 }

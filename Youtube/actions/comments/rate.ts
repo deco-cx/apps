@@ -71,11 +71,14 @@ const action = async (
       success: true,
       message: `Comentário avaliado com sucesso: ${rating}`,
     };
-  } catch (error) {
-    console.error("Erro ao processar a avaliação do comentário:", error);
+  } catch (error: unknown) {
+    let message = "Erro desconhecido";
+    if (error instanceof Error) {
+      message = error.message;
+    }
     return {
       success: false,
-      message: `Erro ao avaliar comentário: ${error.message}`,
+      message: `Erro ao avaliar comentário: ${message}`,
     };
   }
 };

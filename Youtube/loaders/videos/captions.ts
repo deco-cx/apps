@@ -1,6 +1,7 @@
 import type { AppContext } from "../../mod.ts";
 import type { YouTubeCaptionListResponse } from "../../utils/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
+import type { Client } from "../../utils/client.ts";
 
 export interface VideoCaptionsOptions {
   /**
@@ -86,7 +87,7 @@ export default async function loader(
   _req: Request,
   ctx: AppContext,
 ): Promise<CaptionResponse | null> {
-  const client = ctx.client;
+  const client = ctx.client as Client;
 
   if (!videoId) {
     return createErrorResponse(400, "Video ID is required");
@@ -159,7 +160,7 @@ function findCaptionToLoad(
 }
 
 async function loadCaption(
-  client: unknown,
+  client: Client,
   response: CaptionResponse,
   captionId: string,
   format: "srt" | "sbv" | "vtt",

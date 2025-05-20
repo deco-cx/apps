@@ -62,11 +62,14 @@ const action = async (
       message: "Resposta enviada com sucesso",
       comment: data,
     };
-  } catch (error) {
-    console.error("Erro ao processar a resposta ao comentário:", error);
+  } catch (error: unknown) {
+    let message = "Erro desconhecido";
+    if (error instanceof Error) {
+      message = error.message;
+    }
     return {
       success: false,
-      message: `Erro ao responder comentário: ${error.message}`,
+      message: `Erro ao responder comentário: ${message}`,
     };
   }
 };

@@ -76,13 +76,11 @@ export default async function action(
       return createErrorResponse(400, "Formato de imagem inválido");
     }
 
-    // Enviar a requisição para atualizar o thumbnail
-    const updateResponse = await fetch(
-      `https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId=${videoId}&uploadType=media`,
+    // Usar o client para upload do thumbnail
+    const updateResponse = await client["POST /thumbnails/set"](
+      { videoId, uploadType: "media" },
       {
-        method: "POST",
         headers: {
-          Authorization: `Bearer ${client.accessToken}`,
           "Content-Type": "image/jpeg, image/png, image/webp",
         },
         body: imageBase64 ? imageBase64 : imageBlob!,

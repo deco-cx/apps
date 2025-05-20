@@ -133,27 +133,28 @@ export default async function action(
 
       // Adicionar propriedades opcionais
       if (section.title) {
-        sectionBody.snippet.title = section.title;
+        (sectionBody.snippet as Record<string, unknown>).title = section.title;
       }
 
       if (section.position !== undefined) {
-        sectionBody.snippet.position = section.position;
+        (sectionBody.snippet as Record<string, unknown>).position =
+          section.position;
       }
 
       // Por padrão, mostrar para todos
       const localizable = {
         defaultLanguage: "pt-BR",
       };
-      sectionBody.localizations = { "pt-BR": localizable };
+      (sectionBody as Record<string, unknown>).localizations = {
+        "pt-BR": localizable,
+      };
 
       // Configurar visibilidade da seção
-      sectionBody.snippet.targetChannelId = "UC"; // Representa o próprio canal
+      (sectionBody.snippet as Record<string, unknown>).targetChannelId = "UC"; // Representa o próprio canal
 
       // Configurar para mostrar para usuários não inscritos (opcional)
       if (section.showForNotSubscribed !== undefined) {
-        // Se for true, configuramos para mostrar para todos
-        // Se for false, só mostra para inscritos
-        sectionBody.snippet.showForNonSubscribers =
+        (sectionBody.snippet as Record<string, unknown>).showForNonSubscribers =
           section.showForNotSubscribed;
       }
 
@@ -162,11 +163,13 @@ export default async function action(
         (section.type === "singlePlaylist" ||
           section.type === "multiplePlaylists") && section.playlists?.length
       ) {
-        sectionBody.contentDetails.playlists = section.playlists;
+        (sectionBody.contentDetails as Record<string, unknown>).playlists =
+          section.playlists;
       }
 
       if (section.type === "multipleChannels" && section.channels?.length) {
-        sectionBody.contentDetails.channels = section.channels;
+        (sectionBody.contentDetails as Record<string, unknown>).channels =
+          section.channels;
       }
 
       // Enviar a requisição para adicionar ou atualizar a seção
@@ -240,14 +243,13 @@ export default async function action(
 
     return result;
   } catch (error: unknown) {
-    console.error(
-      "Erro ao processar a configuração das seções do canal:",
-      error,
-    );
-    let message = "Erro ao processar a solicitação";
+    let message = "Erro desconhecido";
     if (error instanceof Error) {
-      message = `Erro ao processar a solicitação: ${error.message}`;
+      message = error.message;
     }
+    console.error(
+      `Erro ao atualizar seção do canal: ${message}`,
+    );
     return {
       success: false,
       message,

@@ -119,14 +119,14 @@ export default async function action(
       message: "Miniatura atualizada com sucesso",
       thumbnails: responseData.items?.[0] || responseData,
     };
-  } catch (error) {
-    console.error("Erro ao atualizar miniatura:", error);
+  } catch (error: unknown) {
+    let message = "Erro desconhecido";
+    if (error instanceof Error) {
+      message = error.message;
+    }
     return {
       success: false,
-      message: `Erro ao atualizar miniatura: ${
-        error.message || "Erro desconhecido"
-      }`,
-      error,
+      message,
     };
   }
 }

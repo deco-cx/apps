@@ -192,14 +192,14 @@ export default async function action(
       message: "Transmissão atualizada com sucesso",
       broadcast: updatedBroadcast,
     };
-  } catch (error) {
-    console.error("Erro ao atualizar transmissão:", error);
+  } catch (error: unknown) {
+    let message = "Erro desconhecido";
+    if (error instanceof Error) {
+      message = error.message;
+    }
     return {
       success: false,
-      message: `Erro ao atualizar transmissão: ${
-        error.message || "Erro desconhecido"
-      }`,
-      error,
+      message,
     };
   }
 }

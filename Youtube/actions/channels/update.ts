@@ -252,11 +252,14 @@ export default async function action(
       message: "Canal atualizado com sucesso",
       channel: updatedChannelData.items?.[0],
     };
-  } catch (error) {
-    console.error("Erro ao processar a atualização do canal:", error);
+  } catch (error: unknown) {
+    let message = "Erro desconhecido";
+    if (error instanceof Error) {
+      message = error.message;
+    }
     return {
       success: false,
-      message: `Erro ao processar a solicitação: ${error.message}`,
+      message: `Erro ao processar a solicitação: ${message}`,
     };
   }
 }

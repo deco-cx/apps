@@ -1,4 +1,5 @@
 import { LiveBroadcast } from "../../utils/types.ts";
+import type { AppContext } from "../../mod.ts";
 
 export interface BindStreamParams {
   /**
@@ -26,6 +27,7 @@ export interface BindStreamResult {
 export default async function action(
   props: BindStreamParams,
   _req: Request,
+  ctx: AppContext,
 ): Promise<BindStreamResult> {
   const {
     broadcastId,
@@ -84,14 +86,14 @@ export default async function action(
       message: "Stream vinculado com sucesso à transmissão",
       broadcast,
     };
-  } catch (error) {
-    console.error("Erro ao vincular stream:", error);
+  } catch (error: unknown) {
+    let message = "Erro desconhecido";
+    if (error instanceof Error) {
+      message = error.message;
+    }
     return {
       success: false,
-      message: `Erro ao vincular stream: ${
-        error.message || "Erro desconhecido"
-      }`,
-      error,
+      message,
     };
   }
 }

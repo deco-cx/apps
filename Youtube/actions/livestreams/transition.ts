@@ -118,14 +118,14 @@ export default async function action(
       message: successMessage,
       broadcast,
     };
-  } catch (error) {
-    console.error(`Erro ao transicionar para ${transitionType}:`, error);
+  } catch (error: unknown) {
+    let message = "Erro desconhecido";
+    if (error instanceof Error) {
+      message = error.message;
+    }
     return {
       success: false,
-      message: `Erro ao alterar status da transmissão: ${
-        error.message || "Erro desconhecido"
-      }`,
-      error,
+      message,
     };
   }
 }

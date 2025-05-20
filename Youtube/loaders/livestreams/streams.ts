@@ -181,14 +181,14 @@ export default async function loader(
     }
 
     return data;
-  } catch (error) {
-    console.error("Erro ao listar streams:", error);
+  } catch (error: unknown) {
+    let message = "Erro desconhecido";
+    if (error instanceof Error) {
+      message = error.message;
+    }
     return {
       error: true,
-      message: `Erro inesperado ao listar streams: ${
-        error.message || "Erro desconhecido"
-      }`,
-      details: error,
+      message,
     };
   }
 }

@@ -112,12 +112,14 @@ export default async function action(
       message: "Stream criado com sucesso",
       stream,
     };
-  } catch (error) {
-    console.error("Erro ao criar stream:", error);
+  } catch (error: unknown) {
+    let message = "Erro desconhecido";
+    if (error instanceof Error) {
+      message = error.message;
+    }
     return {
       success: false,
-      message: `Erro ao criar stream: ${error.message || "Erro desconhecido"}`,
-      error,
+      message: `Erro ao criar stream: ${message}`,
     };
   }
 }

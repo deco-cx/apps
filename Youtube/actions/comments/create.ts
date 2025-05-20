@@ -153,15 +153,18 @@ const action = async (
           comment: commentData,
           pinned: true,
         };
-      } catch (pinError) {
-        console.error("Erro ao tentar pinar o comentário:", pinError);
+      } catch (pinError: unknown) {
+        let pinErrorMessage = "Erro desconhecido";
+        if (pinError instanceof Error) {
+          pinErrorMessage = pinError.message;
+        }
         return {
           success: true,
           message:
             "Comentário enviado com sucesso, mas ocorreu um erro ao piná-lo",
           comment: commentData,
           pinned: false,
-          error: pinError.message,
+          error: pinErrorMessage,
         };
       }
     }
@@ -172,11 +175,14 @@ const action = async (
       comment: commentData,
       pinned: false,
     };
-  } catch (error) {
-    console.error("Erro ao processar a requisição de comentário:", error);
+  } catch (error: unknown) {
+    let message = "Erro desconhecido";
+    if (error instanceof Error) {
+      message = error.message;
+    }
     return {
       success: false,
-      message: `Erro ao processar a requisição: ${error.message}`,
+      message: `Erro ao processar a requisição: ${message}`,
     };
   }
 };

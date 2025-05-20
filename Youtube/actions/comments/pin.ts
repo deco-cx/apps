@@ -146,11 +146,14 @@ const action = async (
       message: "Comentário pinado com sucesso",
       pinned: true,
     };
-  } catch (error) {
-    console.error("Erro ao pinar comentário:", error);
+  } catch (error: unknown) {
+    let message = "Erro desconhecido";
+    if (error instanceof Error) {
+      message = error.message;
+    }
     return {
       success: false,
-      message: `Erro ao processar a solicitação: ${error.message}`,
+      message: `Erro ao processar a solicitação: ${message}`,
       pinned: false,
     };
   }
