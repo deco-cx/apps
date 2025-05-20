@@ -108,11 +108,12 @@ export interface AuthClient {
   "POST /token": {
     response: youtubeTokenResponse;
     searchParams: {
-      code: string;
+      code?: string;
       client_id: string;
       client_secret: string;
-      redirect_uri: string;
+      redirect_uri?: string;
       grant_type: string;
+      refresh_token?: string;
     };
   };
 }

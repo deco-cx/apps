@@ -17,11 +17,12 @@ import * as $$$$$$$$$11 from "./actions/livestreams/transition.ts";
 import * as $$$$$$$$$12 from "./actions/livestreams/update.ts";
 import * as $$$$$$$$$13 from "./actions/livestreams/updateThumbnail.ts";
 import * as $$$$$$$$$14 from "./actions/oauth/callback.ts";
-import * as $$$$$$$$$15 from "./actions/videos/delete.ts";
-import * as $$$$$$$$$16 from "./actions/videos/list.ts";
-import * as $$$$$$$$$17 from "./actions/videos/update.ts";
-import * as $$$$$$$$$18 from "./actions/videos/updateCategory.ts";
-import * as $$$$$$$$$19 from "./actions/videos/updateThumbnail.ts";
+import * as $$$$$$$$$15 from "./actions/oauth/refreshToken.ts";
+import * as $$$$$$$$$16 from "./actions/videos/delete.ts";
+import * as $$$$$$$$$17 from "./actions/videos/list.ts";
+import * as $$$$$$$$$18 from "./actions/videos/update.ts";
+import * as $$$$$$$$$19 from "./actions/videos/updateCategory.ts";
+import * as $$$$$$$$$20 from "./actions/videos/updateThumbnail.ts";
 import * as $$$0 from "./loaders/analytics/channelStats.ts";
 import * as $$$1 from "./loaders/analytics/videoStats.ts";
 import * as $$$2 from "./loaders/channels/get.ts";
@@ -70,11 +71,12 @@ const manifest = {
     "youtube/actions/livestreams/update.ts": $$$$$$$$$12,
     "youtube/actions/livestreams/updateThumbnail.ts": $$$$$$$$$13,
     "youtube/actions/oauth/callback.ts": $$$$$$$$$14,
-    "youtube/actions/videos/delete.ts": $$$$$$$$$15,
-    "youtube/actions/videos/list.ts": $$$$$$$$$16,
-    "youtube/actions/videos/update.ts": $$$$$$$$$17,
-    "youtube/actions/videos/updateCategory.ts": $$$$$$$$$18,
-    "youtube/actions/videos/updateThumbnail.ts": $$$$$$$$$19,
+    "youtube/actions/oauth/refreshToken.ts": $$$$$$$$$15,
+    "youtube/actions/videos/delete.ts": $$$$$$$$$16,
+    "youtube/actions/videos/list.ts": $$$$$$$$$17,
+    "youtube/actions/videos/update.ts": $$$$$$$$$18,
+    "youtube/actions/videos/updateCategory.ts": $$$$$$$$$19,
+    "youtube/actions/videos/updateThumbnail.ts": $$$$$$$$$20,
   },
   "name": "youtube",
   "baseUrl": import.meta.url,
