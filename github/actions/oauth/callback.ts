@@ -8,14 +8,16 @@ interface Props {
   code: string;
   returnUrl?: string;
   redirectUri: string;
+  clientSecret: string;
 }
 
 export default async function callback(
-  { code, returnUrl, redirectUri}: Props,
+  { code, returnUrl, redirectUri, clientSecret }: Props,
   _req: Request,
   ctx: AppContext,
 ) {
   const currentCtx = await ctx.getConfiguration();
+  console.log(clientSecret);
   const response = await fetch(`${GITHUB_URL_OAUTH_ACCESS_TOKEN}`, {
     method: "POST",
     headers: {
@@ -24,7 +26,7 @@ export default async function callback(
     },
     body: JSON.stringify({
       client_id: CLIENT_ID,
-      client_secret: "9f15d6ad56ec05ffe64f17dcfa3ea0713c1c2d69",
+      client_secret: clientSecret,
       code,
       redirect_uri: redirectUri,
     }),
