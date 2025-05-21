@@ -39,55 +39,74 @@ export default async function action(
   urlencoded.append("newPassword", props.newPassword);
   urlencoded.append("authenticationToken", VtexSessionToken);
 
-  const response = await vcsDeprecated
-    ["POST /api/vtexid/pub/authentication/classic/setpassword"](
-      {
-        locale: segment?.payload.cultureInfo || "pt-BR",
-        scope: account,
-      },
-      {
-        body: urlencoded,
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/x-www-form-urlencoded",
+  try {
+    const response = await vcsDeprecated
+      ["POST /api/vtexid/pub/authentication/classic/setpassword"](
+        {
+          locale: segment?.payload.cultureInfo || "pt-BR",
+          scope: account,
         },
-      },
-    );
+        {
+          body: urlencoded,
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        },
+      );
+    console.log(response.ok);
 
-  if (!response.ok) {
-    throw new Error(
-      `Authentication request failed: ${response.status} ${response.statusText}`,
-    );
-  }
-
-  const data: AuthResponse = await response.json();
-  if (data.authStatus === "Success") {
-    const VTEXID_EXPIRES = data.expiresIn;
-
-    if (data.authCookie) {
-      setCookie(ctx.response.headers, {
-        name: data.authCookie.Name,
-        value: data.authCookie.Value,
-        httpOnly: true,
-        maxAge: VTEXID_EXPIRES,
-        path: "/",
-        secure: true,
-      });
+    if (!response.ok) {
+      throw new Error(
+        `Authentication request failed: ${response.status} ${response.statusText}`,
+      );
     }
 
-    if (data.accountAuthCookie) {
-      setCookie(ctx.response.headers, {
-        name: data.accountAuthCookie.Name,
-        value: data.accountAuthCookie.Value,
-        httpOnly: true,
-        maxAge: VTEXID_EXPIRES,
-        path: "/",
-        secure: true,
-      });
+    const data: AuthResponse = await response.json();
+    if (data.authStatus === "Success") {
+      const VTEXID_EXPIRES = data.expiresIn;
+
+      if (data.authCookie) {
+        setCookie(ctx.response.headers, {
+          name: data.authCookie.Name,
+          value: data.authCookie.Value,
+          httpOnly: true,
+          maxAge: VTEXID_EXPIRES,
+          path: "/",
+          secure: true,
+        });
+      }
+
+      if (data.accountAuthCookie) {
+        setCookie(ctx.response.headers, {
+          name: data.accountAuthCookie.Name,
+          value: data.accountAuthCookie.Value,
+          httpOnly: true,
+          maxAge: VTEXID_EXPIRES,
+          path: "/",
+          secure: true,
+        });
+      }
     }
+
+    await ctx.invoke.vtex.actions.session.editSession({});
+
+    return data;
+  } catch (error) {
+    const errorString = error.toString();
+    const jsonStr = errorString.substring(errorString.indexOf('{'));
+    const errorData = JSON.parse(jsonStr);
+
+    return {
+      authStatus: errorData.authStatus,
+      promptMFA: errorData.promptMFA,
+      clientToken: errorData.clientToken,
+      authCookie: errorData.authCookie,
+      accountAuthCookie: errorData.accountAuthCookie,
+      expiresIn: errorData.expiresIn,
+      userId: errorData.userId,
+      phoneNumber: errorData.phoneNumber,
+      scope: errorData.scope
+    };
   }
-
-  await ctx.invoke.vtex.actions.session.editSession({});
-
-  return data;
 }
