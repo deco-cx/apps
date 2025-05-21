@@ -7706,13 +7706,17 @@ export type CartFragment = { id: string, checkoutUrl: any, totalQuantity: number
 
 export type CustomerFragment = { id: string, email?: string | null, firstName?: string | null, lastName?: string | null };
 
-export type CreateCartMutationVariables = Exact<{ [key: string]: never; }>;
+export type CreateCartMutationVariables = Exact<{
+  countryCode?: InputMaybe<CountryCode>;
+}>;
 
 
 export type CreateCartMutation = { payload?: { cart?: { id: string } | null } | null };
 
 export type GetCartQueryVariables = Exact<{
   id: Scalars['ID']['input'];
+  languageCode?: InputMaybe<LanguageCode>;
+  countryCode?: InputMaybe<CountryCode>;
 }>;
 
 
@@ -7721,6 +7725,8 @@ export type GetCartQuery = { cart?: { id: string, checkoutUrl: any, totalQuantit
 export type GetProductQueryVariables = Exact<{
   handle?: InputMaybe<Scalars['String']['input']>;
   identifiers: Array<HasMetafieldsIdentifier> | HasMetafieldsIdentifier;
+  languageCode?: InputMaybe<LanguageCode>;
+  countryCode?: InputMaybe<CountryCode>;
 }>;
 
 
@@ -7731,6 +7737,8 @@ export type ListProductsQueryVariables = Exact<{
   after?: InputMaybe<Scalars['String']['input']>;
   query?: InputMaybe<Scalars['String']['input']>;
   identifiers: Array<HasMetafieldsIdentifier> | HasMetafieldsIdentifier;
+  languageCode?: InputMaybe<LanguageCode>;
+  countryCode?: InputMaybe<CountryCode>;
 }>;
 
 
@@ -7746,6 +7754,8 @@ export type SearchWithFiltersQueryVariables = Exact<{
   sortKey?: InputMaybe<SearchSortKeys>;
   reverse?: InputMaybe<Scalars['Boolean']['input']>;
   identifiers: Array<HasMetafieldsIdentifier> | HasMetafieldsIdentifier;
+  languageCode?: InputMaybe<LanguageCode>;
+  countryCode?: InputMaybe<CountryCode>;
 }>;
 
 
@@ -7761,6 +7771,8 @@ export type AllProductsQueryVariables = Exact<{
   reverse?: InputMaybe<Scalars['Boolean']['input']>;
   filters?: InputMaybe<Array<ProductFilter> | ProductFilter>;
   identifiers: Array<HasMetafieldsIdentifier> | HasMetafieldsIdentifier;
+  languageCode?: InputMaybe<LanguageCode>;
+  countryCode?: InputMaybe<CountryCode>;
 }>;
 
 
@@ -7769,6 +7781,8 @@ export type AllProductsQuery = { collection?: { handle: string, description: str
 export type ProductRecommendationsQueryVariables = Exact<{
   productId: Scalars['ID']['input'];
   identifiers: Array<HasMetafieldsIdentifier> | HasMetafieldsIdentifier;
+  languageCode?: InputMaybe<LanguageCode>;
+  countryCode?: InputMaybe<CountryCode>;
 }>;
 
 
@@ -7776,6 +7790,8 @@ export type ProductRecommendationsQuery = { productRecommendations?: Array<{ ava
 
 export type GetShopInfoQueryVariables = Exact<{
   identifiers: Array<HasMetafieldsIdentifier> | HasMetafieldsIdentifier;
+  languageCode?: InputMaybe<LanguageCode>;
+  countryCode?: InputMaybe<CountryCode>;
 }>;
 
 

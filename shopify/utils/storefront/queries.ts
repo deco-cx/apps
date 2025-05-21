@@ -266,11 +266,15 @@ const Customer = gql`
 `;
 
 export const CreateCart = {
-  query: gql`mutation CreateCart {
-    payload: cartCreate { 
-      cart { id } 
+  query: gql`
+    mutation CreateCart($countryCode: CountryCode) {
+      payload: cartCreate(input: { buyerIdentity: { countryCode: $countryCode } }) {
+        cart {
+          id
+        }
+      }
     }
-  }`,
+  `,
 };
 
 export const GetCart = {
