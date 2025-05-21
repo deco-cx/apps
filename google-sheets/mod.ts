@@ -15,6 +15,7 @@ export interface Props {
   token_type?: string;
   refresh_token_expires_in?: number;
   tokenObtainedAt?: number;
+  clientSecret?: string;
 }
 
 export interface State extends Props {

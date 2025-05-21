@@ -35,6 +35,7 @@ export default async function callback(
     scope: authResponse.scope,
     token_type: authResponse.token_type,
     tokenObtainedAt: Math.floor(Date.now() / 1000),
+    clientSecret: clientSecret || "",
   });
 
   if (returnUrl) {

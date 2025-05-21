@@ -58,11 +58,10 @@ const loader = async (
 
   if (!isTokenValid) {
     throw new Error(
-      "Não foi possível obter um token válido. Autentique-se novamente.",
+      "failed to get a valid token. please authenticate again.",
     );
   }
 
-  // Construindo a URL com query parameters
   const rangeWithParams = `${
     encodeURIComponent(range)
   }?majorDimension=${majorDimension}&valueRenderOption=${valueRenderOption}&dateTimeRenderOption=${dateTimeRenderOption}`;
@@ -79,20 +78,17 @@ const loader = async (
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Erro ao obter valores:", error);
+    console.error("error to get values:", error);
 
-    // Verificar se o erro está relacionado a token expirado
     if (
       error instanceof Error &&
       (error.message.includes("401") ||
         error.message.includes("invalid_token") ||
         error.message.includes("expired"))
     ) {
-      // Tenta atualizar o token novamente no caso de falha específica de autenticação
       try {
         const isTokenRefreshed = await ensureValidToken(ctx);
         if (isTokenRefreshed) {
-          // Token atualizado com sucesso, tenta a requisição novamente
           const rangeWithParams = `${
             encodeURIComponent(range)
           }?majorDimension=${majorDimension}&valueRenderOption=${valueRenderOption}&dateTimeRenderOption=${dateTimeRenderOption}`;
@@ -109,7 +105,7 @@ const loader = async (
           return data;
         }
       } catch (refreshError) {
-        console.error("Falha ao renovar token:", refreshError);
+        console.error("error to refresh token:", refreshError);
       }
     }
 

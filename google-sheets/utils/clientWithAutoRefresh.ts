@@ -13,7 +13,7 @@ export function createClientWithAutoRefresh(ctx: AppContext) {
     const isValid = await ensureValidToken(ctx);
 
     if (!isValid) {
-      throw new Error("Não foi possível obter um token válido");
+      throw new Error("failed to get a valid token");
     }
 
     const config = await ctx.getConfiguration();

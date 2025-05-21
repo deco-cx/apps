@@ -3,15 +3,15 @@ import { CLIENT_ID } from "../../utils/constant.ts";
 
 /**
  * @name REFRESH_TOKEN
- * @title Refresh GitHub Token
- * @description Atualiza o token de acesso usando o refresh token existente
+ * @title Refresh Google Sheets Token
+ * @description Refresh the access token using the existing refresh token
  */
 export default async function refreshToken(
   _: unknown,
   _req: Request,
   ctx: AppContext,
 ) {
-  const { authClient, refresh_token: _refresh_token } = ctx;
+  const { authClient, refresh_token: _refresh_token, clientSecret } = ctx;
   const currentCtx = await ctx.getConfiguration();
 
   const refresh_token = _refresh_token || currentCtx.refresh_token;
@@ -19,15 +19,14 @@ export default async function refreshToken(
   if (!refresh_token) {
     return {
       success: false,
-      message:
-        "Não há refresh token disponível. É necessário autenticar novamente.",
+      message: "no refresh token",
     };
   }
 
   try {
     const response = await authClient[`POST /token`]({
       client_id: CLIENT_ID,
-      client_secret: "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",
+      client_secret: clientSecret || "",
       refresh_token: refresh_token,
       redirect_uri: new URL("/oauth/callback", _req.url).href,
       grant_type: "refresh_token",
@@ -52,19 +51,19 @@ export default async function refreshToken(
 
       return {
         success: true,
-        message: "Token atualizado com sucesso",
+        message: "token refreshed",
         expires_in: refreshResponse.expires_in,
       };
     } else {
       return {
         success: false,
-        message: "Falha ao atualizar o token",
+        message: "failed to refresh token",
       };
     }
   } catch (error: unknown) {
     return {
       success: false,
-      message: `Erro ao atualizar o token: ${
+      message: `error to refresh token: ${
         error instanceof Error ? error.message : String(error)
       }`,
     };
