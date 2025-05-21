@@ -1,5 +1,6 @@
 import { AppContext } from "../mod.ts";
 import { ValueRange } from "../utils/types.ts";
+import { ensureValidToken } from "../utils/tokenManager.ts";
 
 export interface Props {
   /**
@@ -34,12 +35,6 @@ export interface Props {
    * @default "SERIAL_NUMBER"
    */
   dateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
-
-  /**
-   * @title Token de Autenticação
-   * @description O token de autenticação para acessar o Google Sheets
-   */
-  token: string;
 }
 
 /**
@@ -59,22 +54,25 @@ const loader = async (
     dateTimeRenderOption = "SERIAL_NUMBER",
   } = props;
 
-  try {
-    // Construindo a URL com query parameters
-    const rangeWithParams = `${
-      encodeURIComponent(range)
-    }?majorDimension=${majorDimension}&valueRenderOption=${valueRenderOption}&dateTimeRenderOption=${dateTimeRenderOption}`;
+  const isTokenValid = await ensureValidToken(ctx);
 
+  if (!isTokenValid) {
+    throw new Error(
+      "Não foi possível obter um token válido. Autentique-se novamente.",
+    );
+  }
+
+  // Construindo a URL com query parameters
+  const rangeWithParams = `${
+    encodeURIComponent(range)
+  }?majorDimension=${majorDimension}&valueRenderOption=${valueRenderOption}&dateTimeRenderOption=${dateTimeRenderOption}`;
+
+  try {
     const response = await ctx.client
       ["GET /v4/spreadsheets/:spreadsheetId/values/:range"](
         {
           spreadsheetId,
           range: rangeWithParams,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${props.token}`,
-          },
         },
       );
 
@@ -82,6 +80,39 @@ const loader = async (
     return data;
   } catch (error) {
     console.error("Erro ao obter valores:", error);
+
+    // Verificar se o erro está relacionado a token expirado
+    if (
+      error instanceof Error &&
+      (error.message.includes("401") ||
+        error.message.includes("invalid_token") ||
+        error.message.includes("expired"))
+    ) {
+      // Tenta atualizar o token novamente no caso de falha específica de autenticação
+      try {
+        const isTokenRefreshed = await ensureValidToken(ctx);
+        if (isTokenRefreshed) {
+          // Token atualizado com sucesso, tenta a requisição novamente
+          const rangeWithParams = `${
+            encodeURIComponent(range)
+          }?majorDimension=${majorDimension}&valueRenderOption=${valueRenderOption}&dateTimeRenderOption=${dateTimeRenderOption}`;
+
+          const response = await ctx.client
+            ["GET /v4/spreadsheets/:spreadsheetId/values/:range"](
+              {
+                spreadsheetId,
+                range: rangeWithParams,
+              },
+            );
+
+          const data = await response.json();
+          return data;
+        }
+      } catch (refreshError) {
+        console.error("Falha ao renovar token:", refreshError);
+      }
+    }
+
     throw error;
   }
 };
