@@ -1,5 +1,4 @@
-export const CLIENT_ID = "Ov23li5rj2snDzdakgGt";
-export const SCOPES = "read:user repo gist";
+export const SCOPES = "read:user public_repo gist";
 
 export const GITHUB_URL = "https://api.github.com";
 export const GITHUB_URL_OAUTH = "https://github.com/login/oauth";
