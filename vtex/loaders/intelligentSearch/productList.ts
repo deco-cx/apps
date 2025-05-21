@@ -109,6 +109,11 @@ export interface CommonProps {
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
+  /**
+   * @title Simulation Behavior
+   * @description Defines the simulation behavior.
+   */
+  simulationBehavior?: "default" | "skip" | "only1P";
 }
 
 /**
@@ -142,6 +147,7 @@ const fromProps = ({ props }: Props) => {
       sort: props.sort || "",
       selectedFacets: [{ key: "", value: props.facets }],
       hideUnavailableItems: props.hideUnavailableItems,
+      simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
 
@@ -152,6 +158,7 @@ const fromProps = ({ props }: Props) => {
       sort: "",
       selectedFacets: [],
       hideUnavailableItems: props.hideUnavailableItems,
+      simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
 
@@ -163,6 +170,7 @@ const fromProps = ({ props }: Props) => {
       fuzzy: mapLabelledFuzzyToFuzzy(props.fuzzy),
       selectedFacets: [],
       hideUnavailableItems: props.hideUnavailableItems,
+      simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
 
@@ -173,6 +181,7 @@ const fromProps = ({ props }: Props) => {
       sort: props.sort || "",
       selectedFacets: [{ key: "productClusterIds", value: props.collection }],
       hideUnavailableItems: props.hideUnavailableItems,
+      simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
 
@@ -254,6 +263,7 @@ const getSearchParams = (
         "hideUnavailableItems",
         (props.hideUnavailableItems ?? false).toString(),
       ],
+      ["simulationBehavior", props.simulationBehavior || "default"],
     ];
   }
 
@@ -267,6 +277,7 @@ const getSearchParams = (
         "hideUnavailableItems",
         (props.hideUnavailableItems ?? false).toString(),
       ],
+      ["simulationBehavior", props.simulationBehavior || "default"],
     ];
   }
 
@@ -279,6 +290,7 @@ const getSearchParams = (
         "hideUnavailableItems",
         (props.hideUnavailableItems ?? false).toString(),
       ],
+      ["simulationBehavior", props.simulationBehavior || "default"],
     ];
   }
 
