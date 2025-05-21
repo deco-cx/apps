@@ -45,7 +45,6 @@ export default async function action(
     body: formData,
     headers: {
       "Accept": "application/json",
-      "Content-Type": "application/x-www-form-urlencoded",
     },
   });
 
