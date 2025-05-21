@@ -1,7 +1,6 @@
 import { AppContext } from "../../mod.ts";
 import { CLIENT_ID } from "../../utils/constant.ts";
 
-
 /**
  * @name REFRESH_TOKEN
  * @title Refresh GitHub Token
@@ -14,9 +13,9 @@ export default async function refreshToken(
 ) {
   const { authClient, refresh_token: _refresh_token } = ctx;
   const currentCtx = await ctx.getConfiguration();
-    
+
   const refresh_token = _refresh_token || currentCtx.refresh_token;
-  
+
   if (!refresh_token) {
     return {
       success: false,
@@ -26,7 +25,7 @@ export default async function refreshToken(
   }
 
   try {
-    const response = await authClient [`POST /token`]({
+    const response = await authClient[`POST /token`]({
       client_id: CLIENT_ID,
       client_secret: "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",
       refresh_token: refresh_token,
@@ -38,7 +37,7 @@ export default async function refreshToken(
 
     if (refreshResponse.access_token) {
       const new_refresh_token = refreshResponse.refresh_token || refresh_token;
-      
+
       await ctx.configure({
         ...currentCtx,
         access_token: refreshResponse.access_token,
