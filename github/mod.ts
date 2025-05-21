@@ -8,12 +8,8 @@ import { createHttpClient } from "../utils/http.ts";
 
 export interface Props {
   access_token?: string;
-  refresh_token?: string;
-  expires_in?: number;
   scope?: string;
   token_type?: string;
-  refresh_token_expires_in?: number;
-  tokenObtainedAt?: number;
 }
 
 export interface State extends Props {
@@ -31,13 +27,6 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 export default function App(props: Props): App<Manifest, State> {
   const { access_token } = props;
 
-  const updatedProps = {
-    ...props,
-    tokenObtainedAt: access_token
-      ? (props.tokenObtainedAt || Math.floor(Date.now() / 1000))
-      : undefined,
-  };
-
   const client = createHttpClient<Client>({
     base: GITHUB_URL,
     headers: new Headers({
@@ -48,7 +37,7 @@ export default function App(props: Props): App<Manifest, State> {
     fetcher: fetchSafe,
   });
 
-  const state = { ...updatedProps, client };
+  const state = { ...props, client };
   return {
     state,
     manifest,

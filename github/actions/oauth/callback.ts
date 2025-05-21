@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default async function callback(
-  { code, returnUrl, redirectUri }: Props,
+  { code, returnUrl, redirectUri}: Props,
   _req: Request,
   ctx: AppContext,
 ) {
@@ -35,11 +35,8 @@ export default async function callback(
   await ctx.configure({
     ...currentCtx,
     access_token: authResponse.access_token,
-    refresh_token: authResponse.refresh_token,
-    expires_in: authResponse.expires_in,
     scope: authResponse.scope,
     token_type: authResponse.token_type,
-    tokenObtainedAt: Math.floor(Date.now() / 1000),
   });
 
   if (returnUrl) {
