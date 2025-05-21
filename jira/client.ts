@@ -72,6 +72,11 @@ export class JiraClient {
         data: undefined as unknown as T,
       };
     }
+
+    if (response.status === 204) {
+      return { ok: true, data: {} as T };
+    }
+
     const data = await response.json();
     return { ok: true, data };
   }
@@ -138,7 +143,7 @@ export class JiraClient {
     });
   }
 
-  updateField(
+  async updateField(
     issueKey: string,
     field: string,
     value: unknown,
@@ -146,11 +151,11 @@ export class JiraClient {
     const endpoint = `/rest/api/3/issue/${issueKey}`;
     const body = {
       fields: {
-        [field]: value,
+        [field]: { value },
       },
     };
-    return this.fetch(endpoint, {
-      method: "PATCH",
+    return await this.fetch(endpoint, {
+      method: "PUT",
       body: JSON.stringify(body),
     });
   }

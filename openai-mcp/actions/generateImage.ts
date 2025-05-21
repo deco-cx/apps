@@ -1,25 +1,22 @@
 import { AppContext } from "../mod.ts";
 import { Buffer } from "node:buffer";
-import { PREVIEW_URL } from "../loaders/imagePreview.ts";
-import { createPreviewUrl, getInstallId } from "../utils.ts";
 import OpenAI from "npm:openai";
+
 /**
  * @title Generate Image
  * @description Creates high-quality images from text prompts using OpenAI's image generation models.
  * This action allows you to generate images by providing a descriptive prompt and customizing
- * various parameters to control the output. Different models have different capabilities and limitations,
- * so parameters should be chosen accordingly. The result will be available in the previewUrls. Use the full previewUrls to render the images.
+ * various parameters to control the output.
  */
 export interface Props {
   /**
-   * @description The presigned URLs to upload the generated images to. When provided, the images will be
-   * uploaded to these URLs rather than returned as base64 in the response. This allows for larger images
-   * and easier integration with storage systems. One for each image. (n = number of images)
+   * @description The presigned URLs to upload the generated images to. The images will be
+   * uploaded to these URLs rather than returned as base64 in the response. One for each image. (n = number of images)
    *
    * Can be obtained from a CREATE_PRESIGNED_URL tool or similar functionality that creates S3/cloud storage
    * presigned URLs with PUT permission.
    */
-  presignedUrls: string[];
+  presignedUrls?: string[];
 
   /**
    * @description The text prompt that describes the image you want to generate. For best results,
@@ -34,37 +31,19 @@ export interface Props {
   prompt: string;
 
   /**
-   * @description The AI model to use for image generation. Each model has different capabilities:
+   * @description The dimensions of the generated output image. Available sizes depend on the model:
    *
-   * - gpt-image-1: OpenAI's newest model with superior instruction following, text rendering, and real-world knowledge
-   * - dall-e-3: High quality images with good creative interpretation
-   * - dall-e-2: Lower cost option, supports variations endpoint
-   *
-   * Note that each model has different parameter support. For example, dall-e-3 supports the 'style' parameter
-   * but not 'variations', while gpt-image-1 supports 'quality' with more granular options and transparent backgrounds.
-   *
-   * @default gpt-image-1
-   */
-  model?: "gpt-image-1" | "dall-e-3" | "dall-e-2";
-
-  /**
-   * @description The dimensions of the generated image. Available sizes depend on the model:
-   *
-   * - Square (1024x1024): auto size, works with all models, fastest generation time
+   * - Square (1024x1024): Standard size, works with all models
    * - Landscape (1536x1024): Good for scenic images, horizontally oriented content
    * - Portrait (1024x1536): Good for portraits, vertically oriented content
    *
-   * Note: Larger sizes may take longer to generate and cost more. Different models support
-   * different sizes - check model documentation if you encounter errors.
+   * For inpainting with a mask, the output size should match the input image size for best results.
+   * If the sizes don't match, the image might be stretched or distorted.
    *
    * @default 1024x1024
    */
   size?:
-    | "256x256"
-    | "512x512"
     | "1024x1024"
-    | "1792x1024"
-    | "1024x1792"
     | "1536x1024"
     | "1024x1536";
 
@@ -73,42 +52,22 @@ export interface Props {
    * settings produce more detailed images but take longer to generate and cost more.
    *
    * For gpt-image-1:
-   * - low: Fastest generation, less detail (272 tokens for 1024x1024)
-   * - medium: Balanced option (1056 tokens for 1024x1024)
-   * - high: Most detailed images, slowest generation (4160 tokens for 1024x1024)
+   * - low: Fastest generation, less detail
+   * - medium: Balanced option
+   * - high: Most detailed images, slowest generation
    *
-   * For dall-e-3:
-   * - auto: Normal quality
-   * - hd: High definition quality (more detailed)
-   *
-   * Note: Quality options are interpreted differently depending on model. The dall-e-3 model
-   * only supports 'auto' and 'hd', while gpt-image-1 supports 'low', 'medium', and 'high'.
-   * If you specify 'hd' for gpt-image-1 or 'high' for dall-e-3, the API will map to the closest equivalent.
+   * Quality setting affects the rendering detail and token consumption. For precise edits requiring
+   * fine details, use 'medium' or 'high' quality.
    *
    * @default auto
    */
-  quality?: "auto" | "hd" | "low" | "medium" | "high";
-
-  /**
-   * @description Controls the stylistic approach for dall-e-3 model only. This parameter is ignored for other models.
-   *
-   * - vivid: Creates images with more intense, dramatic, and vibrant colors
-   * - natural: Creates images with more subtle, realistic, and less saturated colors
-   *
-   * Use 'vivid' for more artistic or dramatic imagery, and 'natural' for more realistic scenes.
-   * This parameter only works with the dall-e-3 model and is ignored by other models.
-   *
-   * @default vivid
-   */
-  style?: "vivid" | "natural";
+  quality?: "low" | "medium" | "high" | "auto";
 
   /**
    * @description The number of images to generate in a single request. Higher values allow batch generation
    * but may increase response time and costs. The maximum value depends on the model:
    *
    * - gpt-image-1: Up to 4 images per request
-   * - dall-e-3: Up to 1 image per request
-   * - dall-e-2: Up to 10 images per request
    *
    * Note: If you specify a value higher than the model supports, the API will automatically
    * use the maximum supported value for that model.
@@ -131,35 +90,25 @@ export interface Props {
    *
    * @default png
    */
-  format?: "png" | "jpeg" | "webp";
+  outputFormat?: "png" | "jpeg" | "webp";
 
   /**
    * @description Controls whether the image has a transparent background or a solid color background.
    *
-   * - opaque: auto solid background
+   * - opaque: Standard solid background
    * - transparent: Transparent background (only works with png and webp formats)
+   * - auto: Model automatically determines the best background type
    *
-   * Important: Transparency only works with the 'png' and 'webp' formats. If you specify 'transparent'
-   * with 'jpeg' format, the API will ignore the transparency setting. Also, transparency works best
-   * with 'medium' or 'high' quality settings when using gpt-image-1.
+   * Important: Transparency only works with 'png' and 'webp' formats. If 'transparent' is specified
+   * with 'jpeg' format, the transparency setting will be ignored. When using transparency, set the
+   * output format to either png (default) or webp.
    *
-   * @default opaque
+   * Transparent backgrounds are useful for creating compositable elements that can be layered in
+   * external editing tools.
+   *
+   * @default auto
    */
-  background?: "opaque" | "transparent";
-
-  /**
-   * @description Controls the compression level for 'jpeg' and 'webp' formats only.
-   * Range is 0-100, where 0 is maximum compression (lowest quality) and 100 is minimum
-   * compression (highest quality).
-   *
-   * - Low values (0-30): Small file size, visible compression artifacts
-   * - Medium values (30-70): Balanced file size and quality
-   * - High values (70-100): Larger file size, minimal compression artifacts
-   *
-   * This parameter is ignored for 'png' format. If not specified, the API uses default
-   * compression settings.
-   */
-  compression?: number;
+  background?: "opaque" | "transparent" | "auto";
 
   /**
    * @description Controls how strictly content is filtered for the gpt-image-1 model.
@@ -176,47 +125,24 @@ export interface Props {
   moderation?: "auto" | "low";
 }
 
-interface ImageResponse {
-  b64_json?: string;
-  url?: string;
-  revised_prompt?: string;
-}
-
-export default async function generateImageAction(
+export default function generateImageAction(
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ) {
   const {
     presignedUrls,
-    prompt,
-    model = "gpt-image-1",
-    size = "1024x1024",
-    quality = "auto",
-    style,
-    n = 1,
-    format = "png",
-    background = "opaque",
-    compression,
-    moderation = "auto",
   } = props;
 
   const openAI = ctx.openAI;
-  const url = new URL(req.url);
-  const installId = getInstallId(url);
 
   // If presigned URLs are provided, return preview URL
   if (presignedUrls && presignedUrls.length > 0) {
-    const cleanedUrls = presignedUrls.map((url) =>
-      url.split("?")[0].replace("_presigned/", "")
-    );
-
     // Run image generation asynchronously without awaiting
     setTimeout(() => {
-      processImageGeneration(props, openAI, presignedUrls, format)
+      processImageGeneration(props, openAI, presignedUrls)
         .catch((error) => {
           console.error("Async image generation failed:", error);
-          ctx.log("Async image generation failed:", error);
           // If there's an error, write the error message to the presigned URLs
           Promise.all(
             presignedUrls.map((url) =>
@@ -234,79 +160,9 @@ export default async function generateImageAction(
         });
     }, 0);
 
-    const previewUrls = cleanedUrls.map((url) =>
-      createPreviewUrl(url, PREVIEW_URL, installId)
-    );
-
     return {
       success: true,
-      previewUrls,
-      message:
-        "Image generation started. Render the previewUrls to see the images.",
-    };
-  }
-
-  // If no presigned URLs are provided, handle synchronously as before
-  try {
-    // Set up parameters based on model
-    const requestParams: Record<string, unknown> = {
-      model,
-      prompt,
-      n,
-      size,
-    };
-
-    // Quality handling - gpt-image-1 uses quality, dall-e-3 uses quality_preference
-    if (model === "gpt-image-1") {
-      requestParams.quality = quality;
-      if (
-        background === "transparent" && (format === "png" || format === "webp")
-      ) {
-        requestParams.background = background;
-      }
-      if (moderation) {
-        requestParams.moderation = moderation;
-      }
-    } else if (model === "dall-e-3") {
-      // dall-e-3 uses different quality naming
-      if (quality === "high" || quality === "hd") {
-        requestParams.quality = "hd";
-      } else {
-        requestParams.quality = "auto";
-      }
-      if (style) {
-        requestParams.style = style;
-      }
-    }
-
-    // Add format and compression settings
-    if (format !== "png") {
-      if (
-        compression !== undefined && (format === "jpeg" || format === "webp")
-      ) {
-        requestParams.output_compression = compression;
-      }
-    }
-
-    const result = await openAI.images.generate(requestParams);
-
-    return {
-      success: true,
-      images: result.data.map((img: ImageResponse) =>
-        img.b64_json ? `data:image/${format};base64,${img.b64_json}` : img.url
-      ),
-      model,
-      prompt,
-    };
-  } catch (error: unknown) {
-    console.error("Error generating image:", error);
-    const errorMessage = error instanceof Error
-      ? error.message
-      : "Failed to generate image";
-
-    return {
-      success: false,
-      error: errorMessage,
+      message: "Image generation started.",
     };
   }
 }
@@ -318,57 +174,46 @@ async function processImageGeneration(
   props: Props,
   openAI: OpenAI,
   presignedUrls: string[],
-  format: string,
 ) {
   const {
     prompt,
-    model = "gpt-image-1",
     size = "1024x1024",
     quality = "auto",
-    style,
     n = 1,
-    background = "opaque",
-    compression,
+    background = "auto",
+    outputFormat = "png",
     moderation = "auto",
   } = props;
 
   // Set up parameters based on model
   // deno-lint-ignore no-explicit-any
   const requestParams: any = {
-    model,
+    model: "gpt-image-1",
     prompt,
     n,
     size,
   };
 
-  // Quality handling - gpt-image-1 uses quality, dall-e-3 uses quality_preference
-  if (model === "gpt-image-1") {
-    requestParams.quality = quality;
-    if (
-      background === "transparent" && (format === "png" || format === "webp")
-    ) {
-      requestParams.background = background;
-    }
-    if (moderation) {
-      requestParams.moderation = moderation;
-    }
-  } else if (model === "dall-e-3") {
-    // dall-e-3 uses different quality naming
-    if (quality === "high" || quality === "hd") {
-      requestParams.quality = "hd";
-    } else {
-      requestParams.quality = "auto";
-    }
-    if (style) {
-      requestParams.style = style;
-    }
+  if (
+    !(quality === "low" || quality === "medium" || quality === "high" ||
+      quality === "auto")
+  ) {
+    throw new Error("Quality must be a valid quality value");
   }
 
-  // Add format and compression settings
-  if (format !== "png") {
-    if (compression !== undefined && (format === "jpeg" || format === "webp")) {
-      requestParams.output_compression = compression;
-    }
+  requestParams.quality = quality;
+  if (
+    background === "transparent" &&
+    (outputFormat === "png" || outputFormat === "webp")
+  ) {
+    requestParams.background = background;
+  }
+  if (moderation) {
+    requestParams.moderation = moderation;
+  }
+
+  if (outputFormat !== "png") {
+    requestParams.output_format = outputFormat;
   }
 
   const result = await openAI.images.generate(requestParams);
@@ -393,7 +238,7 @@ async function processImageGeneration(
     }
 
     await Promise.all(presignedUrls.map(async (presignedUrl) => {
-      return await uploadImage(imageData, presignedUrl, format);
+      return await uploadImage(imageData, presignedUrl, outputFormat);
     }));
   }
 }
@@ -449,6 +294,8 @@ export async function uploadImage(
 
   // Set the appropriate content type based on format
   const contentType = `image/${format}`;
+
+  console.log({ contentType });
 
   const response = await fetch(presignedUrl, {
     method: "PUT",

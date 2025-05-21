@@ -10,6 +10,10 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("turso-db"),
+    app("discohook"),
+    app("tiny"),
+    app("js-bundler"),
     app("jira"),
     app("deno-deploy"),
     app("exa"),
@@ -32,6 +36,7 @@ const config = {
     app("konfidency"),
     app("mailchimp"),
     app("ai-assistants"),
+    app("airtable"),
     app("files"),
     app("openai"),
     app("perplexity"),
@@ -57,6 +62,7 @@ const config = {
     app("streamshop"),
     app("brasilapi"),
     app("readwise"),
+    app("rd-station-marketing"),
     app("website"),
     app("commerce"),
     app("workflows"),

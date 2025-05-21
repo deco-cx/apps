@@ -18,3 +18,15 @@ Check and test apps in https://mcp.deco.site/.
 ### Create a new app
 
 Open this repo in an AI Editor and use [NewAppPrompt.md](NewAppPrompt.md) as prompt to create a new app. You can use OpenAPI, API docs or even code that explains the service you wish to expose as an app.
+
+---
+
+## Debugging HTTP Requests
+
+To enable verbose HTTP request debugging logs, set the environment variable `DEBUG_HTTP` to `true` when running this repo:
+
+```sh
+DEBUG_HTTP=true deno run ...
+```
+
+When enabled, this will print curl-like representations of all HTTP requests made by the internal HTTP client.
