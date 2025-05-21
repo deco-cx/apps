@@ -1,23 +1,21 @@
 import { AppContext } from "../../mod.ts";
-import {
-  CLIENT_ID,
-  GITHUB_URL_OAUTH_ACCESS_TOKEN,
-} from "../../utils/constant.ts";
+import { GITHUB_URL_OAUTH_ACCESS_TOKEN } from "../../utils/constant.ts";
 
 interface Props {
+  installId?: string;
   code: string;
   returnUrl?: string;
   redirectUri: string;
   clientSecret: string;
+  clientId: string;
 }
 
 export default async function callback(
-  { code, returnUrl, redirectUri, clientSecret }: Props,
+  { code, returnUrl, redirectUri, clientSecret, clientId, installId }: Props,
   _req: Request,
   ctx: AppContext,
 ) {
   const currentCtx = await ctx.getConfiguration();
-  console.log(clientSecret);
   const response = await fetch(`${GITHUB_URL_OAUTH_ACCESS_TOKEN}`, {
     method: "POST",
     headers: {
@@ -25,7 +23,7 @@ export default async function callback(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      client_id: CLIENT_ID,
+      client_id: clientId,
       client_secret: clientSecret,
       code,
       redirect_uri: redirectUri,
@@ -42,7 +40,11 @@ export default async function callback(
   });
 
   if (returnUrl) {
-    return Response.redirect(returnUrl);
+    const url = new URL(returnUrl);
+    if (installId) {
+      url.searchParams.set("installId", installId);
+    }
+    return Response.redirect(url.toString());
   }
 
   return new Response(
