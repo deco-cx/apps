@@ -63,6 +63,431 @@ export type SavePersonalData = boolean
  * True if the shopper opted to receive the newsletter.
  */
 export type OptinNewsLetter = boolean
+/**
+ * Information about the order totals.
+ */
+export type TotalsUpdated = {
+/**
+ * Total ID, which defines what the total is about.
+ */
+id?: ("Items" | "Discounts" | "Shipping" | "Tax")
+/**
+ * Total name.
+ */
+name?: string
+/**
+ * Total value in cents.
+ */
+value?: number
+/**
+ * Information about the order alternative totals, when applicable. For example, when there is a discount for items in the marketplace that results in a difference in the `Items` total value, the `alternativeTotals` can retrieve details about it.
+ */
+alternativeTotals?: {
+/**
+ * Alternative total ID, which can be related to items, discounts, shipping or taxes.
+ */
+id?: string
+/**
+ * Alternative total name.
+ */
+name?: string
+/**
+ * Alternative total value in cents.
+ */
+value?: number
+}[]
+}[]
+/**
+ * Information on order items.
+ */
+export type ItemsUpdated = {
+/**
+ * Order item unique ID.
+ */
+uniqueId?: string
+/**
+ * Item ID.
+ */
+id?: string
+/**
+ * Product ID.
+ */
+productId?: string
+/**
+ * European Article Number (EAN) of the item.
+ */
+ean?: string
+/**
+ * [Reservation](https://help.vtex.com/en/tutorial/how-does-reservation-work--tutorials_92) ID.
+ */
+lockId?: string
+/**
+ * Information about [attachments](https://help.vtex.com/en/tutorial/what-is-an-attachment--aGICk0RVbqKg6GYmQcWUm).
+ */
+attachments?: {
+/**
+ * Attachment name.
+ */
+name?: string
+/**
+ * Custom field for attachment content.
+ */
+content?: {
+/**
+ * Attachment custom field content.
+ */
+[k: string]: string
+}
+}[]
+/**
+ * Item quantity.
+ */
+quantity?: number
+/**
+ * Seller name. When the store acts both as marketplace and seller, this field corresponds to `1`, because every VTEX store is its own seller 1.
+ */
+seller?: string
+/**
+ * SKU name.
+ */
+name?: string
+/**
+ * Ref ID.
+ */
+refId?: string
+/**
+ * Item price in cents.
+ */
+price?: number
+/**
+ * List price in cents.
+ */
+listPrice?: number
+/**
+ * [Manual price](https://help.vtex.com/en/tutorial/change-the-price-of-an-item-in-the-shopping-cart--7Cd37aCAmtL1qmoZJJvjNf) in cents.
+ */
+manualPrice?: number
+/**
+ * ID of the user who applied the manual price.
+ */
+manualPriceAppliedBy?: string
+/**
+ * Information about price tags. A price tag is a price modifier, like s discount or a promotion applicable to the item in the order context.
+ */
+priceTags?: {
+/**
+ * Price tag name.
+ */
+name?: string
+/**
+ * Price tag value in cents. Discounts correspond to negative numbers.
+ */
+value?: number
+/**
+ * Defines if the price tag value is applied through a percentage (`true`) or not (`false`).
+ */
+isPercentual?: boolean
+/**
+ * Price tag identifier.
+ */
+identifier?: string
+/**
+ * Price tag raw value.
+ */
+rawValue?: number
+/**
+ * Price tag rate.
+ */
+rate?: number
+/**
+ * Juris code.
+ */
+jurisCode?: string
+/**
+ * Juris type.
+ */
+jurisType?: string
+/**
+ * Juris name.
+ */
+jurisName?: string
+}[]
+/**
+ * Image URL.
+ */
+imageUrl?: string
+/**
+ * Detail URL.
+ */
+detailUrl?: string
+/**
+ * Item components.
+ */
+components?: string[]
+/**
+ * Information about services sold with the item. For example, a gift package.
+ */
+bundleItems?: {
+/**
+ * Service type.
+ */
+type?: string
+/**
+ * Service ID.
+ */
+id?: number
+/**
+ * Service name.
+ */
+name?: string
+/**
+ * Service price in cents.
+ */
+price?: number
+}[]
+/**
+ * Array with information about params.
+ */
+params?: string[]
+/**
+ * Information about offerings, which are services related to the item. For example, a warranty or installation.
+ */
+offerings?: string[]
+/**
+ * Array containing attachments information.
+ */
+attachmentOfferings?: {
+/**
+ * Attachment name.
+ */
+name?: string
+/**
+ * Defines if the attachment is required (`true`) or not (`false`).
+ */
+required?: boolean
+/**
+ * Schema of the content declared in the field `attachmentOfferings`.
+ */
+schema?: {
+/**
+ * Attachment schema content.
+ */
+[k: string]: string
+}
+}[]
+/**
+ * Seller SKU ID.
+ */
+sellerSku?: string
+/**
+ * Item price expiration date and time in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+priceValidUntil?: string
+/**
+ * Commission value registered for the seller.
+ */
+commission?: number
+/**
+ * Tax value in cents.
+ */
+tax?: number
+/**
+ * Presale date and time in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+preSaleDate?: string
+/**
+ * Item additional information.
+ */
+additionalInfo?: {
+/**
+ * Item brand name.
+ */
+brandName?: string
+/**
+ * Item brand ID.
+ */
+brandId?: string
+/**
+ * Categories IDs.
+ */
+categoriesIds?: string
+/**
+ * Item [categories](https://help.vtex.com/tracks/catalog-101--5AF0XfnjfWeopIFBgs3LIQ/2gkZDjXRqfsq62TlAkj4uf) information.
+ */
+categories?: {
+/**
+ * Category ID.
+ */
+id?: number
+/**
+ * Category name.
+ */
+name?: string
+}[]
+/**
+ * All product clusters related to the item.
+ */
+productClusterId?: string
+/**
+ * Commercial condition ID.
+ */
+commercialConditionId?: string
+dimension?: Dimension
+/**
+ * Offering information.
+ */
+offeringInfo?: string
+/**
+ * Offering type.
+ */
+offeringType?: string
+/**
+ * Offering type ID.
+ */
+offeringTypeId?: string
+}
+/**
+ * Item measurement unit.
+ */
+measurementUnit?: string
+/**
+ * Item unit multiplier.
+ */
+unitMultiplier?: number
+/**
+ * Selling price in cents. This field can present rounding discrepancies, so we recommend retrieving pricing information from the `priceDefinition` field.
+ */
+sellingPrice?: number
+/**
+ * Defines it the item is a gift (`true`) or not (`false`).
+ */
+isGift?: boolean
+/**
+ * Item shipping price in cents. This value does not account for the order total shipping price.
+ */
+shippingPrice?: number
+/**
+ * Reward value in cents.
+ */
+rewardValue?: number
+/**
+ * Freight commission value in cents.
+ */
+freightCommission?: number
+/**
+ * Item price information.
+ */
+priceDefinition?: {
+/**
+ * Item selling prices.
+ */
+sellingPrices?: {
+/**
+ * Item selling price value in cents.
+ */
+value?: number
+/**
+ * Item quantity.
+ */
+quantity?: number
+}[]
+/**
+ * Item calculated selling price in cents.
+ */
+calculatedSellingPrice?: number
+/**
+ * Item total price in cents.
+ */
+total?: number
+/**
+ * Item price definition reason.
+ */
+reason?: string
+}
+/**
+ *  Item tax code.
+ */
+taxCode?: string
+/**
+ * Ranking number that shows how related items are indexed in between each other. It starts at `0` as the primary item reference and counts up to `1`, `2`, and so on. For example, a customer bought sunglasses and hired a warranty service. Since the sunglasses are index `0`, the warranty service (the [assembly option](https://help.vtex.com/en/tutorial/assembly-options--5x5FhNr4f5RUGDEGWzV1nH)) is index `1` and has the `parentItemIndex` value `0`. This response is `null` for items that are not assembly options.
+ */
+parentItemIndex?: number
+/**
+ * When items are indexed in between each other, this field returns the assembly option ID. This response is `null` for items that are not [assembly options](https://help.vtex.com/en/tutorial/assembly-options--5x5FhNr4f5RUGDEGWzV1nH).
+ */
+parentAssemblyBinding?: string
+/**
+ * Identification code of the call center operator that sold the item, when applicable.
+ */
+callCenterOperator?: string
+/**
+ * @deprecated
+ * This field identifies the order in the `handling` status in the workflow, and it was used for VTEX internal control.
+ */
+serialNumbers?: string
+/**
+ * Information about the item customization, when applicable.
+ */
+assemblies?: string[]
+/**
+ * Item cost price in cents.
+ */
+costPrice?: number
+}[]
+/**
+ * Information about the sellers associated with the order.
+ */
+export type SellersUpdated = {
+/**
+ * Seller identifier.
+ */
+id?: string
+/**
+ * Seller name.
+ */
+name?: string
+/**
+ * Seller logo URL.
+ */
+logo?: string
+/**
+ * URL of the endpoint for fulfillment of seller's orders, which the marketplace use to communicate with the seller.
+ */
+fulfillmentEndpoint?: string
+}[]
+/**
+ * Information about the [seller order cancellation denials](https://developers.vtex.com/docs/guides/order-canceling-improvements), regardless if the cancellation request was made by the marketplace or the customer.
+ */
+export type CancellationRequestsUpdated = {
+/**
+ * ID that identifies the original cancellation operation made by the marketplaces or its customer care service using the [Cancel order](https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/cancel) endpoint.
+ */
+id?: string
+/**
+ * Reason why there was a request to cancel the order.
+ */
+reason?: string
+/**
+ * Date of when the order cancellation request was processed by the platform. The date format is [ISO 8601 time zone offset](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+cancellationRequestDate?: string
+/**
+ * Defines if the order cancellation was requested by the customer (`true`) or not (`false`).
+ */
+requestedByUser?: boolean
+/**
+ * Defines if the order cancellation request was [denied by the seller](https://developers.vtex.com/docs/guides/order-canceling-improvements) (`true`) or accepted by the seller (`false`).
+ */
+deniedBySeller?: boolean
+/**
+ * Reason given by the seller for denying the order cancellation.
+ */
+deniedBySellerReason?: string
+/**
+ * Date of when the platform processed the seller denial to an order cancellation request. The date format is [ISO 8601 time zone offset](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+cancellationRequestDenyDate?: string
+}[]
 
 export interface OpenAPI {
 /**
@@ -19678,6 +20103,202 @@ clientEmail: string
 response: Userorderdetails
 }
 /**
+ * Retrieves details about all orders related to the same purchase by searching by order group ID.
+ * 
+ * >⚠️ Throttling: Each VTEX account can make up to 6000 requests per minute.
+ * 
+ * > You can only access information from orders created in the last two years, and that same period is valid for customers through [My Account](https://help.vtex.com/en/tutorial/how-my-account-works--2BQ3GiqhqGJTXsWVuio3Xh).
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | OMS | OMS access | **View order** |
+ * | Checkout         | CheckoutResources | **Orders Full Access** |
+ * 
+ * You can [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) with that resource or use one of the following [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy):
+ * 
+ * | **Role** | **Resource** | 
+ * | --------------- | ----------------- | 
+ * | OMS - Full access | View order |
+ * | Checkout Admin | View order |
+ * | IntegrationProfile - Fulfillment Oms | View order |
+ * | OMS - Full access | Orders Full Access |
+ * | Checkout Admin | Orders Full Access |
+ * | IntegrationProfile - Fulfillment Oms | Orders Full Access |
+ * 
+ * >❗ Assigning a [predefined role](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) to users or application keys usually grants permission to multiple [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3). If some of these permissions are not necessary, consider creating a custom role instead. For more information regarding security, see [Best practices for using application keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm). To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ */
+"GET /api/oms/pvt/orders/order-group/:orderGroup": {
+/**
+ * List of orders grouped by the order group ID.
+ */
+response: {
+/**
+ * Order ID.
+ */
+orderId?: string
+/**
+ * Sequence number part of the order ID. For example, in order `v70530116str-01`, the sequence is `70530116`.
+ */
+sequence?: string
+/**
+ * Order ID in the marketplace.
+ */
+marketplaceOrderId?: (null | string)
+/**
+ * Marketplace endpoint for post purchase communication.
+ */
+marketplaceServicesEndpoint?: (null | string)
+/**
+ * Seller order ID.
+ */
+sellerOrderId?: string
+/**
+ * Order's [origin in the order flow](https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196).
+ */
+origin?: ("Marketplace" | "Fulfillment" | "Chain")
+/**
+ * Three-letter [affiliate](https://help.vtex.com/en/tutorial/configuring-affiliates--tutorials_187) code configured by the seller to identify a marketplace.
+ */
+affiliateId?: (null | string)
+/**
+ * Sales channel (or [trade policy](https://help.vtex.com/en/tutorial/how-trade-policies-work--6Xef8PZiFm40kg2STrMkMV)) ID related to the order.
+ */
+salesChannel?: string
+/**
+ * For a VTEX store, the merchant's name will be the same as the account name. An external seller can have a `merchantName`, but it will not be an account name.
+ */
+merchantName?: (null | string)
+/**
+ * [Order status](https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196) in the workflow.
+ */
+status?: string
+/**
+ * @deprecated
+ * Status description displayed on the VTEX Admin. This field is obsolete and may not return any value.
+ */
+statusDescription?: (null | string)
+/**
+ * Order total value in cents.
+ */
+value?: number
+/**
+ * Order creation date in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+creationDate?: string
+/**
+ * Order last change date in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+lastChange?: string
+/**
+ * Order group ID, a segment of the order ID that groups all orders related to the same purchase. For example, in order ID `v71021570str-02`), the order group ID is `v71021570str`.
+ */
+orderGroup?: string
+totals?: TotalsUpdated
+items?: ItemsUpdated
+/**
+ * Array with marketplace items information.
+ */
+marketplaceItems?: string[]
+clientProfileData?: ClientProfileDataUpdated
+giftRegistryData?: GiftRegistryDataUpdated
+marketingData?: MarketingDataUpdated
+ratesAndBenefitsData?: RatesAndBenefitsDataUpdated
+shippingData?: ShippingDataUpdated
+paymentData?: PaymentDataUpdated
+packageAttachment?: PackageAttachmentUpdated
+sellers?: SellersUpdated
+callCenterOperatorData?: CallCenterOperatorDataUpdated
+/**
+ * Email of the store employee responsible for managing the order.
+ */
+followUpEmail?: string
+/**
+ * Last transactional message sent to the customer.
+ */
+lastMessage?: (null | string)
+/**
+ * Main [account name](https://help.vtex.com/en/tutorial/what-is-an-account-name--i0mIGLcg3QyEy8OCicEoC).
+ */
+hostname?: string
+invoiceData?: InvoiceDataUpdated
+changesAttachment?: ChangesAttachmentUpdated
+/**
+ * Optional field for additional information.
+ */
+openTextField?: (null | {
+/**
+ * Additional information.
+ */
+[k: string]: string
+})
+/**
+ * Rounding error total value in cents, when applicable. For example, in orders with a discount over non-integer multiplier items, the rounding price is applied per item, not after the sum of all items, what can cause a difference in the total discount value.
+ */
+roundingError?: number
+/**
+ * ID of the [orderForm](https://developers.vtex.com/docs/guides/orderform-fields), the main object processed by the VTEX Checkout.
+ */
+orderFormId?: string
+/**
+ * Commercial condition information.
+ */
+commercialConditionData?: (null | string)
+/**
+ * Defines if the order payment has been settled (`true`) or not (`false`).
+ */
+isCompleted?: boolean
+/**
+ * Customizable fields created by the store for the shopping cart. This field is useful for storing data not included in other fields. For example, a message for a gift or a name to be printed in a shirt.
+ */
+customData?: (null | {
+/**
+ * Customizable apps created by the store.
+ */
+customApps?: (null | (null | string)[])
+})
+storePreferencesData?: StorePreferencesDataUpdated
+/**
+ * Defines if order cancellation is allowed (`true`) or not anymore (`false`).
+ */
+allowCancellation?: boolean
+/**
+ * Defines if the order can be edited (`true`) or not anymore (`false`).
+ */
+allowEdition?: boolean
+/**
+ * Defines if the order was placed via [VTEX Sales App](https://help.vtex.com/en/tracks/instore-getting-started-and-setting-up--zav76TFEZlAjnyBVL5tRc) (`true`) or not (`false`).
+ */
+isCheckedIn?: boolean
+marketplace?: MarketplaceUpdated
+/**
+ * Order authorization date in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+authorizedDate?: (null | string)
+/**
+ * Order invoice date in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+invoicedDate?: (null | string)
+/**
+ * Order cancellation reason.
+ */
+cancelReason?: (null | string)
+itemMetadata?: ItemMetadataUpdated
+subscriptionData?: SubscriptionDataUpdated
+taxData?: TaxDataUpdated
+/**
+ * When the order is created at a physical store which is configured as a pickup point, this field retrieves the pickup point ID.
+ */
+checkedInPickupPointId?: (null | string)
+cancellationData?: CancellationDataUpdated
+cancellationRequests?: CancellationRequestsUpdated
+clientPreferencesData?: ClientPreferencesDataUpdated
+}[]
+}
+/**
  * Retrieves information from a previously created sesssion.
  * 
  * >⚠️ The Session Manager API uses the `vtex_session` and `vtex_segment` cookies to store the data required to identify the user and the session. These cookies are stored in the user's browser when the session is created and sent automatically in every request to that domain. You will have to reproduce that by sending these cookies as headers to Session Manager API in order for it to work outside of a browser environment.
@@ -23419,6 +24040,1767 @@ isCertified: string
  * Name of the marketplace.
  */
 name: string
+}
+/**
+ * Information about the customer profile.
+ */
+export interface ClientProfileDataUpdated {
+/**
+ * Object ID, the expected value is `clientProfileData`.
+ */
+id?: string
+/**
+ * Customer email.
+ */
+email?: string
+/**
+ * Customer first name.
+ */
+firstName?: string
+/**
+ * Customer last name.
+ */
+lastName?: string
+/**
+ * Type of the document informed by the customer.
+ */
+documentType?: string
+/**
+ * Document identification code informed by the customer.
+ */
+document?: string
+/**
+ * Customer phone number.
+ */
+phone?: string
+/**
+ * If the customer is a legal entity, this field includes the corporate name.
+ */
+corporateName?: string
+/**
+ * If the customer is a legal entity, this field includes the trade name.
+ */
+tradeName?: string
+/**
+ * If the customer is a legal entity, this field includes the corporate document.
+ */
+corporateDocument?: string
+/**
+ * If the customer is a legal entity, this field includes the state inscription.
+ */
+stateInscription?: string
+/**
+ * If the customer is a legal entity, this field includes the company's phone number.
+ */
+corporatePhone?: string
+/**
+ * Defines if the customer is a legal entity (`true`) or not (`false`).
+ */
+isCorporate?: boolean
+/**
+ * Customer user profile ID.
+ */
+userProfileId?: string
+/**
+ * Customer user profile version.
+ */
+userProfileVersion?: string
+/**
+ * Customer class identification.
+ */
+customerClass?: string
+/**
+ * Customer code.
+ */
+customerCode?: string
+}
+/**
+ * [Gift list](https://developers.vtex.com/docs/guides/creating-gift-lists) information.
+ */
+export interface GiftRegistryDataUpdated {
+/**
+ * Gift list ID.
+ */
+giftRegistryId?: string
+/**
+ * [Gift list type](https://help.vtex.com/en/tutorial/creating-a-type-of-list).
+ */
+giftRegistryType?: string
+/**
+ * Gift list type name.
+ */
+giftRegistryTypeName?: string
+/**
+ * Gift list shipping address ID.
+ */
+addressId?: string
+/**
+ * Gift list description.
+ */
+description?: string
+}
+/**
+ * Information about marketing and promotions, such as coupon code and [Urchin Tracking Module (UTM)](https://help.vtex.com/en/tutorial/what-are-utm-source-utm-campaign-and-utm-medium--2wTz7QJ8KUG6skGAoAQuii).
+ */
+export interface MarketingDataUpdated {
+/**
+ * Object ID. The expected value is `marketingData`.
+ */
+id?: string
+/**
+ * A UTM is an Urchin Tracking Module used to track traffic related to your store. This field is an UTM for tracking the traffic source, to know from which site, advertiser, or publication the customer came before reaching your site.
+ */
+utmSource?: string
+/**
+ * UTM for tracking the partner.
+ */
+utmPartner?: string
+/**
+ * UTM for tracking the advertising or marketing media used to reach your site, such as banners and newsletters.
+ */
+utmMedium?: string
+/**
+ * UTM for tracking the marketing campaign context.
+ */
+utmCampaign?: string
+/**
+ * Coupon code used by the customer.
+ */
+coupon?: string
+/**
+ * Internal UTM for tracking the marketing campaign context.
+ */
+utmiCampaign?: string
+/**
+ * A `utmi` is an internal Urchin Tracking Module (UTM) used to track traffic inside your site. This field is an internal UTM for tracking pages.
+ */
+utmipage?: string
+/**
+ * Internal UTM for tracking the partner.
+ */
+utmiPart?: string
+/**
+ * List of marketing tags valid for the item.
+ */
+marketingTags?: string[]
+}
+/**
+ * Information on promotions and taxes that apply to the order.
+ */
+export interface RatesAndBenefitsDataUpdated {
+/**
+ * Object ID. The expected value is `ratesAndBenefitsData`.
+ */
+id?: string
+/**
+ * Information about order's promotions and taxes identifiers.
+ */
+rateAndBenefitsIdentifiers?: {
+/**
+ * Promotion or tax description.
+ */
+description?: string
+/**
+ * Defines if the [target audience](https://help.vtex.com/en/tutorial/creating-a-campaign-audience--6cnuDZJzIkIeocewAQQK4K) is featured (`true`) or not (`false`).
+ */
+featured?: boolean
+/**
+ * Promotion or tax ID.
+ */
+id?: string
+/**
+ * Promotion or tax name.
+ */
+name?: string
+/**
+ * Informs the criteria and conditions fulfilled so the promotion became valid.
+ */
+matchedParameters?: {
+/**
+ * Promotion or tax criteria content.
+ */
+[k: string]: string
+}
+/**
+ * Object containing the promotion or tax additional information.
+ */
+additionalInfo?: {
+/**
+ * Additional information.
+ */
+[k: string]: string
+}
+}[]
+}
+/**
+ * Order shipping information.
+ */
+export interface ShippingDataUpdated {
+/**
+ * Object ID. The expected value is `shippingData`.
+ */
+id?: string
+/**
+ * Shipping address details.
+ */
+address?: {
+/**
+ * Shipping address type.
+ */
+addressType: ("residential" | "pickup")
+/**
+ * Full name of the order receiver.
+ */
+receiverName: string
+/**
+ * Shipping address ID.
+ */
+addressId: string
+/**
+ * Shipping address version ID.
+ */
+versionId?: string
+/**
+ * Shipping address entity ID.
+ */
+entityId?: string
+/**
+ * Shipping address postal code.
+ */
+postalCode: string
+/**
+ * Shipping address city.
+ */
+city: string
+/**
+ * Shipping address state.
+ */
+state: string
+/**
+ * Shipping address three-digit country code in [ISO 3166 ALPHA-3](https://www.iban.com/country-codes) format.
+ */
+country: string
+/**
+ * Shipping address street.
+ */
+street: string
+/**
+ * Shipping address number.
+ */
+number: string
+/**
+ * Shipping address neighborhood.
+ */
+neighborhood: string
+/**
+ * Shipping address complement.
+ */
+complement: string
+/**
+ * Shipping address additional information.
+ */
+reference: string
+/**
+ * Shipping address pair of geolocation coordinates, first longitude then latitude.
+ */
+geoCoordinates: number[]
+}
+/**
+ * Logistics information regarding order items.
+ */
+logisticsInfo?: {
+/**
+ * Each item in the order is identified by an index. The position starts in `0`, followed by `1`, `2`, and so on.
+ */
+itemIndex?: number
+/**
+ * SKU ID.
+ */
+itemId?: string
+/**
+ * Service Level Agreement (SLA), which corresponds to the shipping method selected by the customer, usually like normal or express.
+ */
+selectedSla?: string
+/**
+ * Logistics [reservation](https://help.vtex.com/en/tutorial/how-does-reservation-work--tutorials_92) waiting time.
+ */
+lockTTL?: string
+/**
+ * Item shipping price in cents. This value does not correspond to the order total shipping price.
+ */
+price?: number
+/**
+ * Item [list price](https://help.vtex.com/en/tracks/prices-101--6f8pwCns3PJHqMvQSugNfP/3XcXp0r5WrJvogB8KIX4Kx#list-price) in cents.
+ */
+listPrice?: number
+/**
+ * Item selling price in cents.
+ */
+sellingPrice?: number
+/**
+ * [Scheduled delivery](https://help.vtex.com/tutorial/scheduled-delivery--22g3HAVCGLFiU7xugShOBi) window information, when applicable.
+ */
+deliveryWindow?: string
+/**
+ * [Carrier](https://help.vtex.com/en/tutorial/carriers-on-vtex--7u9duMD5UQa2QQwukAWMcE) company name.
+ */
+deliveryCompany?: string
+/**
+ * Shipping estimate time in days. For instance, three business days is represented `3bd`.
+ */
+shippingEstimate?: string
+/**
+ * Shipping estimate date, defined after order confirmation, in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+shippingEstimateDate?: string
+/**
+ * Service Level Agreements (SLA) corresponding to [shipping policies](https://help.vtex.com/en/tutorial/shipping-policy--tutorials_140).
+ */
+slas?: {
+/**
+ * ID of the shipping method used in the [shipping policy](https://help.vtex.com/en/tutorial/shipping-policy--tutorials_140).
+ */
+id?: string
+/**
+ * [Shipping policy](https://help.vtex.com/en/tutorial/shipping-policy--tutorials_140) name.
+ */
+name?: string
+/**
+ * Shipping estimate time in days. For instance, three business days is represented `3bd`.
+ */
+shippingEstimate?: string
+/**
+ * SLA shipping estimate date in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+shippingEstimateDate?: string
+/**
+ * [Delivery window](https://help.vtex.com/tutorial/scheduled-delivery--22g3HAVCGLFiU7xugShOBi) information, when applicable.
+ */
+deliveryWindow?: string
+/**
+ * Available delivery windows information, when applicable.
+ */
+availableDeliveryWindows?: string[]
+/**
+ * SLA delivery IDs information.
+ */
+deliveryIds?: {
+/**
+ * Carrier ID.
+ */
+courierId?: string
+/**
+ * Carrier name.
+ */
+courierName?: string
+/**
+ * [Loading dock](https://help.vtex.com/en/tutorial/loading-dock--5DY8xHEjOLYDVL41Urd5qj) ID.
+ */
+dockId?: string
+/**
+ * Quantity of items being delivered.
+ */
+quantity?: number
+/**
+ * [Warehouse](https://help.vtex.com/en/tutorial/warehouse--6oIxvsVDTtGpO7y6zwhGpb) ID.
+ */
+warehouseId?: string
+/**
+ * Account carrier name.
+ */
+accountCarrierName?: string
+/**
+ * Information about [kit](https://help.vtex.com/tutorial/what-is-a-kit--5ov5s3eHM4AqAAgqWwoc28) items, when applicable.
+ */
+kitItemDetails?: string[]
+}[]
+/**
+ * SLA shipping list price in cents.
+ */
+listPrice?: number
+/**
+ * SLA shipping price in cents. Does not account for the order total shipping price.
+ */
+price?: number
+/**
+ * Defines if the delivery channel is delivery or [pickup point](https://help.vtex.com/en/tutorial/pickup-points--2fljn6wLjn8M4lJHA6HP3R).
+ */
+selectedDeliveryChannel?: ("delivery" | "pickup-in-point")
+pickupStoreInfo?: PickupStoreInfoUpdated
+/**
+ * Name of the [polygon](https://help.vtex.com/en/tutorial/registering-geolocation/) associated with the shipping policy.
+ */
+polygonName?: string
+/**
+ * Logistics [reservation](https://help.vtex.com/en/tutorial/how-does-reservation-work--tutorials_92) waiting time related to the SLA.
+ */
+lockTTL?: string
+/**
+ * [Pickup point](https://help.vtex.com/en/tutorial/pickup-points--2fljn6wLjn8M4lJHA6HP3R) ID related to the SLA.
+ */
+pickupPointId?: string
+/**
+ * Number of days the carrier takes in transit to deliver the order. For instance, three business days is represented `3bd`.
+ */
+transitTime?: string
+/**
+ * Distance in kilometers between the pickup point and the customer address. The distance is measured as a straight line.
+ */
+pickupDistance?: number
+}[]
+/**
+ * List of shipping address countries.
+ */
+shipsTo?: string[]
+/**
+ * Order delivery IDs information.
+ */
+deliveryIds?: {
+/**
+ * Carrier ID.
+ */
+courierId?: string
+/**
+ * Carrier name.
+ */
+courierName?: string
+/**
+ * [Loading dock](https://help.vtex.com/en/tutorial/loading-dock--5DY8xHEjOLYDVL41Urd5qj) ID.
+ */
+dockId?: string
+/**
+ * Quantity of items being delivered.
+ */
+quantity?: number
+/**
+ * [Warehouse](https://help.vtex.com/en/tutorial/warehouse--6oIxvsVDTtGpO7y6zwhGpb) ID.
+ */
+warehouseId?: string
+/**
+ * Account carrier name.
+ */
+accountCarrierName?: string
+/**
+ * Information about [kit](https://help.vtex.com/tutorial/what-is-a-kit--5ov5s3eHM4AqAAgqWwoc28) items, when applicable.
+ */
+kitItemDetails?: string[]
+}[]
+/**
+ * Delivery channels associated with the sales channel (or [trade policy](https://help.vtex.com/tutorial/how-trade-policies-work--6Xef8PZiFm40kg2STrMkMV)).
+ */
+deliveryChannels?: {
+/**
+ * Delivery channel shipping type.
+ */
+id?: ("delivery" | "pickup-in-point")
+/**
+ * Stock check for SKU availability.
+ */
+stockBalance?: number
+}[]
+/**
+ * @deprecated
+ * Defines if the delivery channel is delivery or pickup. This field is deprecated and was replaced by the `deliveryChannels` field.
+ */
+deliveryChannel?: ("delivery" | "pickup-in-point")
+pickupStoreInfo?: PickupStoreInfoUpdated
+/**
+ * Shipping address ID.
+ */
+addressId?: string
+/**
+ * Shipping address version ID.
+ */
+versionId?: string
+/**
+ * Shipping address entity ID.
+ */
+entityId?: string
+/**
+ * Name of the [polygon](https://help.vtex.com/en/tutorial/registering-geolocation/) associated with the [shipping policy](https://help.vtex.com/en/tutorial/shipping-policy--tutorials_140).
+ */
+polygonName?: string
+/**
+ * [Pickup point](https://help.vtex.com/en/tutorial/pickup-points--2fljn6wLjn8M4lJHA6HP3R) ID, when applicable.
+ */
+pickupPointId?: string
+/**
+ * Number of days the carrier takes in transit to deliver the order. For instance, three business days is represented `3bd`.
+ */
+transitTime?: string
+}[]
+/**
+ * List containing order shipping label information.
+ */
+trackingHints?: {
+/**
+ * Order tracking ID.
+ */
+trackingId?: string
+/**
+ * [Carrier](https://help.vtex.com/en/tutorial/carriers-on-vtex--7u9duMD5UQa2QQwukAWMcE) name.
+ */
+courierName?: string
+/**
+ * Order tracking URL.
+ */
+trackingUrl?: string
+/**
+ * Order tracking label.
+ */
+trackingLabel?: string
+}[]
+/**
+ * Selected adresses information.
+ */
+selectedAddresses?: {
+/**
+ * Selected address ID.
+ */
+addressId?: string
+/**
+ * Selected address version ID.
+ */
+versionId?: string
+/**
+ * Selected address entity ID.
+ */
+entityId?: string
+/**
+ * Selected adress shipping type.
+ */
+addressType?: ("residential" | "pickup")
+/**
+ * Full name of the order receiver.
+ */
+receiverName?: string
+/**
+ * Selected address street.
+ */
+street?: string
+/**
+ * Selected address number.
+ */
+number?: string
+/**
+ * Selected address complement.
+ */
+complement?: string
+/**
+ * Selected address neighborhood.
+ */
+neighborhood?: string
+/**
+ * Selected address postal code.
+ */
+postalCode?: string
+/**
+ * Selected address city.
+ */
+city?: string
+/**
+ * Selected address state.
+ */
+state?: string
+/**
+ * Selected address three-digit country code in [ISO 3166 ALPHA-3](https://www.iban.com/country-codes) format.
+ */
+country?: string
+/**
+ * Selected address additional information.
+ */
+reference?: string
+/**
+ * Selected address pair of geolocation coordinates, first longitude then latitude.
+ */
+geoCoordinates?: number[]
+}[]
+/**
+ * Available adresses information.
+ */
+availableAddresses?: {
+/**
+ * Available address ID.
+ */
+addressId?: string
+/**
+ * Available address version ID.
+ */
+versionId?: string
+/**
+ * Available address entity ID.
+ */
+entityId?: string
+/**
+ * Available adress shipping type.
+ */
+addressType?: ("residential" | "pickup")
+/**
+ * Full name of the order receiver.
+ */
+receiverName?: string
+/**
+ * Available address street.
+ */
+street?: string
+/**
+ * Available address number.
+ */
+number?: string
+/**
+ * Available address complement.
+ */
+complement?: string
+/**
+ * Available address neighborhood.
+ */
+neighborhood?: string
+/**
+ * Available address postal code.
+ */
+postalCode?: string
+/**
+ * Available address city.
+ */
+city?: string
+/**
+ * Available address state.
+ */
+state?: string
+/**
+ * Available address three-digit country code in [ISO 3166 ALPHA-3](https://www.iban.com/country-codes) format.
+ */
+country?: string
+/**
+ * Available address additional information.
+ */
+reference?: string
+/**
+ * Available address pair of geolocation coordinates, first longitude then latitude.
+ */
+geoCoordinates?: number[]
+}[]
+/**
+ * Order contact information.
+ */
+contactInformation?: {
+/**
+ * Contact ID.
+ */
+id?: string
+/**
+ * Contact email.
+ */
+email?: string
+/**
+ * Contact first name.
+ */
+firstName?: string
+/**
+ * Contact last name.
+ */
+lastName?: string
+/**
+ * Contact document number.
+ */
+document?: string
+/**
+ * Contact phone number.
+ */
+phone?: string
+/**
+ * Contact document type.
+ */
+documentType?: string
+}[]
+}
+/**
+ * Information about a [loading dock](https://help.vtex.com/en/tutorial/loading-dock--5DY8xHEjOLYDVL41Urd5qj) that was transformed into a [pickup point](https://help.vtex.com/en/tutorial/pickup-points--2fljn6wLjn8M4lJHA6HP3R).
+ */
+export interface PickupStoreInfoUpdated {
+/**
+ * Defines if the shipping type was pickup (`true`) or not (`false`).
+ */
+isPickupStore: boolean
+/**
+ * Name of the pickup point displayed at checkout.
+ */
+friendlyName: string
+/**
+ * Pickup point address information.
+ */
+address: {
+/**
+ * Pickup point address postal code.
+ */
+postalCode?: string
+/**
+ * Three-digit country code of the pickup point address in [ISO 3166 ALPHA-3](https://www.iban.com/country-codes) format.
+ */
+country?: string
+/**
+ * Pickup point address city.
+ */
+city?: string
+/**
+ * Pickup point address state.
+ */
+state?: string
+/**
+ * Pickup point address neighborhood.
+ */
+neighborhood?: string
+/**
+ * Pickup point address street.
+ */
+street?: string
+/**
+ * Pickup point address number.
+ */
+number?: string
+/**
+ * Pickup point address complement.
+ */
+complement?: string
+/**
+ * Pickup point address reference.
+ */
+reference?: string
+/**
+ * Pickup point geolocation coordinates.
+ */
+location?: {
+/**
+ * Latitude coordinate.
+ */
+latitude?: number
+/**
+ * Longitude coordinate.
+ */
+longitude?: number
+}
+}
+/**
+ * Additional information.
+ */
+additionalInfo: string
+/**
+ * ID of the loading dock related to the pickup point.
+ */
+dockId: string
+}
+/**
+ * Payments information.
+ */
+export interface PaymentDataUpdated {
+/**
+ * [Gift cards](https://developers.vtex.com/docs/guides/gift-card-integration-guide) information, when applicable.
+ */
+giftCards?: {
+/**
+ * Gift card identification.
+ */
+id?: string
+/**
+ * Gift card code used by the customer at checkout.
+ */
+redemptionCode?: string
+/**
+ * Gift card name.
+ */
+name?: string
+/**
+ * Gift card loyalty program, when applicable.
+ */
+caption?: string
+/**
+ * Gift card value in cents.
+ */
+value?: number
+/**
+ * Gift card current balance. For newly created gift cards, the balance will be `0.0`.
+ */
+balance?: number
+/**
+ * Gift card provider name.
+ */
+provider?: string
+/**
+ * Gift card group name.
+ */
+groupName?: string
+/**
+ * Defines if the gift card is in use (`true`) or not (`false`).
+ */
+inUse?: boolean
+/**
+ * Defines if the gift card is a special card (`true`) or not (`false`).
+ */
+isSpecialCard?: boolean
+}[]
+/**
+ * Information about the order financial transactions.
+ */
+transactions?: {
+/**
+ * Defines of the transaction is active (`true`) or inactive (`false`).
+ */
+isActive?: boolean
+/**
+ * Transaction ID.
+ */
+transactionId?: string
+/**
+ * Merchant name.
+ */
+merchantName?: string
+/**
+ * Payments information.
+ */
+payments?: {
+/**
+ * Payment unique identifier.
+ */
+id?: string
+/**
+ * Payment system ID.
+ */
+paymentSystem?: string
+/**
+ * Payment system name.
+ */
+paymentSystemName?: string
+/**
+ * Order total payment value in cents.
+ */
+value?: number
+/**
+ * Number of payment installments.
+ */
+installments?: number
+/**
+ * Total payment reference value in cents.
+ */
+referenceValue?: number
+/**
+ * Name of the card owner.
+ */
+cardHolder?: string
+/**
+ * Card number.
+ */
+cardNumber?: string
+/**
+ * Card first four digits.
+ */
+firstDigits?: string
+/**
+ * Card last four digits.
+ */
+lastDigits?: string
+/**
+ * Card Verification Value (CVV2) is a security code used by payment processors to reduce fraudulent credit and debit card transactions.
+ */
+cvv2?: string
+/**
+ * Card expiration month in 2-digit format.
+ */
+expireMonth?: string
+/**
+ * Card expiration year in 4-digit format.
+ */
+expireYear?: string
+/**
+ * Payment URL.
+ */
+url?: string
+/**
+ * Gift card ID.
+ */
+giftCardId?: string
+/**
+ * Gift card name.
+ */
+giftCardName?: string
+/**
+ * Gift card caption.
+ */
+giftCardCaption?: string
+/**
+ * Gift card code used by the customer at checkout.
+ */
+redemptionCode?: string
+/**
+ * Transaction payment method, which can be credit card, debid card, bank invoice, promissory, gift card or pix (`instantPayment`).
+ */
+group?: ("creditCard" | "debitCard" | "bankInvoice" | "promissory" | "giftCard" | "instantPayment")
+/**
+ * Provider unique identifier for the transaction.
+ */
+tid?: string
+/**
+ * Payment due date in `MM/YY` format.
+ */
+dueDate?: string
+/**
+ * Payment provider (connector) responses. The fields within this object can vary according to the order payment provider.
+ */
+connectorResponses?: {
+/**
+ * Provider operational message or error to be logged.
+ */
+Message?: string
+/**
+ * Provider unique identifier for the transaction.
+ */
+tid?: string
+/**
+ * Provider authorization ID.
+ */
+authorizationId?: string
+/**
+ * Order payment status in the [transaction flow](https://help.vtex.com/en/tracks/payments--6GAS7ZzGAm7AGoEAwDbwJG/1xjzgJZvqwaI1rfxLMCC3Y).
+ */
+status?: string
+/**
+ * Total time (in seconds) before the auto settle, when the platform makes an automatic call to `/settlements`, regardless if the payment was approved by the merchant's anti-fraud provider. The maximum value allowed is `604800` seconds (7 days).
+ */
+delayToAutoSettle?: number
+/**
+ * Provider operational return code or error to be logged.
+ */
+ReturnCode?: string
+/**
+ * Provider unique sequential number for the transaction.
+ */
+nsu?: string
+/**
+ * Provider operational code or error to be logged.
+ */
+code?: string
+/**
+ * Provider operational message or error to be logged.
+ */
+message?: string
+/**
+ * Provider unique identifier for the transaction.
+ */
+Tid?: string
+/**
+ * [Acquirer](https://help.vtex.com/en/tracks/payments--6GAS7ZzGAm7AGoEAwDbwJG/kdPbEIWf8Xq8tESQvViMB#acquirer) name (mostly used for card payments).
+ */
+acquirer?: string
+/**
+ * Authorization identification.
+ */
+authId?: string
+/**
+ * Payment ID.
+ */
+paymentId?: string
+/**
+ * Total time (in seconds) before the auto settle, when the platform makes an automatic call to `/settlements`. This happens only after the payment was approved by the merchant's anti-fraud provider.
+ */
+delayToAutoSettleAfterAntifraud?: string
+}
+/**
+ * Gift card provider ID.
+ */
+giftCardProvider?: string
+/**
+ * Defines if the payment has a gift card discount (`true`) or not (`false`).
+ */
+giftCardAsDiscount?: boolean
+/**
+ * Koin connector URL.
+ */
+koinUrl?: string
+/**
+ * Identification code of the account where the payment was made.
+ */
+accountId?: string
+/**
+ * When the payment was made in a subaccount, this field retrieves the main account ID.
+ */
+parentAccountId?: string
+/**
+ * Bank issued invoice numeric sequence.
+ */
+bankIssuedInvoiceIdentificationNumber?: string
+/**
+ * Bank issued invoice numeric sequence formatted as customers see.
+ */
+bankIssuedInvoiceIdentificationNumberFormatted?: string
+/**
+ * Bank issued invoice bar code number.
+ */
+bankIssuedInvoiceBarCodeNumber?: string
+/**
+ * Bank issued invoice bar code type.
+ */
+bankIssuedInvoiceBarCodeType?: string
+/**
+ * Billing address information.
+ */
+billingAddress?: {
+/**
+ * Billing address postal code.
+ */
+postalCode?: string
+/**
+ * Billing address city.
+ */
+city?: string
+/**
+ * Billing address state.
+ */
+state?: string
+/**
+ * Billing address three-digit country code in [ISO 3166 ALPHA-3](https://www.iban.com/country-codes) format.
+ */
+country?: string
+/**
+ * Billing address street.
+ */
+street?: string
+/**
+ * Billing address number.
+ */
+number?: string
+/**
+ * Billing address neighborhood.
+ */
+neighborhood?: string
+/**
+ * Billing address complement.
+ */
+complement?: string
+/**
+ * Billing address additional information.
+ */
+reference?: string
+/**
+ * Billing address pair of geolocation coordinates, first longitude then latitude.
+ */
+geoCoordinates?: number[]
+}
+/**
+ * Type of [wallet](https://help.vtex.com/en/tutorial/what-is-an-e-wallet--4v5wcOe4A0SiaimWM2cU60) used in the payment.
+ */
+paymentOrigin?: string
+}[]
+}[]
+}
+/**
+ * Information about shipping packages, which are created after order invoicing.
+ */
+export interface PackageAttachmentUpdated {
+/**
+ * List with packages' information.
+ */
+packages?: {
+/**
+ * Name of the [carrier](https://help.vtex.com/en/tutorial/carriers-on-vtex--7u9duMD5UQa2QQwukAWMcE) responsible for the package shipping.
+ */
+courier?: string
+/**
+ * Package description.
+ */
+description?: string
+/**
+ * Unique identification code of the package invoice.
+ */
+invoiceNumber?: string
+/**
+ * Package invoice value in cents.
+ */
+invoiceValue?: number
+/**
+ * Package invoice URL.
+ */
+invoiceUrl?: string
+/**
+ * Package invoice issuance date in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+issuanceDate?: string
+/**
+ * Package [tracking number](https://developers.vtex.com/docs/api-reference/orders-api#patch-/api/oms/pvt/orders/-orderId-/invoice/-invoiceNumber-).
+ */
+trackingNumber?: string
+/**
+ * Package invoice key.
+ */
+invoiceKey?: string
+/**
+ * Package tracking URL.
+ */
+trackingUrl?: string
+/**
+ * Package invoice text in [xml format](https://help.vtex.com/en/tutorial/configuring-xml--tutorials_242). This field is important for stores integrated with [external marketplaces](https://developers.vtex.com/docs/guides/external-marketplace-integration-guide).
+ */
+embeddedInvoice?: string
+/**
+ * Package invoice type, which can be:
+ * - `Output`: Selling order invoice.
+ * - `Input`: Returning items invoice.
+ */
+type?: ("Output" | "Input")
+/**
+ * Information on each item in the package.
+ */
+items?: {
+/**
+ * Item index of the item position whithin the `items` array. The count starts at `0`.
+ */
+itemIndex?: number
+/**
+ * SKU ID.
+ */
+id?: string
+/**
+ * Package item quantity.
+ */
+quantity?: number
+/**
+ * Package item price in cents.
+ */
+price?: number
+/**
+ * Package item description.
+ */
+description?: string
+/**
+ * Package item unit multiplier.
+ */
+unitMultiplier?: number
+}[]
+/**
+ * [Carrier](https://help.vtex.com/en/tutorial/carriers-on-vtex--7u9duMD5UQa2QQwukAWMcE) shipping information.
+ */
+courierStatus?: {
+/**
+ * Package delivery date in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+deliveredDate?: string
+/**
+ * Defines if a carrier was assigned for order shipping (`ok`) or not (`null`).
+ */
+status?: string
+/**
+ * Defines if the carrier has already delivered the package (`true`) or not (`false`).
+ */
+finished?: boolean
+/**
+ * Package tracking information.
+ */
+data?: {
+/**
+ * Date since package tracking last change in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+lastChange?: string
+/**
+ * Package tracking city.
+ */
+city?: string
+/**
+ * Package tracking state in two-digit code format.
+ */
+state?: string
+/**
+ * Package tracking description.
+ */
+description?: string
+/**
+ * Package tracking creation date in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+createDate?: string
+}[]
+}
+/**
+ * [CFOP](https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/acoes-e-programas/facilitacao/anexo-ecf-cfop) (_Código Fiscal de Operação e Prestação_) is a Brazilian fiscal code of operations and services that classifies business transaction types.
+ */
+cfop?: string
+/**
+ * Date since package tracking last change in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+lastChange?: string
+/**
+ * Information about a value being returned to the customer. This field applies only to invoices with the `Input` type because it relates to returning items.
+ */
+restitutions?: {
+/**
+ * Customer refund details.
+ */
+refund?: {
+/**
+ * Refund value in cents.
+ */
+value?: number
+/**
+ * Refund involving a [gift card](https://developers.vtex.com/docs/guides/gift-card-integration-guide).
+ */
+giftCardData?: string
+/**
+ * Information about the items being returned.
+ */
+items?: {
+/**
+ * Defines if the refund includes freight values (`true`) or not (`false`).
+ */
+useFreight?: boolean
+/**
+ * Defines if there are compensated unit tags in the package (`true`) or not (`false`).
+ */
+isCompensation?: boolean
+/**
+ * Compensational refund value in cents.
+ */
+compensationValue?: number
+/**
+ * SKU ID of the returned item.
+ */
+id?: string
+/**
+ * Number of items being returned.
+ */
+quantity?: number
+/**
+ * Returned item price in cents.
+ */
+price?: number
+/**
+ * Customer reason for returning the item.
+ */
+description?: string
+}[]
+}
+}
+/**
+ * Indicates the number of boxes (volumes) needed to contain the package items. For example, two refrigerators do not fit in a single volume, so this field would have value `2`.
+ */
+volumes?: number
+}[]
+}
+/**
+ * Information about the call center operator responsible for the order.
+ */
+export interface CallCenterOperatorDataUpdated {
+/**
+ * Call center operator identification code.
+ */
+id?: string
+/**
+ * Call center operator email.
+ */
+email?: string
+/**
+ * Call center operator user name.
+ */
+userName?: string
+}
+/**
+ * Order invoices information.
+ */
+export interface InvoiceDataUpdated {
+/**
+ * Invoice address information.
+ */
+address?: {
+/**
+ * Invoice address type, which can be `residential`, when the customer gives an address for delivery, or `pickup`, when the customer picks the order at a pickup point.
+ */
+addressType?: ("residential" | "pickup")
+/**
+ * Full name of the order receiver.
+ */
+receiverName?: string
+/**
+ * Invoice address ID.
+ */
+addressId?: string
+/**
+ * Invoice address version ID.
+ */
+versionId?: string
+/**
+ * Invoice address entity ID.
+ */
+entityId?: string
+/**
+ * Invoice address postal code.
+ */
+postalCode?: string
+/**
+ * Invoice address city.
+ */
+city?: string
+/**
+ * Invoice address state.
+ */
+state?: string
+/**
+ * Invoice address three-digit country code in [ISO 3166 ALPHA-3](https://www.iban.com/country-codes) format.
+ */
+country?: string
+/**
+ * Invoice address street.
+ */
+street?: string
+/**
+ * Invoice address number.
+ */
+number?: string
+/**
+ * Invoice address neighborhood.
+ */
+neighborhood?: string
+/**
+ * Invoice address complement.
+ */
+complement?: string
+/**
+ * Invoice address additional information.
+ */
+reference?: string
+/**
+ * Invoice address pair of geolocation coordinates, first longitude then latitude.
+ */
+geoCoordinates?: number[]
+/**
+ * Contact unique identifier.
+ */
+contactId?: string
+}
+/**
+ * Invoice information regarding payment method.
+ */
+userPaymentInfo?: {
+/**
+ * List of the payment methods used by the customer in the purchase.
+ */
+paymentMethods?: string[]
+}
+/**
+ * Information about the invoice subject.
+ */
+invoiceSubject?: {
+/**
+ * Invoice subject ID.
+ */
+id?: string
+/**
+ * Invoice subject email address.
+ */
+email?: string
+/**
+ * Invoice subject first name.
+ */
+firstName?: string
+/**
+ * Invoice subject last name.
+ */
+lastName?: string
+/**
+ * Invoice subject phone number.
+ */
+phone?: string
+}
+}
+/**
+ * Information about changes in the order.
+ */
+export interface ChangesAttachmentUpdated {
+/**
+ * Order changes ID.
+ */
+id: string
+/**
+ * Information about changes in the order.
+ */
+changesData: {
+/**
+ * Text explaining why the order was changed. This information may be shown to the customer in the storefront or transactional emails.
+ */
+reason: string
+/**
+ * Order change discount value in cents.
+ */
+discountValue: number
+/**
+ * Order change increment value in cents.
+ */
+incrementValue: number
+/**
+ * Information about items added to the order, when applicable.
+ */
+itemsAdded: {
+/**
+ * Added item SKU ID.
+ */
+id?: string
+/**
+ * Added item SKU name.
+ */
+name?: string
+/**
+ * Quantity of items added.
+ */
+quantity?: number
+/**
+ * Added item price in cents.
+ */
+price?: number
+/**
+ * Added item unit multiplier.
+ */
+unitMultiplier?: string
+}[]
+/**
+ * Information about items removed from the order, when applicable.
+ */
+itemsRemoved: {
+/**
+ * Removed item SKU ID.
+ */
+id: string
+/**
+ * Removed item name.
+ */
+name: string
+/**
+ * Quantity of removed items.
+ */
+quantity: number
+/**
+ * Removed item price in cents.
+ */
+price: number
+/**
+ * Removed item unit multiplier.
+ */
+unitMultiplier: string
+}[]
+/**
+ * Order changes receipt information.
+ */
+receipt: {
+/**
+ * Receipt creation date in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+date: string
+/**
+ * Order ID.
+ */
+orderId: string
+/**
+ * Receipt unique identifier code.
+ */
+receipt: string
+}
+}[]
+}
+/**
+ * Store preferences in the [Account settings](https://help.vtex.com/en/tutorial/account-details-page--2vhUVOKfCaswqLguT2F9xq) page.
+ */
+export interface StorePreferencesDataUpdated {
+/**
+ * Country code in three-digit [ISO 3166 ALPHA-3](https://www.iban.com/country-codes) format.
+ */
+countryCode?: string
+/**
+ * Currency code in [ISO 4217](https://www.iban.com/currency-codes) format.
+ */
+currencyCode?: string
+/**
+ * Currency format settings.
+ */
+currencyFormatInfo?: {
+/**
+ * Number of currency decimal digits.
+ */
+CurrencyDecimalDigits?: number
+/**
+ * Character for currency decimal separation.
+ */
+CurrencyDecimalSeparator?: string
+/**
+ * Character for currency group separation.
+ */
+CurrencyGroupSeparator?: string
+/**
+ * Limit of characters that can be grouped for currency groups.
+ */
+CurrencyGroupSize?: number
+/**
+ * Defines if the prices displayed for customers start with the currency symbol (`true`) or not (`false`).
+ */
+StartsWithCurrencySymbol?: boolean
+}
+/**
+ * Currency locale code in [LCID](https://learn.microsoft.com/en-us/openspecs/office_standards/ms-oe376/6c085406-a698-4e12-9d4d-c3b0ee3dbc4a) format.
+ */
+currencyLocale?: number
+/**
+ * Currency symbol characters.
+ */
+currencySymbol?: string
+/**
+ * Time zone considered for the store orders.
+ */
+timeZone?: string
+}
+/**
+ * Information about the marketplace related to the order.
+ */
+export interface MarketplaceUpdated {
+/**
+ * Marketplace base URL.
+ */
+baseURL?: string
+/**
+ * Defines if the marketplace is a [VTEX certified marketplace](https://help.vtex.com/en/tutorial/marketplace-strategies-at-vtex--tutorials_402#integrating-with-certified-marketplaces) (`true`) or not (`false`).
+ */
+isCertified?: boolean
+/**
+ * Marketplace name.
+ */
+name?: string
+}
+/**
+ * Metadata information about items.
+ */
+export interface ItemMetadataUpdated {
+/**
+ * Metadata details about items.
+ */
+Items?: {
+/**
+ * SKU ID.
+ */
+Id?: string
+/**
+ * Seller ID.
+ */
+Seller?: string
+/**
+ * Item name as displayed to customers in the storefront.
+ */
+Name?: string
+/**
+ * SKU name.
+ */
+SkuName?: string
+/**
+ * Product ID.
+ */
+ProductId?: string
+/**
+ * SKU reference ID.
+ */
+RefId?: string
+/**
+ * European Article Number (EAN) of the item.
+ */
+Ean?: string
+/**
+ * SKU image URL.
+ */
+ImageUrl?: string
+/**
+ * SKU slug.
+ */
+DetailUrl?: string
+/**
+ * [Assembly options](https://help.vtex.com/en/tutorial/assembly-options--5x5FhNr4f5RUGDEGWzV1nH) information related to the item, when applicable.
+ */
+AssemblyOptions?: {
+/**
+ * Assembly option ID.
+ */
+Id?: string
+/**
+ * Assembly option name.
+ */
+Name?: string
+/**
+ * Defines if sending the attachment for the item purchased is required(`true`) or optional (`false`).
+ */
+Required?: boolean
+/**
+ * Assembly option content.
+ */
+InputValues?: {
+/**
+ * Assembly option value.
+ */
+[k: string]: string
+}
+/**
+ * Assembly option composition.
+ */
+Composition?: {
+/**
+ * Assembly option composition value.
+ */
+[k: string]: string
+}
+}[]
+}[]
+}
+/**
+ * Information about [subscriptions](https://help.vtex.com/en/tutorial/how-subscriptions-work--frequentlyAskedQuestions_4453), when applicable.
+ */
+export interface SubscriptionDataUpdated {
+/**
+ * Subscription group ID. If this field returns `null` and the `executionCount` is `0`, the order is the first subscription order.
+ */
+subscriptionGroupId?: string
+/**
+ * List with subscriptions details.
+ */
+subscriptions?: {
+/**
+ * Position of the order in the subscription cycle. The first order will have the value `0`, the second will have the value `1`, and so on.
+ */
+executionCount?: number
+/**
+ * @deprecated
+ * Value of the order when the customer subscribed. Subscriptions created via VTEX Admin or [Subscriptions API](https://developers.vtex.com/docs/api-reference/subscriptions-api-v3) do not have an original order, so this field returns `0.0`.
+ */
+priceAtSubscriptionDate?: number
+/**
+ * Each item in the subscription order is identified by an index. The position starts in `0`, followed by `1`, `2`, and so on.
+ */
+itemIndex?: number
+/**
+ * Information about the [subscription plan](https://help.vtex.com/en/tutorial/subscription-plans-beta--5kczKRqHEsrs1tYtRcY8wR).
+ */
+plan?: {
+/**
+ * Plan type.
+ */
+type?: string
+/**
+ * Information about the subscription recurrence.
+ */
+frequency?: {
+/**
+ * Defines the subscription recurrence period.
+ */
+periodicity?: ("DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY")
+/**
+ * Time interval configured between subscription orders, which depends on the frequency. For a `DAY` frequency, the value will be days, for `MONTH` it will be months, and so on.
+ */
+interval?: number
+}
+/**
+ * Information about the period during which the subscription will be valid.
+ */
+validity?: {
+/**
+ * Subscription plan beginning date and time in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+begin?: string
+/**
+ * Subscription plan ending date and time in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+end?: string
+}
+}
+}[]
+}
+/**
+ * Order taxes information.
+ */
+export interface TaxDataUpdated {
+/**
+ * Defines if the taxes were applied by the marketplace (`true`) or not (`false`).
+ */
+areTaxesDesignatedByMarketplace: boolean
+/**
+ * Order taxes details.
+ */
+taxInfoCollection: {
+/**
+ * Item indexing number.
+ */
+itemIndex: number
+/**
+ * SKU ID.
+ */
+sku: string
+/**
+ * Price tags information.
+ */
+priceTags: {
+/**
+ * Price tag identifier code.
+ */
+identifier?: string
+/**
+ * Indicates whether price tag value is applied through a percentage (`true`) or not (`false`).
+ */
+isPercentual?: boolean
+/**
+ * Price tag name.
+ */
+name?: string
+/**
+ * Price tag value in cents.
+ */
+value?: number
+/**
+ * Price tag raw value that can contain up to five decimals, separated by a period.
+ */
+rawValue?: number
+}[]
+}[]
+}
+/**
+ * Information about [order cancellation](https://developers.vtex.com/docs/guides/order-canceling-improvements), when applicable.
+ */
+export interface CancellationDataUpdated {
+/**
+ * Defines if the order cancellation was requested by the customer (`true`) or not (`false`).
+ */
+requestedByUser?: boolean
+/**
+ * Defines if the order cancellation was made by the system (`true`) or not (`false`). This type of order cancellation happens in [incomplete orders](https://help.vtex.com/en/tutorial/how-incomplete-orders-work--tutorials_294), for example.
+ */
+requestedBySystem?: boolean
+/**
+ * Defines if the order cancellation was requested by the seller (`true`) or not (`false`).
+ */
+requestedBySellerNotification?: boolean
+/**
+ * Defines if the order cancellation was requested by the payment gateway (`true`) or not (`false`).
+ */
+requestedByPaymentNotification?: boolean
+/**
+ * Reason why the order was canceled.
+ */
+reason?: string
+/**
+ * Order cancellation date in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ssZ`.
+ */
+cancellationDate?: string
+/**
+ * ID that identifies the cancellation operation.
+ */
+cancellationRequestId?: string
+}
+/**
+ * Information about the customer preferences.
+ */
+export interface ClientPreferencesDataUpdated {
+/**
+ * Language code of the customer preferred language while accessing the store.
+ */
+locale?: string
+/**
+ * Defines if the customer receives the store's newsletter (`true`) or not (`false`).
+ */
+optinNewsLetter?: boolean
 }
 /**
  * Session information.
