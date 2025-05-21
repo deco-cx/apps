@@ -5,7 +5,7 @@ interface Props {
   code: string;
   returnUrl?: string;
   redirectUri: string;
-  clientSecret: string;
+  clientSecret?: string;
 }
 
 export default async function callback(
@@ -19,7 +19,7 @@ export default async function callback(
   const response = await authClient[`POST /token`]({
     code,
     client_id: CLIENT_ID,
-    client_secret: clientSecret,
+    client_secret: clientSecret || "",
     redirect_uri: new URL("/oauth/callback", req.url).href,
     grant_type: "authorization_code",
   });
@@ -34,6 +34,7 @@ export default async function callback(
     expires_in: authResponse.expires_in,
     scope: authResponse.scope,
     token_type: authResponse.token_type,
+    tokenObtainedAt: Math.floor(Date.now() / 1000),
   });
 
   if (returnUrl) {

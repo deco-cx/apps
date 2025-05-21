@@ -3,7 +3,8 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 import type { FnContext } from "@deco/deco";
 import { createHttpClient } from "../utils/http.ts";
 import { fetchSafe } from "../utils/fetch.ts";
-import { McpContext } from "./mcp/context.ts";
+import { McpContext } from "../mcp/context.ts";
+import { GOOGLE_OAUTH_URL, GOOGLE_SHEETS_URL } from "./utils/constant.ts";
 
 export interface Props {
   code?: string;
@@ -13,6 +14,7 @@ export interface Props {
   scope?: string;
   token_type?: string;
   refresh_token_expires_in?: number;
+  tokenObtainedAt?: number;
 }
 
 export interface State extends Props {
@@ -30,7 +32,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
  */
 export default function App({ ...props }: Props) {
   const client = createHttpClient<GoogleSheetsClient>({
-    base: "https://sheets.googleapis.com",
+    base: GOOGLE_SHEETS_URL,
     headers: new Headers({
       "Accept": "application/json",
       "Content-Type": "application/json",
@@ -40,11 +42,10 @@ export default function App({ ...props }: Props) {
   });
 
   const authClient = createHttpClient<GoogleAuthClient>({
-    base: "https://oauth2.googleapis.com",
+    base: GOOGLE_OAUTH_URL,
     headers: new Headers({
       "Accept": "application/json",
       "Content-Type": "application/x-www-form-urlencoded",
-      "Authorization": `Bearer ${props.access_token}`,
     }),
     fetcher: fetchSafe,
   });

@@ -6,6 +6,7 @@ interface Props {
 }
 
 export default function start(props: Props) {
+  console.log("props", props);
   const authParams = new URLSearchParams({
     client_id: CLIENT_ID,
     redirect_uri: props.redirectUri,
