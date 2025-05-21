@@ -5,7 +5,8 @@
 import * as $$$$$$$$$0 from "./actions/batchUpdateValues.ts";
 import * as $$$$$$$$$1 from "./actions/createSpreadsheet.ts";
 import * as $$$$$$$$$2 from "./actions/oauth/callback.ts";
-import * as $$$$$$$$$3 from "./actions/updateValues.ts";
+import * as $$$$$$$$$3 from "./actions/oauth/refreshToken.ts";
+import * as $$$$$$$$$4 from "./actions/updateValues.ts";
 import * as $$$0 from "./loaders/getBatchValues.ts";
 import * as $$$1 from "./loaders/getSpreadsheet.ts";
 import * as $$$2 from "./loaders/getValues.ts";
@@ -22,7 +23,8 @@ const manifest = {
     "google-sheets/actions/batchUpdateValues.ts": $$$$$$$$$0,
     "google-sheets/actions/createSpreadsheet.ts": $$$$$$$$$1,
     "google-sheets/actions/oauth/callback.ts": $$$$$$$$$2,
-    "google-sheets/actions/updateValues.ts": $$$$$$$$$3,
+    "google-sheets/actions/oauth/refreshToken.ts": $$$$$$$$$3,
+    "google-sheets/actions/updateValues.ts": $$$$$$$$$4,
   },
   "name": "google-sheets",
   "baseUrl": import.meta.url,
