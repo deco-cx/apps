@@ -1,3 +1,4 @@
+import { redirect } from "@deco/deco";
 import type { ProductListingPage } from "../../../commerce/types.ts";
 import { parseRange } from "../../../commerce/utils/filters.ts";
 import { STALE } from "../../../utils/fetch.ts";
@@ -5,6 +6,7 @@ import sendEvent from "../../actions/analytics/sendEvent.ts";
 import { AppContext } from "../../mod.ts";
 import {
   isFilterParam,
+  pageTypesFromUrl,
   toPath,
   withDefaultFacets,
   withDefaultParams,
@@ -15,8 +17,8 @@ import {
   pageTypesToSeo,
 } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
-import { pageTypesFromUrl } from "../../utils/intelligentSearch.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
+import { getSkipSimulationBehaviorFromBag } from "../../utils/simulationBehavior.ts";
 import { slugify } from "../../utils/slugify.ts";
 import {
   filtersFromURL,
@@ -36,7 +38,7 @@ import type {
 } from "../../utils/types.ts";
 import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
-import { redirect } from "@deco/deco";
+
 /** this type is more friendly user to fuzzy type that is 0, 1 or auto. */
 export type LabelledFuzzy = "automatic" | "disabled" | "enabled";
 /**
@@ -166,9 +168,15 @@ export interface Props {
    */
   simulationBehavior?: "default" | "skip" | "only1P";
 }
-const searchArgsOf = (props: Props, url: URL) => {
+const searchArgsOf = (props: Props, url: URL, ctx: AppContext) => {
   const hideUnavailableItems = props.hideUnavailableItems;
-  const simulationBehavior = props.simulationBehavior || "default";
+  const simulationBehavior = getSkipSimulationBehaviorFromBag(ctx)
+    ? "skip" as const
+    : (url.searchParams.get("simulationBehavior") as
+      | "skip"
+      | "default"
+      | "only1P") ||
+      props.simulationBehavior || "default";
   const countFromSearchParams = url.searchParams.get("PS");
   const count = Number(countFromSearchParams ?? props.count ?? 12);
   const query = props.query ?? url.searchParams.get("q") ?? "";
@@ -289,6 +297,7 @@ const loader = async (
   const { selectedFacets: baseSelectedFacets, page, ...args } = searchArgsOf(
     props,
     url,
+    ctx,
   );
   let pathToUse = url.href.replace(url.origin, "");
 
@@ -467,7 +476,12 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
       ).join("\\"),
     ],
     ["segment", segment],
-    ["simulationBehavior", props.simulationBehavior || "default"],
+    [
+      "simulationBehavior",
+      getSkipSimulationBehaviorFromBag(ctx)
+        ? "skip"
+        : props.simulationBehavior || "default",
+    ],
   ]);
   url.searchParams.forEach((value, key) => {
     if (!ALLOWED_PARAMS.has(key.toLowerCase()) && !isFilterParam(key)) {

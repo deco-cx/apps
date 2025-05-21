@@ -9,14 +9,14 @@ import {
 } from "../../utils/intelligentSearch.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
-import { toProduct } from "../../utils/transform.ts";
+import { getSkipSimulationBehaviorFromBag } from "../../utils/simulationBehavior.ts";
+import { sortProducts, toProduct } from "../../utils/transform.ts";
 import type { Item, ProductID, Sort } from "../../utils/types.ts";
+import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 import {
   LabelledFuzzy,
   mapLabelledFuzzyToFuzzy,
 } from "./productListingPage.ts";
-import { sortProducts } from "../../utils/transform.ts";
-import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 
 /**
  * @title Collection ID
@@ -205,8 +205,14 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
-  const props = expandedProps.props ??
+  const _props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
+  const props = {
+    ..._props,
+    simulationBehavior: getSkipSimulationBehaviorFromBag(ctx)
+      ? "skip"
+      : _props.simulationBehavior || "default",
+  };
   const { vcsDeprecated } = ctx;
   const { url } = req;
   const segment = getSegmentFromBag(ctx);
@@ -304,8 +310,14 @@ export const cacheKey = (
   req: Request,
   ctx: AppContext,
 ) => {
-  const props = expandedProps.props ??
+  const _props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
+  const props = {
+    ..._props,
+    simulationBehavior: getSkipSimulationBehaviorFromBag(ctx)
+      ? "skip"
+      : _props.simulationBehavior || "default",
+  };
 
   const url = new URL(req.url);
 

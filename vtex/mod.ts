@@ -18,6 +18,7 @@ import {
   type AppContext as AC,
   type AppMiddlewareContext as AMC,
   type AppRuntime,
+  asResolved,
   type ManifestOf,
 } from "@deco/deco";
 export type App = ReturnType<typeof VTEX>;
@@ -36,6 +37,8 @@ export type SegmentCulture = Omit<
   | "priceTables"
   | "regionId"
 >;
+import { Matcher } from "@deco/deco/blocks";
+
 /** @title VTEX */
 export interface Props {
   /**
@@ -76,6 +79,10 @@ export interface Props {
    * @hide true
    */
   platform: "vtex";
+  /**
+   * @title Skip Simulation Behavior
+   */
+  skipSimulationBehavior?: Matcher;
 }
 export const color = 0xf71963;
 /**
@@ -164,5 +171,15 @@ export const preview = async (props: AppRuntime) => {
       ...props,
       markdownContent,
     },
+  };
+};
+export const onBeforeResolveProps = (props: Props) => {
+  const skipSimulationBehavior = props.skipSimulationBehavior
+    ? asResolved(props.skipSimulationBehavior, false)
+    : undefined;
+
+  return {
+    ...props,
+    skipSimulationBehavior,
   };
 };
