@@ -54,7 +54,6 @@ export default async function action(
           },
         },
       );
-    console.log(response.ok);
 
     if (!response.ok) {
       throw new Error(
