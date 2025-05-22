@@ -20,7 +20,10 @@ export async function resolveSkipSimulationBehavior(
   req: Request,
 ) {
   const { __resolveType, ...props } = ctx
-    .skipSimulationBehavior as unknown as Resolved<Matcher>;
+    .skipSimulationBehavior as unknown as Resolved<Matcher> || {};
+  if (!__resolveType) {
+    return false;
+  }
   const skipSimulationBehavior = await ctx.invoke(
     // @ts-ignore	ignore
     __resolveType,
