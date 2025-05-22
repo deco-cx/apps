@@ -1,4 +1,5 @@
 import type { ProductListingPage } from "../../../commerce/types.ts";
+import { safeJsonSerialize } from "../../../website/utils/html.ts";
 import { AppContext } from "../../mod.ts";
 import { isGridProductsModel } from "../../utils/paths.ts";
 import {
@@ -107,11 +108,11 @@ const loader = async (
       value: sort.Alias,
       label: sort.Label,
     })),
-    seo: {
+    seo: safeJsonSerialize({
       title: pageInfo.PageTitle,
       description: pageInfo.MetaDescription || "",
       canonical: pageInfo.CanonicalLink,
-    },
+    }),
   };
 };
 

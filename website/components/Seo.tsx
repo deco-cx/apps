@@ -1,7 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
-import type { ImageWidget } from "../../admin/widgets.ts";
-import { stripHTML } from "../utils/html.ts";
 import { JSX } from "preact";
+import type { ImageWidget } from "../../admin/widgets.ts";
+import { safeJsonSerialize, stripHTML } from "../utils/html.ts";
 
 export const renderTemplateString = (template: string, value: string) =>
   template.replace("%s", value);
@@ -97,11 +97,11 @@ function Component({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+            __html: safeJsonSerialize({
               "@context": "https://schema.org",
               // @ts-expect-error Trust me, I'm an engineer
               ...json,
-            }),
+            }, { returnAsString: true }),
           }}
         />
       ))}
