@@ -1,5 +1,4 @@
 import { AppContext } from "../../mod.ts";
-import { CLIENT_ID } from "../../utils/constant.ts";
 
 /**
  * @name REFRESH_TOKEN
@@ -11,10 +10,12 @@ export default async function refreshToken(
   _req: Request,
   ctx: AppContext,
 ) {
-  const { authClient, refresh_token: _refresh_token, clientSecret } = ctx;
+  const { authClient, refresh_token: _refresh_token, clientSecret, clientId } = ctx;
   const currentCtx = await ctx.getConfiguration();
 
   const refresh_token = _refresh_token || currentCtx.refresh_token;
+  const client_id = clientId || currentCtx.clientId;
+  const client_secret = clientSecret || currentCtx.clientSecret;
 
   if (!refresh_token) {
     return {
@@ -23,10 +24,17 @@ export default async function refreshToken(
     };
   }
 
+  if (!client_id || !client_secret) {
+    return {
+      success: false,
+      message: "no client id or client secret",
+    };
+  }
+
   try {
     const response = await authClient[`POST /token`]({
-      client_id: CLIENT_ID,
-      client_secret: clientSecret || "",
+      client_id,
+      client_secret,
       refresh_token: refresh_token,
       redirect_uri: new URL("/oauth/callback", _req.url).href,
       grant_type: "refresh_token",
