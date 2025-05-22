@@ -7,12 +7,6 @@ export interface Props {
    * @description O ID da planilha do Google Sheets a ser obtida
    */
   spreadsheetId: string;
-
-  /**
-   * @title Token de Autenticação
-   * @description O token de autenticação para acessar o Google Sheets
-   */
-  token: string;
 }
 
 /**
@@ -24,7 +18,7 @@ const loader = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<Spreadsheet> => {
-  const { spreadsheetId, token } = props;
+  const { spreadsheetId } = props;
 
   try {
     const response = await ctx.client
@@ -32,15 +26,9 @@ const loader = async (
         {
           spreadsheetId,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
       );
 
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
     console.error("Erro ao obter planilha:", error);
     throw error;
