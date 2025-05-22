@@ -1,5 +1,6 @@
 import type { ProductListingPage } from "../../commerce/types.ts";
 import { AppContext } from "../../shopify/mod.ts";
+import { safeJsonSerialize } from "../../website/utils/html.ts";
 import {
   ProductsByCollection,
   SearchProducts,
@@ -219,13 +220,13 @@ const loader = async (
       recordPerPage: count,
     },
     sortOptions: isSearch ? searchSortOptions : sortOptions,
-    seo: {
+    seo: safeJsonSerialize({
       title: collectionTitle || "",
       description: collectionDescription || "",
       canonical: `${url.origin}${url.pathname}${
         page >= 1 ? `?page=${page}` : ""
       }`,
-    },
+    }),
   };
 };
 
