@@ -10,7 +10,8 @@ export default async function refreshToken(
   _req: Request,
   ctx: AppContext,
 ) {
-  const { authClient, refresh_token: _refresh_token, clientSecret, clientId } = ctx;
+  const { authClient, refresh_token: _refresh_token, clientSecret, clientId } =
+    ctx;
   const currentCtx = await ctx.getConfiguration();
 
   const refresh_token = _refresh_token || currentCtx.refresh_token;
