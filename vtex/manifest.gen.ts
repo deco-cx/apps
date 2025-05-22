@@ -87,14 +87,15 @@ import * as $$$38 from "./loaders/product/extensions/listingPage.ts";
 import * as $$$39 from "./loaders/product/extensions/suggestions.ts";
 import * as $$$40 from "./loaders/product/wishlist.ts";
 import * as $$$41 from "./loaders/profile/getUserProfile.ts";
-import * as $$$42 from "./loaders/promotion/getPromotionById.ts";
-import * as $$$43 from "./loaders/proxy.ts";
-import * as $$$44 from "./loaders/session/getSession.ts";
-import * as $$$45 from "./loaders/session/getUserSessions.ts";
-import * as $$$46 from "./loaders/user.ts";
-import * as $$$47 from "./loaders/wishlist.ts";
-import * as $$$48 from "./loaders/workflow/product.ts";
-import * as $$$49 from "./loaders/workflow/products.ts";
+import * as $$$42 from "./loaders/profile/getUserProfileRest.ts";
+import * as $$$43 from "./loaders/promotion/getPromotionById.ts";
+import * as $$$44 from "./loaders/proxy.ts";
+import * as $$$45 from "./loaders/session/getSession.ts";
+import * as $$$46 from "./loaders/session/getUserSessions.ts";
+import * as $$$47 from "./loaders/user.ts";
+import * as $$$48 from "./loaders/wishlist.ts";
+import * as $$$49 from "./loaders/workflow/product.ts";
+import * as $$$50 from "./loaders/workflow/products.ts";
 import * as $$$$$$0 from "./sections/Analytics/Vtex.tsx";
 import * as $$$$$$$$$$0 from "./workflows/events.ts";
 import * as $$$$$$$$$$1 from "./workflows/product/index.ts";
@@ -143,14 +144,15 @@ const manifest = {
     "vtex/loaders/product/extensions/suggestions.ts": $$$39,
     "vtex/loaders/product/wishlist.ts": $$$40,
     "vtex/loaders/profile/getUserProfile.ts": $$$41,
-    "vtex/loaders/promotion/getPromotionById.ts": $$$42,
-    "vtex/loaders/proxy.ts": $$$43,
-    "vtex/loaders/session/getSession.ts": $$$44,
-    "vtex/loaders/session/getUserSessions.ts": $$$45,
-    "vtex/loaders/user.ts": $$$46,
-    "vtex/loaders/wishlist.ts": $$$47,
-    "vtex/loaders/workflow/product.ts": $$$48,
-    "vtex/loaders/workflow/products.ts": $$$49,
+    "vtex/loaders/profile/getUserProfileRest.ts": $$$42,
+    "vtex/loaders/promotion/getPromotionById.ts": $$$43,
+    "vtex/loaders/proxy.ts": $$$44,
+    "vtex/loaders/session/getSession.ts": $$$45,
+    "vtex/loaders/session/getUserSessions.ts": $$$46,
+    "vtex/loaders/user.ts": $$$47,
+    "vtex/loaders/wishlist.ts": $$$48,
+    "vtex/loaders/workflow/product.ts": $$$49,
+    "vtex/loaders/workflow/products.ts": $$$50,
   },
   "handlers": {
     "vtex/handlers/sitemap.ts": $$$$0,
