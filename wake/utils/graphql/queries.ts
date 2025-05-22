@@ -283,6 +283,8 @@ fragment Product on Product {
   productId
   alias
   attributes {
+    id
+    type
     value
     name
   }
