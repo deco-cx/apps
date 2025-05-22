@@ -1,25 +1,23 @@
 // Types for the browser-use API client
 
 // Task Status Enum
-export enum TaskStatusEnum {
-  CREATED = "created",
-  RUNNING = "running",
-  FINISHED = "finished",
-  STOPPED = "stopped",
-  PAUSED = "paused",
-  FAILED = "failed",
-}
+export type TaskStatusEnum =
+  | "created"
+  | "running"
+  | "finished"
+  | "stopped"
+  | "paused"
+  | "failed";
 
 // LLM Model types
-export enum LLMModel {
-  GPT_4O = "gpt-4o",
-  GPT_4O_MINI = "gpt-4o-mini",
-  GPT_4_1 = "gpt-4.1",
-  GPT_4_1_MINI = "gpt-4.1-mini",
-  GEMINI_2_0_FLASH = "gemini-2.0-flash",
-  GEMINI_2_0_FLASH_LITE = "gemini-2.0-flash-lite",
-  CLAUDE_3_7_SONNET = "claude-3-7-sonnet-20250219",
-}
+export type LLMModel =
+  | "gpt-4o"
+  | "gpt-4o-mini"
+  | "gpt-4.1"
+  | "gpt-4.1-mini"
+  | "gemini-2.0-flash"
+  | "gemini-2.0-flash-lite"
+  | "claude-3-7-sonnet-20250219";
 
 // Response types
 export interface TaskCreatedResponse {
