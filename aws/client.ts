@@ -314,15 +314,6 @@ export class AWSCostExplorerClient {
     const region = "us-east-1";
     const service = "ce";
 
-    console.log(
-      `[AWS Cost Explorer] Signing request for service: ${service}, region: ${region}`,
-    );
-    console.log(
-      `[AWS Cost Explorer] Using access key: ${
-        this.credentials.accessKeyId?.substring(0, 4)
-      }****`,
-    );
-
     // Create canonical request
     const canonicalHeaders = Object.keys(headers)
       .sort()
@@ -358,8 +349,6 @@ export class AWSCostExplorerClient {
       credentialScope,
       canonicalRequestHash,
     ].join("\n");
-
-    console.log(`[AWS Cost Explorer] Credential scope: ${credentialScope}`);
 
     // Calculate signature
     const kDate = createHmac(
@@ -397,11 +386,6 @@ export class AWSCostExplorerClient {
       "Content-Length": requestBody.length.toString(),
     };
 
-    console.log(`[AWS Cost Explorer] Making request to: ${target}`);
-    console.log(
-      `[AWS Cost Explorer] Request summary: ${Object.keys(body).join(", ")}`,
-    );
-
     const signedHeaders = await this.signRequest(
       "POST",
       "/",
@@ -415,39 +399,24 @@ export class AWSCostExplorerClient {
       body: requestBody,
     });
 
-    console.log(
-      `[AWS Cost Explorer] Response status: ${response.status} ${response.statusText}`,
-    );
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`[AWS Cost Explorer] Error response body:`, errorText);
       throw new Error(`AWS API Error (${response.status}): ${errorText}`);
     }
 
     // Check if response has content
     const responseText = await response.text();
-    console.log(
-      `[AWS Cost Explorer] Response body length: ${responseText.length} chars`,
-    );
 
     if (!responseText) {
       throw new Error("AWS API returned empty response");
     }
 
     try {
-      const parsedResponse = JSON.parse(responseText);
-      console.log(`[AWS Cost Explorer] Successfully parsed JSON response`);
-      return parsedResponse;
+      return JSON.parse(responseText);
     } catch (parseError) {
       const errorMessage = parseError instanceof Error
         ? parseError.message
         : "Unknown JSON parse error";
-      console.error(`[AWS Cost Explorer] JSON parse error:`, parseError);
-      console.error(
-        `[AWS Cost Explorer] Failed to parse response:`,
-        responseText.substring(0, 200) + "...",
-      );
       throw new Error(
         `Failed to parse AWS API response as JSON: ${errorMessage}`,
       );
@@ -633,15 +602,6 @@ export class AWSBudgetsClient {
     const region = "us-east-1";
     const service = "budgets";
 
-    console.log(
-      `[AWS Budgets] Signing request for service: ${service}, region: ${region}`,
-    );
-    console.log(
-      `[AWS Budgets] Using access key: ${
-        this.credentials.accessKeyId?.substring(0, 4)
-      }****`,
-    );
-
     // Create canonical request
     const canonicalHeaders = Object.keys(headers)
       .sort()
@@ -677,8 +637,6 @@ export class AWSBudgetsClient {
       credentialScope,
       canonicalRequestHash,
     ].join("\n");
-
-    console.log(`[AWS Budgets] Credential scope: ${credentialScope}`);
 
     // Calculate signature
     const kDate = createHmac(
@@ -716,9 +674,6 @@ export class AWSBudgetsClient {
       "Content-Length": requestBody.length.toString(),
     };
 
-    console.log(`[AWS Budgets] Making request to: ${target}`);
-    console.log(`[AWS Budgets] Request body:`, JSON.stringify(body, null, 2));
-
     const signedHeaders = await this.signRequest(
       "POST",
       "/",
@@ -726,35 +681,19 @@ export class AWSBudgetsClient {
       headers,
     );
 
-    console.log(`[AWS Budgets] Final request headers:`, signedHeaders);
-
     const response = await fetch(this.baseUrl, {
       method: "POST",
       headers: signedHeaders,
       body: requestBody,
     });
 
-    console.log(
-      `[AWS Budgets] Response status: ${response.status} ${response.statusText}`,
-    );
-    console.log(
-      `[AWS Budgets] Response headers:`,
-      Object.fromEntries(response.headers.entries()),
-    );
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`[AWS Budgets] Error response body:`, errorText);
       throw new Error(`AWS API Error (${response.status}): ${errorText}`);
     }
 
     // Check if response has content
     const responseText = await response.text();
-    console.log(`[AWS Budgets] Response body length: ${responseText.length}`);
-    console.log(
-      `[AWS Budgets] Response body:`,
-      responseText.substring(0, 500) + (responseText.length > 500 ? "..." : ""),
-    );
 
     if (!responseText) {
       throw new Error("AWS API returned empty response");
@@ -766,8 +705,6 @@ export class AWSBudgetsClient {
       const errorMessage = parseError instanceof Error
         ? parseError.message
         : "Unknown JSON parse error";
-      console.error(`[AWS Budgets] JSON parse error:`, parseError);
-      console.error(`[AWS Budgets] Failed to parse response:`, responseText);
       throw new Error(
         `Failed to parse AWS API response as JSON: ${errorMessage}`,
       );

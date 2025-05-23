@@ -146,23 +146,12 @@ export default async function loader(
     serviceFilter,
   } = props;
 
-  console.log(
-    `[Cost and Usage] Starting loader with props:`,
-    JSON.stringify(props, null, 2),
-  );
-
   // Validate credentials
   if (!ctx.credentials.accessKeyId || !ctx.credentials.secretAccessKey) {
     throw new Error(
       "AWS credentials not configured. Please set accessKeyId and secretAccessKey in the app configuration.",
     );
   }
-
-  console.log(
-    `[Cost and Usage] Credentials validated. Access Key: ${
-      ctx.credentials.accessKeyId?.substring(0, 4)
-    }****`,
-  );
 
   const client = new AWSCostExplorerClient(ctx.credentials);
 
@@ -173,8 +162,6 @@ export default async function loader(
   } else {
     timePeriod = AWSCostUtils.getDateRange(timePeriodDays);
   }
-
-  console.log(`[Cost and Usage] Time period:`, timePeriod);
 
   // Build group by configuration
   const groupByConfig: GroupDefinition[] = [{
@@ -194,9 +181,6 @@ export default async function loader(
     };
   }
 
-  console.log(`[Cost and Usage] Group by config:`, groupByConfig);
-  console.log(`[Cost and Usage] Filter:`, filter);
-
   try {
     const response = await client.getCostAndUsage({
       TimePeriod: timePeriod,
@@ -206,28 +190,10 @@ export default async function loader(
       Filter: filter,
     });
 
-    console.log(`[Cost and Usage] Raw AWS response sample:`, {
-      resultsByTimeCount: response.ResultsByTime.length,
-      firstResult: response.ResultsByTime[0]
-        ? {
-          timePeriod: response.ResultsByTime[0].TimePeriod,
-          totalInResponse: response.ResultsByTime[0].Total,
-          groupsCount: response.ResultsByTime[0].Groups?.length || 0,
-          estimated: response.ResultsByTime[0].Estimated,
-        }
-        : null,
-    });
-
     // Process the response data
     const costData: CostData[] = response.ResultsByTime.map((result) => {
       const totalMetric = result.Total[metrics[0]];
       let totalAmount = parseFloat(totalMetric?.Amount || "0");
-
-      console.log(
-        `[Cost and Usage] Processing ${result.TimePeriod.Start}: AWS Total=${
-          totalMetric?.Amount || "0"
-        }, Groups=${result.Groups?.length || 0}`,
-      );
 
       // If Total is 0 but we have groups (which happens when grouping by dimensions),
       // calculate the total by summing up all the groups
@@ -236,14 +202,8 @@ export default async function loader(
           const groupAmount = parseFloat(
             group.Metrics[metrics[0]]?.Amount || "0",
           );
-          console.log(
-            `[Cost and Usage] Adding ${group.Keys[0]}: $${groupAmount}`,
-          );
           return sum + groupAmount;
         }, 0);
-        console.log(
-          `[Cost and Usage] Calculated total for ${result.TimePeriod.Start}: $${totalAmount}`,
-        );
       }
 
       const unit = totalMetric?.Unit || ctx.defaultCurrency || "USD";
@@ -279,10 +239,6 @@ export default async function loader(
     const totalCost = costData.reduce((sum, data) => {
       return sum + parseFloat(data.total.amount);
     }, 0);
-
-    console.log(
-      `[Cost and Usage] Final summary: Total cost across all days: $${totalCost}`,
-    );
 
     const totalCostFormatted = AWSCostUtils.formatCurrency(
       totalCost.toString(),
