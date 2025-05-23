@@ -92,8 +92,10 @@ export default async function action(
 
     return data;
   } catch (error) {
-    const errorString = error.toString();
-    const jsonStr = errorString.substring(errorString.indexOf('{'));
+    const errorString = error instanceof Error
+      ? error.toString()
+      : String(error);
+    const jsonStr = errorString.substring(errorString.indexOf("{"));
     const errorData = JSON.parse(jsonStr);
 
     return {
@@ -105,7 +107,7 @@ export default async function action(
       expiresIn: errorData.expiresIn,
       userId: errorData.userId,
       phoneNumber: errorData.phoneNumber,
-      scope: errorData.scope
+      scope: errorData.scope,
     };
   }
 }

@@ -1653,7 +1653,7 @@ export interface OrderFormOrder {
   sequence?: string;
   marketPlaceOrderId?: string;
   origin?: number;
-  items: Item[];
+  items: OrderFormItem[];
   giftRegistryData?: unknown;
   contextData?: unknown;
   marketPlaceOrderGroup?: string | null;
@@ -1686,7 +1686,7 @@ export interface OrderFormOrder {
   paymentData: PaymentData;
   clientPreferencesData: ClientPreferencesData;
   commercialConditionData?: unknown;
-  marketingData?: unknown;
+  marketingData?: MarketingData | null;
   storePreferencesData: StorePreferencesData;
   openTextField?: unknown;
   invoiceData?: unknown;
