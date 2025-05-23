@@ -134,7 +134,7 @@ const action = async (
     ["PUT /v4/spreadsheets/:spreadsheetId/values/:range"](
       {
         spreadsheetId,
-        range: range,
+        range,
         valueInputOption,
         ...(includeValuesInResponse
           ? {
