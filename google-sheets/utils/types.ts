@@ -1,6 +1,7 @@
-// client.ts para API Google Sheets
+/**
+ * Google Sheets API data types
+ */
 
-// Tipos de dados para as entidades principais da API Google Sheets
 export interface Spreadsheet {
   spreadsheetId: string;
   properties?: SheetProperties;
@@ -253,7 +254,6 @@ export interface Request {
   addSheet?: AddSheetRequest;
   deleteSheet?: DeleteSheetRequest;
   updateTable?: UpdateTableRequest;
-  // Outros tipos de requests podem ser adicionados conforme necessário
 }
 
 export interface UpdateSheetPropertiesRequest {
@@ -347,4 +347,178 @@ export interface UpdateTableRequest {
   tableId?: string;
   table?: Table;
   fields?: string;
+}
+
+/**
+ * Simplified cell value - accepts the most common types
+ */
+export type CellValue = string | number | boolean | null | undefined;
+
+/**
+ * Data row - array of cell values
+ */
+export type Row = CellValue[];
+
+/**
+ * Tabular data - array of rows
+ */
+export type TableData = Row[];
+
+/**
+ * Simple range - string in A1 notation
+ * Examples: "A1", "Sheet1!A1", "A1:B10", "Data!C2:E5"
+ */
+export type SimpleRange = string;
+
+/**
+ * Spreadsheet ID - alphanumeric string
+ */
+export type SpreadsheetId = string;
+
+/**
+ * Simplified value range
+ */
+export interface SimpleValueRange {
+  /** Range in A1 notation */
+  range: SimpleRange;
+  /** Table data */
+  values: TableData;
+  /** How to interpret the data (default: ROWS) */
+  majorDimension?: "ROWS" | "COLUMNS";
+}
+
+/**
+ * Data input options
+ */
+export interface InputOptions {
+  /** How to interpret input values */
+  valueInputOption?: "RAW" | "USER_ENTERED";
+  /** Include updated values in response */
+  includeValuesInResponse?: boolean;
+  /** Response values format */
+  responseValueRenderOption?: "FORMATTED_VALUE" | "UNFORMATTED_VALUE" | "FORMULA";
+  /** Response date/time format */
+  responseDateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
+}
+
+/**
+ * Simplified props for single value update
+ */
+export interface SimpleUpdateProps extends InputOptions {
+  /** Spreadsheet ID */
+  spreadsheetId: SpreadsheetId;
+  /** Range to be updated */
+  range: SimpleRange;
+  /** Data to be inserted */
+  values: TableData;
+}
+
+/**
+ * Simplified props for batch update
+ */
+export interface SimpleBatchUpdateProps extends InputOptions {
+  /** Spreadsheet ID */
+  spreadsheetId: SpreadsheetId;
+  /** Array of ranges and their data */
+  data: SimpleValueRange[];
+}
+
+/**
+ * Simplified update response
+ */
+export interface SimpleUpdateResponse {
+  /** Spreadsheet ID */
+  spreadsheetId: SpreadsheetId;
+  /** Updated range */
+  updatedRange: SimpleRange;
+  /** Number of updated rows */
+  updatedRows: number;
+  /** Number of updated columns */
+  updatedColumns: number;
+  /** Number of updated cells */
+  updatedCells: number;
+  /** Updated data (if requested) */
+  updatedData?: SimpleValueRange;
+}
+
+/**
+ * Simplified batch update response
+ */
+export interface SimpleBatchUpdateResponse {
+  /** Spreadsheet ID */
+  spreadsheetId: SpreadsheetId;
+  /** Total updated ranges */
+  totalUpdatedRanges: number;
+  /** Total updated rows */
+  totalUpdatedRows: number;
+  /** Total updated columns */
+  totalUpdatedColumns: number;
+  /** Total updated cells */
+  totalUpdatedCells: number;
+  /** Individual responses for each range */
+  responses: SimpleUpdateResponse[];
+}
+
+/**
+ * Simplified error
+ */
+export interface SimpleError {
+  /** Error code */
+  code?: string;
+  /** Error message */
+  message: string;
+  /** Additional details */
+  details?: Record<string, unknown>;
+}
+
+/**
+ * Result that can be success or error
+ */
+export type Result<T> = T | SimpleError;
+
+/**
+ * Function to check if it's an error
+ */
+export function isError(result: Result<unknown>): result is SimpleError {
+  return (result as SimpleError).message !== undefined;
+}
+
+/**
+ * Function to check if it's success
+ */
+export function isSuccess<T>(result: Result<T>): result is T {
+  return !isError(result);
+}
+
+/**
+ * Spreadsheet metadata
+ */
+export interface SpreadsheetMetadata {
+  /** Spreadsheet ID */
+  spreadsheetId: SpreadsheetId;
+  /** Spreadsheet title */
+  title: string;
+  /** Spreadsheet URL */
+  url: string;
+  /** List of sheets/tabs */
+  sheets: SheetMetadata[];
+}
+
+/**
+ * Sheet/tab metadata
+ */
+export interface SheetMetadata {
+  /** Sheet ID */
+  sheetId: number;
+  /** Sheet name */
+  title: string;
+  /** Sheet index */
+  index: number;
+  /** Grid properties */
+  gridProperties: {
+    rowCount: number;
+    columnCount: number;
+    frozenRowCount?: number;
+    frozenColumnCount?: number;
+  };
 }

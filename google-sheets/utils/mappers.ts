@@ -1,5 +1,5 @@
 /**
- * Utilitários para mapear entre tipos simplificados e tipos oficiais da Google API
+ * Utilities for mapping between simplified types and official Google API types
  */
 
 import type {
@@ -11,7 +11,7 @@ import type {
   SimpleUpdateResponse,
   SimpleBatchUpdateResponse,
   SimpleError,
-} from "../@types.ts";
+} from "./types.ts";
 
 import type {
   ValueRange,
@@ -20,12 +20,8 @@ import type {
   BatchUpdateValuesResponse,
 } from "./types.ts";
 
-// ============================================================================
-// MAPEADORES DE ENTRADA (Simple -> API)
-// ============================================================================
-
 /**
- * Limpa e valida um valor de célula
+ * Cleans and validates a cell value
  */
 export function cleanCellValue(value: CellValue): string | number | boolean {
   if (value === null || value === undefined) return "";
@@ -36,7 +32,7 @@ export function cleanCellValue(value: CellValue): string | number | boolean {
 }
 
 /**
- * Converte dados tabulares simples para formato da API
+ * Converts simple tabular data to API format
  */
 export function mapTableDataToApiValues(data: TableData): (string | number | boolean)[][] {
   return data.map(row => 
@@ -45,7 +41,7 @@ export function mapTableDataToApiValues(data: TableData): (string | number | boo
 }
 
 /**
- * Converte SimpleValueRange para ValueRange da API
+ * Converts SimpleValueRange to API ValueRange
  */
 export function mapSimpleValueRangeToApi(simple: SimpleValueRange): ValueRange {
   return {
@@ -56,7 +52,7 @@ export function mapSimpleValueRangeToApi(simple: SimpleValueRange): ValueRange {
 }
 
 /**
- * Converte props simples para formato da API updateValues
+ * Converts simple props to API updateValues format
  */
 export function mapSimpleUpdatePropsToApi(props: SimpleUpdateProps): {
   body: ValueRange;
@@ -90,7 +86,7 @@ export function mapSimpleUpdatePropsToApi(props: SimpleUpdateProps): {
 }
 
 /**
- * Converte props simples para formato da API batchUpdate
+ * Converts simple props to API batchUpdate format
  */
 export function mapSimpleBatchUpdatePropsToApi(props: SimpleBatchUpdateProps): {
   body: BatchUpdateValuesRequest;
@@ -116,12 +112,8 @@ export function mapSimpleBatchUpdatePropsToApi(props: SimpleBatchUpdateProps): {
   return { body, params };
 }
 
-// ============================================================================
-// MAPEADORES DE SAÍDA (API -> Simple)
-// ============================================================================
-
 /**
- * Converte valores da API para dados tabulares simples
+ * Converts API values to simple tabular data
  */
 export function mapApiValuesToTableData(values?: (string | number | boolean)[][]): TableData {
   if (!values) return [];
@@ -131,7 +123,7 @@ export function mapApiValuesToTableData(values?: (string | number | boolean)[][]
 }
 
 /**
- * Converte ValueRange da API para SimpleValueRange
+ * Converts API ValueRange to SimpleValueRange
  */
 export function mapApiValueRangeToSimple(apiRange: ValueRange): SimpleValueRange {
   return {
@@ -142,7 +134,7 @@ export function mapApiValueRangeToSimple(apiRange: ValueRange): SimpleValueRange
 }
 
 /**
- * Converte resposta da API updateValues para formato simples
+ * Converts API updateValues response to simple format
  */
 export function mapApiUpdateResponseToSimple(
   apiResponse: UpdateValuesResponse
@@ -160,7 +152,7 @@ export function mapApiUpdateResponseToSimple(
 }
 
 /**
- * Converte resposta da API batchUpdate para formato simples
+ * Converts API batchUpdate response to simple format
  */
 export function mapApiBatchUpdateResponseToSimple(
   apiResponse: BatchUpdateValuesResponse
@@ -177,12 +169,8 @@ export function mapApiBatchUpdateResponseToSimple(
   };
 }
 
-// ============================================================================
-// TRATAMENTO DE ERROS
-// ============================================================================
-
 /**
- * Converte erro da API para formato simples
+ * Converts API error to simple format
  */
 export function mapApiErrorToSimple(error: unknown): SimpleError {
   if (typeof error === "string") {
@@ -194,19 +182,19 @@ export function mapApiErrorToSimple(error: unknown): SimpleError {
     
     return {
       code: errorObj.code as string,
-      message: errorObj.message as string || "Erro desconhecido",
+      message: errorObj.message as string || "Unknown error",
       details: errorObj,
     };
   }
 
   return {
-    message: "Erro desconhecido",
+    message: "Unknown error",
     details: { originalError: error },
   };
 }
 
 /**
- * Tenta fazer parse de um erro de texto da API
+ * Attempts to parse an API error text
  */
 export function parseApiErrorText(errorText: string): SimpleError {
   try {
@@ -214,92 +202,85 @@ export function parseApiErrorText(errorText: string): SimpleError {
     return mapApiErrorToSimple(parsed);
   } catch {
     return {
-      message: errorText || "Erro na comunicação com a API",
+      message: errorText || "API communication error",
     };
   }
 }
 
-// ============================================================================
-// VALIDADORES
-// ============================================================================
-
 /**
- * Valida se um range está no formato correto
+ * Validates if a range is in the correct format
  */
 export function validateRange(range: string): boolean {
-  // Padrão: Sheet1!A1, A1:B10, Sheet1!A1:B10, etc.
   const rangePattern = /^([^!]*!)?[A-Z]+[0-9]+(:[A-Z]+[0-9]+)?$/;
   return rangePattern.test(range);
 }
 
 /**
- * Valida se os dados da tabela são válidos
+ * Validates if table data is valid
  */
 export function validateTableData(data: TableData): boolean {
   if (!Array.isArray(data)) return false;
-  if (data.length === 0) return true; // Array vazio é válido
-  
-  // Verifica se todas as linhas são arrays
+  if (data.length === 0) return true;
   return data.every(row => Array.isArray(row));
 }
 
 /**
- * Valida props de atualização simples
+ * Validates simple update props
  */
 export function validateSimpleUpdateProps(props: SimpleUpdateProps): string[] {
   const errors: string[] = [];
 
   if (!props.spreadsheetId) {
-    errors.push("spreadsheetId é obrigatório");
+    errors.push("spreadsheetId is required");
   }
 
   if (!props.range) {
-    errors.push("range é obrigatório");
+    errors.push("range is required");
   } else if (!validateRange(props.range)) {
-    errors.push("range deve estar no formato A1 ou A1:B10");
+    errors.push("range must be in A1 format like A1 or A1:B10");
   }
 
   if (!props.values) {
-    errors.push("values é obrigatório");
+    errors.push("values is required");
   } else if (!validateTableData(props.values)) {
-    errors.push("values deve ser um array de arrays");
+    errors.push("values must be an array of arrays");
   }
 
   return errors;
 }
 
 /**
- * Valida props de atualização em lote
+ * Validates simple batch update props
  */
 export function validateSimpleBatchUpdateProps(props: SimpleBatchUpdateProps): string[] {
   const errors: string[] = [];
 
   if (!props.spreadsheetId) {
-    errors.push("spreadsheetId é obrigatório");
+    errors.push("spreadsheetId is required");
   }
 
   if (!props.data || !Array.isArray(props.data)) {
-    errors.push("data deve ser um array");
+    errors.push("data must be an array");
   } else {
     if (props.data.length === 0) {
-      errors.push("data não pode ser vazio");
+      errors.push("data cannot be empty");
     }
 
     if (props.data.length > 100) {
-      errors.push("data não pode ter mais de 100 ranges");
+      errors.push("data cannot have more than 100 ranges");
     }
 
     props.data.forEach((item, index) => {
       if (!item.range) {
-        errors.push(`data[${index}].range é obrigatório`);
+        errors.push(`data[${index}].range is required`);
       } else if (!validateRange(item.range)) {
-        errors.push(`data[${index}].range deve estar no formato A1 ou A1:B10`);
+        errors.push(`data[${index}].range must be in A1 format like A1 or A1:B10`);
       }
 
       if (!item.values) {
-        errors.push(`data[${index}].values é obrigatório`);
+        errors.push(`data[${index}].values is required`);
       } else if (!validateTableData(item.values)) {
-        errors.push(`data[${index}].values deve ser um array de arrays`);
+        errors.push(`data[${index}].values must be an array of arrays`);
       }
     });
   }
