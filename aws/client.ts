@@ -305,7 +305,7 @@ export class AWSCostExplorerClient {
     path: string,
     body: string,
     headers: Record<string, string>,
-  ): Promise<Record<string, string>> {
+  ): Record<string, string> {
     const now = new Date();
     const isoDateTime = now.toISOString().replace(/[:\-]|\.\d{3}/g, "");
     const isoDate = isoDateTime.substr(0, 8);
@@ -624,7 +624,7 @@ export class AWSBudgetsClient {
     path: string,
     body: string,
     headers: Record<string, string>,
-  ): Promise<Record<string, string>> {
+  ): Record<string, string> {
     const now = new Date();
     const isoDateTime = now.toISOString().replace(/[:\-]|\.\d{3}/g, "");
     const isoDate = isoDateTime.substr(0, 8);
