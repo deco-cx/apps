@@ -1,18 +1,19 @@
-import { SCOPES } from "../../utils/constant.ts";
-
-interface Props {
-  state: string;
-  redirectUri: string;
+export interface Props {
   clientId: string;
-  scopes?: string;
+  redirectUri: string;
+  state: string;
 }
 
+/**
+ * @title Start OAuth Google
+ * @description Inicia o fluxo de autorização OAuth do Google
+ */
 export default function start(props: Props) {
   const authParams = new URLSearchParams({
     client_id: props.clientId,
     redirect_uri: props.redirectUri,
     response_type: "code",
-    scope: props.scopes || SCOPES,
+    scope: "https://www.googleapis.com/auth/spreadsheets",
     access_type: "offline",
     prompt: "consent",
     state: props.state,

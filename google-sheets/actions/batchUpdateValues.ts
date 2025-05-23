@@ -66,12 +66,6 @@ export interface Props {
    * @default "SERIAL_NUMBER"
    */
   responseDateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
-
-  /**
-   * @title Token de Autenticação
-   * @description O token de autenticação para acessar o Google Sheets
-   */
-  token: string;
 }
 
 /**
@@ -81,8 +75,8 @@ export interface Props {
 const action = async (
   props: Props,
   _req: Request,
-  _ctx: AppContext,
-): Promise<BatchUpdateValuesResponse> => {
+  ctx: AppContext,
+): Promise<BatchUpdateValuesResponse | { error: string }> => {
   const {
     spreadsheetId,
     data,
@@ -90,56 +84,40 @@ const action = async (
     includeValuesInResponse = false,
     responseValueRenderOption = "FORMATTED_VALUE",
     responseDateTimeRenderOption = "SERIAL_NUMBER",
-    token,
   } = props;
 
-  try {
-    // Preparando o corpo da requisição
-    const body: BatchUpdateValuesRequest = {
-      valueInputOption,
-      includeValuesInResponse,
-      responseValueRenderOption: includeValuesInResponse
-        ? responseValueRenderOption
-        : undefined,
-      responseDateTimeRenderOption: includeValuesInResponse
-        ? responseDateTimeRenderOption
-        : undefined,
-      data: data.map((item) => ({
-        range: item.range,
-        majorDimension: item.majorDimension || "ROWS",
-        values: item.values,
-      })),
-    };
+  const { client } = ctx;
 
-    // Constrói a URL para atualizar os valores em lote
-    const url = new URL(
-      `/v4/spreadsheets/${spreadsheetId}/values:batchUpdate`,
-      "https://sheets.googleapis.com",
+  const requestBody: BatchUpdateValuesRequest = {
+    valueInputOption,
+    includeValuesInResponse,
+    responseValueRenderOption: includeValuesInResponse
+      ? responseValueRenderOption
+      : undefined,
+    responseDateTimeRenderOption: includeValuesInResponse
+      ? responseDateTimeRenderOption
+      : undefined,
+    data: data.map((item) => ({
+      range: item.range,
+      majorDimension: item.majorDimension || "ROWS",
+      values: item.values,
+    })),
+  };
+
+  const response = await client
+    ["POST /v4/spreadsheets/:spreadsheetId/values:batchUpdate"](
+      { spreadsheetId },
+      { body: requestBody },
     );
 
-    // Faz a requisição para atualizar os valores em lote
-    const response = await fetch(url.toString(), {
-      method: "POST",
-      headers: new Headers({
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Authorization": `Bearer ${token}`,
-      }),
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `Erro ao atualizar valores em lote: ${response.status} ${response.statusText} - ${errorText}`,
-      );
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Erro ao atualizar valores em lote:", error);
-    throw error;
+  if (!response.ok) {
+    const errorText = await response.text();
+    return {
+      error: errorText,
+    };
   }
+
+  return await response.json();
 };
 
 export default action;

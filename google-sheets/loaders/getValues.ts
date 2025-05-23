@@ -1,6 +1,5 @@
 import { AppContext } from "../mod.ts";
 import { ValueRange } from "../utils/types.ts";
-import { ensureValidToken } from "../utils/tokenManager.ts";
 
 export interface Props {
   /**
@@ -11,27 +10,30 @@ export interface Props {
 
   /**
    * @title Intervalo
-   * @description O intervalo de células na notação A1 (ex: "Sheet1!A1:B10")
+   * @description O intervalo de células na notação A1 (ex: Sheet1!A1:B10) sem as aspas
    */
   range: string;
 
   /**
    * @title Dimensão Principal
-   * @description Determina a ordenação dos valores retornados
+   * @description Determina como organizar os valores na matriz (por linhas ou colunas)
    * @default "ROWS"
    */
   majorDimension?: "ROWS" | "COLUMNS";
 
   /**
    * @title Opção de Renderização de Valores
-   * @description Como os valores devem ser representados
+   * @description Como os valores devem ser representados na resposta
    * @default "FORMATTED_VALUE"
    */
-  valueRenderOption?: "FORMATTED_VALUE" | "UNFORMATTED_VALUE" | "FORMULA";
+  valueRenderOption?:
+    | "FORMATTED_VALUE"
+    | "UNFORMATTED_VALUE"
+    | "FORMULA";
 
   /**
    * @title Opção de Renderização de Data/Hora
-   * @description Como os valores de data e hora devem ser representados
+   * @description Como os valores de data e hora devem ser representados na resposta
    * @default "SERIAL_NUMBER"
    */
   dateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
@@ -39,7 +41,7 @@ export interface Props {
 
 /**
  * @title Obter Valores
- * @description Lê os valores de células de uma planilha do Google Sheets
+ * @description Obtém os valores de um intervalo específico de células da planilha
  */
 const loader = async (
   props: Props,
@@ -54,63 +56,19 @@ const loader = async (
     dateTimeRenderOption = "SERIAL_NUMBER",
   } = props;
 
-  const isTokenValid = await ensureValidToken(ctx);
-
-  if (!isTokenValid) {
-    throw new Error(
-      "failed to get a valid token. please authenticate again.",
+  const response = await ctx.client
+    ["GET /v4/spreadsheets/:spreadsheetId/values/:range"](
+      {
+        spreadsheetId,
+        range: range,
+        majorDimension,
+        valueRenderOption,
+        dateTimeRenderOption,
+      },
     );
-  }
 
-  const rangeWithParams = `${
-    encodeURIComponent(range)
-  }?majorDimension=${majorDimension}&valueRenderOption=${valueRenderOption}&dateTimeRenderOption=${dateTimeRenderOption}`;
-
-  try {
-    const response = await ctx.client
-      ["GET /v4/spreadsheets/:spreadsheetId/values/:range"](
-        {
-          spreadsheetId,
-          range: rangeWithParams,
-        },
-      );
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("error to get values:", error);
-
-    if (
-      error instanceof Error &&
-      (error.message.includes("401") ||
-        error.message.includes("invalid_token") ||
-        error.message.includes("expired"))
-    ) {
-      try {
-        const isTokenRefreshed = await ensureValidToken(ctx);
-        if (isTokenRefreshed) {
-          const rangeWithParams = `${
-            encodeURIComponent(range)
-          }?majorDimension=${majorDimension}&valueRenderOption=${valueRenderOption}&dateTimeRenderOption=${dateTimeRenderOption}`;
-
-          const response = await ctx.client
-            ["GET /v4/spreadsheets/:spreadsheetId/values/:range"](
-              {
-                spreadsheetId,
-                range: rangeWithParams,
-              },
-            );
-
-          const data = await response.json();
-          return data;
-        }
-      } catch (refreshError) {
-        console.error("error to refresh token:", refreshError);
-      }
-    }
-
-    throw error;
-  }
+  const data = await response.json();
+  return data;
 };
 
 export default loader;

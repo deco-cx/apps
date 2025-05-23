@@ -54,12 +54,6 @@ export interface Props {
      */
     columnCount?: number;
   }>;
-
-  /**
-   * @title Token de Autenticação
-   * @description O token de autenticação para acessar o Google Sheets
-   */
-  token: string;
 }
 
 /**
@@ -69,63 +63,48 @@ export interface Props {
 const action = async (
   props: Props,
   _req: Request,
-  _ctx: AppContext,
-): Promise<Spreadsheet> => {
+  ctx: AppContext,
+): Promise<Spreadsheet | { error: string }> => {
   const {
     title,
     locale = "pt_BR",
     timeZone = "America/Sao_Paulo",
     autoRecalc = "ON_CHANGE",
     sheets = [{ title: "Sheet1", rowCount: 1000, columnCount: 26 }],
-    token,
   } = props;
 
-  try {
-    // Preparando o corpo da requisição
-    const body = {
+  const { client } = ctx;
+
+  const requestBody = {
+    properties: {
+      title,
+      locale,
+      timeZone,
+      autoRecalc,
+    },
+    sheets: sheets.map((sheet) => ({
       properties: {
-        title,
-        locale,
-        timeZone,
-        autoRecalc,
-      },
-      sheets: sheets.map((sheet) => ({
-        properties: {
-          title: sheet.title,
-          gridProperties: {
-            rowCount: sheet.rowCount || 1000,
-            columnCount: sheet.columnCount || 26,
-          },
+        title: sheet.title,
+        gridProperties: {
+          rowCount: sheet.rowCount,
+          columnCount: sheet.columnCount,
         },
-      })),
+      },
+    })),
+  };
+
+  const response = await client["POST /v4/spreadsheets"]({}, {
+    body: requestBody,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    return {
+      error: errorText,
     };
-
-    // Constrói a URL para criar a planilha
-    const url = new URL("/v4/spreadsheets", "https://sheets.googleapis.com");
-
-    // Faz a requisição para criar a planilha
-    const response = await fetch(url.toString(), {
-      method: "POST",
-      headers: new Headers({
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Authorization": `Bearer ${token}`,
-      }),
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `Erro ao criar planilha: ${response.status} ${response.statusText} - ${errorText}`,
-      );
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Erro ao criar planilha:", error);
-    throw error;
   }
+
+  return await response.json();
 };
 
 export default action;

@@ -1,61 +1,86 @@
-import type { GoogleAuthClient, GoogleSheetsClient } from "./utils/client.ts";
+import { createOAuthHttpClient } from "../mcp/utils/httpClient.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import type { FnContext } from "@deco/deco";
-import { createHttpClient } from "../utils/http.ts";
-import { fetchSafe } from "../utils/fetch.ts";
 import { McpContext } from "../mcp/context.ts";
-import { GOOGLE_OAUTH_URL, GOOGLE_SHEETS_URL } from "./utils/constant.ts";
+import { GOOGLE_SHEETS_URL } from "./utils/constant.ts";
+import { GoogleAuthClient, GoogleSheetsClient } from "./utils/client.ts";
+import {
+  DEFAULT_OAUTH_HEADERS,
+  OAuthClientOptions,
+  OAuthClients,
+  OAuthProvider,
+  OAuthTokens,
+} from "../mcp/oauth.ts";
+
+export const GoogleProvider: OAuthProvider = {
+  name: "Google",
+  authUrl: "https://accounts.google.com/o/oauth2/v2/auth",
+  tokenUrl: "https://oauth2.googleapis.com",
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  clientId: "",
+  clientSecret: "",
+};
 
 export interface Props {
-  code?: string;
-  access_token?: string;
-  refresh_token?: string;
-  expires_in?: number;
-  scope?: string;
-  token_type?: string;
-  refresh_token_expires_in?: number;
-  tokenObtainedAt?: number;
+  tokens?: OAuthTokens;
   clientSecret?: string;
   clientId?: string;
 }
 
 export interface State extends Props {
-  client: ReturnType<typeof createHttpClient<GoogleSheetsClient>>;
-  authClient: ReturnType<typeof createHttpClient<GoogleAuthClient>>;
+  client: OAuthClients<GoogleSheetsClient, GoogleAuthClient>;
 }
 
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Google Sheets
- * @description Integração com a API Google Sheets para criar, ler e modificar planilhas
+ * @description Integração com Google Sheets usando OAuth 2.0 com refresh automático de tokens
  * @category Produtividade
  * @logo https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Google_Sheets_logo_%282014-2020%29.svg/1498px-Google_Sheets_logo_%282014-2020%29.svg.png
  */
-export default function App({ ...props }: Props) {
-  const client = createHttpClient<GoogleSheetsClient>({
-    base: GOOGLE_SHEETS_URL,
-    headers: new Headers({
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${props.access_token}`,
-    }),
-    fetcher: fetchSafe,
-  });
+export default function App(
+  props: Props,
+  _req: Request,
+  ctx?: McpContext<Props>,
+) {
+  const { tokens, clientId, clientSecret } = props;
 
-  const authClient = createHttpClient<GoogleAuthClient>({
-    base: GOOGLE_OAUTH_URL,
-    headers: new Headers({
-      "Accept": "application/json",
-      "Content-Type": "application/x-www-form-urlencoded",
-    }),
-    fetcher: fetchSafe,
+  const googleProvider: OAuthProvider = {
+    ...GoogleProvider,
+    clientId,
+    clientSecret,
+  };
+
+  const options: OAuthClientOptions = {
+    headers: DEFAULT_OAUTH_HEADERS,
+    authClientConfig: {
+      headers: new Headers({
+        "Accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+      }),
+    },
+  };
+
+  const client = createOAuthHttpClient<GoogleSheetsClient, GoogleAuthClient>({
+    provider: googleProvider,
+    apiBaseUrl: GOOGLE_SHEETS_URL,
+    tokens,
+    options,
+    onTokenRefresh: async (newTokens: OAuthTokens) => {
+      if (ctx) {
+        await ctx.configure({
+          ...ctx,
+          tokens: newTokens,
+        });
+      }
+    },
   });
 
   const state: State = {
     ...props,
+    tokens,
     client,
-    authClient,
   };
 
   return {

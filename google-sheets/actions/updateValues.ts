@@ -57,12 +57,6 @@ export interface Props {
    * @default "SERIAL_NUMBER"
    */
   responseDateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
-
-  /**
-   * @title Token de Autenticação
-   * @description O token de autenticação para acessar o Google Sheets
-   */
-  token: string;
 }
 
 /**
@@ -83,70 +77,42 @@ const action = async (
     includeValuesInResponse = false,
     responseValueRenderOption = "FORMATTED_VALUE",
     responseDateTimeRenderOption = "SERIAL_NUMBER",
-    token,
   } = props;
 
-  try {
-    // Verificar se os valores estão em formato válido antes de enviar
-    const validatedValues = values.map((row) =>
-      row.map((cell) => {
-        if (cell === null || cell === undefined) return "";
-        if (typeof cell === "object" && Object.keys(cell).length === 0) {
-          return "";
-        }
-        return cell;
-      })
+  const validatedValues = values.map((row) =>
+    row.map((cell) => {
+      if (cell === null || cell === undefined) return "";
+      if (typeof cell === "object" && Object.keys(cell).length === 0) {
+        return "";
+      }
+      return cell;
+    })
+  );
+
+  const body: ValueRange = {
+    range,
+    majorDimension,
+    values: validatedValues,
+  };
+
+  const response = await ctx.client
+    ["PUT /v4/spreadsheets/:spreadsheetId/values/:range"](
+      {
+        spreadsheetId,
+        range: encodeURIComponent(range),
+        valueInputOption,
+        ...(includeValuesInResponse
+          ? {
+            includeValuesInResponse,
+            responseValueRenderOption,
+            responseDateTimeRenderOption,
+          }
+          : {}),
+      },
+      { body },
     );
 
-    // Preparando o corpo da requisição
-    const body: ValueRange = {
-      range,
-      majorDimension,
-      values: validatedValues,
-    };
-
-    // Constrói os parâmetros para a chamada
-    // deno-lint-ignore no-explicit-any
-    const params: Record<string, any> = {
-      spreadsheetId,
-      range: encodeURIComponent(range),
-      valueInputOption,
-    };
-
-    if (includeValuesInResponse) {
-      params.includeValuesInResponse = true;
-      params.responseValueRenderOption = responseValueRenderOption;
-      params.responseDateTimeRenderOption = responseDateTimeRenderOption;
-    }
-
-    // Faz a requisição usando o clientSheets
-    const updateResponse = await ctx.client
-      ["PUT /v4/spreadsheets/:spreadsheetId/values/:range"](
-        {
-          spreadsheetId,
-          range: encodeURIComponent(range),
-          valueInputOption,
-          ...(includeValuesInResponse
-            ? {
-              includeValuesInResponse,
-              responseValueRenderOption,
-              responseDateTimeRenderOption,
-            }
-            : {}),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body,
-        },
-      );
-
-    return await updateResponse.json();
-  } catch (error) {
-    console.error("Erro ao atualizar valores:", error);
-    throw error;
-  }
+  return await response.json();
 };
 
 export default action;

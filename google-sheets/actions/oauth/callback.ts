@@ -1,45 +1,64 @@
 import { AppContext } from "../../mod.ts";
 
-interface Props {
-  installId?: string;
-  code: string;
-  redirectUri: string;
-  clientSecret: string;
-  clientId: string;
+interface OAuthCallbackResponse {
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+  scope: string;
+  token_type: string;
 }
 
+export interface Props {
+  code: string;
+  installId: string;
+  clientId: string;
+  clientSecret: string;
+  redirectUri: string;
+}
+
+/**
+ * @title Callback OAuth Google
+ * @description Troca o código de autorização por tokens de acesso
+ */
 export default async function callback(
-  { code, installId, clientSecret, clientId }: Props,
+  { code, installId, clientId, clientSecret, redirectUri }: Props,
   req: Request,
   ctx: AppContext,
-) {
-  const { authClient } = ctx;
-  const currenteCtx = await ctx.getConfiguration();
+): Promise<{ installId: string }> {
+  const { client } = ctx;
 
-  const response = await authClient[`POST /token`]({
+  const response = await client["POST /token"]({
     code,
     client_id: clientId,
     client_secret: clientSecret,
-    redirect_uri: new URL("/oauth/callback", req.url).href,
+    redirect_uri: redirectUri || new URL("/oauth/callback", req.url).host,
     grant_type: "authorization_code",
   });
 
-  const authResponse = await response.json();
+  const tokenData = await response.json() as OAuthCallbackResponse;
+  const currentTime = Math.floor(Date.now() / 1000);
 
+  client.oauth.tokens.access_token = tokenData.access_token;
+  client.oauth.tokens.refresh_token = tokenData.refresh_token;
+  client.oauth.tokens.expires_in = tokenData.expires_in;
+  client.oauth.tokens.scope = tokenData.scope;
+  client.oauth.tokens.token_type = tokenData.token_type;
+  client.oauth.tokens.tokenObtainedAt = currentTime;
+
+  const currentCtx = await ctx.getConfiguration();
   await ctx.configure({
-    ...currenteCtx,
-    code,
-    access_token: authResponse.access_token,
-    refresh_token: authResponse.refresh_token,
-    expires_in: authResponse.expires_in,
-    scope: authResponse.scope,
-    token_type: authResponse.token_type,
-    tokenObtainedAt: Math.floor(Date.now() / 1000),
-    clientSecret,
-    clientId,
+    ...currentCtx,
+    tokens: {
+      access_token: tokenData.access_token,
+      refresh_token: tokenData.refresh_token,
+      expires_in: tokenData.expires_in,
+      scope: tokenData.scope,
+      token_type: tokenData.token_type,
+      tokenObtainedAt: currentTime,
+    },
+    clientSecret: clientSecret,
+    clientId: clientId,
   });
 
-  return {
-    installId,
-  };
+  return { installId };
 }
