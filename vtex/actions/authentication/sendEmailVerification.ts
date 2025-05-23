@@ -3,6 +3,8 @@ import type { AppContext } from "../../mod.ts";
 
 export interface Props {
   email: string;
+  locale?: string;
+  parentAppId?: string;
 }
 
 export type SendEmailVerificationResult = boolean;
@@ -36,6 +38,12 @@ export default async function action(
   const formData = new FormData();
   formData.append("authenticationToken", authenticationToken);
   formData.append("email", props.email);
+  if (props.locale) {
+    formData.append("locale", props.locale);
+  }
+  if (props.parentAppId) {
+    formData.append("parentAppId", props.parentAppId);
+  }
 
   try {
     const response = await vcsDeprecated[
