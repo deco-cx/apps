@@ -3,62 +3,58 @@ import { Spreadsheet } from "../utils/types.ts";
 
 export interface Props {
   /**
-   * @title Título da Planilha
-   * @description O título para a nova planilha
+   * @title Spreadsheet Title
+   * @description The title for the new spreadsheet
    */
   title: string;
 
   /**
    * @title Locale
-   * @description O código de localização para a planilha
-   * @default "pt_BR"
+   * @description The locale code for the spreadsheet
    */
   locale?: string;
 
   /**
-   * @title Fuso Horário
-   * @description O fuso horário da planilha
-   * @default "America/Sao_Paulo"
+   * @title Time Zone
+   * @description The time zone of the spreadsheet
    */
   timeZone?: string;
 
   /**
-   * @title Auto Recalcular
-   * @description Quando as fórmulas devem ser recalculadas
-   * @default "ON_CHANGE"
+   * @title Auto Recalculate
+   * @description When formulas should be recalculated
    */
   autoRecalc?: "ON_CHANGE" | "MINUTE" | "HOUR";
 
   /**
-   * @title Folhas Iniciais
-   * @description Configuração das folhas iniciais da planilha
+   * @title Initial Sheets
+   * @description Configuration of the initial sheets in the spreadsheet
    */
   sheets?: Array<{
     /**
-     * @title Título da Folha
-     * @description Título da folha a ser criada
+     * @title Sheet Title
+     * @description Title of the sheet to be created
      */
     title: string;
 
     /**
-     * @title Número de Linhas
-     * @description Número de linhas na folha
-     * @default 1000
+     * @title Row Count
+     * @description Number of rows in the sheet
      */
     rowCount?: number;
 
     /**
-     * @title Número de Colunas
-     * @description Número de colunas na folha
-     * @default 26
+     * @title Column Count
+     * @description Number of columns in the sheet
      */
     columnCount?: number;
   }>;
 }
 
 /**
- * @title Criar Planilha
- * @description Cria uma nova planilha no Google Sheets
+ * @name CREATE_SPREADSHEET
+ * @title Create Spreadsheet
+ * @description Creates a new spreadsheet in Google Sheets
  */
 const action = async (
   props: Props,

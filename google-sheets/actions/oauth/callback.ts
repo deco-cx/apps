@@ -17,8 +17,9 @@ export interface Props {
 }
 
 /**
- * @title Callback OAuth Google
- * @description Troca o código de autorização por tokens de acesso
+ * @name OAUTH_CALLBACK
+ * @title OAuth Google Callback
+ * @description Exchanges the authorization code for access tokens
  */
 export default async function callback(
   { code, installId, clientId, clientSecret, redirectUri }: Props,
@@ -27,11 +28,14 @@ export default async function callback(
 ): Promise<{ installId: string }> {
   const { client } = ctx;
 
+  const finalRedirectUri = redirectUri ||
+    new URL("/oauth/callback", req.url).href;
+
   const response = await client["POST /token"]({
     code,
     client_id: clientId,
     client_secret: clientSecret,
-    redirect_uri: redirectUri || new URL("/oauth/callback", req.url).host,
+    redirect_uri: finalRedirectUri,
     grant_type: "authorization_code",
   });
 
