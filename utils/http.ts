@@ -1,4 +1,4 @@
-import { type RequestInit } from "@deco/deco";
+import { HttpError as DecoHttpError, type RequestInit } from "@deco/deco";
 import { fetchSafe } from "./fetch.ts";
 
 // Check if DEBUG_HTTP env var is set
@@ -17,9 +17,16 @@ const HTTP_VERBS = new Set(
     "HEAD",
   ] as const,
 );
-export class HttpError extends Error {
-  constructor(public status: number, message?: string, options?: ErrorOptions) {
-    super(message, options);
+export class HttpError extends DecoHttpError {
+  constructor(status: number, message?: string) {
+    super(
+      new Response(JSON.stringify({ message }), {
+        status,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+    );
     this.name = `HttpError ${status}`;
   }
 }
