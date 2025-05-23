@@ -74,6 +74,7 @@ const config = {
     app("sap"),
     app("tiptap-cloud"),
     app("browser-use"),
+    app("slack-binding"),
     ...compatibilityApps,
   ],
 };
