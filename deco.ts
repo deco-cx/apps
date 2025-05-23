@@ -34,6 +34,7 @@ const config = {
     app("anthropic"),
     app("resend"),
     app("emailjs"),
+    app("aws"),
     app("konfidency"),
     app("mailchimp"),
     app("ai-assistants"),
