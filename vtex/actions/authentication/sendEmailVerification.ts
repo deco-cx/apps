@@ -3,6 +3,8 @@ import type { AppContext } from "../../mod.ts";
 
 export interface Props {
   email: string;
+  locale?: string;
+  parentAppId?: string;
 }
 
 export type SendEmailVerificationResult = boolean;
@@ -36,39 +38,50 @@ export default async function action(
   const formData = new FormData();
   formData.append("authenticationToken", authenticationToken);
   formData.append("email", props.email);
-
-  const response = await vcsDeprecated[
-    "POST /api/vtexid/pub/authentication/accesskey/send"
-  ]({
-    deliveryMethod: "email",
-  }, {
-    body: formData,
-    headers: {
-      "Accept": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `Authentication request failed: ${response.status} ${response.statusText}`,
-    );
+  if (props.locale) {
+    formData.append("locale", props.locale);
+  }
+  if (props.parentAppId) {
+    formData.append("parentAppId", props.parentAppId);
   }
 
-  const data = await response.json();
-  if (data?.authStatus === "InvalidToken") {
-    throw new Error('"Authentication Token" is invalid');
+  try {
+    const response = await vcsDeprecated[
+      "POST /api/vtexid/pub/authentication/accesskey/send"
+    ]({
+      deliveryMethod: "email",
+    }, {
+      body: formData,
+      headers: {
+        "Accept": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Authentication request failed: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    const data = await response.json();
+    if (data?.authStatus === "InvalidToken") {
+      throw new Error('"Authentication Token" is invalid');
+    }
+
+    // VtexSessionToken is valid for 10 minutes
+    const SESSION_TOKEN_EXPIRES = 600;
+    setCookie(ctx.response.headers, {
+      name: "VtexSessionToken",
+      value: authenticationToken,
+      httpOnly: true,
+      maxAge: SESSION_TOKEN_EXPIRES,
+      path: "/",
+      secure: true,
+    });
+
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
   }
-
-  // VtexSessionToken is valid for 10 minutes
-  const SESSION_TOKEN_EXPIRES = 600;
-  setCookie(ctx.response.headers, {
-    name: "VtexSessionToken",
-    value: authenticationToken,
-    httpOnly: true,
-    maxAge: SESSION_TOKEN_EXPIRES,
-    path: "/",
-    secure: true,
-  });
-
-  return true;
 }
