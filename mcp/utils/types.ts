@@ -14,8 +14,8 @@ export interface OAuthProvider {
   authUrl: string;
   tokenUrl: string;
   scopes: string[];
-  clientId?: string;
-  clientSecret?: string;
+  clientId: string;
+  clientSecret: string;
 }
 
 export interface OAuthTokenEndpoint {
