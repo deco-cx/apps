@@ -4,20 +4,20 @@
 
 import type {
   CellValue,
-  TableData,
-  SimpleValueRange,
-  SimpleUpdateProps,
   SimpleBatchUpdateProps,
-  SimpleUpdateResponse,
   SimpleBatchUpdateResponse,
   SimpleError,
+  SimpleUpdateProps,
+  SimpleUpdateResponse,
+  SimpleValueRange,
+  TableData,
 } from "./types.ts";
 
 import type {
-  ValueRange,
   BatchUpdateValuesRequest,
-  UpdateValuesResponse,
   BatchUpdateValuesResponse,
+  UpdateValuesResponse,
+  ValueRange,
 } from "./types.ts";
 
 /**
@@ -34,10 +34,10 @@ export function cleanCellValue(value: CellValue): string | number | boolean {
 /**
  * Converts simple tabular data to API format
  */
-export function mapTableDataToApiValues(data: TableData): (string | number | boolean)[][] {
-  return data.map(row => 
-    row.map(cell => cleanCellValue(cell))
-  );
+export function mapTableDataToApiValues(
+  data: TableData,
+): (string | number | boolean)[][] {
+  return data.map((row) => row.map((cell) => cleanCellValue(cell)));
 }
 
 /**
@@ -77,8 +77,10 @@ export function mapSimpleUpdatePropsToApi(props: SimpleUpdateProps): {
     valueInputOption: props.valueInputOption || "USER_ENTERED",
     ...(props.includeValuesInResponse && {
       includeValuesInResponse: true,
-      responseValueRenderOption: props.responseValueRenderOption || "FORMATTED_VALUE",
-      responseDateTimeRenderOption: props.responseDateTimeRenderOption || "SERIAL_NUMBER",
+      responseValueRenderOption: props.responseValueRenderOption ||
+        "FORMATTED_VALUE",
+      responseDateTimeRenderOption: props.responseDateTimeRenderOption ||
+        "SERIAL_NUMBER",
     }),
   };
 
@@ -97,12 +99,14 @@ export function mapSimpleBatchUpdatePropsToApi(props: SimpleBatchUpdateProps): {
   const body: BatchUpdateValuesRequest = {
     valueInputOption: props.valueInputOption || "USER_ENTERED",
     includeValuesInResponse: props.includeValuesInResponse || false,
-    data: props.data.map(item => mapSimpleValueRangeToApi(item)),
+    data: props.data.map((item) => mapSimpleValueRangeToApi(item)),
   };
 
   if (props.includeValuesInResponse) {
-    body.responseValueRenderOption = props.responseValueRenderOption || "FORMATTED_VALUE";
-    body.responseDateTimeRenderOption = props.responseDateTimeRenderOption || "SERIAL_NUMBER";
+    body.responseValueRenderOption = props.responseValueRenderOption ||
+      "FORMATTED_VALUE";
+    body.responseDateTimeRenderOption = props.responseDateTimeRenderOption ||
+      "SERIAL_NUMBER";
   }
 
   const params = {
@@ -115,17 +119,19 @@ export function mapSimpleBatchUpdatePropsToApi(props: SimpleBatchUpdateProps): {
 /**
  * Converts API values to simple tabular data
  */
-export function mapApiValuesToTableData(values?: (string | number | boolean)[][]): TableData {
+export function mapApiValuesToTableData(
+  values?: (string | number | boolean)[][],
+): TableData {
   if (!values) return [];
-  return values.map(row => 
-    row.map(cell => cell as CellValue)
-  );
+  return values.map((row) => row.map((cell) => cell as CellValue));
 }
 
 /**
  * Converts API ValueRange to SimpleValueRange
  */
-export function mapApiValueRangeToSimple(apiRange: ValueRange): SimpleValueRange {
+export function mapApiValueRangeToSimple(
+  apiRange: ValueRange,
+): SimpleValueRange {
   return {
     range: apiRange.range || "",
     values: mapApiValuesToTableData(apiRange.values),
@@ -137,7 +143,7 @@ export function mapApiValueRangeToSimple(apiRange: ValueRange): SimpleValueRange
  * Converts API updateValues response to simple format
  */
 export function mapApiUpdateResponseToSimple(
-  apiResponse: UpdateValuesResponse
+  apiResponse: UpdateValuesResponse,
 ): SimpleUpdateResponse {
   return {
     spreadsheetId: apiResponse.spreadsheetId || "",
@@ -145,7 +151,7 @@ export function mapApiUpdateResponseToSimple(
     updatedRows: apiResponse.updatedRows || 0,
     updatedColumns: apiResponse.updatedColumns || 0,
     updatedCells: apiResponse.updatedCells || 0,
-    updatedData: apiResponse.updatedData 
+    updatedData: apiResponse.updatedData
       ? mapApiValueRangeToSimple(apiResponse.updatedData)
       : undefined,
   };
@@ -155,7 +161,7 @@ export function mapApiUpdateResponseToSimple(
  * Converts API batchUpdate response to simple format
  */
 export function mapApiBatchUpdateResponseToSimple(
-  apiResponse: BatchUpdateValuesResponse
+  apiResponse: BatchUpdateValuesResponse,
 ): SimpleBatchUpdateResponse {
   return {
     spreadsheetId: apiResponse.spreadsheetId || "",
@@ -163,7 +169,7 @@ export function mapApiBatchUpdateResponseToSimple(
     totalUpdatedRows: apiResponse.totalUpdatedRows || 0,
     totalUpdatedColumns: apiResponse.totalUpdatedColumns || 0,
     totalUpdatedCells: apiResponse.totalUpdatedCells || 0,
-    responses: (apiResponse.responses || []).map(response => 
+    responses: (apiResponse.responses || []).map((response) =>
       mapApiUpdateResponseToSimple(response)
     ),
   };
@@ -179,7 +185,7 @@ export function mapApiErrorToSimple(error: unknown): SimpleError {
 
   if (error && typeof error === "object") {
     const errorObj = error as Record<string, unknown>;
-    
+
     return {
       code: errorObj.code as string,
       message: errorObj.message as string || "Unknown error",
@@ -221,7 +227,7 @@ export function validateRange(range: string): boolean {
 export function validateTableData(data: TableData): boolean {
   if (!Array.isArray(data)) return false;
   if (data.length === 0) return true;
-  return data.every(row => Array.isArray(row));
+  return data.every((row) => Array.isArray(row));
 }
 
 /**
@@ -252,7 +258,9 @@ export function validateSimpleUpdateProps(props: SimpleUpdateProps): string[] {
 /**
  * Validates simple batch update props
  */
-export function validateSimpleBatchUpdateProps(props: SimpleBatchUpdateProps): string[] {
+export function validateSimpleBatchUpdateProps(
+  props: SimpleBatchUpdateProps,
+): string[] {
   const errors: string[] = [];
 
   if (!props.spreadsheetId) {
@@ -274,7 +282,9 @@ export function validateSimpleBatchUpdateProps(props: SimpleBatchUpdateProps): s
       if (!item.range) {
         errors.push(`data[${index}].range is required`);
       } else if (!validateRange(item.range)) {
-        errors.push(`data[${index}].range must be in A1 format like A1 or A1:B10`);
+        errors.push(
+          `data[${index}].range must be in A1 format like A1 or A1:B10`,
+        );
       }
 
       if (!item.values) {
@@ -286,4 +296,4 @@ export function validateSimpleBatchUpdateProps(props: SimpleBatchUpdateProps): s
   }
 
   return errors;
-} 
+}

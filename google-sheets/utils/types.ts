@@ -396,7 +396,10 @@ export interface InputOptions {
   /** Include updated values in response */
   includeValuesInResponse?: boolean;
   /** Response values format */
-  responseValueRenderOption?: "FORMATTED_VALUE" | "UNFORMATTED_VALUE" | "FORMULA";
+  responseValueRenderOption?:
+    | "FORMATTED_VALUE"
+    | "UNFORMATTED_VALUE"
+    | "FORMULA";
   /** Response date/time format */
   responseDateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
 }

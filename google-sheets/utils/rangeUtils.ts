@@ -33,27 +33,35 @@ export function columnNumberToLetter(num: number): string {
  * @param values Dados 2D para calcular o range automaticamente
  * @returns Range no formato "Sheet1!A1:B3" ou "A1:B3"
  */
-export function buildFullRange(sheetName: string, firstCell: string, values: string[][]): string {
+export function buildFullRange(
+  sheetName: string,
+  firstCell: string,
+  values: string[][],
+): string {
   if (!values || values.length === 0) {
     return sheetName ? `${sheetName}!${firstCell}` : firstCell;
   }
 
   const match = firstCell.match(/^([A-Z]+)(\d+)$/);
   if (!match) {
-    throw new Error(`Invalid cell format: ${firstCell}. Use format like A1, B2, etc.`);
+    throw new Error(
+      `Invalid cell format: ${firstCell}. Use format like A1, B2, etc.`,
+    );
   }
 
   const [, startColumn, startRowStr] = match;
   const startRow = parseInt(startRowStr, 10);
 
   const numRows = values.length;
-  const numCols = Math.max(...values.map(row => row.length));
+  const numCols = Math.max(...values.map((row) => row.length));
 
   if (numRows === 1 && numCols === 1) {
     return sheetName ? `${sheetName}!${firstCell}` : firstCell;
   }
 
-  const endColumn = columnNumberToLetter(columnLetterToNumber(startColumn) + numCols - 1);
+  const endColumn = columnNumberToLetter(
+    columnLetterToNumber(startColumn) + numCols - 1,
+  );
   const endRow = startRow + numRows - 1;
 
   const range = `${firstCell}:${endColumn}${endRow}`;
@@ -74,7 +82,9 @@ export function isValidCellReference(cellReference: string): boolean {
  * @param cellReference Referência da célula (ex: "A1", "BC123")
  * @returns Objeto com coluna (letra) e linha (número)
  */
-export function parseCellReference(cellReference: string): { column: string; row: number } {
+export function parseCellReference(
+  cellReference: string,
+): { column: string; row: number } {
   const match = cellReference.match(/^([A-Z]+)(\d+)$/);
   if (!match) {
     throw new Error(`Invalid cell format: ${cellReference}`);
@@ -112,19 +122,25 @@ export function getNextColumn(column: string): string {
  * @param numCols Número de colunas
  * @returns Range calculado
  */
-export function calculateRange(startCell: string, numRows: number, numCols: number): string {
+export function calculateRange(
+  startCell: string,
+  numRows: number,
+  numCols: number,
+): string {
   if (numRows <= 0 || numCols <= 0) {
     return startCell;
   }
 
   const { column: startColumn, row: startRow } = parseCellReference(startCell);
-  
+
   if (numRows === 1 && numCols === 1) {
     return startCell;
   }
 
-  const endColumn = columnNumberToLetter(columnLetterToNumber(startColumn) + numCols - 1);
+  const endColumn = columnNumberToLetter(
+    columnLetterToNumber(startColumn) + numCols - 1,
+  );
   const endRow = startRow + numRows - 1;
 
   return `${startCell}:${endColumn}${endRow}`;
-} 
+}
