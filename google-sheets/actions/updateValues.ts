@@ -1,121 +1,141 @@
 import { AppContext } from "../mod.ts";
 import type {
+  Result,
+  SimpleError,
   SimpleUpdateProps,
   SimpleUpdateResponse,
-  SimpleError,
-  Result,
-} from "../@types.ts";
+} from "../utils/types.ts";
 import {
-  mapSimpleUpdatePropsToApi,
   mapApiUpdateResponseToSimple,
+  mapSimpleUpdatePropsToApi,
   parseApiErrorText,
   validateSimpleUpdateProps,
 } from "../utils/mappers.ts";
+import { buildFullRange } from "../utils/rangeUtils.ts";
 
 /**
- * Props para atualização de valores simplificada
+ * Simplified props for updating values
  */
 export interface Props {
   /**
-   * @title Spreadsheet ID
-   * @description ID único da planilha Google Sheets. Encontrado na URL: https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/edit
-   * @pattern ^[a-zA-Z0-9-_]+$
+   * @title First Cell Location
+   * @description The starting cell for the update range, specified in A1 notation (e.g., 'A1', 'B2')
    */
-  spreadsheetId: string;
+  first_cell_location?: string;
 
   /**
-   * @title Range de Células
-   * @description Range das células a atualizar em notação A1. Pode ser uma célula única ou um intervalo.
-   * @examples ["A1", "Sheet1!A1", "A1:B10", "Dados!C2:E5"]
-   */
-  range: string;
-
-  /**
-   * @title Dados da Tabela
-   * @description Array 2D de valores para escrever na planilha. Cada sub-array representa uma linha. Suporta: string, number, boolean, null.
-   * @examples [
-   *   [["Nome", "Idade"], ["João", 25], ["Maria", 30]],
-   *   [["Produto", "Preço", "Estoque"], ["Mouse", 50, 100], ["Teclado", 150, 50]]
-   * ]
-   */
-  // deno-lint-ignore no-explicit-any
-  values: any[][];
-
-  /**
-   * @title Modo de Entrada
-   * @description Como interpretar os valores de entrada:
-   * - RAW: Valores armazenados exatamente como inseridos (apenas strings)
-   * - USER_ENTERED: Interpreta valores como se digitados pelo usuário (fórmulas, números, datas convertidos automaticamente)
-   * @default "USER_ENTERED"
-   */
-  valueInputOption?: "RAW" | "USER_ENTERED";
-
-  /**
-   * @title Incluir Valores na Resposta
-   * @description Se deve retornar os valores atualizados na resposta da API. Útil para confirmação.
-   * @default false
+   * @title Include Values in Response
+   * @description Whether to return the updated values in the API response
    */
   includeValuesInResponse?: boolean;
 
   /**
-   * @title Formato da Resposta
-   * @description Como formatar valores na resposta (apenas se includeValuesInResponse=true):
-   * - FORMATTED_VALUE: Como aparecem na UI (ex: "R$ 1.000,00")
-   * - UNFORMATTED_VALUE: Valores calculados brutos (ex: 1000)
-   * - FORMULA: As fórmulas (ex: "=SOMA(A1:A10)")
-   * @default "FORMATTED_VALUE"
+   * @title Sheet Name
+   * @description The name of the specific sheet within the spreadsheet to update
    */
-  responseValueRenderOption?: "FORMATTED_VALUE" | "UNFORMATTED_VALUE" | "FORMULA";
+  sheet_name: string;
 
   /**
-   * @title Formato de Data/Hora na Resposta
-   * @description Como formatar datas na resposta (apenas se includeValuesInResponse=true):
-   * - FORMATTED_STRING: Formato legível (ex: "1 Set 2008 15:00:00")
-   * - SERIAL_NUMBER: Número serial do Excel (ex: 39682.625)
-   * @default "SERIAL_NUMBER"
+   * @title Spreadsheet ID
+   * @description The unique identifier of the Google Sheets spreadsheet to be updated
+   */
+  spreadsheet_id: string;
+
+  /**
+   * @title Value Input Option
+   * @description Use 'RAW' to store values as-is or 'USER_ENTERED' to interpret formulas
+   */
+  valueInputOption?: "RAW" | "USER_ENTERED";
+
+  /**
+   * @title Values
+   * @description A 2D list representing the values to update. Each inner list corresponds to a row in the spreadsheet
+   */
+  values: string[][];
+
+  /**
+   * @title Response Value Render Option
+   * @description How to format values in response: FORMATTED_VALUE, UNFORMATTED_VALUE or FORMULA
+   */
+  responseValueRenderOption?:
+    | "FORMATTED_VALUE"
+    | "UNFORMATTED_VALUE"
+    | "FORMULA";
+
+  /**
+   * @title Response Date Time Render Option
+   * @description How to format dates in response: FORMATTED_STRING or SERIAL_NUMBER
    */
   responseDateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
 }
 
 /**
- * @title Atualizar Valores da Planilha
- * @description Atualiza valores de células em uma planilha Google Sheets. Use para escrever dados em um ÚNICO range de células.
- * 
- * **Exemplos de uso:**
- * - Célula única: `range: "A1"`, `values: [["João"]]`
- * - Linha: `range: "A1:C1"`, `values: [["Nome", "Idade", "Cidade"]]`
- * - Tabela: `range: "A1:C3"`, `values: [["Nome", "Idade"], ["João", 25], ["Maria", 30]]`
- * - Com sheet: `range: "Dados!A1:B2"`, `values: [["Item", "Valor"], ["Mouse", 50]]`
+ * Maps simplified props to the expected API format
+ */
+function mapPropsToApiFormat(props: Props): SimpleUpdateProps {
+  const firstCell = props.first_cell_location || "A1";
+  const range = buildFullRange(props.sheet_name, firstCell, props.values);
+
+  return {
+    spreadsheetId: props.spreadsheet_id,
+    range: range,
+    values: props.values,
+    valueInputOption: props.valueInputOption || "USER_ENTERED",
+    includeValuesInResponse: props.includeValuesInResponse || false,
+    responseValueRenderOption: props.responseValueRenderOption ||
+      "FORMATTED_VALUE",
+    responseDateTimeRenderOption: props.responseDateTimeRenderOption ||
+      "SERIAL_NUMBER",
+  };
+}
+
+/**
+ * @name UPDATE_SPREADSHEET_VALUES
+ * @title Update Spreadsheet Values
+ * @description Updates cell values in a Google Sheets spreadsheet in a simple and intuitive way. Just specify the sheet name, starting cell and data, and the system will automatically calculate the required range.
  */
 const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Result<SimpleUpdateResponse>> => {
-  // Converter props para formato simplificado
-  const simpleProps: SimpleUpdateProps = {
-    spreadsheetId: props.spreadsheetId,
-    range: props.range,
-    values: props.values,
-    valueInputOption: props.valueInputOption,
-    includeValuesInResponse: props.includeValuesInResponse,
-    responseValueRenderOption: props.responseValueRenderOption,
-    responseDateTimeRenderOption: props.responseDateTimeRenderOption,
-  };
-
-  // Validar entrada
-  const validationErrors = validateSimpleUpdateProps(simpleProps);
-  if (validationErrors.length > 0) {
+  // Basic validations
+  if (!props.spreadsheet_id || !props.sheet_name || !props.values) {
     return {
-      message: `Erro de validação: ${validationErrors.join(", ")}`,
+      message:
+        "Missing required parameters: spreadsheet_id, sheet_name and values are required",
+    } as SimpleError;
+  }
+
+  if (!Array.isArray(props.values) || props.values.length === 0) {
+    return {
+      message: "The 'values' parameter must be a non-empty array of arrays",
+    } as SimpleError;
+  }
+
+  // Check if all elements of values are arrays
+  if (!props.values.every((row) => Array.isArray(row))) {
+    return {
+      message: "All elements in 'values' must be arrays (representing rows)",
     } as SimpleError;
   }
 
   try {
-    // Mapear para formato da API
+    // Map simple props to API format
+    const simpleProps = mapPropsToApiFormat(props);
+
+    // Validate mapped props
+    const validationErrors = validateSimpleUpdateProps(simpleProps);
+    if (validationErrors.length > 0) {
+      return {
+        message: `Validation error: ${validationErrors.join(", ")}`,
+      } as SimpleError;
+    }
+
+    // Map to Google API format
     const { body, params } = mapSimpleUpdatePropsToApi(simpleProps);
 
-    // Fazer chamada para API
+    // Make API call
     const response = await ctx.client
       ["PUT /v4/spreadsheets/:spreadsheetId/values/:range"](
         params,
@@ -127,13 +147,14 @@ const action = async (
       return parseApiErrorText(errorText);
     }
 
-    // Mapear resposta da API para formato simples
+    // Map API response to simple format
     const apiResponse = await response.json();
     return mapApiUpdateResponseToSimple(apiResponse);
-
   } catch (error) {
     return {
-      message: `Erro na comunicação: ${error instanceof Error ? error.message : "Erro desconhecido"}`,
+      message: `Communication error: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`,
       details: { originalError: error },
     } as SimpleError;
   }

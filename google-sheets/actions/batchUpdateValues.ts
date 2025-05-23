@@ -1,150 +1,130 @@
 import { AppContext } from "../mod.ts";
 import type {
+  Result,
   SimpleBatchUpdateProps,
   SimpleBatchUpdateResponse,
   SimpleError,
   SimpleValueRange,
-  Result,
-} from "../@types.ts";
+} from "../utils/types.ts";
 import {
-  mapSimpleBatchUpdatePropsToApi,
   mapApiBatchUpdateResponseToSimple,
+  mapSimpleBatchUpdatePropsToApi,
   parseApiErrorText,
   validateSimpleBatchUpdateProps,
 } from "../utils/mappers.ts";
+import { buildFullRange } from "../utils/rangeUtils.ts";
 
 /**
- * Dados de um range individual para atualização em lote
- */
-export interface BatchUpdateData {
-  /**
-   * @title Range de Células
-   * @description Range das células a atualizar em notação A1. Pode ser uma célula única ou um intervalo.
-   * @examples ["A1", "Sheet1!A1", "A1:B10", "Dados!C2:E5"]
-   */
-  range: string;
-
-  /**
-   * @title Dados da Tabela
-   * @description Array 2D de valores para este range específico. Cada sub-array representa uma linha. Suporta: string, number, boolean, null.
-   * @examples [
-   *   [["Nome", "Idade"]],
-   *   [["João", 25], ["Maria", 30]]
-   * ]
-   */
-  // deno-lint-ignore no-explicit-any
-  values: any[][];
-
-  /**
-   * @title Organização dos Dados
-   * @description Como interpretar a matriz de dados para este range. ROWS = cada inner array é uma linha, COLUMNS = cada inner array é uma coluna
-   * @default "ROWS"
-   */
-  majorDimension?: "ROWS" | "COLUMNS";
-}
-
-/**
- * Props para atualização em lote simplificada
+ * Simplified props for batch updating values
  */
 export interface Props {
   /**
-   * @title Spreadsheet ID
-   * @description ID único da planilha Google Sheets. Encontrado na URL: https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/edit
-   * @pattern ^[a-zA-Z0-9-_]+$
+   * @title First Cell Location
+   * @description The starting cell for the update range, specified in A1 notation (e.g., 'A1', 'B2')
    */
-  spreadsheetId: string;
+  first_cell_location?: string;
 
   /**
-   * @title Dados de Atualização em Lote
-   * @description Array de ranges e seus valores correspondentes para atualizar. Cada elemento atualiza um range diferente na planilha.
-   * @minItems 1
-   * @maxItems 100
-   * @examples [
-   *   [{"range": "A1", "values": [["Título"]]}, {"range": "C1", "values": [["Data"]]}],
-   *   [{"range": "Sheet1!A1:B2", "values": [["Nome", "Idade"], ["João", 25]]}, {"range": "Sheet2!A1", "values": [["Total"]]}]
-   * ]
-   */
-  data: BatchUpdateData[];
-
-  /**
-   * @title Modo de Entrada
-   * @description Como interpretar TODOS os valores de entrada em todos os ranges:
-   * - RAW: Valores armazenados exatamente como inseridos (apenas strings)
-   * - USER_ENTERED: Interpreta valores como se digitados pelo usuário (fórmulas, números, datas convertidos automaticamente)
-   * @default "USER_ENTERED"
-   */
-  valueInputOption?: "RAW" | "USER_ENTERED";
-
-  /**
-   * @title Incluir Valores na Resposta
-   * @description Se deve retornar os valores atualizados na resposta da API. Útil para confirmação.
-   * @default false
+   * @title Include Values in Response
+   * @description Whether to return the updated values in the API response
    */
   includeValuesInResponse?: boolean;
 
   /**
-   * @title Formato da Resposta
-   * @description Como formatar valores na resposta (apenas se includeValuesInResponse=true):
-   * - FORMATTED_VALUE: Como aparecem na UI (ex: "R$ 1.000,00")
-   * - UNFORMATTED_VALUE: Valores calculados brutos (ex: 1000)
-   * - FORMULA: As fórmulas (ex: "=SOMA(A1:A10)")
-   * @default "FORMATTED_VALUE"
+   * @title Sheet Name
+   * @description The name of the specific sheet within the spreadsheet to update
    */
-  responseValueRenderOption?: "FORMATTED_VALUE" | "UNFORMATTED_VALUE" | "FORMULA";
+  sheet_name: string;
 
   /**
-   * @title Formato de Data/Hora na Resposta
-   * @description Como formatar datas na resposta (apenas se includeValuesInResponse=true):
-   * - FORMATTED_STRING: Formato legível (ex: "1 Set 2008 15:00:00")
-   * - SERIAL_NUMBER: Número serial do Excel (ex: 39682.625)
-   * @default "SERIAL_NUMBER"
+   * @title Spreadsheet ID
+   * @description The unique identifier of the Google Sheets spreadsheet to be updated
    */
-  responseDateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
+  spreadsheet_id: string;
+
+  /**
+   * @title Value Input Option
+   * @description Use 'RAW' to store values as-is or 'USER_ENTERED' to interpret formulas
+   */
+  valueInputOption?: "RAW" | "USER_ENTERED";
+
+  /**
+   * @title Values
+   * @description A 2D list representing the values to update. Each inner list corresponds to a row in the spreadsheet
+   */
+  values: string[][];
 }
 
 /**
- * @title Atualização em Lote de Valores da Planilha
- * @description Atualiza múltiplos ranges SEPARADOS de células em uma planilha Google Sheets em uma única chamada da API. Mais eficiente que múltiplas atualizações individuais.
- * 
- * **Exemplos de uso:**
- * - Múltiplas células: `data: [{"range": "A1", "values": [["Nome"]]}, {"range": "C1", "values": [["Idade"]]}]`
- * - Diferentes sheets: `data: [{"range": "Sheet1!A1", "values": [["Dados"]]}, {"range": "Sheet2!A1", "values": [["Resumo"]]}]`
- * - Dashboard: `data: [{"range": "A1:B1", "values": [["KPI", "Valor"]]}, {"range": "A5:C7", "values": [["Produto", "Vendas", "Meta"], ["Mouse", 100, 120], ["Teclado", 80, 90]]}]`
+ * Maps simplified props to the expected API format
+ */
+function mapPropsToApiFormat(props: Props): SimpleBatchUpdateProps {
+  const firstCell = props.first_cell_location || "A1";
+  const range = buildFullRange(props.sheet_name, firstCell, props.values);
+
+  const simpleData: SimpleValueRange[] = [{
+    range: range,
+    values: props.values,
+    majorDimension: "ROWS",
+  }];
+
+  return {
+    spreadsheetId: props.spreadsheet_id,
+    data: simpleData,
+    valueInputOption: props.valueInputOption || "USER_ENTERED",
+    includeValuesInResponse: props.includeValuesInResponse || false,
+    responseValueRenderOption: "FORMATTED_VALUE",
+    responseDateTimeRenderOption: "SERIAL_NUMBER",
+  };
+}
+
+/**
+ * @name BATCH_UPDATE_SPREADSHEET_VALUES
+ * @title Batch Update Spreadsheet Values
+ * @description Updates values in a Google Sheets spreadsheet in a simple and intuitive way. Just specify the sheet name, starting cell and data, and the system will automatically calculate the required range.
  */
 const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Result<SimpleBatchUpdateResponse>> => {
-  // Converter props para formato simplificado
-  const simpleData: SimpleValueRange[] = props.data.map(item => ({
-    range: item.range,
-    values: item.values,
-    majorDimension: item.majorDimension,
-  }));
-
-  const simpleProps: SimpleBatchUpdateProps = {
-    spreadsheetId: props.spreadsheetId,
-    data: simpleData,
-    valueInputOption: props.valueInputOption,
-    includeValuesInResponse: props.includeValuesInResponse,
-    responseValueRenderOption: props.responseValueRenderOption,
-    responseDateTimeRenderOption: props.responseDateTimeRenderOption,
-  };
-
-  // Validar entrada
-  const validationErrors = validateSimpleBatchUpdateProps(simpleProps);
-  if (validationErrors.length > 0) {
+  // Basic validations
+  if (!props.spreadsheet_id || !props.sheet_name || !props.values) {
     return {
-      message: `Erro de validação: ${validationErrors.join(", ")}`,
+      message:
+        "Missing required parameters: spreadsheet_id, sheet_name and values are required",
+    } as SimpleError;
+  }
+
+  if (!Array.isArray(props.values) || props.values.length === 0) {
+    return {
+      message: "The 'values' parameter must be a non-empty array of arrays",
+    } as SimpleError;
+  }
+
+  // Check if all elements of values are arrays
+  if (!props.values.every((row) => Array.isArray(row))) {
+    return {
+      message: "All elements in 'values' must be arrays (representing rows)",
     } as SimpleError;
   }
 
   try {
-    // Mapear para formato da API
+    // Map simple props to API format
+    const simpleProps = mapPropsToApiFormat(props);
+
+    // Validate mapped props
+    const validationErrors = validateSimpleBatchUpdateProps(simpleProps);
+    if (validationErrors.length > 0) {
+      return {
+        message: `Validation error: ${validationErrors.join(", ")}`,
+      } as SimpleError;
+    }
+
+    // Map to Google API format
     const { body, params } = mapSimpleBatchUpdatePropsToApi(simpleProps);
 
-    // Fazer chamada para API
+    // Make API call
     const response = await ctx.client
       ["POST /v4/spreadsheets/:spreadsheetId/values:batchUpdate"](
         params,
@@ -156,13 +136,14 @@ const action = async (
       return parseApiErrorText(errorText);
     }
 
-    // Mapear resposta da API para formato simples
+    // Map API response to simple format
     const apiResponse = await response.json();
     return mapApiBatchUpdateResponseToSimple(apiResponse);
-
   } catch (error) {
     return {
-      message: `Erro na comunicação: ${error instanceof Error ? error.message : "Erro desconhecido"}`,
+      message: `Communication error: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`,
       details: { originalError: error },
     } as SimpleError;
   }
