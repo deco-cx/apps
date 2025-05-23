@@ -11,17 +11,16 @@ export interface Props {
 
   /**
    * @title Cell Range
-   * @description The range of cells to update in A1 notation. Examples: "Sheet1!A1:B10", "Data!C2:E5", "A1:Z100"
-   * @pattern ^[^!]*![A-Z]+[0-9]+:[A-Z]+[0-9]+$|^[A-Z]+[0-9]+:[A-Z]+[0-9]+$
+   * @description The range of cells to update in A1 notation. Can be a single cell or a range. Examples: Sheet1!A1, Sheet1!A1:B10, Data!C2:E5, A1:Z100
    */
   range: string;
 
   /**
    * @title Values to Write
-   * @description 2D array of values to write to the spreadsheet. Each sub-array represents a row. Use strings, numbers, booleans, or formulas.
-   * @examples [["Name", "Age", "Email"], ["John", 30, "john@example.com"], ["Jane", 25, "jane@example.com"]]
+   * @description 2D array of values to write to the spreadsheet. Each sub-array represents a row. Supported types: string, number, boolean. Null values will be skipped.
    */
-  values: (string | number | boolean | null)[][];
+  // deno-lint-ignore no-explicit-any
+  values: any[][];
 
   /**
    * @title Data Organization
@@ -74,17 +73,17 @@ export interface UpdateValuesSuccess extends UpdateValuesResponse {
    * @description The spreadsheet that was updated
    */
   spreadsheetId: string;
-  
+
   /**
    * @description The number of rows that were updated
    */
   updatedRows?: number;
-  
+
   /**
    * @description The number of columns that were updated
    */
   updatedColumns?: number;
-  
+
   /**
    * @description The number of cells that were updated
    */
@@ -100,19 +99,7 @@ export interface UpdateValuesError {
 
 /**
  * @title Update Spreadsheet Values
- * @description Updates cell values in a Google Sheets spreadsheet. Use this to write data to specific ranges of cells.
- * 
- * Common use cases:
- * - Writing structured data (tables, lists)
- * - Updating specific cells with calculated values  
- * - Inserting formulas for automatic calculations
- * - Batch updating multiple rows/columns at once
- * 
- * Tips for AI usage:
- * - Always specify the exact range you want to update
- * - Use USER_ENTERED for formulas and automatic type conversion
- * - Use RAW when you need exact string values
- * - Include response values when you need to verify the update
+ * @description Updates cell values in a Google Sheets spreadsheet. Use this to write data to a SINGLE range of cells.
  */
 const action = async (
   props: Props,
@@ -130,13 +117,9 @@ const action = async (
     responseDateTimeRenderOption = "SERIAL_NUMBER",
   } = props;
 
-  // Validate and clean the input values
   const validatedValues = values.map((row) =>
     row.map((cell) => {
       if (cell === null || cell === undefined) return "";
-      if (typeof cell === "object" && Object.keys(cell).length === 0) {
-        return "";
-      }
       return cell;
     })
   );
@@ -151,7 +134,7 @@ const action = async (
     ["PUT /v4/spreadsheets/:spreadsheetId/values/:range"](
       {
         spreadsheetId,
-        range: encodeURIComponent(range),
+        range: range,
         valueInputOption,
         ...(includeValuesInResponse
           ? {

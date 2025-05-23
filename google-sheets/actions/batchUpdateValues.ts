@@ -7,17 +7,16 @@ import {
 export interface BatchUpdateData {
   /**
    * @title Cell Range
-   * @description The range of cells to update in A1 notation. Examples: "Sheet1!A1:B10", "Data!C2:E5"
-   * @pattern ^[^!]*![A-Z]+[0-9]+:[A-Z]+[0-9]+$|^[A-Z]+[0-9]+:[A-Z]+[0-9]+$
+   * @description The range of cells to update in A1 notation. Can be a single cell or a range. Examples: Sheet1!A1, Sheet1!A1:B10, Data!C2:E5 (sem aspas)
    */
   range: string;
 
   /**
    * @title Values to Write
-   * @description 2D array of values for this specific range. Each sub-array represents a row.
-   * @examples [["Product", "Price"], ["Laptop", 999.99], ["Mouse", 29.99]]
+   * @description 2D array of values for this specific range. Each sub-array represents a row. Supported types: string, number, boolean.
    */
-  values: (string | number | boolean | null)[][];
+  // deno-lint-ignore no-explicit-any
+  values: any[][];
 
   /**
    * @title Data Organization
@@ -87,22 +86,22 @@ export interface BatchUpdateValuesSuccess extends BatchUpdateValuesResponse {
    * @description The spreadsheet that was updated
    */
   spreadsheetId: string;
-  
+
   /**
    * @description Total number of updated value ranges
    */
   totalUpdatedRange?: number;
-  
+
   /**
    * @description Total number of rows updated across all ranges
    */
   totalUpdatedRows?: number;
-  
+
   /**
    * @description Total number of columns updated across all ranges
    */
   totalUpdatedColumns?: number;
-  
+
   /**
    * @description Total number of cells updated across all ranges
    */
@@ -118,25 +117,7 @@ export interface BatchUpdateValuesError {
 
 /**
  * @title Batch Update Spreadsheet Values
- * @description Updates multiple ranges of cells in a Google Sheets spreadsheet in a single API call. More efficient than multiple individual updates.
- * 
- * Common use cases:
- * - Updating multiple tables/sections in different parts of the sheet
- * - Populating headers and data in separate ranges
- * - Updating summary sections alongside detailed data
- * - Bulk operations across multiple sheets in the same spreadsheet
- * 
- * Tips for AI usage:
- * - Group related updates into a single batch for better performance
- * - Use different ranges for headers vs data to maintain formatting
- * - Consider using this for complex reports with multiple sections
- * - All ranges use the same valueInputOption, so group similar data types
- * - Maximum 100 ranges per batch update
- * 
- * Performance benefits:
- * - Reduces API calls (rate limiting friendly)
- * - Atomic operation (all succeed or all fail)
- * - Better for user experience in interactive applications
+ * @description Updates multiple SEPARATE ranges of cells in a Google Sheets spreadsheet in a single API call. More efficient than multiple individual updates.
  */
 const action = async (
   props: Props,
@@ -170,9 +151,6 @@ const action = async (
       values: item.values.map((row) =>
         row.map((cell) => {
           if (cell === null || cell === undefined) return "";
-          if (typeof cell === "object" && Object.keys(cell).length === 0) {
-            return "";
-          }
           return cell;
         })
       ),
