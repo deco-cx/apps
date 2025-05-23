@@ -54,6 +54,8 @@ export default async function refreshToken(
         scope: refreshResponse.scope || currentCtx.scope,
         token_type: refreshResponse.token_type || currentCtx.token_type,
         tokenObtainedAt: Math.floor(Date.now() / 1000),
+        clientId,
+        clientSecret,
       });
 
       console.log("refreshResponse", refreshResponse);
