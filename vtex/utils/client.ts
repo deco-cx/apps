@@ -1,4 +1,7 @@
-import { Userorderdetails, Userorderslist } from "./openapi/vcs.openapi.gen.ts";
+import {
+  Userorderdetails,
+  Userorderslist,
+} from "./openapi/orders.openapi.gen.ts";
 import {
   Brand,
   Category,
