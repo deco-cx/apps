@@ -67,7 +67,7 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<UpdateValuesResponse> => {
+): Promise<UpdateValuesResponse | { error: string }> => {
   const {
     spreadsheetId,
     range,
@@ -111,6 +111,13 @@ const action = async (
       },
       { body },
     );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    return {
+      error: errorText,
+    };
+  }
 
   return await response.json();
 };
