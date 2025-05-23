@@ -18,6 +18,10 @@ fragment Checkout on Checkout {
 		listPrice
     totalListPrice
     totalAdjustedPrice
+    seller {
+      sellerName
+      distributionCenterId
+    }
     productAttributes {
         name
         type
