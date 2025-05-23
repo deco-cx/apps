@@ -48,8 +48,8 @@ export default function App(
 
   const googleProvider: OAuthProvider = {
     ...GoogleProvider,
-    clientId,
-    clientSecret,
+    clientId: clientId ?? "",
+    clientSecret: clientSecret ?? "",
   };
 
   const options: OAuthClientOptions = {
