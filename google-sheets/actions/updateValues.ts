@@ -1,160 +1,142 @@
 import { AppContext } from "../mod.ts";
-import type { UpdateValuesResponse, ValueRange } from "../utils/types.ts";
+import type {
+  SimpleUpdateProps,
+  SimpleUpdateResponse,
+  SimpleError,
+  Result,
+} from "../@types.ts";
+import {
+  mapSimpleUpdatePropsToApi,
+  mapApiUpdateResponseToSimple,
+  parseApiErrorText,
+  validateSimpleUpdateProps,
+} from "../utils/mappers.ts";
 
+/**
+ * Props para atualização de valores simplificada
+ */
 export interface Props {
   /**
    * @title Spreadsheet ID
-   * @description The unique identifier of the Google Sheets spreadsheet. Found in the URL: https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/edit
+   * @description ID único da planilha Google Sheets. Encontrado na URL: https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/edit
    * @pattern ^[a-zA-Z0-9-_]+$
    */
   spreadsheetId: string;
 
   /**
-   * @title Cell Range
-   * @description The range of cells to update in A1 notation. Can be a single cell or a range. Examples: Sheet1!A1, Sheet1!A1:B10, Data!C2:E5, A1:Z100
+   * @title Range de Células
+   * @description Range das células a atualizar em notação A1. Pode ser uma célula única ou um intervalo.
+   * @examples ["A1", "Sheet1!A1", "A1:B10", "Dados!C2:E5"]
    */
   range: string;
 
   /**
-   * @title Values to Write
-   * @description 2D array of values to write to the spreadsheet. Each sub-array represents a row. Supported types: string, number, boolean. Null values will be skipped.
+   * @title Dados da Tabela
+   * @description Array 2D de valores para escrever na planilha. Cada sub-array representa uma linha. Suporta: string, number, boolean, null.
+   * @examples [
+   *   [["Nome", "Idade"], ["João", 25], ["Maria", 30]],
+   *   [["Produto", "Preço", "Estoque"], ["Mouse", 50, 100], ["Teclado", 150, 50]]
+   * ]
    */
   // deno-lint-ignore no-explicit-any
   values: any[][];
 
   /**
-   * @title Data Organization
-   * @description How to interpret the input data matrix. ROWS = each inner array is a row, COLUMNS = each inner array is a column
-   * @default "ROWS"
-   */
-  majorDimension?: "ROWS" | "COLUMNS";
-
-  /**
-   * @title Value Input Mode
-   * @description How Google Sheets should interpret the input values:
-   * - RAW: Values stored exactly as entered (strings only)
-   * - USER_ENTERED: Parse values as if typed by user (formulas, numbers, dates automatically converted)
+   * @title Modo de Entrada
+   * @description Como interpretar os valores de entrada:
+   * - RAW: Valores armazenados exatamente como inseridos (apenas strings)
+   * - USER_ENTERED: Interpreta valores como se digitados pelo usuário (fórmulas, números, datas convertidos automaticamente)
    * @default "USER_ENTERED"
    */
   valueInputOption?: "RAW" | "USER_ENTERED";
 
   /**
-   * @title Include Updated Values in Response
-   * @description Whether to return the updated cell values in the API response. Useful for confirmation or getting formatted results.
+   * @title Incluir Valores na Resposta
+   * @description Se deve retornar os valores atualizados na resposta da API. Útil para confirmação.
    * @default false
    */
   includeValuesInResponse?: boolean;
 
   /**
-   * @title Response Value Format
-   * @description How values should be formatted in the response (only applies if includeValuesInResponse=true):
-   * - FORMATTED_VALUE: Values as they appear in the UI (e.g., "$1,000.00")
-   * - UNFORMATTED_VALUE: Raw calculated values (e.g., 1000)
-   * - FORMULA: The formulas themselves (e.g., "=SUM(A1:A10)")
+   * @title Formato da Resposta
+   * @description Como formatar valores na resposta (apenas se includeValuesInResponse=true):
+   * - FORMATTED_VALUE: Como aparecem na UI (ex: "R$ 1.000,00")
+   * - UNFORMATTED_VALUE: Valores calculados brutos (ex: 1000)
+   * - FORMULA: As fórmulas (ex: "=SOMA(A1:A10)")
    * @default "FORMATTED_VALUE"
    */
-  responseValueRenderOption?:
-    | "FORMATTED_VALUE"
-    | "UNFORMATTED_VALUE"
-    | "FORMULA";
+  responseValueRenderOption?: "FORMATTED_VALUE" | "UNFORMATTED_VALUE" | "FORMULA";
 
   /**
-   * @title Date/Time Response Format
-   * @description How dates and times should be formatted in the response (only applies if includeValuesInResponse=true):
-   * - FORMATTED_STRING: Human-readable format (e.g., "Sep 1, 2008 3:00:00 PM")
-   * - SERIAL_NUMBER: Excel-style serial number (e.g., 39682.625)
+   * @title Formato de Data/Hora na Resposta
+   * @description Como formatar datas na resposta (apenas se includeValuesInResponse=true):
+   * - FORMATTED_STRING: Formato legível (ex: "1 Set 2008 15:00:00")
+   * - SERIAL_NUMBER: Número serial do Excel (ex: 39682.625)
    * @default "SERIAL_NUMBER"
    */
   responseDateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
 }
 
-export interface UpdateValuesSuccess extends UpdateValuesResponse {
-  /**
-   * @description The spreadsheet that was updated
-   */
-  spreadsheetId: string;
-
-  /**
-   * @description The number of rows that were updated
-   */
-  updatedRows?: number;
-
-  /**
-   * @description The number of columns that were updated
-   */
-  updatedColumns?: number;
-
-  /**
-   * @description The number of cells that were updated
-   */
-  updatedCells?: number;
-}
-
-export interface UpdateValuesError {
-  /**
-   * @description Error message from Google Sheets API
-   */
-  error: string;
-}
-
 /**
- * @title Update Spreadsheet Values
- * @description Updates cell values in a Google Sheets spreadsheet. Use this to write data to a SINGLE range of cells.
+ * @title Atualizar Valores da Planilha
+ * @description Atualiza valores de células em uma planilha Google Sheets. Use para escrever dados em um ÚNICO range de células.
+ * 
+ * **Exemplos de uso:**
+ * - Célula única: `range: "A1"`, `values: [["João"]]`
+ * - Linha: `range: "A1:C1"`, `values: [["Nome", "Idade", "Cidade"]]`
+ * - Tabela: `range: "A1:C3"`, `values: [["Nome", "Idade"], ["João", 25], ["Maria", 30]]`
+ * - Com sheet: `range: "Dados!A1:B2"`, `values: [["Item", "Valor"], ["Mouse", 50]]`
  */
 const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<UpdateValuesSuccess | UpdateValuesError> => {
-  const {
-    spreadsheetId,
-    range,
-    values,
-    majorDimension = "ROWS",
-    valueInputOption = "USER_ENTERED",
-    includeValuesInResponse = false,
-    responseValueRenderOption = "FORMATTED_VALUE",
-    responseDateTimeRenderOption = "SERIAL_NUMBER",
-  } = props;
-
-  const validatedValues = values.map((row) =>
-    row.map((cell) => {
-      if (cell === null || cell === undefined) return "";
-      return cell;
-    })
-  );
-
-  const body: ValueRange = {
-    range,
-    majorDimension,
-    values: validatedValues,
+): Promise<Result<SimpleUpdateResponse>> => {
+  // Converter props para formato simplificado
+  const simpleProps: SimpleUpdateProps = {
+    spreadsheetId: props.spreadsheetId,
+    range: props.range,
+    values: props.values,
+    valueInputOption: props.valueInputOption,
+    includeValuesInResponse: props.includeValuesInResponse,
+    responseValueRenderOption: props.responseValueRenderOption,
+    responseDateTimeRenderOption: props.responseDateTimeRenderOption,
   };
 
-  const response = await ctx.client
-    ["PUT /v4/spreadsheets/:spreadsheetId/values/:range"](
-      {
-        spreadsheetId,
-        range,
-        valueInputOption,
-        ...(includeValuesInResponse
-          ? {
-            includeValuesInResponse,
-            responseValueRenderOption,
-            responseDateTimeRenderOption,
-          }
-          : {}),
-      },
-      { body },
-    );
-
-  if (!response.ok) {
-    const errorText = await response.text();
+  // Validar entrada
+  const validationErrors = validateSimpleUpdateProps(simpleProps);
+  if (validationErrors.length > 0) {
     return {
-      error: errorText,
-    } as UpdateValuesError;
+      message: `Erro de validação: ${validationErrors.join(", ")}`,
+    } as SimpleError;
   }
 
-  return await response.json() as UpdateValuesSuccess;
+  try {
+    // Mapear para formato da API
+    const { body, params } = mapSimpleUpdatePropsToApi(simpleProps);
+
+    // Fazer chamada para API
+    const response = await ctx.client
+      ["PUT /v4/spreadsheets/:spreadsheetId/values/:range"](
+        params,
+        { body },
+      );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return parseApiErrorText(errorText);
+    }
+
+    // Mapear resposta da API para formato simples
+    const apiResponse = await response.json();
+    return mapApiUpdateResponseToSimple(apiResponse);
+
+  } catch (error) {
+    return {
+      message: `Erro na comunicação: ${error instanceof Error ? error.message : "Erro desconhecido"}`,
+      details: { originalError: error },
+    } as SimpleError;
+  }
 };
 
 export default action;
