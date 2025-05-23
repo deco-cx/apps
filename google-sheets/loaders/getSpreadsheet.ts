@@ -3,15 +3,16 @@ import { Spreadsheet } from "../utils/types.ts";
 
 export interface Props {
   /**
-   * @title ID da Planilha
-   * @description O ID da planilha do Google Sheets a ser obtida
+   * @title Spreadsheet ID
+   * @description The ID of the Google Sheets spreadsheet to retrieve
    */
   spreadsheetId: string;
 }
 
 /**
- * @title Obter Planilha
- * @description Obtém os metadados de uma planilha do Google Sheets
+ * @name GET_SPREADSHEET_METADATA
+ * @title Get Spreadsheet Metadata
+ * @description Gets the metadata of a Google Sheets spreadsheet
  */
 const loader = async (
   props: Props,
@@ -30,7 +31,7 @@ const loader = async (
 
     return await response.json();
   } catch (error) {
-    console.error("Erro ao obter planilha:", error);
+    console.error("Error retrieving spreadsheet:", error);
     throw error;
   }
 };

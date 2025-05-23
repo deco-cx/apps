@@ -5,8 +5,9 @@ export interface Props {
 }
 
 /**
+ * @name OAUTH_START
  * @title Start OAuth Google
- * @description Inicia o fluxo de autorização OAuth do Google
+ * @description Starts the Google OAuth authorization flow
  */
 export default function start(props: Props) {
   const authParams = new URLSearchParams({

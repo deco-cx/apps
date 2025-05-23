@@ -3,42 +3,40 @@ import { ValueRange } from "../utils/types.ts";
 
 export interface Props {
   /**
-   * @title ID da Planilha
-   * @description O ID da planilha do Google Sheets
+   * @title Spreadsheet ID
+   * @description The ID of the Google Sheets spreadsheet
    */
   spreadsheetId: string;
 
   /**
-   * @title Intervalos
-   * @description Lista de intervalos de células na notação A1 (ex: ["Sheet1!A1:B10", "Sheet2!C3:D4"])
+   * @title Ranges
+   * @description List of cell ranges in A1 notation (e.g., ["Sheet1!A1:B10", "Sheet2!C3:D4"])
    */
   ranges: string[];
 
   /**
-   * @title Dimensão Principal
-   * @description Determina a ordenação dos valores retornados
-   * @default "ROWS"
+   * @title Major Dimension
+   * @description Determines the ordering of returned values
    */
   majorDimension?: "ROWS" | "COLUMNS";
 
   /**
-   * @title Opção de Renderização de Valores
-   * @description Como os valores devem ser representados
-   * @default "FORMATTED_VALUE"
+   * @title Value Render Option
+   * @description How values should be represented
    */
   valueRenderOption?: "FORMATTED_VALUE" | "UNFORMATTED_VALUE" | "FORMULA";
 
   /**
-   * @title Opção de Renderização de Data/Hora
-   * @description Como os valores de data e hora devem ser representados
-   * @default "SERIAL_NUMBER"
+   * @title Date Time Render Option
+   * @description How date and time values should be represented
    */
   dateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
 }
 
 /**
- * @title Obter Valores em Lote
- * @description Lê os valores de múltiplos intervalos de células de uma planilha do Google Sheets
+ * @name GET_BATCH_SPREADSHEET_VALUES
+ * @title Get Batch Spreadsheet Values
+ * @description Reads values from multiple cell ranges of a Google Sheets spreadsheet
  */
 const loader = async (
   props: Props,

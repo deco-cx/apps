@@ -3,28 +3,26 @@ import { ValueRange } from "../utils/types.ts";
 
 export interface Props {
   /**
-   * @title ID da Planilha
-   * @description O ID da planilha do Google Sheets
+   * @title Spreadsheet ID
+   * @description The ID of the Google Sheets spreadsheet
    */
   spreadsheetId: string;
 
   /**
-   * @title Intervalo
-   * @description O intervalo de células na notação A1 (ex: Sheet1!A1:B10) sem as aspas
+   * @title Range
+   * @description The range of cells in A1 notation (e.g., Sheet1!A1:B10) without quotes
    */
   range: string;
 
   /**
-   * @title Dimensão Principal
-   * @description Determina como organizar os valores na matriz (por linhas ou colunas)
-   * @default "ROWS"
+   * @title Major Dimension
+   * @description Determines how to organize the values in the matrix (by rows or columns)
    */
   majorDimension?: "ROWS" | "COLUMNS";
 
   /**
-   * @title Opção de Renderização de Valores
-   * @description Como os valores devem ser representados na resposta
-   * @default "FORMATTED_VALUE"
+   * @title Value Render Option
+   * @description How values should be represented in the response
    */
   valueRenderOption?:
     | "FORMATTED_VALUE"
@@ -32,16 +30,16 @@ export interface Props {
     | "FORMULA";
 
   /**
-   * @title Opção de Renderização de Data/Hora
-   * @description Como os valores de data e hora devem ser representados na resposta
-   * @default "SERIAL_NUMBER"
+   * @title Date Time Render Option
+   * @description How date and time values should be represented in the response
    */
   dateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
 }
 
 /**
- * @title Obter Valores
- * @description Obtém os valores de um intervalo específico de células da planilha
+ * @name GET_SPREADSHEET_VALUES
+ * @title Get Spreadsheet Values
+ * @description Gets the values from a specific range of cells in the spreadsheet
  */
 const loader = async (
   props: Props,
