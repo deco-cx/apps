@@ -13,6 +13,7 @@ export interface Props<TPayload = any> {
   handlers:
     | HandleStreamParameters<TPayload>
     | (<TCtx extends AppContext>(
+      req: Request,
       ctx: TCtx,
     ) => HandleStreamParameters<TPayload>);
 }
@@ -22,7 +23,7 @@ export type BindingHandler<TPayload = any> = (
 ) => Promise<void>;
 
 export interface State {
-  handle: <TCtx extends AppContext>(ctx: TCtx) => BindingHandler;
+  handle: <TCtx extends AppContext>(req: Request, ctx: TCtx) => BindingHandler;
 }
 
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
@@ -38,7 +39,7 @@ export default function App<TPayload = any>(
   return {
     state: {
       handle: typeof handlers === "function"
-        ? (ctx: AppContext) => processStream(handlers(ctx))
+        ? (req: Request, ctx: AppContext) => processStream(handlers(req, ctx))
         : () => processStream(handlers),
     },
     manifest,

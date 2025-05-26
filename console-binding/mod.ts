@@ -12,7 +12,7 @@ export default function App() {
     state: {},
     manifest,
     dependencies: [binding<Payload>({
-      handlers: (_ctx) => ({
+      handlers: (_req, _ctx) => ({
         mapPayloadToOptions: (payload) => {
           return {
             messages: [{
