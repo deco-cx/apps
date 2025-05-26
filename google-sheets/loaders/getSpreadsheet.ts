@@ -18,7 +18,7 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<Spreadsheet> => {
+): Promise<Spreadsheet | { error: string }> => {
   const { spreadsheetId } = props;
 
   try {
@@ -28,11 +28,14 @@ const loader = async (
           spreadsheetId,
         },
       );
-
-    return await response.json();
+    const data = await response.json();
+    console.log(data);
+    return data;
   } catch (error) {
     console.error("Error retrieving spreadsheet:", error);
-    throw error;
+    return {
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 };
 
