@@ -182,7 +182,7 @@ if (import.meta.main) {
   );
 
   const type = await Select.prompt({
-    message: "Selecione o tipo",
+    message: "Select the type",
     options: ["APP", "MCP"],
   }) as TemplateType;
 
@@ -206,7 +206,7 @@ if (import.meta.main) {
   }
 
   const name = await Input.prompt({
-    message: "Nome do projeto",
+    message: "What is the name of your project?",
     minLength: 1,
     validate: validateProjectName,
   });
