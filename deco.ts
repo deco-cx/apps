@@ -11,6 +11,8 @@ const compatibilityApps = [{
 const config = {
   apps: [
     app("google-gmail"),
+    app("console-binding"),
+    app("binding"),
     app("github"),
     app("turso-db"),
     app("discohook"),
