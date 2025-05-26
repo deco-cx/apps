@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("google-gmail"),
     app("github"),
     app("turso-db"),
     app("discohook"),
