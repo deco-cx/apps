@@ -2,7 +2,12 @@ import { createOAuthHttpClient } from "../mcp/utils/httpClient.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import type { FnContext } from "@deco/deco";
 import { McpContext } from "../mcp/context.ts";
-import { API_URL, OAUTH_URL, OAUTH_URL_AUTH, SCOPES } from "./utils/constant.ts";
+import {
+  API_URL,
+  OAUTH_URL,
+  OAUTH_URL_AUTH,
+  SCOPES,
+} from "./utils/constant.ts";
 import { AuthClient, Client } from "./utils/client.ts";
 import {
   DEFAULT_OAUTH_HEADERS,

@@ -1,6 +1,10 @@
 import { AppContext } from "../mod.ts";
 import { EmailMessage } from "../utils/types.ts";
-import { getHeader, processEmailForListing, extractBody } from "../utils/emailUtils.ts";
+import {
+  extractBody,
+  getHeader,
+  processEmailForListing,
+} from "../utils/emailUtils.ts";
 
 export interface Props {
   /**
@@ -46,11 +50,12 @@ const loader = async (
       };
     }
 
-    const response = await ctx.client["GET /gmail/v1/users/:userId/messages/:id"]({
-      userId,
-      id,
-      format,
-    });
+    const response = await ctx.client
+      ["GET /gmail/v1/users/:userId/messages/:id"]({
+        userId,
+        id,
+        format,
+      });
 
     if (!response.ok) {
       const errorData = await response.text();
@@ -60,7 +65,7 @@ const loader = async (
     }
 
     const emailData = await response.json();
-    
+
     if (format === "metadata") {
       const basicData = processEmailForListing(emailData);
       return {
@@ -75,7 +80,9 @@ const loader = async (
     }
 
     const headers = emailData.payload?.headers || [];
-    const body = emailData.payload ? extractBody(emailData.payload) : { text: undefined, html: undefined };
+    const body = emailData.payload
+      ? extractBody(emailData.payload)
+      : { text: undefined, html: undefined };
 
     return {
       id: emailData.id,
@@ -99,9 +106,11 @@ const loader = async (
     };
   } catch (error) {
     return {
-      error: `Erro interno: ${error instanceof Error ? error.message : String(error)}`,
+      error: `Erro interno: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
     };
   }
 };
 
-export default loader; 
+export default loader;

@@ -32,14 +32,15 @@ const loader = async (
       };
     }
 
-    const listResponse = await ctx.client["GET /gmail/v1/users/:userId/messages"]({
-      userId,
-      q: query,
-      labelIds,
-      includeSpamTrash,
-      maxResults,
-      pageToken,
-    });
+    const listResponse = await ctx.client
+      ["GET /gmail/v1/users/:userId/messages"]({
+        userId,
+        q: query,
+        labelIds,
+        includeSpamTrash,
+        maxResults,
+        pageToken,
+      });
 
     if (!listResponse.ok) {
       const errorData = await listResponse.text();
@@ -49,7 +50,7 @@ const loader = async (
     }
 
     const listData = await listResponse.json();
-    
+
     if (!listData.messages || listData.messages.length === 0) {
       return {
         messages: [],
@@ -59,15 +60,32 @@ const loader = async (
     }
 
     const messagesWithMetadata = await Promise.all(
-      listData.messages.map(async (message: { id: string; threadId: string }) => {
-        try {
-          const detailResponse = await ctx.client["GET /gmail/v1/users/:userId/messages/:id"]({
-            userId,
-            id: message.id,
-            format: "metadata",
-          });
+      listData.messages.map(
+        async (message: { id: string; threadId: string }) => {
+          try {
+            const detailResponse = await ctx.client
+              ["GET /gmail/v1/users/:userId/messages/:id"]({
+                userId,
+                id: message.id,
+                format: "metadata",
+              });
 
-          if (!detailResponse.ok) {
+            if (!detailResponse.ok) {
+              return {
+                id: message.id,
+                threadId: message.threadId,
+                subject: "Erro ao carregar",
+                from: "Desconhecido",
+                to: "",
+                date: "",
+                snippet: "",
+              };
+            }
+
+            const emailData = await detailResponse.json();
+
+            return processEmailForListing(emailData);
+          } catch (_error) {
             return {
               id: message.id,
               threadId: message.threadId,
@@ -78,22 +96,8 @@ const loader = async (
               snippet: "",
             };
           }
-
-          const emailData = await detailResponse.json();
-          
-          return processEmailForListing(emailData);
-        } catch (_error) {
-          return {
-            id: message.id,
-            threadId: message.threadId,
-            subject: "Erro ao carregar",
-            from: "Desconhecido",
-            to: "",
-            date: "",
-            snippet: "",
-          };
-        }
-      })
+        },
+      ),
     );
 
     return {
@@ -103,9 +107,11 @@ const loader = async (
     };
   } catch (error) {
     return {
-      error: `Erro interno: ${error instanceof Error ? error.message : String(error)}`,
+      error: `Erro interno: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
     };
   }
 };
 
-export default loader; 
+export default loader;

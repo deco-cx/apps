@@ -17,7 +17,7 @@ export default function start(props: Props) {
     state: props.state,
   });
 
-  const authorizationUrl = `${OAUTH_URL_AUTH}?${authParams.toString()}`
+  const authorizationUrl = `${OAUTH_URL_AUTH}?${authParams.toString()}`;
 
   return Response.redirect(authorizationUrl);
 }

@@ -31,7 +31,7 @@ export interface EmailMessage {
   internalDate?: string;
   payload?: GmailPayload;
   sizeEstimate?: number;
-  
+
   // Campos extraídos dos headers
   subject?: string;
   from?: string;
@@ -41,13 +41,13 @@ export interface EmailMessage {
   date?: string;
   messageId?: string;
   replyTo?: string;
-  
+
   // Corpo do email decodificado
   body?: {
     text?: string;
     html?: string;
   };
-  
+
   // Headers completos
   headers?: Array<{
     name: string;

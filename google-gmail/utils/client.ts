@@ -1,8 +1,4 @@
-import {
-  Example,
-  EmailsResponse,
-  EmailMessage,
-} from "./types.ts";
+import { EmailMessage, EmailsResponse, Example } from "./types.ts";
 
 export interface AuthClient {
   "POST /token": {

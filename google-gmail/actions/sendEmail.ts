@@ -99,7 +99,8 @@ const action = async (
 
     if (!bodyText && !bodyHtml) {
       return {
-        error: "Pelo menos um dos campos 'bodyText' ou 'bodyHtml' é obrigatório",
+        error:
+          "Pelo menos um dos campos 'bodyText' ou 'bodyHtml' é obrigatório",
       };
     }
 
@@ -114,11 +115,14 @@ const action = async (
     if (replyTo) headers.push(`Reply-To: ${replyTo}`);
 
     let emailBody = "";
-    
+
     if (bodyHtml && bodyText) {
-      const boundary = "boundary_" + Date.now().toString(36) + Math.random().toString(36);
-      headers.push(`Content-Type: multipart/alternative; boundary="${boundary}"`);
-      
+      const boundary = "boundary_" + Date.now().toString(36) +
+        Math.random().toString(36);
+      headers.push(
+        `Content-Type: multipart/alternative; boundary="${boundary}"`,
+      );
+
       emailBody = [
         "",
         `--${boundary}`,
@@ -147,11 +151,11 @@ const action = async (
     }
 
     const rawMessage = headers.join("\r\n") + emailBody;
-    
+
     const encodedMessage = btoa(unescape(encodeURIComponent(rawMessage)))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '');
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
 
     const requestBody: { raw: string; threadId?: string } = {
       raw: encodedMessage,
@@ -161,11 +165,12 @@ const action = async (
       requestBody.threadId = threadId;
     }
 
-    const response = await ctx.client["POST /gmail/v1/users/:userId/messages/send"]({
-      userId,
-    }, {
-      body: requestBody,
-    });
+    const response = await ctx.client
+      ["POST /gmail/v1/users/:userId/messages/send"]({
+        userId,
+      }, {
+        body: requestBody,
+      });
 
     if (!response.ok) {
       const errorData = await response.text();
@@ -183,9 +188,11 @@ const action = async (
     };
   } catch (error) {
     return {
-      error: `Erro interno: ${error instanceof Error ? error.message : String(error)}`,
+      error: `Erro interno: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
     };
   }
 };
 
-export default action; 
+export default action;

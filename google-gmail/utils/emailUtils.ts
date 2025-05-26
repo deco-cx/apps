@@ -2,7 +2,7 @@ import { GmailPayload } from "./types.ts";
 
 export const extractTitleFromSnippet = (snippet: string): string => {
   if (!snippet) return "";
-  
+
   const meetingSummaryPattern = /Meeting summary:\s*[""]([^"""]+)[""]?/i;
   const quotedTitlePattern = /^[""]([^"""]+)[""]?/;
   const titleBeforeDatePattern = /^([^@]+?)(?:\s*@|\s*\d{1,2}\s+de\s+\w+)/;
@@ -30,27 +30,31 @@ export const extractTitleFromBody = (payload: GmailPayload): string => {
   if (payload?.body?.data) {
     const data = payload.body.data;
     const decodedData = decodeGmailBase64(data);
-    
+
     const htmlTitlePattern = /<title[^>]*>([^<]+)<\/title>/i;
     const htmlTitleMatch = decodedData.match(htmlTitlePattern);
     if (htmlTitleMatch) return htmlTitleMatch[1].trim();
-    
-    const lines = decodedData.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+
+    const lines = decodedData.split("\n").map((line) => line.trim()).filter(
+      (line) => line.length > 0,
+    );
     if (lines.length > 0) {
       const htmlTagPattern = /<[^>]*>/g;
-      const firstLine = lines[0].replace(htmlTagPattern, '').trim();
+      const firstLine = lines[0].replace(htmlTagPattern, "").trim();
       if (firstLine.length > 3 && firstLine.length < 100) {
         return firstLine;
       }
     }
   }
-  
+
   if (payload?.parts) {
     for (const part of payload.parts) {
-      if (part.mimeType === 'text/plain' && part.body?.data) {
+      if (part.mimeType === "text/plain" && part.body?.data) {
         const data = part.body.data;
         const decodedData = decodeGmailBase64(data);
-        const lines = decodedData.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+        const lines = decodedData.split("\n").map((line) => line.trim()).filter(
+          (line) => line.length > 0,
+        );
         if (lines.length > 0) {
           const firstLine = lines[0].trim();
           if (firstLine.length > 3 && firstLine.length < 100) {
@@ -60,14 +64,15 @@ export const extractTitleFromBody = (payload: GmailPayload): string => {
       }
     }
   }
-  
+
   return "";
 };
 
 export const extractSenderFromSnippet = (snippet: string): string => {
   if (!snippet) return "";
-  
-  const mentionPattern = /^([^@\s]+(?:\s+[^@\s]+)*?)\s+(?:mencionou|comentou|adicionou)/i;
+
+  const mentionPattern =
+    /^([^@\s]+(?:\s+[^@\s]+)*?)\s+(?:mencionou|comentou|adicionou)/i;
   const mentionMatch = snippet.match(mentionPattern);
   if (mentionMatch) {
     return mentionMatch[1].trim();
@@ -78,42 +83,52 @@ export const extractSenderFromSnippet = (snippet: string): string => {
   if (bracketMatch) {
     return bracketMatch[1];
   }
-  
+
   return "Sistema";
 };
 
-export const getHeader = (headers: Array<{name: string; value: string}>, name: string): string => {
-  const header = headers.find((h) => h.name.toLowerCase() === name.toLowerCase());
+export const getHeader = (
+  headers: Array<{ name: string; value: string }>,
+  name: string,
+): string => {
+  const header = headers.find((h) =>
+    h.name.toLowerCase() === name.toLowerCase()
+  );
   return header?.value || "";
 };
 
 const decodeGmailBase64 = (data: string): string => {
   const hyphenToPlus = /-/g;
   const underscoreToSlash = /_/g;
-  
-  const urlSafeData = data.replace(hyphenToPlus, '+').replace(underscoreToSlash, '/');
+
+  const urlSafeData = data.replace(hyphenToPlus, "+").replace(
+    underscoreToSlash,
+    "/",
+  );
   return atob(urlSafeData);
 };
 
-export const extractBody = (payload: GmailPayload): { text?: string; html?: string } => {
+export const extractBody = (
+  payload: GmailPayload,
+): { text?: string; html?: string } => {
   const body: { text?: string; html?: string } = {};
 
   if (payload.body?.data) {
     const mimeType = payload.mimeType;
     const data = payload.body.data;
     const decodedData = decodeGmailBase64(data);
-    
-    if (mimeType === 'text/plain') {
+
+    if (mimeType === "text/plain") {
       body.text = decodedData;
-    } else if (mimeType === 'text/html') {
+    } else if (mimeType === "text/html") {
       body.html = decodedData;
     }
   } else if (payload.parts) {
     for (const part of payload.parts) {
-      if (part.mimeType === 'text/plain' && part.body?.data) {
+      if (part.mimeType === "text/plain" && part.body?.data) {
         const decodedData = decodeGmailBase64(part.body.data);
         body.text = decodedData;
-      } else if (part.mimeType === 'text/html' && part.body?.data) {
+      } else if (part.mimeType === "text/html" && part.body?.data) {
         const decodedData = decodeGmailBase64(part.body.data);
         body.html = decodedData;
       } else if (part.parts) {
@@ -135,14 +150,16 @@ export const processEmailForListing = (emailData: {
 }) => {
   const headers = emailData.payload?.headers || [];
   const snippet = emailData.snippet || "";
-  
+
   let subject = getHeader(headers, "Subject");
   let from = getHeader(headers, "From");
   let to = getHeader(headers, "To");
   const date = getHeader(headers, "Date");
 
   if (!subject || subject.trim() === "" || subject.length < 3) {
-    const bodyTitle = emailData.payload ? extractTitleFromBody(emailData.payload) : "";
+    const bodyTitle = emailData.payload
+      ? extractTitleFromBody(emailData.payload)
+      : "";
     if (bodyTitle) {
       subject = bodyTitle;
     } else {
@@ -156,7 +173,8 @@ export const processEmailForListing = (emailData: {
   }
 
   if (!to || to.trim() === "") {
-    to = getHeader(headers, "Delivered-To") || getHeader(headers, "X-Original-To") || "";
+    to = getHeader(headers, "Delivered-To") ||
+      getHeader(headers, "X-Original-To") || "";
   }
 
   return {
@@ -168,4 +186,4 @@ export const processEmailForListing = (emailData: {
     date: date,
     snippet: snippet,
   };
-}; 
+};
