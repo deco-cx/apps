@@ -22,11 +22,11 @@ const loader = async (
   const { spreadsheetId } = props;
 
   const response = await ctx.client
-  ["GET /v4/spreadsheets/:spreadsheetId"](
-    {
-      spreadsheetId,
-    },
-  );
+    ["GET /v4/spreadsheets/:spreadsheetId"](
+      {
+        spreadsheetId,
+      },
+    );
 
   if (!response.ok) {
     throw new Error(

@@ -122,10 +122,10 @@ const action = async (
 
     // Make API call
     const response = await ctx.client
-    ["POST /v4/spreadsheets/:spreadsheetId/values:batchUpdate"](
-      params,
-      { body },
-    );
+      ["POST /v4/spreadsheets/:spreadsheetId/values:batchUpdate"](
+        params,
+        { body },
+      );
 
     if (!response.ok) {
       throw new Error(
@@ -138,7 +138,8 @@ const action = async (
     return mapApiBatchUpdateResponseToSimple(apiResponse);
   } catch (error) {
     throw new Error(
-      `Communication error: ${error instanceof Error ? error.message : "Unknown error"
+      `Communication error: ${
+        error instanceof Error ? error.message : "Unknown error"
       }`,
     );
   }

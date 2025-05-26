@@ -25,9 +25,9 @@ export interface Props {
    * @description How values should be represented in the response
    */
   valueRenderOption?:
-  | "FORMATTED_VALUE"
-  | "UNFORMATTED_VALUE"
-  | "FORMULA";
+    | "FORMATTED_VALUE"
+    | "UNFORMATTED_VALUE"
+    | "FORMULA";
 
   /**
    * @title Date Time Render Option
@@ -55,15 +55,15 @@ const loader = async (
   } = props;
 
   const response = await ctx.client
-  ["GET /v4/spreadsheets/:spreadsheetId/values/:range"](
-    {
-      spreadsheetId,
-      range: range,
-      majorDimension,
-      valueRenderOption,
-      dateTimeRenderOption,
-    },
-  );
+    ["GET /v4/spreadsheets/:spreadsheetId/values/:range"](
+      {
+        spreadsheetId,
+        range: range,
+        majorDimension,
+        valueRenderOption,
+        dateTimeRenderOption,
+      },
+    );
 
   if (!response.ok) {
     throw new Error(
