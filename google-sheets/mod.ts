@@ -40,8 +40,8 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Google Sheets
- * @description Integração com Google Sheets usando OAuth 2.0 com refresh automático de tokens
- * @category Produtividade
+ * @description Create, edit and manage Google Sheets spreadsheets
+ * @category Productivity
  * @logo https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Google_Sheets_logo_%282014-2020%29.svg/1498px-Google_Sheets_logo_%282014-2020%29.svg.png
  */
 export default function App(
