@@ -8,7 +8,6 @@ import type {
 import {
   mapApiUpdateResponseToSimple,
   mapSimpleUpdatePropsToApi,
-  parseApiErrorText,
   validateSimpleUpdateProps,
 } from "../utils/mappers.ts";
 import { buildFullRange } from "../utils/rangeUtils.ts";
@@ -143,8 +142,9 @@ const action = async (
       );
 
     if (!response.ok) {
-      const errorText = await response.text();
-      return parseApiErrorText(errorText);
+      throw new Error(
+        `Error updating spreadsheet values: ${response.statusText}`,
+      );
     }
 
     // Map API response to simple format
