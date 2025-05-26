@@ -8,8 +8,8 @@ import { OutputBindingProps } from "../../utils.ts";
  */
 export default function output(
   props: OutputBindingProps,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ) {
-  return ctx.handle(ctx)(props);
+  return ctx.handle(req, ctx)(props);
 }
