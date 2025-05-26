@@ -1,15 +1,12 @@
 import { AppContext } from "../mod.ts";
 import type {
-  Result,
   SimpleBatchUpdateProps,
   SimpleBatchUpdateResponse,
-  SimpleError,
   SimpleValueRange,
 } from "../utils/types.ts";
 import {
   mapApiBatchUpdateResponseToSimple,
   mapSimpleBatchUpdatePropsToApi,
-  parseApiErrorText,
   validateSimpleBatchUpdateProps,
 } from "../utils/mappers.ts";
 import { buildFullRange } from "../utils/rangeUtils.ts";
@@ -87,26 +84,25 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<Result<SimpleBatchUpdateResponse>> => {
+): Promise<SimpleBatchUpdateResponse> => {
   // Basic validations
   if (!props.spreadsheet_id || !props.sheet_name || !props.values) {
-    return {
-      message:
-        "Missing required parameters: spreadsheet_id, sheet_name and values are required",
-    } as SimpleError;
+    throw new Error(
+      "Missing required parameters: spreadsheet_id, sheet_name and values are required",
+    );
   }
 
   if (!Array.isArray(props.values) || props.values.length === 0) {
-    return {
-      message: "The 'values' parameter must be a non-empty array of arrays",
-    } as SimpleError;
+    throw new Error(
+      "The 'values' parameter must be a non-empty array of arrays",
+    );
   }
 
   // Check if all elements of values are arrays
   if (!props.values.every((row) => Array.isArray(row))) {
-    return {
-      message: "All elements in 'values' must be arrays (representing rows)",
-    } as SimpleError;
+    throw new Error(
+      "All elements in 'values' must be arrays (representing rows)",
+    );
   }
 
   try {
@@ -116,9 +112,9 @@ const action = async (
     // Validate mapped props
     const validationErrors = validateSimpleBatchUpdateProps(simpleProps);
     if (validationErrors.length > 0) {
-      return {
-        message: `Validation error: ${validationErrors.join(", ")}`,
-      } as SimpleError;
+      throw new Error(
+        `Validation error: ${validationErrors.join(", ")}`,
+      );
     }
 
     // Map to Google API format
@@ -126,26 +122,25 @@ const action = async (
 
     // Make API call
     const response = await ctx.client
-      ["POST /v4/spreadsheets/:spreadsheetId/values:batchUpdate"](
-        params,
-        { body },
-      );
+    ["POST /v4/spreadsheets/:spreadsheetId/values:batchUpdate"](
+      params,
+      { body },
+    );
 
     if (!response.ok) {
-      const errorText = await response.text();
-      return parseApiErrorText(errorText);
+      throw new Error(
+        `Error updating spreadsheet values: ${response.statusText}`,
+      );
     }
 
     // Map API response to simple format
     const apiResponse = await response.json();
     return mapApiBatchUpdateResponseToSimple(apiResponse);
   } catch (error) {
-    return {
-      message: `Communication error: ${
-        error instanceof Error ? error.message : "Unknown error"
+    throw new Error(
+      `Communication error: ${error instanceof Error ? error.message : "Unknown error"
       }`,
-      details: { originalError: error },
-    } as SimpleError;
+    );
   }
 };
 

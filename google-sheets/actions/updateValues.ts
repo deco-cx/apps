@@ -8,7 +8,6 @@ import type {
 import {
   mapApiUpdateResponseToSimple,
   mapSimpleUpdatePropsToApi,
-  parseApiErrorText,
   validateSimpleUpdateProps,
 } from "../utils/mappers.ts";
 import { buildFullRange } from "../utils/rangeUtils.ts";
@@ -58,9 +57,9 @@ export interface Props {
    * @description How to format values in response: FORMATTED_VALUE, UNFORMATTED_VALUE or FORMULA
    */
   responseValueRenderOption?:
-    | "FORMATTED_VALUE"
-    | "UNFORMATTED_VALUE"
-    | "FORMULA";
+  | "FORMATTED_VALUE"
+  | "UNFORMATTED_VALUE"
+  | "FORMULA";
 
   /**
    * @title Response Date Time Render Option
@@ -137,14 +136,15 @@ const action = async (
 
     // Make API call
     const response = await ctx.client
-      ["PUT /v4/spreadsheets/:spreadsheetId/values/:range"](
-        params,
-        { body },
-      );
+    ["PUT /v4/spreadsheets/:spreadsheetId/values/:range"](
+      params,
+      { body },
+    );
 
     if (!response.ok) {
-      const errorText = await response.text();
-      return parseApiErrorText(errorText);
+      throw new Error(
+        `Error updating spreadsheet values: ${response.statusText}`,
+      );
     }
 
     // Map API response to simple format
@@ -152,9 +152,8 @@ const action = async (
     return mapApiUpdateResponseToSimple(apiResponse);
   } catch (error) {
     return {
-      message: `Communication error: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`,
+      message: `Communication error: ${error instanceof Error ? error.message : "Unknown error"
+        }`,
       details: { originalError: error },
     } as SimpleError;
   }

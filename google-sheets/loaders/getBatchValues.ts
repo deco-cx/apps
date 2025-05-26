@@ -55,15 +55,21 @@ const loader = async (
 
   for (const range of ranges) {
     const response = await ctx.client
-      ["GET /v4/spreadsheets/:spreadsheetId/values/:range"](
-        {
-          spreadsheetId,
-          range,
-          majorDimension,
-          valueRenderOption,
-          dateTimeRenderOption,
-        },
+    ["GET /v4/spreadsheets/:spreadsheetId/values/:range"](
+      {
+        spreadsheetId,
+        range,
+        majorDimension,
+        valueRenderOption,
+        dateTimeRenderOption,
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Error fetching spreadsheet values: ${response.statusText}`,
       );
+    }
 
     const data = await response.json();
     valueRanges.push(data);
