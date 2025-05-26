@@ -160,6 +160,7 @@ export const toProduct = (
   const metafields = (product.metafields ?? [])
     .filter((metafield) => metafield && metafield.key && metafield.value)
     .map((metafield): PropertyValue => {
+      console.log(metafield, 'metafield const map toProduct')
       const { key, value, reference, references } = metafield || {};
       const hasReferenceImage = reference && "image" in reference;
       const referenceImageUrl = hasReferenceImage ? reference.image?.url : null;
@@ -180,6 +181,7 @@ export const toProduct = (
       };
     });
 
+    console.log(metafields, 'metafields toProduct antes property')
   const additionalProperty: PropertyValue[] = selectedOptions
     .map(toPropertyValue)
     .concat(descriptionHtml)

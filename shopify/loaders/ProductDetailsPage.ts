@@ -32,6 +32,8 @@ const loader = async (
   const { slug } = props;
   const metafields = props.metafields || [];
 
+  console.log(metafields, 'metafields loader')
+
   const splitted = slug?.split("-");
   const maybeSkuId = Number(splitted[splitted.length - 1]);
 
@@ -44,6 +46,8 @@ const loader = async (
     variables: { handle, identifiers: metafields },
     ...GetProduct,
   });
+
+  console.log(data.product?.metafields, 'data metafieldns loader')
 
   if (!data?.product) {
     return null;
