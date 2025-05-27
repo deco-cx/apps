@@ -99,7 +99,6 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<Result<SimpleUpdateResponse>> => {
-  // Basic validations
   if (!props.spreadsheet_id || !props.sheet_name || !props.values) {
     return {
       message:
@@ -113,7 +112,6 @@ const action = async (
     } as SimpleError;
   }
 
-  // Check if all elements of values are arrays
   if (!props.values.every((row) => Array.isArray(row))) {
     return {
       message: "All elements in 'values' must be arrays (representing rows)",
@@ -121,10 +119,8 @@ const action = async (
   }
 
   try {
-    // Map simple props to API format
     const simpleProps = mapPropsToApiFormat(props);
 
-    // Validate mapped props
     const validationErrors = validateSimpleUpdateProps(simpleProps);
     if (validationErrors.length > 0) {
       return {
@@ -132,10 +128,8 @@ const action = async (
       } as SimpleError;
     }
 
-    // Map to Google API format
     const { body, params } = mapSimpleUpdatePropsToApi(simpleProps);
 
-    // Make API call
     const response = await ctx.client
       ["PUT /v4/spreadsheets/:spreadsheetId/values/:range"](
         params,
@@ -147,7 +141,6 @@ const action = async (
       return parseApiErrorText(errorText);
     }
 
-    // Map API response to simple format
     const apiResponse = await response.json();
     return mapApiUpdateResponseToSimple(apiResponse);
   } catch (error) {
