@@ -1,6 +1,6 @@
 # Console Binding MCP
 
-This project is an example of an MCP (Message Control Protocol) binding for input and output operations.
+This project is an example of an MCP (Model Context Protocol) binding for input and output operations.
 
 ## Overview
 
