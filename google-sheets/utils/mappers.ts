@@ -4,12 +4,15 @@
 
 import type {
   CellValue,
+  OptimizedSpreadsheetMetadata,
+  Sheet,
   SimpleBatchUpdateProps,
   SimpleBatchUpdateResponse,
   SimpleError,
   SimpleUpdateProps,
   SimpleUpdateResponse,
   SimpleValueRange,
+  Spreadsheet,
   TableData,
 } from "./types.ts";
 
@@ -19,6 +22,7 @@ import type {
   UpdateValuesResponse,
   ValueRange,
 } from "./types.ts";
+import { columnNumberToLetter, isValidCellReference } from "./rangeUtils.ts";
 
 /**
  * Cleans and validates a cell value
@@ -120,7 +124,7 @@ export function mapSimpleBatchUpdatePropsToApi(props: SimpleBatchUpdateProps): {
  * Converts API values to simple tabular data
  */
 export function mapApiValuesToTableData(
-  values?: (string | number | boolean)[][],
+  values?: CellValue[][],
 ): TableData {
   if (!values) return [];
   return values.map((row) => row.map((cell) => cell as CellValue));
@@ -215,10 +219,17 @@ export function parseApiErrorText(errorText: string): SimpleError {
 
 /**
  * Validates if a range is in the correct format
+ * Supports formats like: A1, A1:B2, Sheet1!A1, Sheet1!A1:B2
  */
 export function validateRange(range: string): boolean {
-  const rangePattern = /^([^!]*!)?[A-Z]+[0-9]+(:[A-Z]+[0-9]+)?$/;
-  return rangePattern.test(range);
+  const rangePart = range.includes("!") ? range.split("!")[1] : range;
+
+  if (rangePart.includes(":")) {
+    const [start, end] = rangePart.split(":");
+    return isValidCellReference(start) && isValidCellReference(end);
+  } else {
+    return isValidCellReference(rangePart);
+  }
 }
 
 /**
@@ -296,4 +307,93 @@ export function validateSimpleBatchUpdateProps(
   }
 
   return errors;
+}
+
+/**
+ * Maps the complete spreadsheet metadata response to an optimized version for LLM consumption
+ * Extracts only the essential information needed for most operations
+ */
+export function mapSpreadsheetToOptimized(
+  spreadsheetData: Spreadsheet,
+  dataRanges?: Record<string, { range: string; filledCells: number }>,
+): OptimizedSpreadsheetMetadata {
+  return {
+    spreadsheetId: spreadsheetData.spreadsheetId,
+    title: spreadsheetData.properties?.title || "",
+    url: spreadsheetData.spreadsheetUrl || "",
+    locale: spreadsheetData.properties?.locale,
+    sheets: (spreadsheetData.sheets || []).map((sheet: Sheet) => {
+      const sheetTitle = sheet.properties?.title || "";
+      const rangeInfo = dataRanges?.[sheetTitle];
+
+      return {
+        id: sheet.properties?.sheetId || 0,
+        title: sheetTitle,
+        rowCount: sheet.properties?.gridProperties?.rowCount || 0,
+        columnCount: sheet.properties?.gridProperties?.columnCount || 0,
+        dataRange: rangeInfo?.range,
+        filledCells: rangeInfo?.filledCells,
+      };
+    }),
+  };
+}
+
+/**
+ * Checks if a cell has content (not empty, null, or undefined)
+ */
+function isCellFilled(cell: CellValue): boolean {
+  return cleanCellValue(cell) !== "";
+}
+
+/**
+ * Calculates the data range and filled cells count from sheet values
+ * Returns the range in A1 notation (e.g., "A1:C10") and the number of filled cells
+ */
+export function calculateDataRange(
+  values: CellValue[][],
+  sheetTitle: string,
+): { range: string; filledCells: number } | null {
+  if (!values || values.length === 0) {
+    return null;
+  }
+
+  let lastRow = 0;
+  let lastColumn = 0;
+  let filledCells = 0;
+
+  for (let i = 0; i < values.length; i++) {
+    const row = values[i];
+    if (row && row.length > 0) {
+      const hasData = row.some(isCellFilled);
+      if (hasData) {
+        lastRow = i + 1;
+        for (let j = row.length - 1; j >= 0; j--) {
+          if (isCellFilled(row[j])) {
+            lastColumn = Math.max(lastColumn, j + 1);
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  for (let i = 0; i < values.length; i++) {
+    const row = values[i];
+    if (row) {
+      for (let j = 0; j < row.length; j++) {
+        if (isCellFilled(row[j])) {
+          filledCells++;
+        }
+      }
+    }
+  }
+
+  if (lastRow === 0 || lastColumn === 0) {
+    return null;
+  }
+
+  const columnLetter = columnNumberToLetter(lastColumn);
+  const range = `${sheetTitle}!A1:${columnLetter}${lastRow}`;
+
+  return { range, filledCells };
 }
