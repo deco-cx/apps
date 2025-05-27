@@ -38,13 +38,6 @@ export interface Props {
   apiKey?: string | Secret;
 
   /**
-   * @title Airtable Base URL
-   * @description The base URL for the Airtable API.
-   * @default https://api.airtable.com
-   */
-  baseUrl?: string;
-
-  /**
    * @title OAuth Tokens
    * @description OAuth tokens for authenticated requests
    */
@@ -87,7 +80,7 @@ export default function App(
   const resolvedApiKey = props.apiKey
     ? (typeof props.apiKey === "string" ? props.apiKey : props.apiKey.get())
     : "";
-  const resolvedBaseUrl = props.baseUrl || AIRTABLE_API_BASE_URL;
+  const resolvedBaseUrl = AIRTABLE_API_BASE_URL;
 
   const createClientWithHeaders = (headers: Headers) => {
     return createHttpClient<AirtableClient>({
