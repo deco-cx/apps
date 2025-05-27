@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { Table, UpdateTableBody } from "../types.ts";
+import type { Table, UpdateTableBody } from "../utils/types.ts";
 
 interface Props {
   /**
@@ -30,29 +30,21 @@ interface Props {
    * @description Optional. ID of an existing field to be set as the new primary field.
    */
   primaryFieldId?: string;
-
-  /**
-   * @title API Key
-   */
-  apiKey?: string;
 }
 
 /**
  * @title Update Airtable Table
- * @description Updates an existing table's name, description, or primary field (Metadata API).
+ * @description Updates an existing table's name, description, or primary field using OAuth (Metadata API).
  */
 const action = async (
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<Table | Response> => {
-  const { baseId, tableId, name, description, primaryFieldId, apiKey } = props;
+  const { baseId, tableId, name, description, primaryFieldId } = props;
 
-  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
-  const resolvedApiKey = authHeader || apiKey;
-
-  if (!resolvedApiKey) {
-    return new Response("API Key is required", { status: 403 });
+  if (!ctx.client) {
+    return new Response("OAuth authentication is required", { status: 401 });
   }
 
   const body: UpdateTableBody = {};
@@ -66,10 +58,10 @@ const action = async (
     );
   }
 
-  const response = await ctx.api(resolvedApiKey)
+  const response = await ctx.client
     ["PATCH /v0/meta/bases/:baseId/tables/:tableId"](
-      { baseId, tableId }, // URL params
-      { body }, // Request body
+      { baseId, tableId },
+      { body },
     );
 
   if (!response.ok) {

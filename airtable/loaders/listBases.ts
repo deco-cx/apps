@@ -1,37 +1,30 @@
 import type { AppContext } from "../mod.ts";
-import type { ListBasesResponse } from "../types.ts";
+import type { ListBasesResponse } from "../utils/types.ts";
 
 interface Props {
-  // If the API supports pagination for bases via offset, it could be a prop here.
-  // For now, let's assume we fetch all or the first page as per client default.
-  offset?: string;
   /**
-   * @title API Key
+   * @title Offset
+   * @description Pagination offset for listing bases
    */
-  apiKey?: string;
+  offset?: string;
 }
 
 /**
  * @title List Airtable Bases
- * @description Fetches a list of bases accessible with the configured API key.
+ * @description Fetches a list of bases accessible with OAuth token.
  */
 const loader = async (
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<ListBasesResponse | Response> => {
-  const { apiKey, offset } = props;
-
-  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
-  const resolvedApiKey = authHeader || apiKey;
-
-  if (!resolvedApiKey) {
-    return new Response("API Key is required", { status: 403 });
-  }
-
-  const response = await ctx.api(resolvedApiKey)["GET /v0/meta/bases"](
+  const { offset } = props;
+  console.log(ctx.tokens);
+  console.log("Listing bases");
+  const response = await ctx.client["GET /v0/meta/bases"](
     offset ? { offset: offset } : {},
   );
+  console.log("Bases listed");
 
   if (!response.ok) {
     throw new Error(`Error listing bases: ${response.statusText}`);

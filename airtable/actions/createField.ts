@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { CreateFieldBody, Field } from "../types.ts";
+import type { CreateFieldBody, Field } from "../utils/types.ts";
 
 // Props will be CreateFieldBody plus baseId and tableId
 interface Props extends CreateFieldBody {
@@ -13,30 +13,22 @@ interface Props extends CreateFieldBody {
    * @description The ID of the table to add the field to.
    */
   tableId: string;
-  /**
-   * @title API Key
-   */
-  apiKey?: string;
-  // name, type, description, options are inherited from CreateFieldBody
 }
 
 /**
  * @title Create Airtable Field
- * @description Creates a new field in a specified table (Metadata API).
+ * @description Creates a new field in a specified table using OAuth (Metadata API).
  * @see https://airtable.com/developers/web/api/create-field
  */
 const action = async (
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<Field | Response> => {
-  const { baseId, tableId, name, type, description, options, apiKey } = props;
+  const { baseId, tableId, name, type, description, options } = props;
 
-  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
-  const resolvedApiKey = authHeader || apiKey;
-
-  if (!resolvedApiKey) {
-    return new Response("API Key is required", { status: 403 });
+  if (!ctx.client) {
+    return new Response("OAuth authentication is required", { status: 401 });
   }
 
   const body: CreateFieldBody = {
@@ -50,10 +42,10 @@ const action = async (
     body.options = options;
   }
 
-  const response = await ctx.api(resolvedApiKey)
+  const response = await ctx.client
     ["POST /v0/meta/bases/:baseId/tables/:tableId/fields"](
-      { baseId, tableId }, // URL params
-      { body }, // Request body
+      { baseId, tableId },
+      { body },
     );
 
   if (!response.ok) {

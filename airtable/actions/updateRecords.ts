@@ -1,5 +1,9 @@
 import type { AppContext } from "../mod.ts";
-import type { AirtableRecord, FieldSet, UpdateRecordsBody } from "../types.ts";
+import type {
+  AirtableRecord,
+  FieldSet,
+  UpdateRecordsBody,
+} from "../utils/types.ts";
 
 interface RecordToUpdate {
   id: string;
@@ -36,30 +40,21 @@ interface Props {
   performUpsert?: {
     fieldsToMergeOn: string[];
   };
-
-  /**
-   * @title API Key
-   */
-  apiKey?: string;
 }
 
 /**
  * @title Update Airtable Records
- * @description Updates one or more records in a specified table.
+ * @description Updates one or more records in a specified table using OAuth.
  */
 const action = async (
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<{ records: AirtableRecord[] } | Response> => {
-  const { baseId, tableIdOrName, records, typecast, performUpsert, apiKey } =
-    props;
+  const { baseId, tableIdOrName, records, typecast, performUpsert } = props;
 
-  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
-  const resolvedApiKey = authHeader || apiKey;
-
-  if (!resolvedApiKey) {
-    return new Response("API Key is required", { status: 403 });
+  if (!ctx.client) {
+    return new Response("OAuth authentication is required", { status: 401 });
   }
 
   const body: UpdateRecordsBody = {
@@ -72,11 +67,10 @@ const action = async (
     body.performUpsert = performUpsert;
   }
 
-  const response = await ctx.api(resolvedApiKey)
-    ["PATCH /v0/:baseId/:tableIdOrName"](
-      { baseId, tableIdOrName },
-      { body },
-    );
+  const response = await ctx.client["PATCH /v0/:baseId/:tableIdOrName"](
+    { baseId, tableIdOrName },
+    { body },
+  );
 
   if (!response.ok) {
     throw new Error(`Error updating records: ${response.statusText}`);

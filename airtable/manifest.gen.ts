@@ -6,14 +6,16 @@ import * as $$$$$$$$$0 from "./actions/createField.ts";
 import * as $$$$$$$$$1 from "./actions/createRecord.ts";
 import * as $$$$$$$$$2 from "./actions/createTable.ts";
 import * as $$$$$$$$$3 from "./actions/deleteRecords.ts";
-import * as $$$$$$$$$4 from "./actions/updateField.ts";
-import * as $$$$$$$$$5 from "./actions/updateRecords.ts";
-import * as $$$$$$$$$6 from "./actions/updateTable.ts";
+import * as $$$$$$$$$4 from "./actions/oauth/callback.ts";
+import * as $$$$$$$$$5 from "./actions/updateField.ts";
+import * as $$$$$$$$$6 from "./actions/updateRecords.ts";
+import * as $$$$$$$$$7 from "./actions/updateTable.ts";
 import * as $$$0 from "./loaders/getBaseSchema.ts";
 import * as $$$1 from "./loaders/getRecord.ts";
 import * as $$$2 from "./loaders/listBases.ts";
 import * as $$$3 from "./loaders/listRecords.ts";
-import * as $$$4 from "./loaders/searchRecords.ts";
+import * as $$$4 from "./loaders/oauth/start.ts";
+import * as $$$5 from "./loaders/searchRecords.ts";
 
 const manifest = {
   "loaders": {
@@ -21,16 +23,18 @@ const manifest = {
     "airtable/loaders/getRecord.ts": $$$1,
     "airtable/loaders/listBases.ts": $$$2,
     "airtable/loaders/listRecords.ts": $$$3,
-    "airtable/loaders/searchRecords.ts": $$$4,
+    "airtable/loaders/oauth/start.ts": $$$4,
+    "airtable/loaders/searchRecords.ts": $$$5,
   },
   "actions": {
     "airtable/actions/createField.ts": $$$$$$$$$0,
     "airtable/actions/createRecord.ts": $$$$$$$$$1,
     "airtable/actions/createTable.ts": $$$$$$$$$2,
     "airtable/actions/deleteRecords.ts": $$$$$$$$$3,
-    "airtable/actions/updateField.ts": $$$$$$$$$4,
-    "airtable/actions/updateRecords.ts": $$$$$$$$$5,
-    "airtable/actions/updateTable.ts": $$$$$$$$$6,
+    "airtable/actions/oauth/callback.ts": $$$$$$$$$4,
+    "airtable/actions/updateField.ts": $$$$$$$$$5,
+    "airtable/actions/updateRecords.ts": $$$$$$$$$6,
+    "airtable/actions/updateTable.ts": $$$$$$$$$7,
   },
   "name": "airtable",
   "baseUrl": import.meta.url,

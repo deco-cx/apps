@@ -1,94 +1,137 @@
 import type { AppContext } from "../mod.ts";
-import type { CreateTableBody, Field, Table } from "../types.ts";
+import type { CreateTableBody, Table } from "../utils/types.ts";
+import { mapTableFields } from "../utils/helpers.ts";
+
+// Tipos específicos de campo que o Airtable aceita
+type AirtableFieldType =
+  | "singleLineText"
+  | "email"
+  | "url"
+  | "multilineText"
+  | "number"
+  | "percent"
+  | "currency"
+  | "singleSelect"
+  | "multipleSelects"
+  | "singleCollaborator"
+  | "multipleCollaborators"
+  | "multipleRecordLinks"
+  | "date"
+  | "dateTime"
+  | "phoneNumber"
+  | "multipleAttachments"
+  | "checkbox"
+  | "formula"
+  | "createdTime"
+  | "rollup"
+  | "count"
+  | "lookup"
+  | "createdBy"
+  | "lastModifiedTime"
+  | "lastModifiedBy"
+  | "button";
+
+interface TableField {
+  /**
+   * @title Field Name
+   * @description Name of the field (required)
+   */
+  name: string;
+
+  /**
+   * @title Field Type
+   * @description Type of the field
+   * @default "singleLineText"
+   */
+  type: AirtableFieldType;
+
+  /**
+   * @title Description
+   * @description Optional description for the field
+   */
+  description?: string;
+
+  /**
+   * @title Options
+   * @description Field-specific options (for select fields, etc.)
+   */
+  options?: {
+    choices?: Array<{
+      name: string;
+      color?: string;
+    }>;
+  };
+}
 
 interface Props {
   /**
    * @title Base ID
+   * @description The ID of the base where the table will be created
    */
   baseId: string;
 
   /**
    * @title Table Name
+   * @description Name of the new table
    */
   name: string;
 
   /**
    * @title Table Description
-   * @description Optional description for the new table.
+   * @description Optional description for the new table
    */
   description?: string;
 
   /**
    * @title Table Fields
-   * @description Array of field definitions for the new table.
-   * @see https://airtable.com/developers/web/api/field-model
+   * @description Array of field definitions for the new table. At least one field is required.
+   * @minItems 1
    */
-  fields: Array<Omit<Field, "id">>; // When creating a table, field IDs are not provided for new fields.
-
-  /**
-   * @title Primary Field ID or Name
-   * @description Optional. The name or ID of the field to be set as primary.
-   * If not provided, Airtable usually defaults to the first field or requires one with a supported type.
-   */
-  primaryFieldNameOrId?: string; // Airtable API for create table can take primaryFieldId. This simplifies it to a name.
-  // This will need to be translated to the correct structure for CreateTableBody.fields if needed
-  // Or CreateTableBody might need primaryFieldId directly.
-  // For simplicity, let's assume CreateTableBody handles fields definitions correctly.
-}
-
-/**
- * @title API Key
- */
-interface PropsWithApiKey extends Props {
-  apiKey?: string;
+  fields: TableField[];
 }
 
 /**
  * @title Create Airtable Table
- * @description Creates a new table within a specified base (Metadata API).
+ * @description Creates a new table within a specified base using OAuth (Metadata API).
  */
 const action = async (
-  props: PropsWithApiKey,
-  req: Request,
+  props: Props,
+  _req: Request,
   ctx: AppContext,
 ): Promise<Table | Response> => {
-  const { baseId, name, description, fields, apiKey } = props;
+  const { baseId, name, description, fields } = props;
 
-  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
-  const resolvedApiKey = authHeader || apiKey;
-
-  if (!resolvedApiKey) {
-    return new Response("API Key is required", { status: 403 });
+  if (!ctx.client) {
+    return new Response("OAuth authentication is required", { status: 401 });
   }
 
-  // The client expects `body: CreateTableBody`
-  // CreateTableBody is { name: string, description?: string, fields: Field[], primaryFieldId?: string }
-  // Our Props.fields is Array<Omit<Field, "id">>. This is compatible with Field[] where id is optional.
+  if (!name || name.trim() === "") {
+    throw new Error("Table name is required");
+  }
+
+  if (!fields || fields.length === 0) {
+    throw new Error("At least one field is required");
+  }
+
+  const mappedFields = mapTableFields(fields);
+
   const body: CreateTableBody = {
-    name,
-    fields: fields as Field[], // Cast Omit<Field, "id">[] to Field[]
+    name: name.trim(),
+    fields: mappedFields,
   };
 
-  if (description) {
-    body.description = description;
+  if (description && description.trim() !== "") {
+    body.description = description.trim();
   }
-  // Handling primaryFieldNameOrId would typically involve finding that field in the `fields` array
-  // (if it's a name) and then setting its ID to `body.primaryFieldId` IF the API expects that.
-  // The Airtable API for creating tables usually infers the primary field or requires one of the fields
-  // to be of a primary-compatible type.
-  // The `CreateTableBody` includes `primaryFieldId?: string;`. If the user provides it, we pass it.
-  // Let's adjust Props to take primaryFieldId to align better with CreateTableBody
-  // For now, this example will omit direct primaryFieldId setting from Props to simplify, assuming field definitions suffice or a default is used.
-  // If `primaryFieldNameOrId` was intended to be `primaryFieldId` from `CreateTableBody` it should be named so in `Props`.
 
-  const response = await ctx.api(resolvedApiKey)
-    ["POST /v0/meta/bases/:baseId/tables"](
-      { baseId }, // URL params
-      { body }, // Request body
-    );
+  const response = await ctx.client["POST /v0/meta/bases/:baseId/tables"](
+    { baseId },
+    { body },
+  );
 
   if (!response.ok) {
-    throw new Error(`Error creating table: ${response.statusText}`);
+    const errorText = await response.text();
+    throw new Error(`Error creating table: ${errorText}`);
   }
 
   return response.json();

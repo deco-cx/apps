@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { AirtableRecord, FieldSet } from "../types.ts";
+import type { AirtableRecord, FieldSet } from "../utils/types.ts";
 
 interface Props {
   /**
@@ -23,29 +23,21 @@ interface Props {
    * @description Optional. If true, Airtable will attempt to convert cell values to the appropriate type.
    */
   typecast?: boolean;
-
-  /**
-   * @title API Key
-   */
-  apiKey?: string;
 }
 
 /**
  * @title Create Airtable Record
- * @description Creates a new record in a specified table.
+ * @description Creates a new record in a specified table using OAuth.
  */
 const action = async (
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<AirtableRecord | Response> => {
-  const { baseId, tableIdOrName, fields, typecast, apiKey } = props;
+  const { baseId, tableIdOrName, fields, typecast } = props;
 
-  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
-  const resolvedApiKey = authHeader || apiKey;
-
-  if (!resolvedApiKey) {
-    return new Response("API Key is required", { status: 403 });
+  if (!ctx.client) {
+    return new Response("OAuth authentication is required", { status: 401 });
   }
 
   const body = {
@@ -53,11 +45,10 @@ const action = async (
     ...(typecast !== undefined && { typecast }),
   };
 
-  const response = await ctx.api(resolvedApiKey)
-    ["POST /v0/:baseId/:tableIdOrName"](
-      { baseId, tableIdOrName }, // URL parameters
-      { body }, // Request body and other options
-    );
+  const response = await ctx.client["POST /v0/:baseId/:tableIdOrName"](
+    { baseId, tableIdOrName },
+    { body },
+  );
 
   if (!response.ok) {
     throw new Error(`Error creating record: ${response.statusText}`);
