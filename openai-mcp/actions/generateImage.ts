@@ -134,12 +134,23 @@ export default function generateImageAction(
     presignedUrls,
   } = props;
 
+  if (props.quality) {
+    if (props.quality !== "low" && props.quality !== "medium" && props.quality !== "high" && props.quality !== "auto") {
+      return {
+        success: false,
+        message: "Quality must be a valid quality value. Valid values are: low, medium, high, auto",
+        error: "Invalid quality value",
+      }
+    }
+  }
+
   const openAI = ctx.openAI;
 
   // If presigned URLs are provided, return preview URL
   if (presignedUrls && presignedUrls.length > 0) {
     // Run image generation asynchronously without awaiting
     setTimeout(() => {
+      console.log({presignedUrls})
       processImageGeneration(props, openAI, presignedUrls)
         .catch((error) => {
           console.error("Async image generation failed:", error);
@@ -217,6 +228,8 @@ async function processImageGeneration(
   }
 
   const result = await openAI.images.generate(requestParams);
+
+  console.log({result})
 
   if (result.data && result.data.length > 0 && result.data[0]) {
     let imageData = result.data[0].b64_json;
