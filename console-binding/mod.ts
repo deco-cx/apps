@@ -10,12 +10,13 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 export interface Payload {
   message: string;
 }
-export type BindingHandler = (
-  input: InputBindingProps<Payload> | OutputBindingProps,
-) => Promise<void>;
 
 export interface State {
-  handle: (req: Request, ctx: AppContext) => BindingHandler;
+  handle: (
+    props: InputBindingProps<Payload> | OutputBindingProps,
+    req: Request,
+    ctx: AppContext,
+  ) => Promise<void>;
 }
 // deno-lint-ignore no-empty-interface
 export interface Props {}
@@ -28,18 +29,22 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 export default function App() {
   return {
     state: {
-      handle: (_req: Request, _ctx: AppContext) =>
-        processStream<Payload>({
-          mapPayloadToOptions: (payload) => {
-            return {
+      handle: (
+        props: InputBindingProps<Payload> | OutputBindingProps,
+        _req: Request,
+        _ctx: AppContext,
+      ) => {
+        return processStream({
+          streamProps: "payload" in props
+            ? {
               messages: [{
                 id: crypto.randomUUID(),
                 role: "user",
-                content: `The user is saying: ${payload.message}`,
+                content: `The user is saying: ${props.payload.message}`,
               }],
               options: {},
-            };
-          },
+            }
+            : undefined,
           onTextPart: (part) => {
             console.log("text part", part);
           },
@@ -88,7 +93,8 @@ export default function App() {
           onRedactedReasoningPart: (part) => {
             console.log("redacted reasoning part", part);
           },
-        }),
+        }, props);
+      },
     },
     manifest,
     dependencies: [],

@@ -27,6 +27,7 @@ export class HttpError extends DecoHttpError {
         },
       }),
     );
+    this.message = message ?? `http error ${status}`;
     this.name = `HttpError ${status}`;
   }
 }

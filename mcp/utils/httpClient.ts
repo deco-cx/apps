@@ -74,7 +74,7 @@ const createFetchWithAutoRefresh = <TAuthClient>(
  * @param config - OAuth client configuration
  * @returns Unified client with API + Auth + OAuth
  */
-export const createOAuthHttpClient = <TApiClient, TAuthClient>(
+export const createOAuthHttpClient = <TApiClient, TAuthClient = TApiClient>(
   config: OAuthClientConfig<TApiClient, TAuthClient>,
 ): OAuthClients<TApiClient, TAuthClient> => {
   const tokens = config.tokens || {} as OAuthTokens;

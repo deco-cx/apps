@@ -11,6 +11,7 @@ export interface Callbacks {
   generate: string;
   generateObject: string;
 }
+
 export interface InputBindingProps<TPayload = any> {
   callbacks: Callbacks;
   payload: TPayload;
@@ -18,50 +19,57 @@ export interface InputBindingProps<TPayload = any> {
   url: string;
 }
 
-export interface OutputBindingProps {
+export interface OutputBindingProps<
+  TMetadata extends Record<string, unknown> = Record<string, unknown>,
+> {
   callbacks: Callbacks;
+  metadata?: TMetadata;
+  threadId: string;
+  resourceId: string;
 }
-export interface StreamOptions {
+export interface StreamOptions<
+  TMetadata extends Record<string, unknown> = Record<string, unknown>,
+> {
   messages: Message[];
   options: {
     threadId?: string;
     resourceId?: string;
+    metadata?: TMetadata;
   };
 }
 
-export interface HandleStreamParameters<TPayload = any>
-  extends ProcessDataStreamParameters {
-  mapPayloadToOptions: (payload: TPayload) => StreamOptions;
+export interface HandleStreamParameters<
+  TMetadata extends Record<string, unknown> = Record<string, unknown>,
+> extends ProcessDataStreamParameters {
+  streamProps?: StreamOptions<TMetadata>;
 }
-export const processStream = <TPayload = any>(
-  { mapPayloadToOptions, ...rest }: HandleStreamParameters<TPayload>,
+export const processStream = async <
+  TMetadata extends Record<string, unknown> = Record<string, unknown>,
+>(
+  { streamProps, ...rest }: HandleStreamParameters<TMetadata>,
+  props: InputBindingProps | OutputBindingProps<TMetadata>,
 ) => {
-  return async (props: InputBindingProps<TPayload> | OutputBindingProps) => {
-    const streamProps = "payload" in props
-      ? mapPayloadToOptions(props.payload)
-      : undefined;
-    const streamEndpoint = props.callbacks.stream;
+  const streamEndpoint = props.callbacks.stream;
 
-    const stream = await fetch(streamEndpoint, {
-      method: "POST",
-      body: streamProps
-        ? JSON.stringify({
-          args: [streamProps.messages, streamProps.options],
-        })
-        : undefined,
-      headers: streamProps
-        ? {
-          "Content-Type": "application/json",
-        }
-        : undefined,
-    });
+  const stream = await fetch(streamEndpoint, {
+    method: "POST",
+    body: streamProps
+      ? JSON.stringify({
+        args: [streamProps.messages, streamProps.options],
+      })
+      : undefined,
+    headers: streamProps
+      ? {
+        "Content-Type": "application/json",
+      }
+      : undefined,
+  });
 
-    if (!stream.body) {
-      throw new Error("Stream body is null");
-    }
-    await processDataStream({
-      stream: stream.body,
-      ...rest,
-    });
-  };
+  if (!stream.body) {
+    throw new Error("Stream body is null");
+  }
+  await processDataStream({
+    stream: stream.body,
+    ...rest,
+  });
 };
