@@ -58,9 +58,6 @@ async function generateCodeChallenge(verifier: string): Promise<string> {
  * @description Redirects to Airtable's OAuth authorization page with PKCE support
  */
 export default async function start(props: Props) {
-  console.log("start", props);
-
-  // Generate PKCE parameters if not provided (Airtable requires PKCE)
   let codeVerifier = props.codeVerifier;
   let codeChallenge = props.codeChallenge;
 
@@ -72,17 +69,12 @@ export default async function start(props: Props) {
     codeChallenge = await generateCodeChallenge(codeVerifier);
   }
 
-  console.log("Generated code_verifier:", codeVerifier);
-  console.log("Generated code_challenge:", codeChallenge);
-
-  // Include code_verifier in state for callback use
   let enhancedState: string;
   try {
     const stateData = JSON.parse(atob(props.state));
     stateData.code_verifier = codeVerifier;
     enhancedState = btoa(JSON.stringify(stateData));
   } catch {
-    // If state is not base64 JSON, create new structure
     enhancedState = btoa(JSON.stringify({
       original_state: props.state,
       code_verifier: codeVerifier,
@@ -100,7 +92,6 @@ export default async function start(props: Props) {
   });
 
   const authorizationUrl = `${OAUTH_URL_AUTH}?${authParams.toString()}`;
-  console.log("Authorization URL:", authorizationUrl);
 
   return Response.redirect(authorizationUrl);
 }
