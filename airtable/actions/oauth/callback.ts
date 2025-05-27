@@ -17,6 +17,12 @@ export interface Props {
   code: string;
 
   /**
+   * @title State
+   * @description The state parameter returned from authorization (contains code_verifier)
+   */
+  state: string;
+
+  /**
    * @title Install ID
    * @description Unique identifier for this installation
    */
@@ -40,36 +46,50 @@ export interface Props {
    * @description The same redirect URI used in the authorization request
    */
   redirectUri: string;
+}
 
-  /**
-   * @title Code Verifier (optional)
-   * @description PKCE code verifier for enhanced security
-   */
-  codeVerifier?: string;
+// Function to extract code_verifier from state
+function extractCodeVerifier(state: string): string | null {
+  try {
+    const stateData = JSON.parse(atob(state));
+    return stateData.code_verifier || null;
+  } catch {
+    console.error("Failed to parse state parameter");
+    return null;
+  }
 }
 
 /**
  * @title OAuth Callback
- * @description Exchanges the authorization code for access tokens
+ * @description Exchanges the authorization code for access tokens with PKCE support
  */
 export default async function callback(
-  { code, installId, clientId, clientSecret, redirectUri, codeVerifier }: Props,
+  props: Props,
   __req: Request,
   _ctx: AppContext,
-): Promise<{ installId: string; success: boolean }> {
+): Promise<{ installId: string; success: boolean; error?: string }> {
+  const { code, state, installId, clientId, clientSecret, redirectUri } = props;
+  console.log("callback", props);
+
   try {
+    // Extract code_verifier from state (required for PKCE)
+    const codeVerifier = extractCodeVerifier(state);
+    if (!codeVerifier) {
+      throw new Error(
+        "code_verifier not found in state parameter. PKCE is required for Airtable OAuth.",
+      );
+    }
+
     const tokenRequestBody = new URLSearchParams({
       grant_type: "authorization_code",
       code,
       client_id: clientId,
       client_secret: clientSecret,
       redirect_uri: redirectUri,
+      code_verifier: codeVerifier, // PKCE is now required
     });
 
-    // Add PKCE code verifier if provided
-    if (codeVerifier) {
-      tokenRequestBody.set("code_verifier", codeVerifier);
-    }
+    console.log("Token request body:", tokenRequestBody.toString());
 
     const response = await fetch(OAUTH_URL_TOKEN, {
       method: "POST",
@@ -82,6 +102,7 @@ export default async function callback(
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error("Token exchange failed:", errorText);
       throw new Error(`Token exchange failed: ${response.status} ${errorText}`);
     }
 
@@ -98,6 +119,10 @@ export default async function callback(
     return { installId, success: true };
   } catch (error) {
     console.error("OAuth callback error:", error);
-    return { installId, success: false };
+    return {
+      installId,
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }
