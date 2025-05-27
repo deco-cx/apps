@@ -158,6 +158,9 @@ export default async function callback(
     return { installId };
   } catch (error) {
     console.error("OAuth callback error:", error);
-    return { installId, error: error instanceof Error ? error.message : "Unknown error" };
+    return {
+      installId,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }
