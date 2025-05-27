@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { ListBasesResponse } from "../types.ts";
+import type { ListBasesResponse } from "../utils/types.ts";
 
 interface Props {
   // If the API supports pagination for bases via offset, it could be a prop here.

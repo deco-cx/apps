@@ -1,5 +1,8 @@
 import type { AppContext } from "../mod.ts";
-import type { ListRecordsOptions, ListRecordsResponse } from "../types.ts";
+import type {
+  ListRecordsOptions,
+  ListRecordsResponse,
+} from "../utils/types.ts";
 
 interface Props extends ListRecordsOptions {
   /**

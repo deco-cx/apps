@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { AirtableRecord } from "../types.ts";
+import type { AirtableRecord } from "../utils/types.ts";
 
 interface Props {
   /**

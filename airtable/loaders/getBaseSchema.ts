@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { BaseSchemaResponse } from "../types.ts";
+import type { BaseSchemaResponse } from "../utils/types.ts";
 
 interface Props {
   /**
