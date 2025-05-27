@@ -3,6 +3,15 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 import { SlackClient } from "./client.ts";
 import { Secret } from "../website/loaders/secret.ts";
 
+export interface SlackWebhookPayload {
+  event_id: string;
+  event: {
+    text: string;
+    team: string;
+    channel: string;
+  };
+}
+
 export interface Props {
   /**
    * @description Slack Bot Token for authentication
