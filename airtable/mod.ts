@@ -1,6 +1,6 @@
 import { createOAuthHttpClient } from "../mcp/utils/httpClient.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import type { App, FnContext } from "@deco/deco";
+import type { FnContext } from "@deco/deco";
 import { McpContext } from "../mcp/context.ts";
 import {
   AIRTABLE_API_BASE_URL,
@@ -47,8 +47,7 @@ export interface Props {
 }
 
 export interface State extends Props {
-  baseUrl: string;
-  client?: OAuthClients<AirtableClient, AirtableClient>;
+  client: OAuthClients<AirtableClient, AirtableClient>;
 }
 
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
@@ -61,52 +60,45 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
  */
 export default function App(
   props: Props,
-  __req: Request,
+  _req: Request,
   ctx?: McpContext<Props>,
-): App<Manifest, State> {
+) {
   const { tokens, clientId, clientSecret } = props;
-  const resolvedBaseUrl = AIRTABLE_API_BASE_URL;
 
-  // OAuth client setup
-  let oauthClient: OAuthClients<AirtableClient, AirtableClient> | undefined;
+  const airtableProvider: OAuthProvider = {
+    ...AirtableProvider,
+    clientId: clientId ?? "",
+    clientSecret: clientSecret ?? "",
+  };
 
-  if (tokens && clientId && clientSecret) {
-    const airtableProvider: OAuthProvider = {
-      ...AirtableProvider,
-      clientId: clientId,
-      clientSecret: clientSecret,
-    };
+  const options: OAuthClientOptions = {
+    headers: DEFAULT_OAUTH_HEADERS,
+    authClientConfig: {
+      headers: new Headers({
+        "Accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+      }),
+    },
+  };
 
-    const options: OAuthClientOptions = {
-      headers: DEFAULT_OAUTH_HEADERS,
-      authClientConfig: {
-        headers: new Headers({
-          "Accept": "application/json",
-          "Content-Type": "application/x-www-form-urlencoded",
-        }),
-      },
-    };
-
-    oauthClient = createOAuthHttpClient<AirtableClient, AirtableClient>({
-      provider: airtableProvider,
-      apiBaseUrl: resolvedBaseUrl,
-      tokens,
-      options,
-      onTokenRefresh: async (newTokens: OAuthTokens) => {
-        if (ctx) {
-          await ctx.configure({
-            ...props,
-            tokens: newTokens,
-          });
-        }
-      },
-    });
-  }
+  const client = createOAuthHttpClient<AirtableClient, AirtableClient>({
+    provider: airtableProvider,
+    apiBaseUrl: AIRTABLE_API_BASE_URL,
+    tokens,
+    options,
+    onTokenRefresh: async (newTokens: OAuthTokens) => {
+      if (ctx) {
+        await ctx.configure({
+          ...ctx,
+          tokens: newTokens,
+        });
+      }
+    },
+  });
 
   const state: State = {
     ...props,
-    baseUrl: resolvedBaseUrl,
-    client: oauthClient,
+    client,
   };
 
   return {

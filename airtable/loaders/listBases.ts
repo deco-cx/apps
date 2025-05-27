@@ -19,14 +19,12 @@ const loader = async (
   ctx: AppContext,
 ): Promise<ListBasesResponse | Response> => {
   const { offset } = props;
-
-  if (!ctx.client) {
-    return new Response("OAuth authentication is required", { status: 401 });
-  }
-
+  console.log(ctx.tokens);
+  console.log("Listing bases");
   const response = await ctx.client["GET /v0/meta/bases"](
     offset ? { offset: offset } : {},
   );
+  console.log("Bases listed");
 
   if (!response.ok) {
     throw new Error(`Error listing bases: ${response.statusText}`);

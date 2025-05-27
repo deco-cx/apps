@@ -92,3 +92,55 @@ export function extractBaseIdFromUrl(url: string): string | null {
   const match = url.match(/app[a-zA-Z0-9]{14}/);
   return match ? match[0] : null;
 }
+
+/**
+ * Maps table fields to the format expected by Airtable API
+ */
+export function mapTableFields(fields: Array<{
+  name: string;
+  type: string;
+  description?: string;
+  options?: {
+    choices?: Array<{
+      name: string;
+      color?: string;
+    }>;
+  };
+}>): Array<{
+  name: string;
+  type: string;
+  description?: string;
+  options?: {
+    choices?: Array<{
+      name: string;
+      color?: string;
+    }>;
+  };
+}> {
+  return fields.map((field) => {
+    const mappedField: {
+      name: string;
+      type: string;
+      description?: string;
+      options?: {
+        choices?: Array<{
+          name: string;
+          color?: string;
+        }>;
+      };
+    } = {
+      name: field.name,
+      type: field.type,
+    };
+
+    if (field.description) {
+      mappedField.description = field.description;
+    }
+
+    if (field.options) {
+      mappedField.options = field.options;
+    }
+
+    return mappedField;
+  });
+}

@@ -1,4 +1,5 @@
 import type { AppContext } from "../mod.ts";
+import { isValidRecordId } from "../utils/helpers.ts";
 
 interface Props {
   /**
@@ -13,7 +14,7 @@ interface Props {
 
   /**
    * @title Record IDs to Delete
-   * @description An array of record IDs to be deleted.
+   * @description An array of record IDs to be deleted. Record IDs must start with 'rec'.
    */
   recordIds: string[];
 }
@@ -33,18 +34,29 @@ const action = async (
     return new Response("OAuth authentication is required", { status: 401 });
   }
 
-  const params = {
-    baseId,
-    tableIdOrName,
-    "records[]": recordIds,
-  };
+  // Validar record IDs
+  const invalidIds = recordIds.filter((id) => !isValidRecordId(id));
+  if (invalidIds.length > 0) {
+    throw new Error(
+      `Invalid record IDs (must start with 'rec'): ${invalidIds.join(", ")}`,
+    );
+  }
+
+  if (recordIds.length === 0) {
+    throw new Error("At least one record ID is required");
+  }
+
+  if (recordIds.length > 10) {
+    throw new Error("Maximum 10 records can be deleted at once");
+  }
 
   const response = await ctx.client["DELETE /v0/:baseId/:tableIdOrName"](
-    params,
+    { baseId, tableIdOrName, "records[]": recordIds },
   );
 
   if (!response.ok) {
-    throw new Error(`Error deleting records: ${response.statusText}`);
+    const errorText = await response.text();
+    throw new Error(`Error deleting records: ${errorText}`);
   }
 
   return response.json();
