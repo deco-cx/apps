@@ -154,9 +154,9 @@ const loader = async (
       data?.search?.pageInfo.hasPreviousPage ?? false,
     );
   } else {
-    // TODO: understand how accept more than one path
-    // example: /collections/first-collection/second-collection
-    const pathname = props.collectionName || url.pathname.split("/")[1];
+    // Support for multiple paths, such as /{lang}/collections/first-collection/second-collection
+    // Always takes the last non-empty segment as pathname
+    const pathname = props.collectionName || url.pathname.split("/").filter(Boolean).pop();
 
     const data = await storefront.query<
       QueryRoot,
@@ -224,7 +224,7 @@ const loader = async (
       "@type": "BreadcrumbList",
       itemListElement: [{
         "@type": "ListItem" as const,
-        name: isSearch ? query : url.pathname.split("/")[1],
+        name: isSearch ? query : url.pathname.split("/").filter(Boolean).pop(),
         item: isSearch ? url.href : url.pathname,
         position: 2,
       }],
