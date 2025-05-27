@@ -47,7 +47,7 @@ export function buildFilterFormula(filters: Record<string, unknown>): string {
     return `{${field}} = "${String(value)}"`;
   });
 
-  return conditions.length > 1 
+  return conditions.length > 1
     ? `AND(${conditions.join(", ")})`
     : conditions[0] || "";
 }
@@ -63,7 +63,8 @@ export function sanitizeFieldName(fieldName: string): string {
  * Validates field set data
  */
 export function validateFieldSet(fields: FieldSet): boolean {
-  return typeof fields === "object" && fields !== null && !Array.isArray(fields);
+  return typeof fields === "object" && fields !== null &&
+    !Array.isArray(fields);
 }
 
 /**
@@ -71,7 +72,7 @@ export function validateFieldSet(fields: FieldSet): boolean {
  */
 export function buildSortParams(
   sortField: string,
-  direction: "asc" | "desc" = "asc"
+  direction: "asc" | "desc" = "asc",
 ): ListRecordsOptions["sort"] {
   return [{ field: sortField, direction }];
 }
@@ -90,4 +91,4 @@ export function extractRecordIdFromUrl(url: string): string | null {
 export function extractBaseIdFromUrl(url: string): string | null {
   const match = url.match(/app[a-zA-Z0-9]{14}/);
   return match ? match[0] : null;
-} 
+}

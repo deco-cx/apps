@@ -34,4 +34,4 @@ export const MAX_RECORDS_PER_REQUEST = 100;
 /**
  * Maximum records for batch operations
  */
-export const MAX_BATCH_RECORDS = 10; 
+export const MAX_BATCH_RECORDS = 10;

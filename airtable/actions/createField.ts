@@ -52,7 +52,7 @@ const action = async (
 
   const response = await ctx.api(resolvedApiKey)
     ["POST /v0/meta/bases/:baseId/tables/:tableId/fields"](
-      { baseId, tableId }
+      { baseId, tableId },
       { body },
     );
 
