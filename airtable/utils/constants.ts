@@ -35,3 +35,17 @@ export const MAX_RECORDS_PER_REQUEST = 100;
  * Maximum records for batch operations
  */
 export const MAX_BATCH_RECORDS = 10;
+
+/**
+ * OAuth Configuration
+ */
+export const OAUTH_SCOPES = [
+  "data.records:read",
+  "data.records:write",
+  "schema.bases:read",
+  "schema.bases:write",
+];
+
+export const OAUTH_URL = "https://airtable.com/oauth2/v1";
+export const OAUTH_URL_AUTH = "https://airtable.com/oauth2/v1/authorize";
+export const OAUTH_URL_TOKEN = "https://airtable.com/oauth2/v1/token";
