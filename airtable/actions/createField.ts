@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { CreateFieldBody, Field } from "../types.ts";
+import type { CreateFieldBody, Field } from "../utils/types.ts";
 
 // Props will be CreateFieldBody plus baseId and tableId
 interface Props extends CreateFieldBody {
@@ -52,8 +52,8 @@ const action = async (
 
   const response = await ctx.api(resolvedApiKey)
     ["POST /v0/meta/bases/:baseId/tables/:tableId/fields"](
-      { baseId, tableId }, // URL params
-      { body }, // Request body
+      { baseId, tableId }
+      { body },
     );
 
   if (!response.ok) {

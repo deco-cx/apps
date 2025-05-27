@@ -1,5 +1,9 @@
 import type { AppContext } from "../mod.ts";
-import type { AirtableRecord, FieldSet, UpdateRecordsBody } from "../types.ts";
+import type {
+  AirtableRecord,
+  FieldSet,
+  UpdateRecordsBody,
+} from "../utils/types.ts";
 
 interface RecordToUpdate {
   id: string;

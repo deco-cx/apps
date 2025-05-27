@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { Table, UpdateTableBody } from "../types.ts";
+import type { Table, UpdateTableBody } from "../utils/types.ts";
 
 interface Props {
   /**

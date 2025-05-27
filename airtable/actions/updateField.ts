@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { Field, UpdateFieldBody } from "../types.ts";
+import type { Field, UpdateFieldBody } from "../utils/types.ts";
 
 // Props will be UpdateFieldBody plus baseId, tableId, and fieldId
 interface Props extends UpdateFieldBody {
