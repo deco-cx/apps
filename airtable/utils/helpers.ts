@@ -96,17 +96,19 @@ export function extractBaseIdFromUrl(url: string): string | null {
 /**
  * Maps table fields to the format expected by Airtable API
  */
-export function mapTableFields(fields: Array<{
-  name: string;
-  type: string;
-  description?: string;
-  options?: {
-    choices?: Array<{
-      name: string;
-      color?: string;
-    }>;
-  };
-}>): Array<{
+export function mapTableFields(
+  fields: Array<{
+    name: string;
+    type: string;
+    description?: string;
+    options?: {
+      choices?: Array<{
+        name: string;
+        color?: string;
+      }>;
+    };
+  }>,
+): Array<{
   name: string;
   type: string;
   description?: string;
