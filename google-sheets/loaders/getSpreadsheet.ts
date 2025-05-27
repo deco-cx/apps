@@ -96,28 +96,20 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<OptimizedSpreadsheetMetadata | { error: string }> => {
+): Promise<OptimizedSpreadsheetMetadata> => {
   const { spreadsheetId } = props;
 
-  try {
-    const spreadsheetData = await fetchSpreadsheetMetadata(
-      ctx.client,
-      spreadsheetId,
-    );
-    const sheets = spreadsheetData.sheets || [];
-    const dataRanges = await fetchAllSheetDataRanges(
-      ctx.client,
-      spreadsheetId,
-      sheets,
-    );
+  const spreadsheetData = await fetchSpreadsheetMetadata(
+    ctx.client,
+    spreadsheetId,
+  );
+  const dataRanges = await fetchAllSheetDataRanges(
+    ctx.client,
+    spreadsheetId,
+    spreadsheetData.sheets || [],
+  );
 
-    return mapSpreadsheetToOptimized(spreadsheetData, dataRanges);
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    return {
-      error: `Failed to retrieve spreadsheet: ${errorMessage}`,
-    };
-  }
+  return mapSpreadsheetToOptimized(spreadsheetData, dataRanges);
 };
 
 export default loader;

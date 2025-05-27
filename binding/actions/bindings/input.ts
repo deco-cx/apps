@@ -8,8 +8,8 @@ import { InputBindingProps } from "../../utils.ts";
  */
 export default function input(
   props: InputBindingProps,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ) {
-  return ctx.handle(ctx)(props);
+  return ctx.handle(req, ctx)(props);
 }

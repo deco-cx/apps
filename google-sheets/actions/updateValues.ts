@@ -1,14 +1,11 @@
 import { AppContext } from "../mod.ts";
 import type {
-  Result,
-  SimpleError,
   SimpleUpdateProps,
   SimpleUpdateResponse,
 } from "../utils/types.ts";
 import {
   mapApiUpdateResponseToSimple,
   mapSimpleUpdatePropsToApi,
-  parseApiErrorText,
   validateSimpleUpdateProps,
 } from "../utils/mappers.ts";
 import { buildFullRange } from "../utils/rangeUtils.ts";
@@ -98,59 +95,50 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<Result<SimpleUpdateResponse>> => {
+): Promise<SimpleUpdateResponse> => {
   if (!props.spreadsheet_id || !props.sheet_name || !props.values) {
-    return {
-      message:
-        "Missing required parameters: spreadsheet_id, sheet_name and values are required",
-    } as SimpleError;
+    throw new Error(
+      "Missing required parameters: spreadsheet_id, sheet_name and values are required",
+    );
   }
 
   if (!Array.isArray(props.values) || props.values.length === 0) {
-    return {
-      message: "The 'values' parameter must be a non-empty array of arrays",
-    } as SimpleError;
+    throw new Error(
+      "The 'values' parameter must be a non-empty array of arrays",
+    );
   }
 
   if (!props.values.every((row) => Array.isArray(row))) {
-    return {
-      message: "All elements in 'values' must be arrays (representing rows)",
-    } as SimpleError;
+    throw new Error(
+      "All elements in 'values' must be arrays (representing rows)",
+    );
   }
 
-  try {
-    const simpleProps = mapPropsToApiFormat(props);
+  const simpleProps = mapPropsToApiFormat(props);
 
-    const validationErrors = validateSimpleUpdateProps(simpleProps);
-    if (validationErrors.length > 0) {
-      return {
-        message: `Validation error: ${validationErrors.join(", ")}`,
-      } as SimpleError;
-    }
-
-    const { body, params } = mapSimpleUpdatePropsToApi(simpleProps);
-
-    const response = await ctx.client
-      ["PUT /v4/spreadsheets/:spreadsheetId/values/:range"](
-        params,
-        { body },
-      );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      return parseApiErrorText(errorText);
-    }
-
-    const apiResponse = await response.json();
-    return mapApiUpdateResponseToSimple(apiResponse);
-  } catch (error) {
-    return {
-      message: `Communication error: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`,
-      details: { originalError: error },
-    } as SimpleError;
+  const validationErrors = validateSimpleUpdateProps(simpleProps);
+  if (validationErrors.length > 0) {
+    throw new Error(
+      `Validation error: ${validationErrors.join(", ")}`,
+    );
   }
+
+  const { body, params } = mapSimpleUpdatePropsToApi(simpleProps);
+
+  const response = await ctx.client
+    ["PUT /v4/spreadsheets/:spreadsheetId/values/:range"](
+      params,
+      { body },
+    );
+
+  if (!response.ok) {
+    throw new Error(
+      `Error updating spreadsheet values: ${response.statusText}`,
+    );
+  }
+
+  const apiResponse = await response.json();
+  return mapApiUpdateResponseToSimple(apiResponse);
 };
 
 export default action;

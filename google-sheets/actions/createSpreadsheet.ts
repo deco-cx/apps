@@ -60,7 +60,7 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<Spreadsheet | { error: string }> => {
+): Promise<Spreadsheet> => {
   const {
     title,
     locale = "pt_BR",
@@ -94,10 +94,9 @@ const action = async (
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
-    return {
-      error: errorText,
-    };
+    throw new Error(
+      `Error creating spreadsheet: ${response.statusText}`,
+    );
   }
 
   return await response.json();
