@@ -77,11 +77,11 @@ export default async function callback(
     installId,
     clientId,
     clientSecret,
-    redirectUri = "https://jonasjesus--mcp.deco.site/oauth/callback",
+    redirectUri,
   }: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<{ installId: string }> {
+): Promise<{ installId: string; error?: string }> {
   try {
     const missingParams = [];
     if (!code) missingParams.push("code");
@@ -117,15 +117,6 @@ export default async function callback(
       code_verifier: codeVerifier,
     });
 
-    console.log("Token request details:", {
-      grant_type: "authorization_code",
-      redirect_uri: redirectUri,
-      code_length: code.length,
-      code_verifier_length: codeVerifier.length,
-    });
-    console.log("Using Basic Auth for client credentials");
-    console.log("Making request to:", OAUTH_URL_TOKEN);
-
     const response = await fetch(OAUTH_URL_TOKEN, {
       method: "POST",
       headers: {
@@ -135,12 +126,6 @@ export default async function callback(
       },
       body: tokenRequestBody,
     });
-
-    console.log("Response status:", response.status);
-    console.log(
-      "Response headers:",
-      Object.fromEntries(response.headers.entries()),
-    );
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -155,7 +140,6 @@ export default async function callback(
     const tokenData = await response.json() as OAuthTokenResponse;
     const currentTime = Math.floor(Date.now() / 1000);
 
-    // Salva os tokens no contexto para uso futuro e refresh automático
     const currentCtx = await ctx.getConfiguration();
     await ctx.configure({
       ...currentCtx,
@@ -174,6 +158,6 @@ export default async function callback(
     return { installId };
   } catch (error) {
     console.error("OAuth callback error:", error);
-    throw error;
+    return { installId, error: error instanceof Error ? error.message : "Unknown error" };
   }
 }
