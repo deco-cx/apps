@@ -93,7 +93,7 @@ export default function App() {
           onRedactedReasoningPart: (part) => {
             console.log("redacted reasoning part", part);
           },
-        }, props);
+        }, props.callbacks.stream);
       },
     },
     manifest,

@@ -1,7 +1,9 @@
 import type { App, FnContext } from "@deco/deco";
-import manifest, { Manifest } from "./manifest.gen.ts";
-import { SlackClient } from "./client.ts";
+import { McpContext } from "../mcp/context.ts";
 import { Secret } from "../website/loaders/secret.ts";
+import { SlackClient } from "./client.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
+import { Callbacks } from "../mcp/bindings.ts";
 
 export interface SlackWebhookPayload {
   event_id: string;
@@ -26,13 +28,18 @@ export interface Props {
    * @description An url that new messages will be sent to
    */
   webhookUrl?: string;
+
+  /**
+   * @hide true
+   */
+  callbacks?: Callbacks;
 }
 
 export interface State extends Props {
   slack: SlackClient;
 }
 
-export type AppContext = FnContext<State, Manifest>;
+export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @name Slack

@@ -12,6 +12,17 @@ export interface Callbacks {
   generateObject: string;
 }
 
+export interface OnCreatedBindingProps {
+  triggerId: string;
+  workspace: string;
+  callbacks: Callbacks;
+}
+
+export interface OnDeletedBindingProps {
+  triggerId: string;
+  workspace: string;
+}
+
 export interface InputBindingProps<TPayload = any> {
   callbacks: Callbacks;
   payload: TPayload;
@@ -47,10 +58,8 @@ export const processStream = async <
   TMetadata extends Record<string, unknown> = Record<string, unknown>,
 >(
   { streamProps, ...rest }: HandleStreamParameters<TMetadata>,
-  props: InputBindingProps | OutputBindingProps<TMetadata>,
+  streamEndpoint: string,
 ) => {
-  const streamEndpoint = props.callbacks.stream;
-
   const stream = await fetch(streamEndpoint, {
     method: "POST",
     body: streamProps

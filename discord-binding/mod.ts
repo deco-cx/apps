@@ -213,7 +213,7 @@ export default function App(
         onMessageAnnotationsPart: (part) => {
           console.log("message annotations part", part);
         },
-      }, props);
+      }, props.callbacks.stream);
     },
     sendDiscordMessage: (
       payload,
