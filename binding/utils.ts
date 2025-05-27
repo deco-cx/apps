@@ -58,7 +58,7 @@ export const processStream = <TPayload = any>(
     if (!stream.body) {
       throw new Error("Stream body is null");
     }
-    processDataStream({
+    await processDataStream({
       stream: stream.body,
       ...rest,
     });
