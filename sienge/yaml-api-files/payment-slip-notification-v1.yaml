@@ -1,0 +1,163 @@
+swagger: "2.0"
+info:
+  description: API de geração de boleto de segunda via por e-mail
+  version: 1.0.0
+  title: Geração de Boleto (Segunda Via)
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Boleto de segunda via
+    description: API para envio de boleto de segunda via por e-mail
+schemes:
+  - https
+paths:
+  /payment-slip-notification:
+    post:
+      tags:
+        - Boleto de segunda via
+      summary: >-
+        Envia o boleto de segunda via do título e parcela informado, no e-mail
+        do respectivo cliente do título.
+      operationId: sendTicketCopy
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Informações para enviar o boleto
+          required: true
+          schema:
+            $ref: "#/definitions/Ticket"
+      responses:
+        "201":
+          description: Boleto enviado com sucesso
+        "404":
+          description: Boleto não enviado
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    get:
+      tags:
+        - Boleto de segunda via
+      summary: >-
+        Gera o link para boleto de segunda via do título e parcela informado, assim como o número digitável do boleto. O link expira em 5 minutos.
+      operationId: generateTicketCopy
+      parameters:
+        - in: query
+          name: billReceivableId
+          description: Código do título, apenas números
+          required: true
+          type: integer
+        - in: query
+          name: installmentId
+          description: Código da parcela do título, apenas números
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Boleto gerado com sucesso
+          schema:
+            $ref: "#/definitions/GetResponseDocument"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  GetResponseDocument:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de unidades retornadas como resultado da pesquisa.
+        items:
+          $ref: "#/definitions/Results"
+
+  Results:
+    type: object
+    properties:
+      urlReport:
+        type: string
+        description: Url para download da segunda via do boleto.
+      digitableNumber:
+        type: string
+        description: Número digitável do boleto.
+
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada.
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+
+  Ticket:
+    type: object
+    required:
+      - receivableBillId
+      - installmentId
+      - emailCustomer
+      - emailTitle
+      - emailBody
+    properties:
+      receivableBillId:
+        type: integer
+        format: int32
+        description: Código do título
+      installmentId:
+        type: integer
+        format: int32
+        description: Código da parcela do título
+      emailCustomer:
+        type: string
+        description: E-mail o qual a segunda via do boleto será enviado
+      emailTitle:
+        type: string
+        description: Texto do título a ser colocado no e-mail enviado ao cliente do título
+      emailBody:
+        type: string
+        description: Texto do corpo a ser colocado no e-mail enviado ao cliente do título
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para analise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.

@@ -1,0 +1,71 @@
+swagger: "2.0"
+info:
+  description: API de documentos.
+  version: 1.0.0
+  title: Documentos
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Documentos
+    description: API para listagem de documentos
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  "/document-identifications/{documentIdentificationId}":
+    get:
+      tags:
+        - Documentos
+      summary: Busca o documento no Sienge
+      operationId: getDocumentIdentification
+      parameters:
+        - name: documentIdentificationId
+          in: path
+          description: Código do documento a ser apresentado
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Documento encontrado
+          schema:
+            $ref: "#/definitions/DocumentIdentification"
+        "404":
+          description: Documento não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  DocumentIdentification:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código do documento
+      name:
+        type: string
+        description: Nome do documento
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para analise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.

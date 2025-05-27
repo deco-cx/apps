@@ -48,7 +48,9 @@ function loader(
     extraPathsToProxy = [],
   } = props as Props;
 
-  const checkout = [...PATHS_TO_PROXY, ...extraPathsToProxy].map((
+  const extraPathsToProxyAsArray = extraPathsToProxy.map((path) => [path]);
+
+  const checkout = [...PATHS_TO_PROXY, ...extraPathsToProxyAsArray].map((
     [pathTemplate, basePath],
   ) => ({
     pathTemplate,

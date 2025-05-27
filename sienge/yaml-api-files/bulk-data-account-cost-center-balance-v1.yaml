@@ -1,0 +1,146 @@
+swagger: "2.0"
+info:
+  description: Bulk data de saldos contábeis consolidados por centro de custo.
+  version: 1.0.0
+  title: Saldos Contábeis Consolidados por Centro de Custo
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/bulk-data/v1"
+tags:
+  - name: Bulk-data saldos por centro de custo
+    description: Bulk data de saldos contábeis consolidados por centro de custo
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  "/accountancy/accountCostCenterBalance":
+    get:
+      tags:
+        - Bulk-data saldos por centro de custo
+      summary: Retorna saldos contábeis, caso possua.
+      operationId: getBulkAccountCostCenterBalance
+      parameters:
+        - name: startDate
+          in: query
+          description: Data de início do período da consulta
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: endDate
+          in: query
+          description: Data do fim do período da consulta
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: costCentersId
+          in: query
+          description: Códigos de centro de custo
+          required: false
+          type: array
+          items:
+            type: integer
+        - name: accountId
+          in: query
+          description: Código contábil ou código reduzido da conta
+          required: false
+          type: string
+        - name: includeBalancesWithoutCostCenter
+          in: query
+          description: Parâmetro para inclusão de saldos sem centro de custo (true | false)
+          default: false
+          required: false
+          type: boolean
+      produces:
+        - application/json
+        - file
+      responses:
+        "200":
+          description: Saldos consolidados encontrados
+          schema:
+            $ref: "#/definitions/GetResponseBulkDataAccountancyAccountCostCenterBalance"
+        "404":
+          description: Saldos consolidados  não encontradas
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  GetResponseBulkDataAccountancyAccountCostCenterBalance:
+    type: object
+    properties:
+      data:
+        type: array
+        description: Lista de saldos contábeis consolidados
+        items:
+          $ref: "#/definitions/AccountancyAccountCostCenterBalance"
+  AccountancyAccountCostCenterBalance:
+    type: object
+    properties:
+      costCenterId:
+        type: integer
+        format: int32
+        description: "Código do centro de custo"
+      companyId:
+        type: integer
+        format: int32
+        description: "Código da empresa"
+      entryId:
+        type: integer
+        format: int32
+        description: "Código do lançamento"
+      batchId:
+        type: integer
+        format: int32
+        description: "Código do lote"
+      id:
+        type: integer
+        format: int32
+        description: "Código reduzido da conta"
+      accountId:
+        type: string
+        description: "Código contábil da conta"
+      previousBalance:
+        type: number
+        format: double
+        description: "Saldo anterior"
+      previousBalanceType:
+        type: string
+        description: "Tipo saldo anterior"
+      debitBalance:
+        type: number
+        format: double
+        description: "Valor saldo debito"
+      creditBalance:
+        type: number
+        format: double
+        description: "Valor saldo crédito"
+      balanceCarriedForward:
+        type: number
+        format: double
+        description: "Valor saldo final"
+      balanceCarriedForwardType:
+        type: string
+        description: "Tipo valor saldo final"
+      monthYear:
+        type: string
+        description: "Período do saldo consolidado (mês/ano)"
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para analise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.

@@ -1,0 +1,445 @@
+swagger: "2.0"
+info:
+  description: API de listagem de lotes e lançamentos contábeis da Integração Contábil
+  version: "1.0"
+  title: Lançamentos Contábeis (Integração Contábil)
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Lotes
+    description: API de listagem de lotes e lançamentos contábeis
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /accountancy/entry-generator/entry-batches:
+    get:
+      tags:
+        - Lotes
+      description: Lista os lotes ordenados por Id.
+      operationId: loadAllEntryBatches
+      produces:
+        - application/json
+      parameters:
+        - name: companyId
+          in: query
+          type: integer
+          description: Código da empresa
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/PaginationResultEntryBatch"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Não existe dados para os parâmetros informados
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  /accountancy/entry-generator/entry-batches/{id}:
+    get:
+      tags:
+        - Lotes
+      description: Mostra um lote pelo código.
+      operationId: loadEntryBatch
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Código do lote a ser mostrado
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/EntryBatch"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Não existe dados para os parâmetros informados
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  /accountancy/entry-generator/entry-batches/{id}/entries:
+    get:
+      tags:
+        - Lançamentos
+      description: >-
+        Mostra as informações dos lançamentos do lote especificado pelo código do lote,
+        ordenados pelo código dos lançamentos.
+      operationId: loadEntryBatchById
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Id do lote a ser mostrado
+          required: true
+          type: integer
+        - name: startDate
+          in: query
+          description: >-
+            Data de inicio (Formato ISO 8601 yyyy-MM-dd | Exemplo:2017-12-20).
+            Informando somente este campo serão filtrados os lançamentos com
+            data maior/igual
+          format: "startDate (Formato ISO 8601 yyyy-MM-dd | Exemplo:2017-12-20)"
+          type: string
+        - name: endDate
+          in: query
+          description: >-
+            Data final (Formato ISO 8601 yyyy-MM-dd | Exemplo:2017-12-20).
+            Informando somente este campo serão filtrados os lançamentos com
+            data menor/igual
+          format: "endDate (Formato ISO 8601 yyyy-MM-dd | Exemplo:2017-12-20)"
+          type: string
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: |-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+              default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/PaginationResultEntry"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Não existe dados para os parâmetros informados
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  /accountancy/entry-generator/entries:
+    get:
+      tags:
+        - Lançamentos
+      description: >-
+        Mostra as informações dos lançamentos ordenados pelo código do lote e código dos
+        lançamentos.
+      operationId: loadAllEntries
+      produces:
+        - application/json
+      parameters:
+        - name: companyId
+          in: query
+          type: integer
+          description: Código da empresa
+        - name: startDate
+          in: query
+          description: >-
+            Data de inicio (Formato ISO 8601 yyyy-MM-dd | Exemplo:2017-12-20).
+            Informando somente este campo serão filtrados os lançamentos com
+            data maior/igual
+          format: "startDate (Formato ISO 8601 yyyy-MM-dd | Exemplo:2017-12-20)"
+          type: string
+        - name: endDate
+          in: query
+          description: >-
+            Data final (Formato ISO 8601 yyyy-MM-dd | Exemplo:2017-12-20).
+            Informando somente este campo serão filtrados os lançamentos com
+            data menor/igual
+          format: "endDate (Formato ISO 8601 yyyy-MM-dd | Exemplo:2017-12-20)"
+          type: string
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: |-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+              default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/PaginationResultEntry"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Não existe dados para os parâmetros informados
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  /accountancy/entry-generator/entry-batches/{id}/entries/{entryId}:
+    get:
+      tags:
+        - Lançamentos
+      operationId: loadAllEntriesById
+      description: "Mostra as informações dos lançamentos pelo código do lançamento, ordenado pelo código do lote"
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Id do lote a ser mostrado
+          required: true
+          type: integer
+        - name: entryId
+          in: path
+          description: Código do lançamento ser mostrado
+          required: true
+          type: integer
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: |-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+              default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/Entry"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Não existe dados para os parâmetros informados
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  PaginationResultEntry:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de lançamentos retornados como resultado da pesquisa
+        items:
+          $ref: "#/definitions/Entry"
+  PaginationResultEntryBatch:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de lotes retornados como resultado da pesquisa
+        items:
+          $ref: "#/definitions/EntryBatch"
+  Link:
+    type: object
+    properties:
+      href:
+        type: string
+      rel:
+        type: string
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API
+  EntryBatch:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Código único do lote
+        example: 1
+      companyId:
+        type: integer
+        description: Código da empresa
+        example: 10
+      startDate:
+        type: string
+        description: Data de início do lote
+        example: "2017-12-20"
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo:2017-12-20)"
+      endDate:
+        type: string
+        description: Data de final do lote
+        example: "2017-12-20"
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo:2017-12-20)"
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/Link"
+  Entry:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Código do lançamento no lote
+        example: 1
+      eventId:
+        type: integer
+        description: Código da partida no lote
+        example: 10
+      entryBatchId:
+        type: integer
+        description: Código do lote
+        example: 10
+      date:
+        type: string
+        description: Data do lançamento
+        example: "2017-12-20"
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo:2017-12-20)"
+      type:
+        type: string
+        description: "Tipo do lançamento (D=Débito, C=Crédito)"
+        example: D
+      accountId:
+        type: string
+        description: Código da conta contábil
+        example: "12345"
+      descriptionId:
+        type: string
+        description: Código do histórico contábil
+        example: "123"
+      description:
+        type: string
+        description: Descrição do histórico contábil
+        example: Provisão do pagamento de...
+      amount:
+        type: number
+        description: Valor do lançamento
+        example: 34.94
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/Link"

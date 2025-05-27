@@ -1,0 +1,122 @@
+swagger: "2.0"
+info:
+  description: API de planos financeiros.
+  version: 1.0.0
+  title: Planos Financeiros
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Planos Financeiros
+    description: API para listagem de planos financeiros
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  "/payment-categories/{paymentCategoriesId}":
+    get:
+      tags:
+        - Planos Financeiros
+      summary: Busca o plano financeiro no Sienge
+      operationId: getPaymentCategories
+      parameters:
+        - name: paymentCategoriesId
+          in: path
+          description: "Código do plano financeiro a ser apresentado (sem pontuação, ex: 1010101)"
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Plano financeiro encontrado
+          schema:
+            $ref: "#/definitions/PaymentCategories"
+        "404":
+          description: Plano financeiro não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/payment-categories":
+    get:
+      tags:
+        - Planos Financeiros
+      summary: Busca todos os planos financeiros no Sienge
+      operationId: getAllPaymentCategories
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Planos financeiros encontrados
+          schema:
+            $ref: "#/definitions/PaymentCategoriesComplete"
+        "404":
+          description: Planos financeiros não encontrados
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  PaymentCategories:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código do plano financeiro
+      name:
+        type: string
+        description: Nome do plano financeiro
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para analise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.
+  PaymentCategoriesComplete:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código do plano financeiro
+      name:
+        type: string
+        description: Nome do plano financeiro
+      tpConta:
+        type: string
+        enum: [T, R]
+        description: Tipo de conta do plano financeiro. "R" para Resultado e "T" para Totalizadora.
+      flRedutora:
+        type: string
+        description: Indica se o plano financeiro é redutor. "S" para Sim e "N" para Não.
+        enum: [S, N]
+      flAtiva:
+        type: string
+        description: Indica se o plano financeiro está ativo. "S" para Sim e "N" para Não.
+        enum: [S, N]
+      flAdiantamento:
+        type: string
+        description: Indica se o plano financeiro é de adiantamento. "S" para Sim e "N" para Não.
+        enum: [S, N]
+      flImposto:
+        type: string
+        description: Indica se o plano financeiro é de imposto. "S" para Sim e "N" para Não.
+        enum: [S, N]

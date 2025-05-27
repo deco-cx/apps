@@ -1,0 +1,360 @@
+swagger: "2.0"
+info:
+  description: >-
+    API  de leitura dos dados apresentados no relatório Extrato Cliente Histórico.
+  version: "1.0"
+  title: Extrato Cliente Histórico
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/bulk-data/v1"
+tags:
+  - name: Extrato Cliente Historico
+    description: API Bulk Data para leitura de dados do Extrato Cliente Histórico
+paths:
+  /customer-extract-history:
+    get:
+      tags:
+        - Extrato Cliente Historico
+      summary: >-
+        Realiza leitura de dados do extrato de cliente.
+      operationId: customerExtractHistory
+      parameters:
+        - in: query
+          name: startDueDate
+          description: Período de vencimento inicial.
+          format: yyyy-MM-dd
+          required: true
+          type: string
+        - in: query
+          name: endDueDate
+          description: Período de vencimento final.
+          format: yyyy-MM-dd
+          required: true
+          type: string
+        - in: query
+          name: correctionDate
+          description: >-
+            Correção até. Se o parâmetro não for fornecido, será considerada a data atual.
+          format: yyyy-MM-dd
+          required: false
+          type: string
+        - in: query
+          name: positionDate
+          description: >-
+            Posição em. Se o parâmetro não for fornecido, será considerada a data atual.
+          format: yyyy-MM-dd
+          required: false
+          type: string
+        - in: query
+          name: billReceivableId
+          description: Número do título.
+          required: false
+          type: integer
+        - in: query
+          name: companyId
+          description: Código da empresa.
+          required: false
+          type: integer
+        - in: query
+          name: customerId
+          description: Código do cliente.
+          required: false
+          type: integer
+        - in: query
+          name: costCenterId
+          description: Código do centro de custo.
+          required: false
+          type: integer
+        - in: query
+          name: unitNumber
+          description: Número da unidade.
+          required: false
+          type: string
+        - in: query
+          name: documentsId
+          description: Lista de códigos de documentos (separados por vírgula).
+          required: false
+          type: string
+        - in: query
+          name: bearersId
+          description: Lista de códigos dos portadores (separados por vírgula).
+          required: false
+          type: integer
+        - in: query
+          name: paymentTermsId
+          description: >-
+            Id das condições de pagamento para incluir na consulta (Exemplo: AT, PM) |
+            Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com as mesmas condições de pagamento informadas no parâmetro.
+          required: false
+          type: array
+          items:
+            type: string
+        - in: query
+          name: includeRemadeInstallments
+          description: Incluir parcelas que foram reparceladas (valor default = true).
+          required: false
+          type: boolean
+          default: true
+        - in: query
+          name: includeCanceledInstallments
+          description: Incluir parcelas que foram canceladas (valor default = true).
+          required: false
+          type: boolean
+          default: true
+        - in: query
+          name: includeRevokedInstallments
+          description: Incluir parcelas que foram distratadas (valor default = true).
+          required: false
+          type: boolean
+          default: true
+        - in: query
+          name: includeRenegotiatedDischarge
+          description: Incluir baixas por repactuação (valor default = true).
+          required: false
+          type: boolean
+          default: true
+        - name: paymentTermsIdNotIn
+          required: false
+          in: query
+          description: >-
+            Id das condições de pagamento para excluir da consulta (Exemplo: AT, PM) |
+            Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com condições de pagamento diferentes das informadas no parâmetro. | Obs: O parâmetro 'paymentTermsId' tem prioridade sobre este, caso sejam preenchidos os parâmetros 'paymentTermsId' e 'paymentTermsIdNotIn', será aplicado o filtro do parâmetro 'paymentTermsId' e ignorada a informação preenchida no parâmetro 'paymentTermsIdNotIn'.
+          type: array
+          items:
+            type: string
+        - in: query
+          name: changeStartDate
+          description: Data Inicial de alteração do Título/Parcela. Buscará apenas títulos/parcelas que tiveram alteração
+            durante um intervalo de tempo pré-definido. A data final será sempre a data atual.
+          format: yyyy-MM-dd
+          required: false
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso.
+          schema:
+            $ref: "#/definitions/GetCustomerExtractHistory"
+        "400":
+          description: Requisição mal formada.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor.
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário.
+  GetCustomerExtractHistory:
+    type: object
+    required:
+      - data
+    properties:
+      data:
+        type: array
+        description: Lista de títulos retornados como resultado da pesquisa.
+        items:
+          $ref: "#/definitions/Results"
+  Results:
+    type: object
+    properties:
+      billReceivableId:
+        type: integer
+        format: int64
+        description: Número do título.
+      company:
+        $ref: "#/definitions/Company"
+      costCenter:
+        $ref: "#/definitions/CostCenter"
+      customer:
+        $ref: "#/definitions/Customer"
+      emissionDate:
+        type: string
+        format: yyyy-MM-dd
+        description: Data de emissão do título.
+      lastRenegotiationDate:
+        type: string
+        format: yyyy-MM-dd
+        description: Data da última repactuação.
+      correctionDate:
+        type: string
+        format: yyyy-MM-dd
+        description: Data de correção até.
+      document:
+        type: string
+        description: Código do documento + "." + Número do documento.
+      privateArea:
+        type: number
+        format: "00.00"
+        description: Área privativa.
+      oldestInstallmentDate:
+        type: string
+        format: yyyy-MM-dd
+        description: Data de vencimento da última parcela em aberto do título.
+      revokedBillReceivableDate:
+        type: string
+        description: Data do distrato do título, retornando null se o título não tiver sido distratado.
+      units:
+        type: array
+        items:
+          $ref: "#/definitions/Unit"
+        description: Lista de unidades
+      installments:
+        type: array
+        items:
+          $ref: "#/definitions/Installment"
+        description: Lista de parcelas
+  Company:
+    description: Empresa
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+  CostCenter:
+    description: Empreendimento / Centro de custo
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+  Customer:
+    description: Cliente
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      document:
+        type: string
+        description: CPF ou CNPJ formatado (exemplo de CPF '000.000.000-00').
+  Unit:
+    description: Unidade
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+  Installment:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: Número da parcela.
+      annualCorrection:
+        type: boolean
+        description: Parcela com correção anual.
+      sentToScripturalCharge:
+        type: boolean
+        description: Parcela enviada para cobrança escritural.
+      paymentTerms:
+        $ref: "#/definitions/PaymentTerms"
+      baseDate:
+        type: string
+        format: yyyy-MM-dd
+        description: Data base do indexador.
+      originalValue:
+        type: number
+        format: "00.00"
+        description: Valor original da parcela.
+      dueDate:
+        type: string
+        format: yyyy-MM-dd
+        description: Data de vencimento.
+      indexerId:
+        type: integer
+        format: int64
+        description: Código do indexador.
+      calculationDate:
+        type: string
+        format: yyyy-MM-dd
+        description: Data cálculo.
+      currentBalance:
+        type: number
+        format: "00.00"
+        description: Saldo atual da parcela.
+      currentBalanceWithAddition:
+        type: number
+        format: "00.00"
+        description: Saldo atual da parcela mais acréscimos.
+      generatedBillet:
+        type: boolean
+        description: informa se foi gerado boleto para a cobrança.
+      installmentSituation:
+        type: string
+        description: >
+          informa a situação de pagamento da parcela:
+            - 0: Em Aberto
+            - 1: Parcialmente recebida
+            - 2: Recebida
+        enum: ["0", "1", "2"]
+        example: "2"
+      receipts:
+        type: array
+        description: Lista de baixas referente a parcela.
+        items:
+          $ref: "#/definitions/Receipt"
+      installmentNumber:
+        type: string
+        description: Numero "sequencial" das parcelas 1, 2, 3, ou por "Condição de Pagamento" 1/2, 2/2... (Resultado será apresentado conforme Parâmetro 651).
+  PaymentTerms:
+    description: Condições de pagamento
+    type: object
+    properties:
+      id:
+        type: string
+      descrition:
+        type: string
+  Receipt:
+    type: object
+    description: Baixa referente a parcela.
+    properties:
+      days:
+        type: integer
+        format: int64
+        description: Número de dias de atraso.
+      date:
+        type: string
+        format: yyyy-MM-dd
+        description: Data da baixa.
+      value:
+        type: number
+        format: "00.00"
+        description: Valor da baixa.
+      extra:
+        type: number
+        format: "00.00"
+        description: Acréscimos.
+      discount:
+        type: number
+        format: "00.00"
+        description: Descontos.
+      netReceipt:
+        type: number
+        format: "00.00"
+        description: Recebimento líquido.
+      type:
+        type: string
+        description: "Tipo da baixa ('Recebimento', 'Distrato', 'Reparcelamento', etc)"

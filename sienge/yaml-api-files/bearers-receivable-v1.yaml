@@ -1,0 +1,139 @@
+swagger: "2.0"
+info:
+  description: API de portadores para o Contas a Receber.
+  version: 1.0.0
+  title: Portadores para o Contas a Receber
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /bearers-receivable:
+    get:
+      tags:
+        - Portadores
+      summary: Busca uma lista de Portadores
+      operationId: findBearer
+      parameters:
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default são 100 e o valor máximo permitido são 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default são 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: filter
+          in: query
+          description: >-
+            .
+          required: false
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Portadores encontrados
+          schema:
+            $ref: "#/definitions/GetResponseDocument"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  Bearer:
+    type: object
+    properties:
+      bearerId:
+        type: integer
+        format: int32
+        description: Código do Portador
+      bearerName:
+        type: string
+        description: Nome do Portador
+      bearerWallet:
+        type: boolean
+        description: Em situação de carteira
+      bearerInCharge:
+        type: boolean
+        description: Em situação de Cobrança
+      bearerDebtWorkout:
+        type: boolean
+        description: Em situação de Negociação
+  GetResponseDocument:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de Portadores retornados como resultado da pesquisa
+        items:
+          $ref: "#/definitions/Bearer"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.

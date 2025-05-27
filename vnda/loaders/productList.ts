@@ -72,3 +72,30 @@ const productListLoader = async (
 };
 
 export default productListLoader;
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props) => {
+  const { term, wildcard, sort, tags, typeTags, ids, count } = props;
+
+  const tagsString = tags?.sort((a, b) => a.localeCompare(b)).join("-") ?? "";
+  const typeTagsString =
+    typeTags?.sort((a, b) => a.key.localeCompare(b.key)).map(({ key, value }) =>
+      `${key}-${value}`
+    ).join("-") ?? "";
+  const idsString = ids?.sort((a, b) => a - b).join("-") ?? "";
+
+  const values = [
+    term,
+    wildcard,
+    sort,
+    tagsString,
+    typeTagsString,
+    idsString,
+    count,
+  ];
+
+  const filteredValues = values.filter(Boolean);
+
+  return `product-list-${filteredValues.join("-")}`;
+};

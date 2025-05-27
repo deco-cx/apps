@@ -127,3 +127,16 @@ async function loader(
 }
 
 export default loader;
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request) => {
+  const url = new URL(req.url);
+  const { slug, priceIntl = false } = props;
+
+  if (!slug) return null;
+
+  const variantId = url.searchParams.get("skuId") || "";
+
+  return `product-details-page-${slug}-${priceIntl}-${variantId}`;
+};

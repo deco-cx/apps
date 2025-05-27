@@ -1,0 +1,123 @@
+swagger: "2.0"
+info:
+  description: |
+    ## API para geração de cobrança de parcelas vencidas
+
+    _Esta API está disponível apenas para as cobranças geradas via Recebimentos Instantâneos. Para utilizá-la, é necessária a confirmação do time de produto dos bancos que já estão integrados, e caso o banco desejado esteja liberado, é necessária a aquisição do conector “Automação Bancária”._
+  version: 1.0.1
+  title: Geração de Cobrança de Parcelas Vencidas
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Geração de cobrança de parcelas vencidas
+    description: API para geração de cobrança de parcelas vencidas para uso exclusivo dos clientes que tem contratado o Conector "Automação Bancária".
+schemes:
+  - https
+paths:
+  /overdue-receivable-bill:
+    post:
+      operationId: postOverdueReceivebleBill
+      tags:
+        - Geração de cobrança de parcelas vencidas
+      summary: >-
+        Registra cobrança referente a parcelas vencidas.
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Informações para registrar cobrança de parcelas.
+          required: true
+          schema:
+            $ref: "#/definitions/OverdueReceivableInputDTO"
+      responses:
+        "201":
+          description: Cobrança gerada com sucesso
+        "400":
+          description: Inconsistências que impedem o envio da cobrança
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Parcelas não encontradas para o envio da cobrança
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  OverdueReceivableInputDTO:
+    type: object
+    required:
+      - receivableBillId
+      - companyId
+      - checkingAccountId
+      - newDueDate
+      - correctAnnualInstallment
+      - groupedInstalments
+      - installments
+    properties:
+      receivableBillId:
+        type: integer
+        format: int32
+        example: 1
+        description: Código do título
+      companyId:
+        type: integer
+        format: int32
+        example: 1
+        description: Código da empresa da conta corrente
+      checkingAccountId:
+        type: string
+        example: "6538-2"
+        description: Código da conta corrente
+      newDueDate:
+        type: string
+        description: Data do vencimento da cobrança
+        example: "2021-01-01"
+      interestPercentage:
+        type: number
+        description: Porcentagem de juros
+        example: 5.98
+      finePercentage:
+        type: number
+        description: Porcentagem de multa
+        example: 5.98
+      insurancepercentage:
+        type: number
+        description: Porcentagem de seguro
+        example: 5.98
+      correctAnnualInstallment:
+        type: boolean
+        description: Corrigir parcelas com correção anual
+        example: true
+      groupedInstalments:
+        type: boolean
+        description: Agrupar parcelas em uma única cobrança
+        example: true
+      installments:
+        type: array
+        description: Lista das parcelas
+        items:
+          type: object
+          required:
+            - installmentId
+          properties:
+            installmentId:
+              type: integer
+              format: int32
+              description: Código da parcela
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para analise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuÃ¡rio
+        example: Client description message.

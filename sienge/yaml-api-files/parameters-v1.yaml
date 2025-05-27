@@ -1,0 +1,82 @@
+swagger: "2.0"
+info:
+  title: Parâmetros
+  description: API para obter dados de parâmetros do sistema.
+  version: "1.0"
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdomain-do-cliente}/public/api/{versão-da-api}"
+paths:
+  "/parameters/{id}":
+    get:
+      tags:
+        - Parâmetro
+      summary: >-
+        Retorna o id e o valor de um determinado parâmetro. O formato do valor depende do seu tipo, podendo ser um texto, uma observação, um valor inteiro, um valor decimal ou o valor de uma chave estrangeira.
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: Código do parâmetro
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Retorna um documento JSON com o id e o valor de um determinado parâmetro.
+          schema:
+            $ref: "#/definitions/ParameterDTO"
+        "400":
+          description: Tipo do parâmetro não é suportando pela API. Os parâmetros do tipo 'Arquivo' não podem ser consultados por esta API.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "403":
+          description: Acesso ao valor do parâmetro não é permitido. Este parâmetro é de uso interno do sistema e não pode ser consultado por esta API.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Não foi encontrado nenhum parâmetro com o código informado.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: O tipo do parâmetro é desconhecido e não pode ser processado.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+definitions:
+  ParameterDTO:
+    type: object
+    description: Representa os dados de um parâmetro.
+    properties:
+      id:
+        description: Código do parâmetro.
+        type: integer
+        format: int32
+        example: 1
+      value:
+        description: Valor do parâmetro. Dependendo do parâmetro, o tipo de retorno deste campo pode ser uma string, um número inteiro ou um numero decimal.
+        type: string
+        example: S
+  ApiError:
+    type: object
+    description: Informações com mensagens de erros da API.
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: integer
+        format: int32
+        description: Status HTTP
+      developerMessage:
+        type: string
+        description: Mensagem de erro a ser reportada ao desenvolvedor da API.
+      clientMessage:
+        type: string
+        description: Mensagem de erro a ser apresentada para o usuário que está consumindo a API.
