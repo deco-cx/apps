@@ -13,7 +13,7 @@ interface Props {
 
 /**
  * @title List Airtable Bases
- * @description Fetches a list of bases accessible with the configured API key.
+ * @description Fetches a list of bases accessible with the configured API key or OAuth token.
  */
 const loader = async (
   props: Props,
@@ -22,11 +22,25 @@ const loader = async (
 ): Promise<ListBasesResponse | Response> => {
   const { apiKey, offset } = props;
 
+  // Use OAuth client if available, otherwise fallback to API key method
+  if (ctx.client) {
+    const response = await ctx.client["GET /v0/meta/bases"](
+      offset ? { offset: offset } : {},
+    );
+
+    if (!response.ok) {
+      throw new Error(`Error listing bases: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  // Fallback to API key authentication
   const authHeader = req.headers.get("Authorization")?.split(" ")[1];
   const resolvedApiKey = authHeader || apiKey;
 
   if (!resolvedApiKey) {
-    return new Response("API Key is required", { status: 403 });
+    return new Response("API Key or OAuth token is required", { status: 403 });
   }
 
   const response = await ctx.api(resolvedApiKey)["GET /v0/meta/bases"](
