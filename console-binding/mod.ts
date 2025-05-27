@@ -15,7 +15,7 @@ export type BindingHandler = (
 ) => Promise<void>;
 
 export interface State {
-  handle: <TCtx extends AppContext>(req: Request, ctx: TCtx) => BindingHandler;
+  handle: (req: Request, ctx: AppContext) => BindingHandler;
 }
 // deno-lint-ignore no-empty-interface
 export interface Props {}
