@@ -45,12 +45,6 @@ export interface Props {
   baseUrl?: string;
 
   /**
-   * @title OAuth Access Token (optional)
-   * @description OAuth access token for authenticated requests
-   */
-  accessToken?: string;
-
-  /**
    * @title OAuth Tokens
    * @description OAuth tokens for authenticated requests
    */
@@ -104,9 +98,7 @@ export default function App(
   };
 
   const api = (apiKey: string) => {
-    // Use OAuth access token if available, otherwise use provided API key
-    const authToken = props.accessToken || apiKey;
-
+    const authToken = tokens?.access_token || apiKey;
     return createClientWithHeaders(
       new Headers({
         "Authorization": `Bearer ${authToken}`,
