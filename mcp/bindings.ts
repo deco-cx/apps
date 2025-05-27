@@ -1,6 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
 import { Message } from "npm:ai@4.3.16";
-
 import { processDataStream } from "npm:@ai-sdk/ui-utils@1.2.11";
 
 export type ProcessDataStreamParameters = Omit<
@@ -15,6 +14,7 @@ export interface Callbacks {
 export interface InputBindingProps<TPayload = any> {
   callbacks: Callbacks;
   payload: TPayload;
+  headers: Record<string, string>;
 }
 
 export interface OutputBindingProps {

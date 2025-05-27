@@ -1,5 +1,5 @@
-import { AppContext } from "../../mod.ts";
-import { InputBindingProps } from "../../utils.ts";
+import { InputBindingProps } from "../../../mcp/bindings.ts";
+import { AppContext, Payload } from "../../mod.ts";
 
 /**
  * @name ON_AGENT_INPUT
@@ -7,7 +7,7 @@ import { InputBindingProps } from "../../utils.ts";
  * @description This action is triggered when the agent receives a message
  */
 export default function input(
-  props: InputBindingProps,
+  props: InputBindingProps<Payload>,
   req: Request,
   ctx: AppContext,
 ) {

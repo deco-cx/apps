@@ -14,7 +14,6 @@ The `console-binding` demonstrates how to implement a custom binding that proces
 
 ## Where to look
 
-- **@binding folder**: Contains the core binding logic and utilities. Check `binding/mod.ts` for the main binding implementation.
 - **@mod.ts**: See `console-binding/mod.ts` for an example use case, showing how to set up handlers for different stream parts and how to use the binding.
 
 ## Usage

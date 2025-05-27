@@ -2,7 +2,14 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$$$$$$$0 from "./actions/bindings/input.ts";
+import * as $$$$$$$$$1 from "./actions/bindings/output.ts";
+
 const manifest = {
+  "actions": {
+    "console-binding/actions/bindings/input.ts": $$$$$$$$$0,
+    "console-binding/actions/bindings/output.ts": $$$$$$$$$1,
+  },
   "name": "console-binding",
   "baseUrl": import.meta.url,
 };
