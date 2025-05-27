@@ -1,4 +1,3 @@
-
 import { Pagination } from "deco/deps.ts";
 import { type Flag } from "@deco/deco";
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
@@ -833,7 +832,6 @@ export interface ProductDetailsPage {
   product: Product;
   seo?: Seo | null;
 }
-
 
 export interface PaginationInfo {
   count: number;

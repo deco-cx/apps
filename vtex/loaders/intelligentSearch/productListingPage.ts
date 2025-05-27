@@ -295,7 +295,6 @@ const loader = async (
     aditionalFieldsInQuery[item.label] = item.value;
   });
 
-
   const currentPageoffset = props.pageOffset ?? 1;
   let pathToUse = url.href.replace(url.origin, "");
 
@@ -334,10 +333,12 @@ const loader = async (
         ...params,
         page: props.page || paramnPage,
         facets: toPath(selected),
-      }, {
+      },
+      {
         ...STALE,
         headers: segment ? withSegmentCookie(segment) : undefined,
-      }).then((res) => res.json()),
+      },
+    ).then((res) => res.json()),
     vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
       ...params,
       ...aditionalFieldsInQuery,
@@ -372,7 +373,7 @@ const loader = async (
   }
 
   //comment this event because this event already calling in another location
-  
+
   /** Intelligent search API analytics. Fire and forget 🔫 */
   // const fullTextTerm = params["query"];
   // if (fullTextTerm) {
@@ -394,7 +395,6 @@ const loader = async (
   //     )
   //     .catch(console.error);
   // }
-
 
   const { products: vtexProducts, pagination, recordsFiltered } =
     productsResult;
@@ -433,9 +433,13 @@ const loader = async (
 
   const getPageUrl = (value: number) => {
     const pageCurrentExist = url.pathname.match(PAGE_REGEX);
-    const queryParamns = currentSearchParams.toString() ? "?" + currentSearchParams.toString() : ""
+    const queryParamns = currentSearchParams.toString()
+      ? "?" + currentSearchParams.toString()
+      : "";
     return pageCurrentExist
-      ? `${url.pathname.replace(PAGE_REGEX, `page${paramnPage + value}`)}${queryParamns} `
+      ? `${
+        url.pathname.replace(PAGE_REGEX, `page${paramnPage + value}`)
+      }${queryParamns} `
       : `${url.pathname}/page${paramnPage + 1}${queryParamns}   `;
   };
 
