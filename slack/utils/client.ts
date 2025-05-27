@@ -1,4 +1,10 @@
-import { SlackChannel, SlackMessage, SlackUser, SlackUserProfile, SlackResponse } from "../client.ts";
+import {
+  SlackChannel,
+  SlackMessage,
+  SlackResponse,
+  SlackUser,
+  SlackUserProfile,
+} from "../client.ts";
 
 // Slack API Client Interface for OAuth
 export interface SlackApiClient {
@@ -18,7 +24,9 @@ export interface SlackApiClient {
       text: string;
       thread_ts?: string;
     };
-    response: SlackResponse<{ channel: string; ts: string; message: SlackMessage }>;
+    response: SlackResponse<
+      { channel: string; ts: string; message: SlackMessage }
+    >;
   };
   "POST /reactions.add": {
     json: {

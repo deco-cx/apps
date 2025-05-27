@@ -93,7 +93,10 @@ export class SlackClient {
   private botHeaders: { Authorization: string; "Content-Type": string };
   private oauthClient?: OAuthClients<SlackApiClient, SlackAuthClient>;
 
-  constructor(botToken: string, oauthClient?: OAuthClients<SlackApiClient, SlackAuthClient>) {
+  constructor(
+    botToken: string,
+    oauthClient?: OAuthClients<SlackApiClient, SlackAuthClient>,
+  ) {
     this.botHeaders = {
       Authorization: `Bearer ${botToken}`,
       "Content-Type": "application/json",
