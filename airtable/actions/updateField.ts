@@ -18,31 +18,22 @@ interface Props extends UpdateFieldBody {
    * @description The ID of the field to update.
    */
   fieldId: string;
-  /**
-   * @title API Key
-   */
-  apiKey?: string;
-  // name, description are inherited from UpdateFieldBody
-  // type and options changes are complex and generally not advised via simple updates.
 }
 
 /**
  * @title Update Airtable Field
- * @description Updates an existing field's properties like name or description (Metadata API).
+ * @description Updates an existing field's properties like name or description using OAuth (Metadata API).
  * @see https://airtable.com/developers/web/api/update-field
  */
 const action = async (
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<Field | Response> => {
-  const { baseId, tableId, fieldId, name, description, apiKey } = props;
+  const { baseId, tableId, fieldId, name, description } = props;
 
-  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
-  const resolvedApiKey = authHeader || apiKey;
-
-  if (!resolvedApiKey) {
-    return new Response("API Key is required", { status: 403 });
+  if (!ctx.client) {
+    return new Response("OAuth authentication is required", { status: 401 });
   }
 
   const body: UpdateFieldBody = {};
@@ -59,10 +50,10 @@ const action = async (
     );
   }
 
-  const response = await ctx.api(resolvedApiKey)
+  const response = await ctx.client
     ["PATCH /v0/meta/bases/:baseId/tables/:tableId/fields/:fieldId"](
-      { baseId, tableId, fieldId }, // URL params
-      { body }, // Request body
+      { baseId, tableId, fieldId },
+      { body },
     );
 
   if (!response.ok) {

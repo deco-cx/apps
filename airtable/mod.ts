@@ -9,9 +9,6 @@ import {
   OAUTH_URL_TOKEN,
 } from "./utils/constants.ts";
 import { AirtableClient } from "./utils/client.ts";
-import type { Secret } from "../website/loaders/secret.ts";
-import { createHttpClient } from "../utils/http.ts";
-import { fetchSafe } from "../utils/fetch.ts";
 import {
   DEFAULT_OAUTH_HEADERS,
   OAuthClientOptions,
@@ -30,13 +27,6 @@ export const AirtableProvider: OAuthProvider = {
 };
 
 export interface Props {
-  /**
-   * @title Airtable API Key (optional if using OAuth)
-   * @description The API key for accessing your Airtable account.
-   * @format password
-   */
-  apiKey?: string | Secret;
-
   /**
    * @title OAuth Tokens
    * @description OAuth tokens for authenticated requests
@@ -57,8 +47,6 @@ export interface Props {
 }
 
 export interface State extends Props {
-  api: (apiKey: string) => ReturnType<typeof createHttpClient<AirtableClient>>;
-  apiKey: string;
   baseUrl: string;
   client?: OAuthClients<AirtableClient, AirtableClient>;
 }
@@ -73,34 +61,13 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
  */
 export default function App(
   props: Props,
-  _req: Request,
+  __req: Request,
   ctx?: McpContext<Props>,
 ): App<Manifest, State> {
   const { tokens, clientId, clientSecret } = props;
-  const resolvedApiKey = props.apiKey
-    ? (typeof props.apiKey === "string" ? props.apiKey : props.apiKey.get())
-    : "";
   const resolvedBaseUrl = AIRTABLE_API_BASE_URL;
 
-  const createClientWithHeaders = (headers: Headers) => {
-    return createHttpClient<AirtableClient>({
-      base: resolvedBaseUrl,
-      fetcher: fetchSafe,
-      headers,
-    });
-  };
-
-  const api = (apiKey: string) => {
-    const authToken = tokens?.access_token || apiKey;
-    return createClientWithHeaders(
-      new Headers({
-        "Authorization": `Bearer ${authToken}`,
-        "Content-Type": "application/json",
-      }),
-    );
-  };
-
-  // OAuth client setup if tokens are provided
+  // OAuth client setup
   let oauthClient: OAuthClients<AirtableClient, AirtableClient> | undefined;
 
   if (tokens && clientId && clientSecret) {
@@ -138,8 +105,6 @@ export default function App(
 
   const state: State = {
     ...props,
-    api,
-    apiKey: resolvedApiKey || "",
     baseUrl: resolvedBaseUrl,
     client: oauthClient,
   };

@@ -54,7 +54,7 @@ export interface Props {
  */
 export default async function callback(
   { code, installId, clientId, clientSecret, redirectUri, codeVerifier }: Props,
-  _req: Request,
+  __req: Request,
   _ctx: AppContext,
 ): Promise<{ installId: string; success: boolean }> {
   try {

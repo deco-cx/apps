@@ -16,43 +16,32 @@ interface Props {
    * @description An array of record IDs to be deleted.
    */
   recordIds: string[];
-
-  /**
-   * @title API Key
-   */
-  apiKey?: string;
 }
 
 /**
  * @title Delete Airtable Records
- * @description Deletes one or more records from a specified table.
+ * @description Deletes one or more records from a specified table using OAuth.
  */
 const action = async (
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<{ records: Array<{ id: string; deleted: boolean }> } | Response> => {
-  const { baseId, tableIdOrName, recordIds, apiKey } = props;
+  const { baseId, tableIdOrName, recordIds } = props;
 
-  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
-  const resolvedApiKey = authHeader || apiKey;
-
-  if (!resolvedApiKey) {
-    return new Response("API Key is required", { status: 403 });
+  if (!ctx.client) {
+    return new Response("OAuth authentication is required", { status: 401 });
   }
 
-  // The client expects searchParams: { "records[]": string[] }
-  // The parameters to the client call should be flat, including URL params and searchParams
   const params = {
     baseId,
     tableIdOrName,
     "records[]": recordIds,
   };
 
-  const response = await ctx.api(resolvedApiKey)
-    ["DELETE /v0/:baseId/:tableIdOrName"](
-      params,
-    );
+  const response = await ctx.client["DELETE /v0/:baseId/:tableIdOrName"](
+    params,
+  );
 
   if (!response.ok) {
     throw new Error(`Error deleting records: ${response.statusText}`);

@@ -31,6 +31,7 @@ export interface Props {
  * @description Redirects to Airtable's OAuth authorization page
  */
 export default function start(props: Props) {
+  console.log("start", props);
   const authParams = new URLSearchParams({
     client_id: props.clientId,
     redirect_uri: props.redirectUri,
@@ -39,7 +40,6 @@ export default function start(props: Props) {
     state: props.state,
   });
 
-  // Add PKCE code challenge if provided
   if (props.codeChallenge) {
     authParams.set("code_challenge", props.codeChallenge);
     authParams.set("code_challenge_method", "S256");
