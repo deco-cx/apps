@@ -4,21 +4,23 @@
 
 import * as $$$$$$$$$0 from "./actions/audioIsolation.ts";
 import * as $$$$$$$$$1 from "./actions/createVoiceClone.ts";
-import * as $$$$$$$$$2 from "./actions/textToSoundEffects.ts";
-import * as $$$$$$$$$3 from "./actions/textToSpeech.ts";
-import * as $$$$$$$$$4 from "./actions/textToVoiceWithTimestamps.ts";
-import * as $$$$$$$$$5 from "./actions/transcribeAudio.ts";
-import * as $$$$$$$$$6 from "./actions/voiceChanger.ts";
+import * as $$$$$$$$$2 from "./actions/getSharedVoices.ts";
+import * as $$$$$$$$$3 from "./actions/textToSoundEffects.ts";
+import * as $$$$$$$$$4 from "./actions/textToSpeech.ts";
+import * as $$$$$$$$$5 from "./actions/textToVoiceWithTimestamps.ts";
+import * as $$$$$$$$$6 from "./actions/transcribeAudio.ts";
+import * as $$$$$$$$$7 from "./actions/voiceChanger.ts";
 
 const manifest = {
   "actions": {
     "elevenlabs/actions/audioIsolation.ts": $$$$$$$$$0,
     "elevenlabs/actions/createVoiceClone.ts": $$$$$$$$$1,
-    "elevenlabs/actions/textToSoundEffects.ts": $$$$$$$$$2,
-    "elevenlabs/actions/textToSpeech.ts": $$$$$$$$$3,
-    "elevenlabs/actions/textToVoiceWithTimestamps.ts": $$$$$$$$$4,
-    "elevenlabs/actions/transcribeAudio.ts": $$$$$$$$$5,
-    "elevenlabs/actions/voiceChanger.ts": $$$$$$$$$6,
+    "elevenlabs/actions/getSharedVoices.ts": $$$$$$$$$2,
+    "elevenlabs/actions/textToSoundEffects.ts": $$$$$$$$$3,
+    "elevenlabs/actions/textToSpeech.ts": $$$$$$$$$4,
+    "elevenlabs/actions/textToVoiceWithTimestamps.ts": $$$$$$$$$5,
+    "elevenlabs/actions/transcribeAudio.ts": $$$$$$$$$6,
+    "elevenlabs/actions/voiceChanger.ts": $$$$$$$$$7,
   },
   "name": "elevenlabs",
   "baseUrl": import.meta.url,

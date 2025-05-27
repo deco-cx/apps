@@ -5,6 +5,7 @@ import { engine as cloudflare } from "../utils/image/engines/cloudflare/engine.t
 import { engine as deco } from "../utils/image/engines/deco/engine.ts";
 import { engine as passThrough } from "../utils/image/engines/passThrough/engine.ts";
 import { engine as wasm } from "../utils/image/engines/wasm/engine.ts";
+import { AppContext } from "../mod.ts";
 
 const ENGINES = [
   passThrough,
@@ -50,10 +51,24 @@ const acceptMediaType = (req: Request) => {
 const handler = async (
   props: Props,
   req: Request,
+  ctx: AppContext,
 ): Promise<Response> => {
   try {
+    if (ctx.disableProxy) {
+      return new Response("Proxy disabled", { status: 403 });
+    }
+
     const preferredMediaType = acceptMediaType(req);
     const params = parseParams(props);
+
+    if (
+      ctx.whitelistPatterns &&
+      ctx.whitelistPatterns.length > 0 &&
+      !ctx.whitelistPatterns.some((pattern) => pattern.test(params.src))
+    ) {
+      return new Response("Proxy disabled for this source", { status: 403 });
+    }
+
     const engine = ENGINES.find((e) => e.accepts(params.src)) ?? passThrough;
 
     const response = await engine.resolve(params, preferredMediaType, req);
@@ -83,12 +98,12 @@ const handler = async (
 
 const cache = typeof caches !== "undefined" ? await caches.open(PATH) : null;
 
-const loader: typeof handler = async (props, req) => {
+const loader: typeof handler = async (props, req, ctx) => {
   const cached = await cache?.match(req).catch(() => null);
 
   if (cached) return cached;
 
-  const response = await handler(props, req);
+  const response = await handler(props, req, ctx);
 
   if (response.status === 200) {
     const cloned = response.clone();

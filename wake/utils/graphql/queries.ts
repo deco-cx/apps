@@ -18,6 +18,10 @@ fragment Checkout on Checkout {
 		listPrice
     totalListPrice
     totalAdjustedPrice
+    seller {
+      sellerName
+      distributionCenterId
+    }
     productAttributes {
         name
         type
@@ -283,6 +287,8 @@ fragment Product on Product {
   productId
   alias
   attributes {
+    id
+    type
     value
     name
   }
