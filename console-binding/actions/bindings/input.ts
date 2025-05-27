@@ -11,5 +11,5 @@ export default function input(
   req: Request,
   ctx: AppContext,
 ) {
-  return ctx.handle(req, ctx)(props);
+  return ctx.handle(props, req, ctx);
 }
