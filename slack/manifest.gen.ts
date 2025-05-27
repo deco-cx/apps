@@ -6,27 +6,31 @@ import * as $$$$$$$$$0 from "./actions/bindings/input.ts";
 import * as $$$$$$$$$1 from "./actions/messages/post.ts";
 import * as $$$$$$$$$2 from "./actions/messages/react.ts";
 import * as $$$$$$$$$3 from "./actions/messages/threads/reply.ts";
-import * as $$$$$$$$$4 from "./actions/webhook/broker.ts";
+import * as $$$$$$$$$4 from "./actions/oauth/callback.ts";
+import * as $$$$$$$$$5 from "./actions/webhook/broker.ts";
 import * as $$$0 from "./loaders/channels.ts";
 import * as $$$1 from "./loaders/channels/history.ts";
-import * as $$$2 from "./loaders/thread/replies.ts";
-import * as $$$3 from "./loaders/user/profile.ts";
-import * as $$$4 from "./loaders/users.ts";
+import * as $$$2 from "./loaders/oauth/start.ts";
+import * as $$$3 from "./loaders/thread/replies.ts";
+import * as $$$4 from "./loaders/user/profile.ts";
+import * as $$$5 from "./loaders/users.ts";
 
 const manifest = {
   "loaders": {
     "slack/loaders/channels.ts": $$$0,
     "slack/loaders/channels/history.ts": $$$1,
-    "slack/loaders/thread/replies.ts": $$$2,
-    "slack/loaders/user/profile.ts": $$$3,
-    "slack/loaders/users.ts": $$$4,
+    "slack/loaders/oauth/start.ts": $$$2,
+    "slack/loaders/thread/replies.ts": $$$3,
+    "slack/loaders/user/profile.ts": $$$4,
+    "slack/loaders/users.ts": $$$5,
   },
   "actions": {
     "slack/actions/bindings/input.ts": $$$$$$$$$0,
     "slack/actions/messages/post.ts": $$$$$$$$$1,
     "slack/actions/messages/react.ts": $$$$$$$$$2,
     "slack/actions/messages/threads/reply.ts": $$$$$$$$$3,
-    "slack/actions/webhook/broker.ts": $$$$$$$$$4,
+    "slack/actions/oauth/callback.ts": $$$$$$$$$4,
+    "slack/actions/webhook/broker.ts": $$$$$$$$$5,
   },
   "name": "slack",
   "baseUrl": import.meta.url,
