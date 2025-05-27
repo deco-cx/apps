@@ -98,7 +98,6 @@ const action = async (
     );
   }
 
-  // Check if all elements of values are arrays
   if (!props.values.every((row) => Array.isArray(row))) {
     throw new Error(
       "All elements in 'values' must be arrays (representing rows)",
@@ -106,10 +105,8 @@ const action = async (
   }
 
   try {
-    // Map simple props to API format
     const simpleProps = mapPropsToApiFormat(props);
 
-    // Validate mapped props
     const validationErrors = validateSimpleBatchUpdateProps(simpleProps);
     if (validationErrors.length > 0) {
       throw new Error(
@@ -117,10 +114,8 @@ const action = async (
       );
     }
 
-    // Map to Google API format
     const { body, params } = mapSimpleBatchUpdatePropsToApi(simpleProps);
 
-    // Make API call
     const response = await ctx.client
       ["POST /v4/spreadsheets/:spreadsheetId/values:batchUpdate"](
         params,
@@ -133,7 +128,6 @@ const action = async (
       );
     }
 
-    // Map API response to simple format
     const apiResponse = await response.json();
     return mapApiBatchUpdateResponseToSimple(apiResponse);
   } catch (error) {

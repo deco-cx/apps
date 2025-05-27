@@ -1,7 +1,5 @@
 import { AppContext } from "../mod.ts";
 import type {
-  Result,
-  SimpleError,
   SimpleUpdateProps,
   SimpleUpdateResponse,
 } from "../utils/types.ts";
@@ -97,67 +95,50 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<Result<SimpleUpdateResponse>> => {
-  // Basic validations
+): Promise<SimpleUpdateResponse> => {
   if (!props.spreadsheet_id || !props.sheet_name || !props.values) {
-    return {
-      message:
-        "Missing required parameters: spreadsheet_id, sheet_name and values are required",
-    } as SimpleError;
+    throw new Error(
+      "Missing required parameters: spreadsheet_id, sheet_name and values are required",
+    );
   }
 
   if (!Array.isArray(props.values) || props.values.length === 0) {
-    return {
-      message: "The 'values' parameter must be a non-empty array of arrays",
-    } as SimpleError;
+    throw new Error(
+      "The 'values' parameter must be a non-empty array of arrays",
+    );
   }
 
-  // Check if all elements of values are arrays
   if (!props.values.every((row) => Array.isArray(row))) {
-    return {
-      message: "All elements in 'values' must be arrays (representing rows)",
-    } as SimpleError;
+    throw new Error(
+      "All elements in 'values' must be arrays (representing rows)",
+    );
   }
 
-  try {
-    // Map simple props to API format
-    const simpleProps = mapPropsToApiFormat(props);
+  const simpleProps = mapPropsToApiFormat(props);
 
-    // Validate mapped props
-    const validationErrors = validateSimpleUpdateProps(simpleProps);
-    if (validationErrors.length > 0) {
-      return {
-        message: `Validation error: ${validationErrors.join(", ")}`,
-      } as SimpleError;
-    }
-
-    // Map to Google API format
-    const { body, params } = mapSimpleUpdatePropsToApi(simpleProps);
-
-    // Make API call
-    const response = await ctx.client
-      ["PUT /v4/spreadsheets/:spreadsheetId/values/:range"](
-        params,
-        { body },
-      );
-
-    if (!response.ok) {
-      throw new Error(
-        `Error updating spreadsheet values: ${response.statusText}`,
-      );
-    }
-
-    // Map API response to simple format
-    const apiResponse = await response.json();
-    return mapApiUpdateResponseToSimple(apiResponse);
-  } catch (error) {
-    return {
-      message: `Communication error: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`,
-      details: { originalError: error },
-    } as SimpleError;
+  const validationErrors = validateSimpleUpdateProps(simpleProps);
+  if (validationErrors.length > 0) {
+    throw new Error(
+      `Validation error: ${validationErrors.join(", ")}`,
+    );
   }
+
+  const { body, params } = mapSimpleUpdatePropsToApi(simpleProps);
+
+  const response = await ctx.client
+    ["PUT /v4/spreadsheets/:spreadsheetId/values/:range"](
+      params,
+      { body },
+    );
+
+  if (!response.ok) {
+    throw new Error(
+      `Error updating spreadsheet values: ${response.statusText}`,
+    );
+  }
+
+  const apiResponse = await response.json();
+  return mapApiUpdateResponseToSimple(apiResponse);
 };
 
 export default action;

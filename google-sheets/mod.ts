@@ -2,7 +2,12 @@ import { createOAuthHttpClient } from "../mcp/utils/httpClient.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import type { FnContext } from "@deco/deco";
 import { McpContext } from "../mcp/context.ts";
-import { GOOGLE_SHEETS_URL } from "./utils/constant.ts";
+import {
+  GOOGLE_OAUTH_URL,
+  GOOGLE_OAUTH_URL_AUTH,
+  GOOGLE_SHEETS_URL,
+  SCOPES,
+} from "./utils/constant.ts";
 import { GoogleAuthClient, GoogleSheetsClient } from "./utils/client.ts";
 import {
   DEFAULT_OAUTH_HEADERS,
@@ -14,9 +19,9 @@ import {
 
 export const GoogleProvider: OAuthProvider = {
   name: "Google",
-  authUrl: "https://accounts.google.com/o/oauth2/v2/auth",
-  tokenUrl: "https://oauth2.googleapis.com",
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  authUrl: GOOGLE_OAUTH_URL_AUTH,
+  tokenUrl: GOOGLE_OAUTH_URL,
+  scopes: SCOPES,
   clientId: "",
   clientSecret: "",
 };
@@ -35,8 +40,8 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Google Sheets
- * @description Integração com Google Sheets usando OAuth 2.0 com refresh automático de tokens
- * @category Produtividade
+ * @description Create, edit and manage Google Sheets spreadsheets
+ * @category Productivity
  * @logo https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Google_Sheets_logo_%282014-2020%29.svg/1498px-Google_Sheets_logo_%282014-2020%29.svg.png
  */
 export default function App(

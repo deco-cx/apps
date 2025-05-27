@@ -4,10 +4,36 @@
 
 export interface Spreadsheet {
   spreadsheetId: string;
-  properties?: SheetProperties;
+  properties?: SpreadsheetProperties;
   sheets?: Sheet[];
   namedRanges?: NamedRange[];
   spreadsheetUrl?: string;
+}
+
+export interface SpreadsheetProperties {
+  title?: string;
+  locale?: string;
+  autoRecalc?: string;
+  timeZone?: string;
+  defaultFormat?: CellFormat;
+  iterativeCalculationSettings?: IterativeCalculationSettings;
+  spreadsheetTheme?: SpreadsheetTheme;
+  importFunctionsExternalUrlAccessAllowed?: boolean;
+}
+
+export interface IterativeCalculationSettings {
+  maxIterations?: number;
+  convergenceThreshold?: number;
+}
+
+export interface SpreadsheetTheme {
+  primaryFontFamily?: string;
+  themeColors?: ThemeColorPair[];
+}
+
+export interface ThemeColorPair {
+  colorType?: string;
+  color?: Color;
 }
 
 export interface Sheet {
@@ -190,8 +216,7 @@ export interface BasicFilter {
 export interface ValueRange {
   range?: string;
   majorDimension?: string;
-  // deno-lint-ignore no-explicit-any
-  values?: any[][];
+  values?: CellValue[][];
 }
 
 export interface BatchUpdateValuesRequest {
@@ -524,4 +549,19 @@ export interface SheetMetadata {
     frozenRowCount?: number;
     frozenColumnCount?: number;
   };
+}
+
+export interface OptimizedSpreadsheetMetadata {
+  spreadsheetId: string;
+  title: string;
+  url: string;
+  locale?: string;
+  sheets: Array<{
+    id: number;
+    title: string;
+    rowCount: number;
+    columnCount: number;
+    dataRange?: string;
+    filledCells?: number;
+  }>;
 }
