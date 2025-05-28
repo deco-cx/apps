@@ -57,6 +57,12 @@ const action = async (
     );
 
   if (!response.ok) {
+    const errorData = await response.json().catch(() => ({})) as any;
+    
+    if (response.status === 422 && errorData.error?.type === "DUPLICATE_OR_EMPTY_FIELD_NAME") {
+      throw new Error(`Field name "${name}" already exists in this table or is empty. Please choose a different name.`);
+    }
+    
     throw new Error(`Error updating field: ${response.statusText}`);
   }
 
