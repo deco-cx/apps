@@ -45,7 +45,16 @@ export default async function invoke(
       console.error("error on part", err);
     },
     onFinishMessagePart: () => {
-      client.postMessage(props.event.channel, buffer);
+      client.postMessage(props.event.channel, buffer).then((response) => {
+        if (!response.ok) {
+          console.error(
+            "error sending message to slack",
+            props,
+            buffer,
+            response,
+          );
+        }
+      });
     },
   }, bindingProps.callbacks.stream);
 }
