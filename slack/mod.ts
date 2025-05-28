@@ -1,15 +1,12 @@
 import type { FnContext } from "@deco/deco";
+import { Callbacks } from "../mcp/bindings.ts";
 import { McpContext } from "../mcp/context.ts";
 import {
   DEFAULT_OAUTH_HEADERS,
   OAuthClientOptions,
 } from "../mcp/utils/config.ts";
 import { createOAuthHttpClient } from "../mcp/utils/httpClient.ts";
-import {
-  OAuthClients,
-  OAuthProvider,
-  OAuthTokens,
-} from "../mcp/utils/types.ts";
+import { OAuthProvider, OAuthTokens } from "../mcp/utils/types.ts";
 import { SlackClient } from "./client.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { SlackApiClient, SlackAuthClient } from "./utils/client.ts";
@@ -19,7 +16,6 @@ import {
   OAUTH_URL_AUTH,
   SCOPES,
 } from "./utils/constants.ts";
-import { Callbacks } from "../mcp/bindings.ts";
 
 export const SlackProvider: OAuthProvider = {
   name: "Slack",
@@ -67,7 +63,6 @@ export interface Props {
 }
 
 export interface State extends Props {
-  client: OAuthClients<SlackApiClient, SlackAuthClient>;
   slack: SlackClient;
   slackClientFor: (p: Props) => SlackClient;
 }
@@ -81,61 +76,54 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
  * @logo https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/306_Slack_logo-512.png
  */
 export default function App(
-  props: Props,
+  appProps: Props,
   _req: Request,
   ctx?: McpContext<Props>,
 ) {
-  const { tokens, clientId, clientSecret, botToken } = props;
-
-  const slackProvider: OAuthProvider = {
-    ...SlackProvider,
-    clientId: clientId ?? "",
-    clientSecret: clientSecret ?? "",
-  };
-
-  const options: OAuthClientOptions = {
-    headers: DEFAULT_OAUTH_HEADERS,
-    authClientConfig: {
-      headers: new Headers({
-        "Accept": "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
-      }),
-    },
-  };
-
   // Create OAuth client or fallback to direct token
-  const client = createOAuthHttpClient<SlackApiClient, SlackAuthClient>({
-    provider: slackProvider,
-    apiBaseUrl: API_URL,
-    tokens,
-    options,
-    onTokenRefresh: async (newTokens: OAuthTokens) => {
-      if (ctx) {
-        await ctx.configure({
-          ...props,
-          tokens: newTokens,
-        });
-      }
-    },
-  });
 
-  // Create Slack client instance
-  const slack = new SlackClient(
-    tokens?.access_token || botToken || "",
-    client,
-  );
+  const slackClientFor = (props: Props) => {
+    const { tokens, clientId, clientSecret } = props;
+
+    const slackProvider: OAuthProvider = {
+      ...SlackProvider,
+      clientId: clientId ?? "",
+      clientSecret: clientSecret ?? "",
+    };
+
+    const options: OAuthClientOptions = {
+      headers: DEFAULT_OAUTH_HEADERS,
+      authClientConfig: {
+        headers: new Headers({
+          "Accept": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
+        }),
+      },
+    };
+    const client = createOAuthHttpClient<SlackApiClient, SlackAuthClient>({
+      provider: slackProvider,
+      apiBaseUrl: API_URL,
+      tokens,
+      options,
+      onTokenRefresh: async (newTokens: OAuthTokens) => {
+        if (ctx) {
+          await ctx.configure({
+            ...props,
+            tokens: newTokens,
+          });
+        }
+      },
+    });
+    return new SlackClient(
+      props.tokens?.access_token || props.botToken || "",
+      client,
+    );
+  };
 
   const state: State = {
-    ...props,
-    tokens,
-    client,
-    slack,
-    slackClientFor: (p: Props) => {
-      return new SlackClient(
-        p.tokens?.access_token || p.botToken || "",
-        client,
-      );
-    },
+    ...appProps,
+    slack: slackClientFor(appProps),
+    slackClientFor,
   };
 
   return {
