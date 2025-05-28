@@ -24,5 +24,13 @@ export default async function listChannels(
   ctx: AppContext,
 ): Promise<SlackResponse<{ channels: SlackChannel[] }>> {
   const { limit, cursor } = props;
-  return await ctx.slack.getChannels(ctx.teamId, limit, cursor);
+  const teamId = ctx.teamId;
+
+  if (!teamId) {
+    throw new Error(
+      "Team ID is required. Please configure the Slack app with a valid team ID.",
+    );
+  }
+
+  return await ctx.slack.getChannels(teamId, limit, cursor);
 }

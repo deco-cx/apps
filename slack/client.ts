@@ -1,3 +1,6 @@
+import { OAuthClients } from "../mcp/utils/types.ts";
+import { SlackApiClient, SlackAuthClient } from "./utils/client.ts";
+
 /**
  * @description Response from Slack API with success/error information
  */
@@ -88,12 +91,17 @@ export interface SlackUser {
  */
 export class SlackClient {
   private botHeaders: { Authorization: string; "Content-Type": string };
+  private oauthClient?: OAuthClients<SlackApiClient, SlackAuthClient>;
 
-  constructor(botToken: string) {
+  constructor(
+    botToken: string,
+    oauthClient?: OAuthClients<SlackApiClient, SlackAuthClient>,
+  ) {
     this.botHeaders = {
       Authorization: `Bearer ${botToken}`,
       "Content-Type": "application/json",
     };
+    this.oauthClient = oauthClient;
   }
 
   /**
