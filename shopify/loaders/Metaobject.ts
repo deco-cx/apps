@@ -3,20 +3,20 @@
 import type { AppContext } from "../mod.ts";
 import type {
   Metaobject,
-  MetaobjectHandleInput, // Importar o tipo necessário
   QueryRoot,
+  MetaobjectHandleInput,
 } from "../utils/storefront/storefront.graphql.gen.ts";
 
 export interface FlexibleMetaobjectProps {
-  metaobjectType: string;
-  handle?: string;
+  metaobjectType?: string; // Opcional se 'id' for fornecido
+  handle?: string;         // Handle textual do metaobjeto (para buscar com 'type')
+  id?: string;             // GID do metaobjeto (ex: "gid://shopify/Metaobject/123")
   fields: string[];
-  first?: number;
-  after?: string;
+  first?: number;          // Para listar metaobjetos por tipo
+  after?: string;          // Para paginação ao listar
 }
 
-// MetaobjectNode permanece como antes
-export interface MetaobjectNode extends Omit<Metaobject, "fields" | "field"> { // Omitir também 'field' se for problemático
+export interface MetaobjectNode extends Omit<Metaobject, "fields" | "field"> {
   id: string;
   handle: string;
   type: string;
@@ -24,7 +24,6 @@ export interface MetaobjectNode extends Omit<Metaobject, "fields" | "field"> { /
   [key: string]: any;
 }
 
-// FlexibleMetaobjectConnection permanece como antes
 export interface FlexibleMetaobjectConnection {
   nodes: MetaobjectNode[];
   pageInfo: {
@@ -33,7 +32,6 @@ export interface FlexibleMetaobjectConnection {
   };
 }
 
-// FlexibleMetaobjectLoaderResult permanece como antes
 export interface FlexibleMetaobjectLoaderResult {
   metaobject?: MetaobjectNode | null;
   metaobjects?: FlexibleMetaobjectConnection | null;
@@ -48,14 +46,15 @@ const loader = async (
   const {
     metaobjectType,
     handle,
+    id, // Novo parâmetro
     fields = [],
     first = 10,
     after,
   } = props;
 
-  if (!metaobjectType || fields.length === 0) {
+  if (fields.length === 0) {
     console.warn(
-      "FlexibleMetaobject: 'metaobjectType' and 'fields' are mandatory and were not provided or 'fields' is empty.",
+      "FlexibleMetaobject: 'fields' are mandatory and were not provided or 'fields' is empty.",
     );
     return { metaobject: null, metaobjects: null };
   }
@@ -63,10 +62,22 @@ const loader = async (
   const fieldsString = fields.join("\n");
 
   let queryGQL: string;
-  let queryVariables: Record<string, any>; // Renomeado para clareza
+  let queryVariables: Record<string, any>;
 
-  if (handle) {
-    // CORREÇÃO 1: Ajustar a query para usar metaobject(handle: MetaobjectHandleInput!)
+  if (id) { // Prioridade para busca por GID
+    queryGQL = `
+      query GetMetaobjectById($id: ID!) {
+        metaobject(id: $id) {
+          id
+          handle
+          type
+          updatedAt
+          ${fieldsString}
+        }
+      }
+    `;
+    queryVariables = { id };
+  } else if (handle && metaobjectType) {
     queryGQL = `
       query GetMetaobjectByHandle($handleInput: MetaobjectHandleInput!) {
         metaobject(handle: $handleInput) {
@@ -79,12 +90,12 @@ const loader = async (
       }
     `;
     queryVariables = {
-      handleInput: { // Este é o objeto MetaobjectHandleInput
+      handleInput: {
         type: metaobjectType,
         handle: handle,
-      } as MetaobjectHandleInput, // Type assertion para maior segurança
+      } as MetaobjectHandleInput,
     };
-  } else {
+  } else if (metaobjectType) { // Listar por tipo
     queryGQL = `
       query GetMetaobjectsByType($type: String!, $first: Int!, $after: String) {
         metaobjects(type: $type, first: $first, after: $after, sortKey: HANDLE, reverse: false) {
@@ -109,43 +120,38 @@ const loader = async (
     if (after) {
       queryVariables.after = after;
     }
+  } else {
+    console.warn(
+      "FlexibleMetaobject: Either 'id', or 'handle' and 'metaobjectType', or just 'metaobjectType' (for listing) must be provided.",
+    );
+    return { metaobject: null, metaobjects: null };
   }
 
-  // Definindo os tipos para TData e TVariables explicitamente
   type QueryResultType = {
-    metaobject?: QueryRoot["metaobject"]; // CORREÇÃO 1: Usar metaobject
+    metaobject?: QueryRoot["metaobject"];
     metaobjects?: QueryRoot["metaobjects"];
   };
   type QueryVariablesType = typeof queryVariables;
 
   try {
-    // CORREÇÃO 2: Chamar storefront.query com um único objeto como argumento
-    // e fornecer os dois argumentos de tipo (TData, TVariables)
     const data = await storefront.query<QueryResultType, QueryVariablesType>(
       {
-        query: queryGQL, // A string da query
-        variables: queryVariables, // O objeto de variáveis
+        query: queryGQL,
+        variables: queryVariables,
       },
     );
 
-    if (handle && data?.metaobject) { // CORREÇÃO 1: Acessar data.metaobject
-      const resultMetaobject = data.metaobject as
-        | MetaobjectNode
-        | null
-        | undefined;
+    if (id || (handle && metaobjectType)) { // Se buscou um único objeto
+      const resultMetaobject = data.metaobject as MetaobjectNode | null | undefined;
       return { metaobject: resultMetaobject };
-    } else if (!handle && data?.metaobjects) {
-      const resultMetaobjects = data.metaobjects as unknown as
-        | FlexibleMetaobjectConnection
-        | null
-        | undefined;
+    } else if (metaobjectType) { // Se listou objetos
+      const resultMetaobjects = data.metaobjects as unknown as FlexibleMetaobjectConnection | null | undefined;
       return { metaobjects: resultMetaobjects };
     }
-    // Caso data seja null ou os campos esperados não existam
     return { metaobject: null, metaobjects: null };
+
   } catch (error) {
     console.error("Error fetching metaobjects:", error);
-    // Considerar lançar o erro para tratamento global, se aplicável
     return { metaobject: null, metaobjects: null };
   }
 };
