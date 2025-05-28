@@ -3,8 +3,8 @@
 import type { AppContext } from "../mod.ts";
 import type {
   Metaobject,
-  QueryRoot,
   MetaobjectHandleInput, // Importar o tipo necessário
+  QueryRoot,
 } from "../utils/storefront/storefront.graphql.gen.ts";
 
 export interface FlexibleMetaobjectProps {
@@ -129,15 +129,20 @@ const loader = async (
     );
 
     if (handle && data?.metaobject) { // CORREÇÃO 1: Acessar data.metaobject
-      const resultMetaobject = data.metaobject as MetaobjectNode | null | undefined;
+      const resultMetaobject = data.metaobject as
+        | MetaobjectNode
+        | null
+        | undefined;
       return { metaobject: resultMetaobject };
     } else if (!handle && data?.metaobjects) {
-      const resultMetaobjects = data.metaobjects as unknown as FlexibleMetaobjectConnection | null | undefined;
+      const resultMetaobjects = data.metaobjects as unknown as
+        | FlexibleMetaobjectConnection
+        | null
+        | undefined;
       return { metaobjects: resultMetaobjects };
     }
     // Caso data seja null ou os campos esperados não existam
     return { metaobject: null, metaobjects: null };
-
   } catch (error) {
     console.error("Error fetching metaobjects:", error);
     // Considerar lançar o erro para tratamento global, se aplicável
