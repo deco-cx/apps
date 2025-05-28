@@ -19,6 +19,7 @@ import {
   OAUTH_URL_AUTH,
   SCOPES,
 } from "./utils/constants.ts";
+import { Callbacks } from "../mcp/bindings.ts";
 
 export const SlackProvider: OAuthProvider = {
   name: "Slack",
@@ -58,11 +59,17 @@ export interface Props {
    * @description An url that new messages will be sent to
    */
   webhookUrl?: string;
+
+  /**
+   * @description Callbacks for the slack binding
+   */
+  callbacks?: Callbacks;
 }
 
 export interface State extends Props {
   client: OAuthClients<SlackApiClient, SlackAuthClient>;
   slack: SlackClient;
+  slackClientFor: (p: Props) => SlackClient;
 }
 
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
@@ -123,6 +130,12 @@ export default function App(
     tokens,
     client,
     slack,
+    slackClientFor: (p: Props) => {
+      return new SlackClient(
+        p.tokens?.access_token || p.botToken || "",
+        client,
+      );
+    },
   };
 
   return {
