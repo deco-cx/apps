@@ -67,13 +67,14 @@ const action = async (
     ) {
       return new Response(
         JSON.stringify({
-          error: `Field name "${name}" already exists in this table or is empty. Please choose a different name.`,
+          error:
+            `Field name "${name}" already exists in this table or is empty. Please choose a different name.`,
           type: "DUPLICATE_OR_EMPTY_FIELD_NAME",
         }),
-        { 
+        {
           status: 422,
-          headers: { "Content-Type": "application/json" }
-        }
+          headers: { "Content-Type": "application/json" },
+        },
       );
     }
 
@@ -82,10 +83,10 @@ const action = async (
         error: `Error updating field: ${response.statusText}`,
         status: response.status,
       }),
-      { 
+      {
         status: response.status,
-        headers: { "Content-Type": "application/json" }
-      }
+        headers: { "Content-Type": "application/json" },
+      },
     );
   }
 
