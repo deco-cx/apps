@@ -8,6 +8,18 @@ import * as $$$$$$$$$2 from "./actions/cart/simulation.ts";
 import * as $$$$$$$$$3 from "./actions/cart/updateCart.ts";
 import * as $$$$$$$$$4 from "./actions/cart/updateItem.ts";
 import * as $$$$$$$$$5 from "./actions/notifyme.ts";
+import * as $$$$$$$$$6 from "./actions/products/createProduct.ts";
+import * as $$$$$$$$$7 from "./actions/products/deleteProduct.ts";
+import * as $$$$$$$$$8 from "./actions/products/getProduct.ts";
+import * as $$$$$$$$$9 from "./actions/products/images/createImage.ts";
+import * as $$$$$$$$$10 from "./actions/products/listProducts.ts";
+import * as $$$$$$$$$11 from "./actions/products/rateProduct.ts";
+import * as $$$$$$$$$12 from "./actions/products/searchProducts.ts";
+import * as $$$$$$$$$13 from "./actions/products/updateProduct.ts";
+import * as $$$$$$$$$14 from "./actions/products/updateProductByReference.ts";
+import * as $$$$$$$$$15 from "./actions/products/variants/createVariant.ts";
+import * as $$$$$$$$$16 from "./actions/products/variants/deleteVariant.ts";
+import * as $$$$$$$$$17 from "./actions/products/variants/listVariants.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/extensions/price/list.ts";
@@ -39,6 +51,18 @@ const manifest = {
     "vnda/actions/cart/updateCart.ts": $$$$$$$$$3,
     "vnda/actions/cart/updateItem.ts": $$$$$$$$$4,
     "vnda/actions/notifyme.ts": $$$$$$$$$5,
+    "vnda/actions/products/createProduct.ts": $$$$$$$$$6,
+    "vnda/actions/products/deleteProduct.ts": $$$$$$$$$7,
+    "vnda/actions/products/getProduct.ts": $$$$$$$$$8,
+    "vnda/actions/products/images/createImage.ts": $$$$$$$$$9,
+    "vnda/actions/products/listProducts.ts": $$$$$$$$$10,
+    "vnda/actions/products/rateProduct.ts": $$$$$$$$$11,
+    "vnda/actions/products/searchProducts.ts": $$$$$$$$$12,
+    "vnda/actions/products/updateProduct.ts": $$$$$$$$$13,
+    "vnda/actions/products/updateProductByReference.ts": $$$$$$$$$14,
+    "vnda/actions/products/variants/createVariant.ts": $$$$$$$$$15,
+    "vnda/actions/products/variants/deleteVariant.ts": $$$$$$$$$16,
+    "vnda/actions/products/variants/listVariants.ts": $$$$$$$$$17,
   },
   "name": "vnda",
   "baseUrl": import.meta.url,

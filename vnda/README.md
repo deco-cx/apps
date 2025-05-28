@@ -1,11 +1,29 @@
+# VNDA
 
+VNDA integration for deco.cx.
 
-Your online store with the best e-commerce platform.
+This app allows integration with VNDA API for e-commerce functionalities.
 
-Loaders, actions and workflows for adding VNDA Commerce Platform to your deco.cx website.
+## Product Management Actions
 
-VNDA offers a range of features and services to facilitate e-commerce operations.
+The following actions have been created for product management based on the VNDA API:
 
-This app wrapps VNDA Commerce API into a comprehensive set of
-loaders/actions/workflows empowering non technical users to interact and act
-upon their headless commerce.
+### Products
+- **createProduct.ts** - Cria um novo produto no catálogo
+- **updateProduct.ts** - Atualiza um produto existente 
+- **deleteProduct.ts** - Remove um produto do catálogo
+- **getProduct.ts** - Retorna um produto específico
+- **listProducts.ts** - Lista produtos do catálogo
+- **searchProducts.ts** - Busca produtos com filtros avançados
+- **rateProduct.ts** - Avalia um produto
+- **updateProductByReference.ts** - Atualiza produto pela referência
+
+### Product Variants
+- **variants/createVariant.ts** - Cria uma variante de produto
+- **variants/listVariants.ts** - Lista variantes de um produto
+- **variants/deleteVariant.ts** - Remove uma variante
+
+### Product Images
+- **images/createImage.ts** - Cria uma imagem do produto
+
+All actions follow the VNDA API specification and include proper TypeScript types and documentation.
