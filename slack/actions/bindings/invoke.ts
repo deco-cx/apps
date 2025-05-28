@@ -1,11 +1,11 @@
-import { processStream } from "../../../mcp/bindings.ts";
+import { Callbacks, processStream } from "../../../mcp/bindings.ts";
 import type { AppContext, SlackWebhookPayload } from "../../mod.ts";
 
 /**
  * @name ON_BINDING_INVOKED
  * @description This action is triggered when slack sends a webhook event
  */
-export default function invoke(
+export default async function invoke(
   props: SlackWebhookPayload & { challenge?: string },
   _req: Request,
   ctx: AppContext,
@@ -15,8 +15,16 @@ export default function invoke(
     return { challenge };
   }
 
-  if (!ctx.callbacks) {
-    return;
+  let callbacks = ctx.callbacks;
+  if (!callbacks) {
+    if (!ctx.appStorage) {
+      return;
+    }
+    callbacks = await ctx.appStorage.getItem<Callbacks>(props.event.team) ??
+      undefined;
+    if (!callbacks) {
+      return;
+    }
   }
 
   let buffer = "";
@@ -38,5 +46,5 @@ export default function invoke(
     onFinishMessagePart: () => {
       ctx.slack.postMessage(props.event.channel, buffer);
     },
-  }, ctx.callbacks.stream);
+  }, callbacks.stream);
 }
