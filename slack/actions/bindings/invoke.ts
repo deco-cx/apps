@@ -23,7 +23,7 @@ export default async function invoke(
   if (!callbacks) {
     return;
   }
-
+  console.log("slack callbacks", callbacks);
   let buffer = "";
   processStream({
     streamProps: {
