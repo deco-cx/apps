@@ -10,13 +10,12 @@ export default async function created(
   _req: Request,
   ctx: AppContext,
 ) {
-  console.log("created", props, ctx.teamId, ctx.installId, _req.url);
-  if (ctx.appStorage && ctx.teamId) {
-    console.log("setting item");
-    await ctx.appStorage.setItem(ctx.teamId, {
+  const config = await ctx.getConfiguration(ctx.installId);
+  const teamId = ctx.teamId ?? config.teamId;
+  if (ctx.appStorage && teamId) {
+    await ctx.appStorage.setItem(teamId, {
       installId: ctx.installId,
       ...props,
     });
-    console.log(await ctx.appStorage.getItem(ctx.teamId));
   }
 }

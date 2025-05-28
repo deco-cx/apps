@@ -18,18 +18,15 @@ export default async function invoke(
   if (!ctx.appStorage) {
     return;
   }
-  console.log("props", props);
   const bindingProps =
     await ctx.appStorage.getItem<OnCreatedBindingProps & { installId: string }>(
       props.event.team,
     ) ??
       undefined;
-  console.log("bindingProps", bindingProps);
   if (!bindingProps) {
     return;
   }
   const config = await ctx.getConfiguration(bindingProps.installId);
-  console.log("config", config);
   const client = ctx.slackClientFor(config);
   let buffer = "";
   processStream({
@@ -51,11 +48,7 @@ export default async function invoke(
       console.error("error on part", err);
     },
     onFinishMessagePart: () => {
-      client.postMessage(props.event.channel, buffer).then(() => {
-        console.log("message sent");
-      }).catch((err) => {
-        console.error("error sending message", err);
-      });
+      client.postMessage(props.event.channel, buffer);
     },
   }, bindingProps.callbacks.stream);
 }
