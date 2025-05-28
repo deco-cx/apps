@@ -11,6 +11,7 @@ export default async function deleted(
   ctx: AppContext,
 ) {
   if (ctx.appStorage && ctx.teamId) {
+    console.log("removing item", ctx.teamId);
     await ctx.appStorage.removeItem(ctx.teamId);
   }
 }
