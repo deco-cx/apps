@@ -18,6 +18,7 @@ export default async function invoke(
   if (!ctx.appStorage) {
     return;
   }
+  console.log("props", props);
   const bindingProps =
     await ctx.appStorage.getItem<OnCreatedBindingProps & { installId: string }>(
       props.event.team,
