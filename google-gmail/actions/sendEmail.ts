@@ -64,6 +64,23 @@ interface SendEmailResponse {
 }
 
 /**
+ * Encode subject line for MIME headers (RFC 2047)
+ * @param subject - The subject string to encode
+ * @returns Encoded subject string
+ */
+function encodeSubject(subject: string): string {
+  // Check if subject contains non-ASCII characters
+  // deno-lint-ignore no-control-regex
+  if (/[^\u0000-\u007F]/.test(subject)) {
+    // Use base64 encoding for UTF-8
+    const encoded = btoa(unescape(encodeURIComponent(subject)));
+    return `=?UTF-8?B?${encoded}?=`;
+  }
+  // Return as-is if only ASCII characters
+  return subject;
+}
+
+/**
  * @title Send Email
  * @description Sends an email through Gmail API
  */
@@ -107,7 +124,7 @@ const action = async (
     const headers = [
       "MIME-Version: 1.0",
       `To: ${to}`,
-      `Subject: ${subject}`,
+      `Subject: ${encodeSubject(subject)}`,
     ];
 
     if (cc) headers.push(`Cc: ${cc}`);
