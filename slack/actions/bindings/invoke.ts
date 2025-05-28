@@ -15,16 +15,13 @@ export default async function invoke(
     return { challenge };
   }
 
-  let callbacks = ctx.callbacks;
+  if (!ctx.appStorage) {
+    return;
+  }
+  const callbacks = await ctx.appStorage.getItem<Callbacks>(props.event.team) ??
+    undefined;
   if (!callbacks) {
-    if (!ctx.appStorage) {
-      return;
-    }
-    callbacks = await ctx.appStorage.getItem<Callbacks>(props.event.team) ??
-      undefined;
-    if (!callbacks) {
-      return;
-    }
+    return;
   }
 
   let buffer = "";

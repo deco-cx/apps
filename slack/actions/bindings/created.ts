@@ -10,9 +10,7 @@ export default async function created(
   _req: Request,
   ctx: AppContext,
 ) {
-  const c = await ctx.getConfiguration();
-  await ctx.configure({ ...c, callbacks: props.callbacks });
-  if (ctx.appStorage && c.teamId) {
-    await ctx.appStorage.setItem(c.teamId, props.callbacks);
+  if (ctx.appStorage && ctx.teamId) {
+    await ctx.appStorage.setItem(ctx.teamId, props.callbacks);
   }
 }

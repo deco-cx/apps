@@ -1,25 +1,24 @@
-import { createOAuthHttpClient } from "../mcp/utils/httpClient.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
 import type { FnContext } from "@deco/deco";
 import { McpContext } from "../mcp/context.ts";
+import {
+  DEFAULT_OAUTH_HEADERS,
+  OAuthClientOptions,
+} from "../mcp/utils/config.ts";
+import { createOAuthHttpClient } from "../mcp/utils/httpClient.ts";
+import {
+  OAuthClients,
+  OAuthProvider,
+  OAuthTokens,
+} from "../mcp/utils/types.ts";
+import { SlackClient } from "./client.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
+import { SlackApiClient, SlackAuthClient } from "./utils/client.ts";
 import {
   API_URL,
   OAUTH_URL,
   OAUTH_URL_AUTH,
   SCOPES,
 } from "./utils/constants.ts";
-import { SlackClient } from "./client.ts";
-import { SlackApiClient, SlackAuthClient } from "./utils/client.ts";
-import {
-  DEFAULT_OAUTH_HEADERS,
-  OAuthClientOptions,
-} from "../mcp/utils/config.ts";
-import {
-  OAuthClients,
-  OAuthProvider,
-  OAuthTokens,
-} from "../mcp/utils/types.ts";
-import { Callbacks } from "../mcp/bindings.ts";
 
 export const SlackProvider: OAuthProvider = {
   name: "Slack",
@@ -59,11 +58,6 @@ export interface Props {
    * @description An url that new messages will be sent to
    */
   webhookUrl?: string;
-
-  /**
-   * @hide true
-   */
-  callbacks?: Callbacks;
 }
 
 export interface State extends Props {

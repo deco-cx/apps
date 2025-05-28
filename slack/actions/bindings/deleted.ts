@@ -10,6 +10,7 @@ export default async function deleted(
   _req: Request,
   ctx: AppContext,
 ) {
-  const c = await ctx.getConfiguration();
-  await ctx.configure({ ...c, callbacks: undefined });
+  if (ctx.appStorage && ctx.teamId) {
+    await ctx.appStorage.removeItem(ctx.teamId);
+  }
 }
