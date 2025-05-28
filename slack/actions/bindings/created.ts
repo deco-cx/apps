@@ -10,6 +10,7 @@ export default async function created(
   _req: Request,
   ctx: AppContext,
 ) {
+  console.log("created", { props });
   if (ctx.appStorage && ctx.teamId) {
     await ctx.appStorage.setItem(ctx.teamId, props.callbacks);
   }
