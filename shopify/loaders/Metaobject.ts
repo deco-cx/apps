@@ -3,17 +3,17 @@
 import type { AppContext } from "../mod.ts";
 import type {
   Metaobject,
-  QueryRoot,
   MetaobjectHandleInput,
+  QueryRoot,
 } from "../utils/storefront/storefront.graphql.gen.ts";
 
 export interface FlexibleMetaobjectProps {
   metaobjectType?: string; // Opcional se 'id' for fornecido
-  handle?: string;         // Handle textual do metaobjeto (para buscar com 'type')
-  id?: string;             // GID do metaobjeto (ex: "gid://shopify/Metaobject/123")
+  handle?: string; // Handle textual do metaobjeto (para buscar com 'type')
+  id?: string; // GID do metaobjeto (ex: "gid://shopify/Metaobject/123")
   fields: string[];
-  first?: number;          // Para listar metaobjetos por tipo
-  after?: string;          // Para paginação ao listar
+  first?: number; // Para listar metaobjetos por tipo
+  after?: string; // Para paginação ao listar
 }
 
 export interface MetaobjectNode extends Omit<Metaobject, "fields" | "field"> {
@@ -142,14 +142,19 @@ const loader = async (
     );
 
     if (id || (handle && metaobjectType)) { // Se buscou um único objeto
-      const resultMetaobject = data.metaobject as MetaobjectNode | null | undefined;
+      const resultMetaobject = data.metaobject as
+        | MetaobjectNode
+        | null
+        | undefined;
       return { metaobject: resultMetaobject };
     } else if (metaobjectType) { // Se listou objetos
-      const resultMetaobjects = data.metaobjects as unknown as FlexibleMetaobjectConnection | null | undefined;
+      const resultMetaobjects = data.metaobjects as unknown as
+        | FlexibleMetaobjectConnection
+        | null
+        | undefined;
       return { metaobjects: resultMetaobjects };
     }
     return { metaobject: null, metaobjects: null };
-
   } catch (error) {
     console.error("Error fetching metaobjects:", error);
     return { metaobject: null, metaobjects: null };
