@@ -9,7 +9,7 @@ export interface Props {
 export default function start(props: Props) {
   const authParams = new URLSearchParams({
     client_id: props.clientId,
-    redirect_uri: props.redirectUri,
+    redirect_uri: props.redirectUri.replace("http", "https"),
     response_type: "code",
     scope: SCOPES.join(","),
     state: props.state,
