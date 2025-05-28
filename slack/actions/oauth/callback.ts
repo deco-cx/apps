@@ -32,7 +32,7 @@ export default async function callback(
       code,
       client_id: clientId,
       client_secret: clientSecret,
-      redirect_uri: finalRedirectUri,
+      redirect_uri: finalRedirectUri.replace("http", "https"),
     }),
   });
 
@@ -48,17 +48,17 @@ export default async function callback(
   const currentCtx = await ctx.getConfiguration();
   await ctx.configure({
     ...currentCtx,
+    botToken: tokenData.access_token, // Bot token for API calls
+    userToken: tokenData.authed_user.access_token, // User token if needed
+    teamId: tokenData.team.id,
+    clientSecret: clientSecret,
+    clientId: clientId,
     tokens: {
       access_token: tokenData.access_token,
       scope: tokenData.scope,
       token_type: tokenData.token_type,
       tokenObtainedAt: currentTime,
     },
-    botToken: tokenData.access_token, // Bot token for API calls
-    userToken: tokenData.authed_user.access_token, // User token if needed
-    teamId: tokenData.team.id,
-    clientSecret: clientSecret,
-    clientId: clientId,
   });
 
   return { installId };
