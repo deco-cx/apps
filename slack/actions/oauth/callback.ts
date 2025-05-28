@@ -26,9 +26,8 @@ export default async function callback(
     code,
     client_id: clientId,
     client_secret: clientSecret,
-    redirect_uri: finalRedirectUri.replace("http", "https"),
+    redirect_uri: finalRedirectUri.replace("http://", "https://"),
   });
-  console.log("oauth body", body);
   // Exchange code for tokens using Slack's oauth.v2.access endpoint
   const tokenResponse = await fetch("https://slack.com/api/oauth.v2.access", {
     method: "POST",

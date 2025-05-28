@@ -7,14 +7,13 @@ export interface Props {
 }
 
 export default function start(props: Props) {
-  console.log("oauthstart", props);
   const redirectUri = props.redirectUri instanceof URL
     ? props.redirectUri.href
     : props.redirectUri;
 
   const authParams = new URLSearchParams({
     client_id: props.clientId,
-    redirect_uri: redirectUri?.replace("http", "https"),
+    redirect_uri: redirectUri?.replace("http://", "https://"),
     response_type: "code",
     scope: SCOPES.join(","),
     state: props.state,
