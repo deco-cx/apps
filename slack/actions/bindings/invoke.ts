@@ -15,9 +15,11 @@ export default async function invoke(
     return { challenge };
   }
 
+  console.log("invoke", { props });
   if (!ctx.appStorage) {
     return;
   }
+  console.log("has appstore");
   const callbacks = await ctx.appStorage.getItem<Callbacks>(props.event.team) ??
     undefined;
   if (!callbacks) {
