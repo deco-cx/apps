@@ -15,9 +15,6 @@ export default async function invoke(
     return { challenge };
   }
 
-  if (!ctx.appStorage) {
-    return;
-  }
   const bindingProps =
     await ctx.appStorage.getItem<OnCreatedBindingProps & { installId: string }>(
       props.event.team,
@@ -33,7 +30,7 @@ export default async function invoke(
     streamProps: {
       messages: [{
         id: props.event_id,
-        content: props.event.text.replace(/^<@.*>\s*/, ""),
+        content: props.event.text,
         role: "user",
       }],
       options: {
