@@ -26,7 +26,7 @@ export default async function invoke(
   if (!bindingProps) {
     return;
   }
-  const config = await ctx.getConfig(bindingProps.installId);
+  const config = await ctx.getConfiguration(bindingProps.installId);
   const client = ctx.slackClientFor(config);
   let buffer = "";
   processStream({
