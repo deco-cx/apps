@@ -6,8 +6,6 @@ export const SCOPES = [
   "users:read",
   "users:read.email",
   "app_mentions:read",
-  "im:history",
-  "im:write",
 ];
 
 export const API_URL = "https://slack.com/api";
