@@ -22,18 +22,20 @@ export default async function callback(
   const finalRedirectUri = redirectUri ||
     new URL("/oauth/callback", req.url).href;
 
+  const body = new URLSearchParams({
+    code,
+    client_id: clientId,
+    client_secret: clientSecret,
+    redirect_uri: finalRedirectUri.replace("http", "https"),
+  });
+  console.log("oauth body", body);
   // Exchange code for tokens using Slack's oauth.v2.access endpoint
   const tokenResponse = await fetch("https://slack.com/api/oauth.v2.access", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: new URLSearchParams({
-      code,
-      client_id: clientId,
-      client_secret: clientSecret,
-      redirect_uri: finalRedirectUri.replace("http", "https"),
-    }),
+    body,
   });
 
   const tokenData = await tokenResponse.json() as SlackOAuthResponse;
