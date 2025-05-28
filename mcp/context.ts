@@ -7,6 +7,7 @@ export interface Storage {
 export interface McpContext<Props> {
   installId: string;
   appStorage: Storage;
+  getConfig: (installId: string) => Promise<Props>;
   configure: (props: Props) => Promise<void>;
   getConfiguration: () => Promise<Props> | Props;
 }

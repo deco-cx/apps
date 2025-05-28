@@ -1,4 +1,4 @@
-import { Callbacks, processStream } from "../../../mcp/bindings.ts";
+import { OnCreatedBindingProps, processStream } from "../../../mcp/bindings.ts";
 import type { AppContext, SlackWebhookPayload } from "../../mod.ts";
 
 /**
@@ -15,17 +15,19 @@ export default async function invoke(
     return { challenge };
   }
 
-  console.log("invoke", { props });
   if (!ctx.appStorage) {
     return;
   }
-  console.log("has appstore");
-  const callbacks = await ctx.appStorage.getItem<Callbacks>(props.event.team) ??
-    undefined;
-  if (!callbacks) {
+  const bindingProps =
+    await ctx.appStorage.getItem<OnCreatedBindingProps & { installId: string }>(
+      props.event.team,
+    ) ??
+      undefined;
+  if (!bindingProps) {
     return;
   }
-  console.log("slack callbacks", callbacks);
+  const config = await ctx.getConfig(bindingProps.installId);
+  const client = ctx.slackClientFor(config);
   let buffer = "";
   processStream({
     streamProps: {
@@ -43,7 +45,7 @@ export default async function invoke(
       buffer += part;
     },
     onFinishMessagePart: () => {
-      ctx.slack.postMessage(props.event.channel, buffer);
+      client.postMessage(props.event.channel, buffer);
     },
-  }, callbacks.stream);
+  }, bindingProps.callbacks.stream);
 }
