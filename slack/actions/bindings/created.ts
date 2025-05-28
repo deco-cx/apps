@@ -12,9 +12,7 @@ export default async function created(
 ) {
   const config = await ctx.getConfiguration(ctx.installId);
   const teamId = ctx.teamId ?? config.teamId;
-  console.log("created", props, teamId, ctx.installId, _req.url);
   if (ctx.appStorage && teamId) {
-    console.log("setting item");
     await ctx.appStorage.setItem(teamId, {
       installId: ctx.installId,
       ...props,
