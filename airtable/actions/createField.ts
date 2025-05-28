@@ -49,7 +49,37 @@ const action = async (
     );
 
   if (!response.ok) {
-    throw new Error(`Error creating field: ${response.statusText}`);
+    const errorData = await response.json().catch(() => ({})) as {
+      error?: { type?: string };
+    };
+
+    if (
+      response.status === 422 &&
+      errorData.error?.type === "DUPLICATE_OR_EMPTY_FIELD_NAME"
+    ) {
+      return new Response(
+        JSON.stringify({
+          error:
+            `Field name "${name}" already exists in this table or is empty. Please choose a different name.`,
+          type: "DUPLICATE_OR_EMPTY_FIELD_NAME",
+        }),
+        {
+          status: 422,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        error: `Error creating field: ${response.statusText}`,
+        status: response.status,
+      }),
+      {
+        status: response.status,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   }
 
   return response.json();
