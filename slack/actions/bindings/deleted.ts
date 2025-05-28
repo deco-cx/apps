@@ -10,8 +10,9 @@ export default async function deleted(
   _req: Request,
   ctx: AppContext,
 ) {
-  if (ctx.appStorage && ctx.teamId) {
-    console.log("removing item", ctx.teamId);
-    await ctx.appStorage.removeItem(ctx.teamId);
+  const config = await ctx.getConfiguration(ctx.installId);
+  const teamId = ctx.teamId ?? config.teamId;
+  if (ctx.appStorage && teamId) {
+    await ctx.appStorage.removeItem(teamId);
   }
 }
