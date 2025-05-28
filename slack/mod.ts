@@ -19,6 +19,7 @@ import {
   OAuthProvider,
   OAuthTokens,
 } from "../mcp/utils/types.ts";
+import { Callbacks } from "../mcp/bindings.ts";
 
 export const SlackProvider: OAuthProvider = {
   name: "Slack",
@@ -58,6 +59,11 @@ export interface Props {
    * @description An url that new messages will be sent to
    */
   webhookUrl?: string;
+
+  /**
+   * @hide true
+   */
+  callbacks?: Callbacks;
 }
 
 export interface State extends Props {

@@ -83,22 +83,7 @@ export default async function callback(
   ctx: AppContext,
 ): Promise<{ installId: string; error?: string }> {
   try {
-    const missingParams = [];
-    if (!code) missingParams.push("code");
-    if (!state) missingParams.push("state");
-    if (!clientId) missingParams.push("clientId");
-    if (!clientSecret) missingParams.push("clientSecret");
-    if (!redirectUri) missingParams.push("redirectUri");
-
-    if (missingParams.length > 0) {
-      throw new Error(
-        `Missing required OAuth parameters: ${missingParams.join(", ")}`,
-      );
-    }
-
-    if (code.length < 10) {
-      throw new Error("Authorization code appears to be too short or invalid");
-    }
+    const uri = redirectUri || new URL("/oauth/callback", _req.url).href;
 
     const codeVerifier = extractCodeVerifier(state);
     if (!codeVerifier) {
@@ -107,13 +92,12 @@ export default async function callback(
       );
     }
 
-    // Create Basic Auth header for client credentials
     const credentials = btoa(`${clientId}:${clientSecret}`);
 
     const tokenRequestBody = new URLSearchParams({
       grant_type: "authorization_code",
       code,
-      redirect_uri: redirectUri,
+      redirect_uri: uri,
       code_verifier: codeVerifier,
     });
 
