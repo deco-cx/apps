@@ -73,6 +73,18 @@ export interface Client {
       labels?: string;
     };
   };
+  "POST /repos/:owner/:repo/issues": {
+    response: GithubIssue;
+    body: {
+      title: string;
+      body?: string;
+      labels?: string[];
+    };
+    searchParams: {
+      owner: string;
+      repo: string;
+    };
+  };
 }
 
 export interface ClientOauth {
