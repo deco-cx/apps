@@ -75,12 +75,21 @@ const loader = async (
       typeof err === "object" &&
       err !== null &&
       "response" in err &&
-      typeof (err as { response?: { status?: number } }).response === "object" &&
+      typeof (err as { response?: { status?: number } }).response ===
+        "object" &&
       (err as { response?: { status?: number } }).response?.status === 410
     ) {
-      return { error: true, message: "The Issues tab is disabled for this repository. Please enable Issues in the repository settings to use this feature." };
+      return {
+        error: true,
+        message:
+          "The Issues tab is disabled for this repository. Please enable Issues in the repository settings to use this feature.",
+      };
     }
-    return { error: true, message: (err as Error)?.message || "Failed to fetch issues from the repository." };
+    return {
+      error: true,
+      message: (err as Error)?.message ||
+        "Failed to fetch issues from the repository.",
+    };
   }
 };
 
