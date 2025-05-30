@@ -8,7 +8,8 @@ import * as $$$0 from "./loaders/getAuthenticatedUser.ts";
 import * as $$$1 from "./loaders/getRepoFileContent.ts";
 import * as $$$2 from "./loaders/listAuthenticatedUserRepos.ts";
 import * as $$$3 from "./loaders/listPublicGists.ts";
-import * as $$$4 from "./loaders/oauth/start.ts";
+import * as $$$4 from "./loaders/listRepoIssues.ts";
+import * as $$$5 from "./loaders/oauth/start.ts";
 
 const manifest = {
   "loaders": {
@@ -16,7 +17,8 @@ const manifest = {
     "github/loaders/getRepoFileContent.ts": $$$1,
     "github/loaders/listAuthenticatedUserRepos.ts": $$$2,
     "github/loaders/listPublicGists.ts": $$$3,
-    "github/loaders/oauth/start.ts": $$$4,
+    "github/loaders/listRepoIssues.ts": $$$4,
+    "github/loaders/oauth/start.ts": $$$5,
   },
   "actions": {
     "github/actions/createGist.ts": $$$$$$$$$0,

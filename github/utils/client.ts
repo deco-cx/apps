@@ -1,6 +1,7 @@
 import { GithubUser } from "./types.ts";
 import type {
   GistSimple,
+  GithubIssue,
   OauthResponse,
   Repository,
   SimpleUser,
@@ -59,6 +60,17 @@ export interface Client {
       owner: string;
       repo: string;
       path: string;
+    };
+  };
+  "GET /repos/:owner/:repo/issues": {
+    response: GithubIssue[];
+    searchParams: {
+      owner: string;
+      repo: string;
+      state?: "open" | "closed" | "all";
+      per_page?: number;
+      page?: number;
+      labels?: string;
     };
   };
 }
