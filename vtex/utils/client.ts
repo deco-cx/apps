@@ -1,5 +1,6 @@
 import { Userorderslist } from "./openapi/vcs.openapi.gen.ts";
 import {
+  AuthResponse,
   Brand,
   Category,
   CreateNewDocument,
@@ -16,10 +17,39 @@ import {
   SimulationItem,
   SimulationOrderForm,
   SPEvent,
+  StartAuthentication,
   Suggestion,
 } from "./types.ts";
 
 export interface VTEXCommerceStable {
+  "GET /api/vtexid/pub/authentication/start": {
+    searchParams: {
+      scope?: string;
+      locale?: string;
+      appStart: boolean;
+      callbackUrl?: string;
+      returnUrl?: string;
+    };
+    response: StartAuthentication;
+  };
+  "POST /api/vtexid/pub/authentication/classic/validate": {
+    body: URLSearchParams;
+    response: AuthResponse;
+  };
+  "POST /api/vtexid/pub/authentication/accesskey/validate": {
+    body: URLSearchParams;
+    response: AuthResponse;
+  };
+  "POST /api/vtexid/pub/authentication/classic/setpassword": {
+    searchParams: { scope?: string; locale?: string };
+    body: URLSearchParams;
+    response: AuthResponse;
+  };
+  "POST /api/vtexid/pub/authentication/accesskey/send": {
+    searchParams: { deliveryMethod: "email" };
+    body: FormData;
+    response: Record<string, string>;
+  };
   "POST /api/checkout/pub/orderForm/:orderFormId/messages/clear": {
     // deno-lint-ignore no-explicit-any
     body: Record<any, never>;
