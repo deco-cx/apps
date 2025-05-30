@@ -77,7 +77,11 @@ const loader = async (
           issue_number: issueNumber,
         });
       const issue: GithubIssue = await response.json();
-      if (!issue || (typeof issue === "object" && issue !== null && "message" in issue && (issue as { message?: string }).message === "Not Found")) {
+      if (
+        !issue ||
+        (typeof issue === "object" && issue !== null && "message" in issue &&
+          (issue as { message?: string }).message === "Not Found")
+      ) {
         return {
           error: true,
           message: `Issue number ${issueNumber} not found in this repository.`,
@@ -99,7 +103,8 @@ const loader = async (
     if (mapped.length === 0) {
       return {
         error: true,
-        message: "This page contains only pull requests (no real issues). Try another page or adjust your filters.",
+        message:
+          "This page contains only pull requests (no real issues). Try another page or adjust your filters.",
       };
     }
     return mapped;
