@@ -85,6 +85,24 @@ export interface Client {
       repo: string;
     };
   };
+  "POST /repos/:owner/:repo/issues/:issue_number/comments": {
+    response: {
+      id: number;
+      html_url: string;
+      body: string;
+      user: { login: string };
+      created_at: string;
+      [key: string]: unknown;
+    };
+    body: {
+      body: string;
+    };
+    searchParams: {
+      owner: string;
+      repo: string;
+      issue_number: number;
+    };
+  };
 }
 
 export interface ClientOauth {
