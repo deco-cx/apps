@@ -1,6 +1,7 @@
 import { GithubUser } from "./types.ts";
 import type {
   GistSimple,
+  GithubIssue,
   OauthResponse,
   Repository,
   SimpleUser,
@@ -59,6 +60,55 @@ export interface Client {
       owner: string;
       repo: string;
       path: string;
+    };
+  };
+  "GET /repos/:owner/:repo/issues": {
+    response: GithubIssue[];
+    searchParams: {
+      owner: string;
+      repo: string;
+      state?: "open" | "closed" | "all";
+      per_page?: number;
+      page?: number;
+      labels?: string;
+    };
+  };
+  "GET /repos/:owner/:repo/issues/:issue_number": {
+    response: GithubIssue;
+    searchParams: {
+      owner: string;
+      repo: string;
+      issue_number: number;
+    };
+  };
+  "POST /repos/:owner/:repo/issues": {
+    response: GithubIssue;
+    body: {
+      title: string;
+      body?: string;
+      labels?: string[];
+    };
+    searchParams: {
+      owner: string;
+      repo: string;
+    };
+  };
+  "POST /repos/:owner/:repo/issues/:issue_number/comments": {
+    response: {
+      id: number;
+      html_url: string;
+      body: string;
+      user: { login: string };
+      created_at: string;
+      [key: string]: unknown;
+    };
+    body: {
+      body: string;
+    };
+    searchParams: {
+      owner: string;
+      repo: string;
+      issue_number: number;
     };
   };
 }
