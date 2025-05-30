@@ -120,7 +120,6 @@ export const pageTypesToSeo = (
     (!current || current.pageType === "Search" ||
       current.pageType === "FullText") && fullTextSearch
   ) {
-    console.log(url.host + url.pathname, "running here");
     return {
       title: capitalize(fullTextSearch),
       description: capitalize(fullTextSearch),
