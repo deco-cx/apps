@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("shopify-mcp"),
     app("google-gmail"),
     app("github"),
     app("turso-db"),
