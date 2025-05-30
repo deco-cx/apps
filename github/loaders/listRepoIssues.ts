@@ -14,9 +14,18 @@ interface RepoIdentify {
 
 interface IssueFilters {
   state?: "open" | "closed" | "all";
+  /**
+   * @title Per Page
+   * @description Number of items per page. Use a large value (e.g., 50 or 100) to increase the chance of getting real issues, since pages may contain only pull requests.
+   */
   per_page?: number;
+  /**
+   * @title Page
+   * @description Page number. Some pages may contain only pull requests (not real issues). Try different pages if you get empty results.
+   */
   page?: number;
   labels?: string;
+  issueNumber?: number;
 }
 
 export interface Props {
@@ -36,7 +45,7 @@ const loader = async (
 ): Promise<GithubIssueClean[] | { error: true; message: string }> => {
   const { repoIdentify, issueFilters } = props;
   const { url } = repoIdentify;
-  const { state, per_page, page, labels } = issueFilters;
+  const { state, per_page, page, labels, issueNumber } = issueFilters;
   let owner = repoIdentify?.owner;
   let repo = repoIdentify?.repo;
 
@@ -60,6 +69,23 @@ const loader = async (
   }
 
   try {
+    if (issueNumber) {
+      const response = await ctx.client
+        ["GET /repos/:owner/:repo/issues/:issue_number"]({
+          owner,
+          repo,
+          issue_number: issueNumber,
+        });
+      const issue: GithubIssue = await response.json();
+      if (!issue || (typeof issue === "object" && issue !== null && "message" in issue && (issue as { message?: string }).message === "Not Found")) {
+        return {
+          error: true,
+          message: `Issue number ${issueNumber} not found in this repository.`,
+        };
+      }
+      return mapIssues([issue]);
+    }
+
     const response = await ctx.client["GET /repos/:owner/:repo/issues"]({
       owner,
       repo,
@@ -69,7 +95,14 @@ const loader = async (
       labels,
     });
     const issues: GithubIssue[] = await response.json();
-    return mapIssues(issues);
+    const mapped = mapIssues(issues);
+    if (mapped.length === 0) {
+      return {
+        error: true,
+        message: "This page contains only pull requests (no real issues). Try another page or adjust your filters.",
+      };
+    }
+    return mapped;
   } catch (err: unknown) {
     if (
       typeof err === "object" &&

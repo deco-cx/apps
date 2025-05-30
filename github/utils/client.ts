@@ -73,6 +73,14 @@ export interface Client {
       labels?: string;
     };
   };
+  "GET /repos/:owner/:repo/issues/:issue_number": {
+    response: GithubIssue;
+    searchParams: {
+      owner: string;
+      repo: string;
+      issue_number: number;
+    };
+  };
   "POST /repos/:owner/:repo/issues": {
     response: GithubIssue;
     body: {
