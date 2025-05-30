@@ -87,7 +87,7 @@ export const pageTypesToBreadcrumbList = (
   const filteredPages = pages
     .filter(({ pageType }) =>
       pageType === "Category" || pageType === "Department" ||
-      pageType === "SubCategory"
+      pageType === "SubCategory" || pageType === "Brand"
     );
 
   return filteredPages.map((page, index) => {
@@ -136,7 +136,8 @@ export const pageTypesToSeo = (
     noIndexing: hasMapTermOrSkuId,
     canonical: toCanonical(
       new URL(
-        (current.url && current.pageType !== "Collection")
+        (current.url && current.pageType !== "Collection" &&
+            current.pageType !== "Brand")
           ? current.url.replace(/.+\.vtexcommercestable\.com\.br/, "")
             .toLowerCase()
           : url,

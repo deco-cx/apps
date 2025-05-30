@@ -5,14 +5,20 @@ import {
   setISCookiesBag,
 } from "./utils/intelligentSearch.ts";
 import { getSegmentFromBag, setSegmentBag } from "./utils/segment.ts";
+import {
+  resolveSkipSimulationBehavior,
+  setSkipSimulationBehaviorToBag,
+} from "./utils/simulationBehavior.ts";
 
-export const middleware = (
+export const middleware = async (
   _props: unknown,
   req: Request,
   ctx: AppMiddlewareContext,
 ) => {
   const segment = getSegmentFromBag(ctx);
   const isCookies = getISCookiesFromBag(ctx);
+  const skipSimulationBehavior = await resolveSkipSimulationBehavior(ctx, req);
+  setSkipSimulationBehaviorToBag(ctx, skipSimulationBehavior);
 
   if (!isCookies || !segment) {
     const cookies = getCookies(req.headers);

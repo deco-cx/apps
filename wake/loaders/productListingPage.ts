@@ -1,7 +1,9 @@
+import { logger } from "@deco/deco/o11y";
 import type { ProductListingPage } from "../../commerce/types.ts";
 import { SortOption } from "../../commerce/types.ts";
 import { capitalize } from "../../utils/capitalize.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import { safeJsonSerialize } from "../../website/utils/html.ts";
 import type { AppContext } from "../mod.ts";
 import {
   getVariations,
@@ -35,7 +37,6 @@ import {
   toProduct,
 } from "../utils/transform.ts";
 import { Filters } from "./productList.ts";
-import { logger } from "@deco/deco/o11y";
 
 export type Sort =
   | "NAME:ASC"
@@ -320,11 +321,11 @@ const searchLoader = async (
     },
     sortOptions: SORT_OPTIONS,
     breadcrumb,
-    seo: {
+    seo: safeJsonSerialize({
       description: description || "",
       title: title || "",
       canonical,
-    },
+    }),
     products: products
       ?.filter((p): p is ProductFragment => Boolean(p))
       .map((variant) => {
