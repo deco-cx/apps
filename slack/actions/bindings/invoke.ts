@@ -35,6 +35,11 @@ export default async function invoke(
     return;
   }
   const client = ctx.slackClientFor(config);
+  const streamURL = new URL(bindingProps.callbacks.stream);
+  streamURL.searchParams.set(
+    "__d",
+    `slack-${props.event.team}-${props.event.channel}`,
+  );
   let buffer = "";
   processStream({
     streamProps: {
@@ -66,5 +71,5 @@ export default async function invoke(
         }
       });
     },
-  }, bindingProps.callbacks.stream);
+  }, streamURL.href);
 }
