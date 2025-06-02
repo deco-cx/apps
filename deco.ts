@@ -77,6 +77,7 @@ const config = {
     app("sap"),
     app("tiptap-cloud"),
     app("browser-use"),
+    app("clearsale"),
     ...compatibilityApps,
   ],
 };
