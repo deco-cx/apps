@@ -86,6 +86,8 @@ export interface SlackUser {
   is_bot: boolean;
 }
 
+export type ChannelType = "public_channel" | "private_channel" | "mpim" | "im";
+
 /**
  * @description Client for interacting with Slack APIs
  */
@@ -114,9 +116,10 @@ export class SlackClient {
     teamId: string,
     limit: number = 100,
     cursor?: string,
+    types: ChannelType[] = ["public_channel"],
   ): Promise<SlackResponse<{ channels: SlackChannel[] }>> {
     const params = new URLSearchParams({
-      types: "public_channel",
+      types: types.join(","),
       exclude_archived: "true",
       limit: Math.min(limit, 200).toString(),
       team_id: teamId,
