@@ -86,6 +86,21 @@ export interface SlackUser {
   is_bot: boolean;
 }
 
+/**
+ * @description Response from Slack auth.test endpoint
+ */
+export interface SlackAuthTestResponse {
+  ok: boolean;
+  url: string;
+  team: string;
+  user: string;
+  team_id: string;
+  user_id: string;
+  bot_id?: string;
+  is_enterprise_install?: boolean;
+  enterprise_id?: string;
+}
+
 export type ChannelType = "public_channel" | "private_channel" | "mpim" | "im";
 
 /**
@@ -297,6 +312,17 @@ export class SlackClient {
       `https://slack.com/api/users.profile.get?${params}`,
       { headers: this.botHeaders },
     );
+
+    return response.json();
+  }
+
+  /**
+   * @description Tests authentication and returns basic information about the authenticated user/team
+   */
+  async testAuth(): Promise<SlackResponse<SlackAuthTestResponse>> {
+    const response = await fetch("https://slack.com/api/auth.test", {
+      headers: this.botHeaders,
+    });
 
     return response.json();
   }
