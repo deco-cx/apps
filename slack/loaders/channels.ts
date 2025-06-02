@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { SlackChannel, SlackResponse } from "../client.ts";
+import type { ChannelType, SlackChannel, SlackResponse } from "../client.ts";
 
 export interface Props {
   /**
@@ -11,6 +11,11 @@ export interface Props {
    * @description Pagination cursor for next page of results
    */
   cursor?: string;
+  /**
+   * @description Types of channels to return
+   * @default ["public_channel"]
+   */
+  types?: ChannelType[];
 }
 
 /**
@@ -23,7 +28,7 @@ export default async function listChannels(
   _req: Request,
   ctx: AppContext,
 ): Promise<SlackResponse<{ channels: SlackChannel[] }>> {
-  const { limit, cursor } = props;
+  const { limit, cursor, types } = props;
   const teamId = ctx.teamId;
 
   if (!teamId) {
@@ -32,5 +37,5 @@ export default async function listChannels(
     );
   }
 
-  return await ctx.slack.getChannels(teamId, limit, cursor);
+  return await ctx.slack.getChannels(teamId, limit, cursor, types);
 }
