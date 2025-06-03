@@ -63,44 +63,33 @@ export interface Props {
   dateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
 }
 
-function extractLabels(query: string): string {
-  const labelMatch = query.match(/LABEL\s+([^;]+)/i);
-  if (!labelMatch) {
-    return "LABEL Col1 'Linha Original'";
-  }
-  return `LABEL ${labelMatch[1].trim()}`;
-}
-
 function sanitizeQueryString(query: string): string {
+  if (!query) return "WHERE 1=1 LABEL Col1 'Linha Original'";
+
   const processedQuery = query.trim();
 
-  let labelPart = "";
-  let queryPart = "";
+  // Uso de expressão regular única para processar a string em uma única passagem
+  const hasLabel = /LABEL\s+/i.test(processedQuery);
 
-  if (/LABEL\s+/i.test(processedQuery)) {
-    const parts = processedQuery.split(/LABEL\s+/i);
-    queryPart = parts[0].trim();
-    labelPart = extractLabels(processedQuery);
+  // Extrair label e query em uma única operação
+  let queryPart;
+  let labelPart;
+
+  if (hasLabel) {
+    [queryPart, labelPart] = processedQuery.split(/LABEL\s+/i, 2);
+    queryPart = queryPart.trim();
+    labelPart = `LABEL ${labelPart.trim()}`;
   } else {
     queryPart = processedQuery;
     labelPart = "LABEL Col1 'Linha Original'";
   }
 
-  queryPart = queryPart.replace(/^SELECT\s+\*(\s+FROM)?/i, "");
-
-  queryPart = queryPart.replace(/^WHERE\s+/i, "");
-
-  queryPart = queryPart.replace(/^\*\s+/i, "");
-
-  queryPart = queryPart.replace(/\*\s+where\s+/i, "");
-
-  queryPart = queryPart.replace(/\s+where\s+/gi, " ");
-
-  const finalQuery = queryPart.trim()
+  queryPart = queryPart
+    .replace(/^(SELECT\s+\*(\s+FROM)?|\*\s+|WHERE\s+)/i, "")
+    .replace(/\*\s+where\s+|\s+where\s+/gi, " ");
+  return queryPart.trim()
     ? `WHERE ${queryPart.trim()} ${labelPart}`.trim()
     : labelPart.trim();
-
-  return finalQuery;
 }
 
 function validateRange(range: string): string {
@@ -159,6 +148,7 @@ async function createTempQuerySheet(
 
     const validatedRange = validateRange(sourceRange);
     const headerOption = keepHeaders ? "1" : "0";
+
     const sanitizedQuery = typeof query === "string"
       ? sanitizeQueryString(query)
       : query;
@@ -314,10 +304,7 @@ const loader = async (
   }
 
   if (sheetsToSearch.length > 1) {
-    const allResults: ValueRange[] = [];
-    const sheetNames: string[] = [];
-
-    for (const sheet of sheetsToSearch) {
+    const processSheet = async (sheet: string) => {
       try {
         await createTempQuerySheet(
           ctx,
@@ -340,14 +327,30 @@ const loader = async (
         if (sheetResponse.ok) {
           const sheetData = await sheetResponse.json();
           if (sheetData.values && sheetData.values.length > 0) {
-            allResults.push(sheetData);
-            sheetNames.push(sheet);
+            return { data: sheetData, sheet };
           }
         }
+        return null;
       } finally {
         await deleteTempQuerySheet(ctx, spreadsheetId);
       }
-    }
+    };
+
+    const results = await Promise.allSettled(sheetsToSearch.map(processSheet));
+
+    const validResults = results
+      .filter((
+        result,
+      ): result is PromiseFulfilledResult<
+        { data: ValueRange; sheet: string }
+      > => result.status === "fulfilled" && result.value !== null)
+      .map((result) =>
+        (result as PromiseFulfilledResult<{ data: ValueRange; sheet: string }>)
+          .value
+      );
+
+    const allResults = validResults.map((r) => r.data);
+    const sheetNames = validResults.map((r) => r.sheet);
 
     return combineQueryResults(
       allResults,
@@ -386,16 +389,15 @@ const loader = async (
 
       const data = await response.json();
 
-      if (data.values) {
-        validateQueryResults(data.values, ctx.errorHandler);
+      if (!data.values) {
+        data.values = [];
       }
 
-      const hasDataBeyondHeaders = data.values &&
-        data.values.length > (keepHeaders ? 1 : 0);
-      const resultCount = data.values
-        ? data.values.length - (keepHeaders ? 1 : 0)
-        : 0;
+      validateQueryResults(data.values, ctx.errorHandler);
 
+      const startIndex = keepHeaders ? 1 : 0;
+      const hasDataBeyondHeaders = data.values.length > startIndex;
+      const resultCount = data.values.length - startIndex;
       const resultDetails: Array<{
         sheet: string;
         resultIndex: number;
@@ -404,43 +406,50 @@ const loader = async (
         columnRange: string;
       }> = [];
 
-      if (data.values && hasDataBeyondHeaders) {
-        const startIndex = keepHeaders ? 1 : 0;
+      if (hasDataBeyondHeaders) {
+        const sheetName = sheetsToSearch[0];
+        const getEndColumn = (() => {
+          const columnCache = new Map<number, string>();
+          return (count: number) => {
+            if (count === 0) return "A";
+            if (columnCache.has(count)) return columnCache.get(count)!;
+            const column = String.fromCharCode(64 + count);
+            columnCache.set(count, column);
+            return column;
+          };
+        })();
+
         data.values.slice(startIndex).forEach((row, rowIndex) => {
           const originalRow = row && row[0]
             ? parseInt(String(row[0]))
             : rowIndex + startIndex + 1;
           const dataColumns = row ? row.slice(1) : [];
           const columnCount = dataColumns.length;
-          const endColumn = columnCount > 0
-            ? String.fromCharCode(64 + columnCount)
-            : "A";
+          const endColumn = getEndColumn(columnCount);
 
           resultDetails.push({
-            sheet: sheetsToSearch[0],
+            sheet: sheetName,
             resultIndex: rowIndex,
             originalRowEstimate: originalRow,
-            columnCount: columnCount,
+            columnCount,
             columnRange: columnCount > 0 ? `A-${endColumn}` : "A",
           });
         });
       }
 
-      const enhancedData = {
-        ...data,
-        meta: {
-          totalResults: Math.max(0, resultCount),
-          hasResults: hasDataBeyondHeaders,
-          query: sanitizedQuery,
-          searchedSheet: sheetsToSearch[0],
-          message: hasDataBeyondHeaders
-            ? `Found ${resultCount} result(s)`
-            : "No data found matching the query criteria",
-          resultDetails: resultDetails,
-        },
+      // Adicionar metadados e retornar
+      data.meta = {
+        totalResults: resultCount,
+        hasResults: hasDataBeyondHeaders,
+        query: sanitizedQuery,
+        searchedSheet: sheetsToSearch[0],
+        message: hasDataBeyondHeaders
+          ? `Found ${resultCount} result(s)`
+          : "No data found matching the query criteria",
+        resultDetails,
       };
 
-      return enhancedData;
+      return data;
     } finally {
       await deleteTempQuerySheet(ctx, spreadsheetId);
     }

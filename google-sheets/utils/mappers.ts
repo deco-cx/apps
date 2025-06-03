@@ -8,7 +8,6 @@ import type {
   Sheet,
   SimpleBatchUpdateProps,
   SimpleBatchUpdateResponse,
-  SimpleError,
   SimpleUpdateProps,
   SimpleUpdateResponse,
   SimpleValueRange,
@@ -29,21 +28,20 @@ import {
 } from "./rangeUtils.ts";
 import { ErrorHandler } from "../../mcp/utils/errorHandling.ts";
 
-export function cleanCellValue(value: CellValue): string | number | boolean {
+function cleanCellValue(value: CellValue): string | number | boolean {
   if (value === null || value === undefined) return "";
   if (typeof value === "string") return value;
   if (typeof value === "number") return value;
   if (typeof value === "boolean") return value;
   return String(value);
 }
-
-export function mapTableDataToApiValues(
+function mapTableDataToApiValues(
   data: TableData,
 ): (string | number | boolean)[][] {
   return data.map((row) => row.map((cell) => cleanCellValue(cell)));
 }
 
-export function mapSimpleValueRangeToApi(simple: SimpleValueRange): ValueRange {
+function mapSimpleValueRangeToApi(simple: SimpleValueRange): ValueRange {
   return {
     range: simple.range,
     majorDimension: simple.majorDimension || "ROWS",
@@ -109,15 +107,14 @@ export function mapSimpleBatchUpdatePropsToApi(props: SimpleBatchUpdateProps): {
 
   return { body, params };
 }
-
-export function mapApiValuesToTableData(
+function mapApiValuesToTableData(
   values?: CellValue[][],
 ): TableData {
   if (!values) return [];
   return values.map((row) => row.map((cell) => cell as CellValue));
 }
 
-export function mapApiValueRangeToSimple(
+function mapApiValueRangeToSimple(
   apiRange: ValueRange,
 ): SimpleValueRange {
   return {
@@ -157,38 +154,6 @@ export function mapApiBatchUpdateResponseToSimple(
   };
 }
 
-export function mapApiErrorToSimple(error: unknown): SimpleError {
-  if (typeof error === "string") {
-    return { message: error };
-  }
-
-  if (error && typeof error === "object") {
-    const errorObj = error as Record<string, unknown>;
-
-    return {
-      code: errorObj.code as string,
-      message: errorObj.message as string || "Unknown error",
-      details: errorObj,
-    };
-  }
-
-  return {
-    message: "Unknown error",
-    details: { originalError: error },
-  };
-}
-
-export function parseApiErrorText(errorText: string): SimpleError {
-  try {
-    const parsed = JSON.parse(errorText);
-    return mapApiErrorToSimple(parsed);
-  } catch {
-    return {
-      message: errorText || "API communication error",
-    };
-  }
-}
-
 export function validateRange(range: string): boolean {
   const rangePart = range.includes("!") ? range.split("!")[1] : range;
 
@@ -199,8 +164,7 @@ export function validateRange(range: string): boolean {
     return isValidCellReference(rangePart);
   }
 }
-
-export function validateTableData(data: TableData): boolean {
+function validateTableData(data: TableData): boolean {
   if (!Array.isArray(data)) return false;
   if (data.length === 0) return true;
   return data.every((row) => Array.isArray(row));
@@ -426,33 +390,16 @@ export function combineQueryResults(
   majorDimension: "ROWS" | "COLUMNS" = "ROWS",
   errorHandler?: ErrorHandler,
   query?: string,
-): ValueRange & {
-  meta?: {
-    totalResults: number;
-    hasResults: boolean;
-    query: string;
-    searchedSheets: string[];
-    message: string;
-    resultDetails: Array<{
-      sheet: string;
-      resultIndex: number;
-      originalRowEstimate: number;
-      columnCount: number;
-      columnRange: string;
-    }>;
-  };
-} {
-  if (!results.length || results.length !== sheetNames.length) {
+): ValueRange {
+  if (results.length === 0) {
     return {
-      range: "Empty!A1",
-      majorDimension,
       values: [],
       meta: {
         totalResults: 0,
         hasResults: false,
         query: query || "",
         searchedSheets: sheetNames,
-        message: "No data found matching the query criteria",
+        message: "No results found in any sheet",
         resultDetails: [],
       },
     };
