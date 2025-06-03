@@ -12,25 +12,25 @@ export interface Callbacks {
   generateObject: string;
 }
 
-export interface OnCreatedBindingProps {
+export interface OnChannelLinkedProps {
   triggerId: string;
   workspace: string;
   callbacks: Callbacks;
 }
 
-export interface OnDeletedBindingProps {
+export interface OnChannelUnlinkedProps {
   triggerId: string;
   workspace: string;
 }
 
-export interface InputBindingProps<TPayload = any> {
+export interface OnEventReceivedProps<TPayload = any> {
   callbacks: Callbacks;
   payload: TPayload;
   headers: Record<string, string>;
   url: string;
 }
 
-export interface OutputBindingProps<
+export interface OutputChannelProps<
   TMetadata extends Record<string, unknown> = Record<string, unknown>,
 > {
   callbacks: Callbacks;
@@ -49,7 +49,7 @@ export interface StreamOptions<
   };
 }
 
-export interface HandleStreamParameters<
+export interface HandleStreamProps<
   TMetadata extends Record<string, unknown> = Record<string, unknown>,
 > extends ProcessDataStreamParameters {
   streamProps?: StreamOptions<TMetadata>;
@@ -57,7 +57,7 @@ export interface HandleStreamParameters<
 export const processStream = async <
   TMetadata extends Record<string, unknown> = Record<string, unknown>,
 >(
-  { streamProps, ...rest }: HandleStreamParameters<TMetadata>,
+  { streamProps, ...rest }: HandleStreamProps<TMetadata>,
   streamEndpoint: string,
 ) => {
   const stream = await fetch(streamEndpoint, {

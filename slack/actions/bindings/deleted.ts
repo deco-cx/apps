@@ -1,4 +1,4 @@
-import { OnDeletedBindingProps } from "../../../mcp/bindings.ts";
+import { OnChannelUnlinkedProps } from "../../../mcp/bindings.ts";
 import type { AppContext } from "../../mod.ts";
 
 /**
@@ -6,7 +6,7 @@ import type { AppContext } from "../../mod.ts";
  * @description This action is triggered when slack binding is deleted
  */
 export default async function deleted(
-  _props: OnDeletedBindingProps,
+  _props: OnChannelUnlinkedProps,
   _req: Request,
   ctx: AppContext,
 ) {

@@ -1,4 +1,4 @@
-import { OnCreatedBindingProps, processStream } from "../../../mcp/bindings.ts";
+import { OnChannelLinkedProps, processStream } from "../../../mcp/bindings.ts";
 import type { AppContext, SlackWebhookPayload } from "../../mod.ts";
 
 /**
@@ -16,7 +16,7 @@ export default async function invoke(
   }
 
   const bindingProps =
-    await ctx.appStorage.getItem<OnCreatedBindingProps & { installId: string }>(
+    await ctx.appStorage.getItem<OnChannelLinkedProps & { installId: string }>(
       props.event.team,
     ) ??
       undefined;

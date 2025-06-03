@@ -1,4 +1,4 @@
-import { InputBindingProps } from "../../../mcp/bindings.ts";
+import { OnEventReceivedProps } from "../../../mcp/bindings.ts";
 import { HttpError } from "../../../utils/http.ts";
 import type { DiscordWebhookPayload } from "../../client.ts";
 import { AppContext } from "../../mod.ts";
@@ -10,7 +10,7 @@ import { verifyKey } from "npm:discord-interactions@4.3.0";
  * @description This action is triggered when Discord sends a webhook event
  */
 export default async function input(
-  props: InputBindingProps<DiscordWebhookPayload>,
+  props: OnEventReceivedProps<DiscordWebhookPayload>,
   req: Request,
   ctx: AppContext,
 ) {

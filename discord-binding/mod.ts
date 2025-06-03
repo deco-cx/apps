@@ -1,7 +1,7 @@
 import type { FnContext } from "@deco/deco";
 import {
-  InputBindingProps,
-  OutputBindingProps,
+  OnEventReceivedProps,
+  OutputChannelProps,
   processStream,
   StreamOptions,
 } from "../mcp/bindings.ts";
@@ -51,8 +51,8 @@ export interface State extends Props {
   client: ReturnType<typeof createOAuthHttpClient<DiscordClient>>;
   handle: (
     props:
-      | InputBindingProps<DiscordWebhookPayload>
-      | OutputBindingProps<Metadata>,
+      | OnEventReceivedProps<DiscordWebhookPayload>
+      | OutputChannelProps,
     req: Request,
     ctx: AppContext,
   ) => Promise<void>;
@@ -110,8 +110,8 @@ export default function App(
     client,
     handle: (
       props:
-        | InputBindingProps<DiscordWebhookPayload>
-        | OutputBindingProps<Metadata>,
+        | OnEventReceivedProps<DiscordWebhookPayload>
+        | OutputChannelProps,
       _req: Request,
       ctx: AppContext,
     ) => {
@@ -167,7 +167,10 @@ export default function App(
             }
             : webhook;
           if (channelWebhook && textBuffer.trim()) {
-            await ctx.sendDiscordMessage(channelWebhook, textBuffer);
+            await ctx.sendDiscordMessage(
+              channelWebhook as ChannelWebhook,
+              textBuffer,
+            );
           }
           textBuffer = "";
         },

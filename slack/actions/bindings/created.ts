@@ -1,4 +1,4 @@
-import { OnCreatedBindingProps } from "../../../mcp/bindings.ts";
+import { OnChannelLinkedProps } from "../../../mcp/bindings.ts";
 import type { AppContext } from "../../mod.ts";
 
 /**
@@ -6,7 +6,7 @@ import type { AppContext } from "../../mod.ts";
  * @description This action is triggered when slack binding is created
  */
 export default async function created(
-  props: OnCreatedBindingProps,
+  props: OnChannelLinkedProps,
   _req: Request,
   ctx: AppContext,
 ) {

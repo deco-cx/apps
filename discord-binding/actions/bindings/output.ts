@@ -1,4 +1,4 @@
-import { OutputBindingProps } from "../../../mcp/bindings.ts";
+import { OutputChannelProps } from "../../../mcp/bindings.ts";
 import { AppContext, Metadata } from "../../mod.ts";
 
 /**
@@ -7,7 +7,7 @@ import { AppContext, Metadata } from "../../mod.ts";
  * @description This action is triggered to send a message to Discord
  */
 export default function output(
-  props: OutputBindingProps<Metadata>,
+  props: OutputChannelProps<Metadata>,
   req: Request,
   ctx: AppContext,
 ) {
