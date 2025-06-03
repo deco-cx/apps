@@ -20,11 +20,17 @@ export interface Node {
   name: string;
   email: string;
   createdAt: string;
-  displayFinancialStatus: string
+  displayFinancialStatus: string;
+  customer: Customer;
   totalPriceSet: TotalPriceSet;
   paymentCollectionDetails: PaymentCollectionDetails;
   lineItems: LineItems;
   events: Events;
+}
+
+export interface Customer {
+  firstName: string;
+  lastName: string;
 }
 
 export interface LineItems {

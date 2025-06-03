@@ -50,6 +50,10 @@ export const GetOrderDetails = {
       email
       createdAt
       displayFinancialStatus
+      customer {
+        firstName
+        lastName
+      }
       totalPriceSet {
         presentmentMoney {
           amount
