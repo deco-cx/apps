@@ -426,20 +426,22 @@ export function combineQueryResults(
   majorDimension: "ROWS" | "COLUMNS" = "ROWS",
   errorHandler?: ErrorHandler,
   query?: string,
-): ValueRange & { meta?: {
-  totalResults: number;
-  hasResults: boolean;
-  query: string;
-  searchedSheets: string[];
-  message: string;
-  resultDetails: Array<{
-    sheet: string;
-    resultIndex: number;
-    originalRowEstimate: number;
-    columnCount: number;
-    columnRange: string;
-  }>;
-} } {
+): ValueRange & {
+  meta?: {
+    totalResults: number;
+    hasResults: boolean;
+    query: string;
+    searchedSheets: string[];
+    message: string;
+    resultDetails: Array<{
+      sheet: string;
+      resultIndex: number;
+      originalRowEstimate: number;
+      columnCount: number;
+      columnRange: string;
+    }>;
+  };
+} {
   if (!results.length || results.length !== sheetNames.length) {
     return {
       range: "Empty!A1",
