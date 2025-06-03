@@ -51,31 +51,35 @@ const loader = async (
     dateTimeRenderOption = "SERIAL_NUMBER",
   } = props;
 
-  const valueRanges: ValueRange[] = [];
+  try {
+    const fetchPromises = ranges.map(async (range) => {
+      const response = await ctx.client
+        ["GET /v4/spreadsheets/:spreadsheetId/values/:range"](
+          {
+            spreadsheetId,
+            range,
+            majorDimension,
+            valueRenderOption,
+            dateTimeRenderOption,
+          },
+        );
 
-  for (const range of ranges) {
-    const response = await ctx.client
-      ["GET /v4/spreadsheets/:spreadsheetId/values/:range"](
-        {
-          spreadsheetId,
-          range,
-          majorDimension,
-          valueRenderOption,
-          dateTimeRenderOption,
-        },
-      );
+      if (!response.ok) {
+        ctx.errorHandler.toHttpError(
+          response,
+          `Error fetching spreadsheet values for range ${range}: ${response.statusText}`,
+        );
+      }
 
-    if (!response.ok) {
-      throw new Error(
-        `Error fetching spreadsheet values: ${response.statusText}`,
-      );
-    }
+      return response.json();
+    });
 
-    const data = await response.json();
-    valueRanges.push(data);
+    const valueRanges = await Promise.all(fetchPromises);
+
+    return { valueRanges };
+  } catch (error) {
+    ctx.errorHandler.toHttpError(error, "Error fetching spreadsheet values");
   }
-
-  return { valueRanges };
 };
 
 export default loader;

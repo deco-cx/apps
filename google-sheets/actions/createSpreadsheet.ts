@@ -89,17 +89,22 @@ const action = async (
     })),
   };
 
-  const response = await client["POST /v4/spreadsheets"]({}, {
-    body: requestBody,
-  });
+  try {
+    const response = await client["POST /v4/spreadsheets"]({}, {
+      body: requestBody,
+    });
 
-  if (!response.ok) {
-    throw new Error(
-      `Error creating spreadsheet: ${response.statusText}`,
-    );
+    if (!response.ok) {
+      ctx.errorHandler.toHttpError(
+        response,
+        `Error creating spreadsheet: ${response.statusText}`,
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    ctx.errorHandler.toHttpError(error, "Error creating spreadsheet");
   }
-
-  return await response.json();
 };
 
 export default action;

@@ -10,9 +10,6 @@ import {
 } from "../utils/mappers.ts";
 import { buildFullRange } from "../utils/rangeUtils.ts";
 
-/**
- * Simplified props for updating values
- */
 export interface Props {
   /**
    * @title First Cell Location
@@ -66,9 +63,6 @@ export interface Props {
   responseDateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
 }
 
-/**
- * Maps simplified props to the expected API format
- */
 function mapPropsToApiFormat(props: Props): SimpleUpdateProps {
   const firstCell = props.first_cell_location || "A1";
   const range = buildFullRange(props.sheet_name, firstCell, props.values);
@@ -97,19 +91,22 @@ const action = async (
   ctx: AppContext,
 ): Promise<SimpleUpdateResponse> => {
   if (!props.spreadsheet_id || !props.sheet_name || !props.values) {
-    throw new Error(
+    ctx.errorHandler.toHttpError(
+      new Error("Missing required parameters"),
       "Missing required parameters: spreadsheet_id, sheet_name and values are required",
     );
   }
 
   if (!Array.isArray(props.values) || props.values.length === 0) {
-    throw new Error(
+    ctx.errorHandler.toHttpError(
+      new Error("Invalid values format"),
       "The 'values' parameter must be a non-empty array of arrays",
     );
   }
 
   if (!props.values.every((row) => Array.isArray(row))) {
-    throw new Error(
+    ctx.errorHandler.toHttpError(
+      new Error("Invalid row format"),
       "All elements in 'values' must be arrays (representing rows)",
     );
   }
@@ -118,7 +115,8 @@ const action = async (
 
   const validationErrors = validateSimpleUpdateProps(simpleProps);
   if (validationErrors.length > 0) {
-    throw new Error(
+    ctx.errorHandler.toHttpError(
+      new Error("Validation failed"),
       `Validation error: ${validationErrors.join(", ")}`,
     );
   }
@@ -132,7 +130,8 @@ const action = async (
     );
 
   if (!response.ok) {
-    throw new Error(
+    ctx.errorHandler.toHttpError(
+      response,
       `Error updating spreadsheet values: ${response.statusText}`,
     );
   }
