@@ -17,24 +17,27 @@ export interface Props {
   spreadsheetId: string;
 }
 
-/**
- * Fetches spreadsheet metadata from Google Sheets API
- */
 async function fetchSpreadsheetMetadata(
   client: AppContext["client"],
+  errorHandler: AppContext["errorHandler"],
   spreadsheetId: string,
 ): Promise<Spreadsheet> {
-  const response = await client["GET /v4/spreadsheets/:spreadsheetId"]({
-    spreadsheetId,
-  });
-  return response.json();
+  try {
+    const response = await client["GET /v4/spreadsheets/:spreadsheetId"]({
+      spreadsheetId,
+    });
+    return response.json();
+  } catch (error) {
+    errorHandler.toHttpError(
+      error,
+      `Failed to get spreadsheet metadata for spreadsheet "${spreadsheetId}"`,
+    );
+  }
 }
 
-/**
- * Fetches data range for a specific sheet
- */
 async function fetchSheetDataRange(
   client: AppContext["client"],
+  errorHandler: AppContext["errorHandler"],
   spreadsheetId: string,
   sheetTitle: string,
 ): Promise<{ range: string; filledCells: number } | null> {
@@ -46,18 +49,27 @@ async function fetchSheetDataRange(
       });
 
     const data = await response.json();
+
+    if (!response.ok) {
+      errorHandler.toHttpError(
+        response,
+        `Failed to get data range for sheet "${sheetTitle}": ${response.statusText}`,
+      );
+    }
+
     return data.values ? calculateDataRange(data.values, sheetTitle) : null;
   } catch (error) {
-    console.warn(`Failed to get data range for sheet "${sheetTitle}":`, error);
+    errorHandler.toHttpError(
+      error,
+      `Failed to get data range for sheet "${sheetTitle}"`,
+    );
     return null;
   }
 }
 
-/**
- * Fetches data ranges for all sheets in parallel
- */
 async function fetchAllSheetDataRanges(
   client: AppContext["client"],
+  errorHandler: AppContext["errorHandler"],
   spreadsheetId: string,
   sheets: Sheet[],
 ): Promise<Record<string, { range: string; filledCells: number }>> {
@@ -70,6 +82,7 @@ async function fetchAllSheetDataRanges(
   const rangePromises = sheetTitles.map(async (sheetTitle) => {
     const rangeInfo = await fetchSheetDataRange(
       client,
+      errorHandler,
       spreadsheetId,
       sheetTitle,
     );
@@ -99,17 +112,30 @@ const loader = async (
 ): Promise<OptimizedSpreadsheetMetadata> => {
   const { spreadsheetId } = props;
 
-  const spreadsheetData = await fetchSpreadsheetMetadata(
-    ctx.client,
-    spreadsheetId,
-  );
-  const dataRanges = await fetchAllSheetDataRanges(
-    ctx.client,
-    spreadsheetId,
-    spreadsheetData.sheets || [],
-  );
+  if (!spreadsheetId) {
+    ctx.errorHandler.toHttpError(
+      new Error("Spreadsheet ID is required"),
+      "Spreadsheet ID is required",
+    );
+  }
 
-  return mapSpreadsheetToOptimized(spreadsheetData, dataRanges);
+  try {
+    const spreadsheetData = await fetchSpreadsheetMetadata(
+      ctx.client,
+      ctx.errorHandler,
+      spreadsheetId,
+    );
+    const dataRanges = await fetchAllSheetDataRanges(
+      ctx.client,
+      ctx.errorHandler,
+      spreadsheetId,
+      spreadsheetData.sheets || [],
+    );
+
+    return mapSpreadsheetToOptimized(spreadsheetData, dataRanges);
+  } catch (error: unknown) {
+    ctx.errorHandler.toHttpError(error, "Error fetching spreadsheet metadata");
+  }
 };
 
 export default loader;

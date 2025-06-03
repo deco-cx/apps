@@ -1526,3 +1526,5 @@ export interface AdvancedLoaderConfig {
 }
 
 export type Maybe<T> = T | null | undefined;
+
+export type SimulationBehavior = "default" | "skip" | "only1P";

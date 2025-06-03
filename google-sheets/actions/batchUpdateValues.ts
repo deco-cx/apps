@@ -1,19 +1,12 @@
 import { AppContext } from "../mod.ts";
-import type {
-  SimpleBatchUpdateProps,
-  SimpleBatchUpdateResponse,
-  SimpleValueRange,
-} from "../utils/types.ts";
+import type { SimpleBatchUpdateResponse } from "../utils/types.ts";
 import {
+  mapActionPropsToSimpleBatchUpdate,
   mapApiBatchUpdateResponseToSimple,
   mapSimpleBatchUpdatePropsToApi,
   validateSimpleBatchUpdateProps,
 } from "../utils/mappers.ts";
-import { buildFullRange } from "../utils/rangeUtils.ts";
 
-/**
- * Simplified props for batch updating values
- */
 export interface Props {
   /**
    * @title First Cell Location
@@ -53,29 +46,6 @@ export interface Props {
 }
 
 /**
- * Maps simplified props to the expected API format
- */
-function mapPropsToApiFormat(props: Props): SimpleBatchUpdateProps {
-  const firstCell = props.first_cell_location || "A1";
-  const range = buildFullRange(props.sheet_name, firstCell, props.values);
-
-  const simpleData: SimpleValueRange[] = [{
-    range: range,
-    values: props.values,
-    majorDimension: "ROWS",
-  }];
-
-  return {
-    spreadsheetId: props.spreadsheet_id,
-    data: simpleData,
-    valueInputOption: props.valueInputOption || "USER_ENTERED",
-    includeValuesInResponse: props.includeValuesInResponse || false,
-    responseValueRenderOption: "FORMATTED_VALUE",
-    responseDateTimeRenderOption: "SERIAL_NUMBER",
-  };
-}
-
-/**
  * @name BATCH_UPDATE_SPREADSHEET_VALUES
  * @title Batch Update Spreadsheet Values
  * @description Updates values in a Google Sheets spreadsheet in a simple and intuitive way. Just specify the sheet name, starting cell and data, and the system will automatically calculate the required range.
@@ -85,31 +55,34 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<SimpleBatchUpdateResponse> => {
-  // Basic validations
   if (!props.spreadsheet_id || !props.sheet_name || !props.values) {
-    throw new Error(
+    ctx.errorHandler.toHttpError(
+      new Error("Missing required parameters"),
       "Missing required parameters: spreadsheet_id, sheet_name and values are required",
     );
   }
 
   if (!Array.isArray(props.values) || props.values.length === 0) {
-    throw new Error(
+    ctx.errorHandler.toHttpError(
+      new Error("Invalid values format"),
       "The 'values' parameter must be a non-empty array of arrays",
     );
   }
 
   if (!props.values.every((row) => Array.isArray(row))) {
-    throw new Error(
+    ctx.errorHandler.toHttpError(
+      new Error("Invalid row format"),
       "All elements in 'values' must be arrays (representing rows)",
     );
   }
 
   try {
-    const simpleProps = mapPropsToApiFormat(props);
+    const simpleProps = mapActionPropsToSimpleBatchUpdate(props);
 
     const validationErrors = validateSimpleBatchUpdateProps(simpleProps);
     if (validationErrors.length > 0) {
-      throw new Error(
+      ctx.errorHandler.toHttpError(
+        new Error("Validation failed"),
         `Validation error: ${validationErrors.join(", ")}`,
       );
     }
@@ -123,7 +96,8 @@ const action = async (
       );
 
     if (!response.ok) {
-      throw new Error(
+      ctx.errorHandler.toHttpError(
+        response,
         `Error updating spreadsheet values: ${response.statusText}`,
       );
     }
@@ -131,10 +105,9 @@ const action = async (
     const apiResponse = await response.json();
     return mapApiBatchUpdateResponseToSimple(apiResponse);
   } catch (error) {
-    throw new Error(
-      `Communication error: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`,
+    ctx.errorHandler.toHttpError(
+      error,
+      "Communication error during batch update",
     );
   }
 };
