@@ -67,11 +67,8 @@ function sanitizeQueryString(query: string): string {
   if (!query) return "WHERE 1=1 LABEL Col1 'Linha Original'";
 
   const processedQuery = query.trim();
-
-  // Uso de expressão regular única para processar a string em uma única passagem
   const hasLabel = /LABEL\s+/i.test(processedQuery);
 
-  // Extrair label e query em uma única operação
   let queryPart;
   let labelPart;
 
@@ -437,7 +434,6 @@ const loader = async (
         });
       }
 
-      // Adicionar metadados e retornar
       data.meta = {
         totalResults: resultCount,
         hasResults: hasDataBeyondHeaders,
