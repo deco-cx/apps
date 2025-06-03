@@ -10,6 +10,7 @@ import * as $$$0 from "./loaders/getBatchValues.ts";
 import * as $$$1 from "./loaders/getSpreadsheet.ts";
 import * as $$$2 from "./loaders/getValues.ts";
 import * as $$$3 from "./loaders/oauth/start.ts";
+import * as $$$4 from "./loaders/query.ts";
 
 const manifest = {
   "loaders": {
@@ -17,6 +18,7 @@ const manifest = {
     "google-sheets/loaders/getSpreadsheet.ts": $$$1,
     "google-sheets/loaders/getValues.ts": $$$2,
     "google-sheets/loaders/oauth/start.ts": $$$3,
+    "google-sheets/loaders/query.ts": $$$4,
   },
   "actions": {
     "google-sheets/actions/batchUpdateValues.ts": $$$$$$$$$0,

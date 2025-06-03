@@ -30,3 +30,5 @@ export const GOOGLE_SHEETS_ERROR_MESSAGES = {
   "INVALID_VALUE":
     "One or more values in your request are invalid for Google Sheets.",
 } as const;
+
+export const TEMP_QUERY_SHEET_NAME = "temp_query_sheet";

@@ -217,6 +217,21 @@ export interface ValueRange {
   range?: string;
   majorDimension?: string;
   values?: CellValue[][];
+  meta?: {
+    totalResults: number;
+    hasResults: boolean;
+    query: string;
+    searchedSheet?: string;
+    searchedSheets?: string[];
+    message: string;
+    resultDetails: Array<{
+      sheet: string;
+      resultIndex: number;
+      originalRowEstimate: number;
+      columnCount: number;
+      columnRange: string;
+    }>;
+  };
 }
 
 export interface BatchUpdateValuesRequest {

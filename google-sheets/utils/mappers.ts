@@ -8,7 +8,6 @@ import type {
   Sheet,
   SimpleBatchUpdateProps,
   SimpleBatchUpdateResponse,
-  SimpleError,
   SimpleUpdateProps,
   SimpleUpdateResponse,
   SimpleValueRange,
@@ -27,22 +26,22 @@ import {
   columnNumberToLetter,
   isValidCellReference,
 } from "./rangeUtils.ts";
+import { ErrorHandler } from "../../mcp/utils/errorHandling.ts";
 
-export function cleanCellValue(value: CellValue): string | number | boolean {
+function cleanCellValue(value: CellValue): string | number | boolean {
   if (value === null || value === undefined) return "";
   if (typeof value === "string") return value;
   if (typeof value === "number") return value;
   if (typeof value === "boolean") return value;
   return String(value);
 }
-
-export function mapTableDataToApiValues(
+function mapTableDataToApiValues(
   data: TableData,
 ): (string | number | boolean)[][] {
   return data.map((row) => row.map((cell) => cleanCellValue(cell)));
 }
 
-export function mapSimpleValueRangeToApi(simple: SimpleValueRange): ValueRange {
+function mapSimpleValueRangeToApi(simple: SimpleValueRange): ValueRange {
   return {
     range: simple.range,
     majorDimension: simple.majorDimension || "ROWS",
@@ -108,15 +107,14 @@ export function mapSimpleBatchUpdatePropsToApi(props: SimpleBatchUpdateProps): {
 
   return { body, params };
 }
-
-export function mapApiValuesToTableData(
+function mapApiValuesToTableData(
   values?: CellValue[][],
 ): TableData {
   if (!values) return [];
   return values.map((row) => row.map((cell) => cell as CellValue));
 }
 
-export function mapApiValueRangeToSimple(
+function mapApiValueRangeToSimple(
   apiRange: ValueRange,
 ): SimpleValueRange {
   return {
@@ -156,38 +154,6 @@ export function mapApiBatchUpdateResponseToSimple(
   };
 }
 
-export function mapApiErrorToSimple(error: unknown): SimpleError {
-  if (typeof error === "string") {
-    return { message: error };
-  }
-
-  if (error && typeof error === "object") {
-    const errorObj = error as Record<string, unknown>;
-
-    return {
-      code: errorObj.code as string,
-      message: errorObj.message as string || "Unknown error",
-      details: errorObj,
-    };
-  }
-
-  return {
-    message: "Unknown error",
-    details: { originalError: error },
-  };
-}
-
-export function parseApiErrorText(errorText: string): SimpleError {
-  try {
-    const parsed = JSON.parse(errorText);
-    return mapApiErrorToSimple(parsed);
-  } catch {
-    return {
-      message: errorText || "API communication error",
-    };
-  }
-}
-
 export function validateRange(range: string): boolean {
   const rangePart = range.includes("!") ? range.split("!")[1] : range;
 
@@ -198,8 +164,7 @@ export function validateRange(range: string): boolean {
     return isValidCellReference(rangePart);
   }
 }
-
-export function validateTableData(data: TableData): boolean {
+function validateTableData(data: TableData): boolean {
   if (!Array.isArray(data)) return false;
   if (data.length === 0) return true;
   return data.every((row) => Array.isArray(row));
@@ -329,9 +294,6 @@ export function calculateDataRange(
   };
 }
 
-/**
- * Interface for action props used in batchUpdateValues
- */
 export interface ActionBatchUpdateProps {
   first_cell_location?: string;
   includeValuesInResponse?: boolean;
@@ -341,9 +303,6 @@ export interface ActionBatchUpdateProps {
   values: string[][];
 }
 
-/**
- * Converts action-specific props to SimpleBatchUpdateProps format
- */
 export function mapActionPropsToSimpleBatchUpdate(
   props: ActionBatchUpdateProps,
 ): SimpleBatchUpdateProps {
@@ -363,5 +322,179 @@ export function mapActionPropsToSimpleBatchUpdate(
     includeValuesInResponse: props.includeValuesInResponse || false,
     responseValueRenderOption: "FORMATTED_VALUE",
     responseDateTimeRenderOption: "SERIAL_NUMBER",
+  };
+}
+
+/**
+ * Extracts the available sheets from a spreadsheet, excluding the temporary query sheet
+ * @param spreadsheet Google Sheets spreadsheet object
+ * @param tempSheetName Name of the temporary query sheet to be excluded from the results
+ * @returns Array with the names of the available sheets
+ */
+export function getAvailableSheets(
+  spreadsheet: Spreadsheet,
+  tempSheetName: string,
+): string[] {
+  if (!spreadsheet?.sheets?.length) {
+    return [];
+  }
+
+  return spreadsheet.sheets
+    .filter((sheet: Sheet) =>
+      sheet?.properties?.title &&
+      sheet.properties.title !== tempSheetName
+    )
+    .map((sheet: Sheet) => sheet.properties?.title || "")
+    .filter((title) => title !== "");
+}
+
+/**
+ * Validate if the results contain invalid query errors (#VALUE!)
+ * @param values Data to be validated
+ * @param errorHandler Handler for handling errors
+ * @returns void - Throws error if invalid query is found
+ */
+export function validateQueryResults(
+  values: CellValue[][],
+  errorHandler: ErrorHandler,
+): void {
+  if (!values || values.length === 0) return;
+
+  const hasInvalidQuery = values.some((row) =>
+    row.some((cell) => cell === "#VALUE!")
+  );
+
+  if (hasInvalidQuery) {
+    errorHandler.toHttpError(
+      null,
+      "Invalid query format. Please check your query syntax and try again.",
+      400,
+    );
+  }
+}
+
+/**
+ * Process and combine the results of queries in multiple sheets
+ * @param results Results of queries for each sheet
+ * @param sheetNames Sheet names corresponding to the results
+ * @param keepHeaders Whether to keep headers
+ * @param majorDimension Main dimension of the data
+ * @param errorHandler Optional handler for query validation
+ * @param query Original query for reference
+ * @returns ValueRange object with combined data and metadata
+ */
+export function combineQueryResults(
+  results: ValueRange[],
+  sheetNames: string[],
+  keepHeaders: boolean,
+  majorDimension: "ROWS" | "COLUMNS" = "ROWS",
+  errorHandler?: ErrorHandler,
+  query?: string,
+): ValueRange {
+  if (results.length === 0) {
+    return {
+      values: [],
+      meta: {
+        totalResults: 0,
+        hasResults: false,
+        query: query || "",
+        searchedSheets: sheetNames,
+        message: "No results found in any sheet",
+        resultDetails: [],
+      },
+    };
+  }
+
+  const allResults: TableData = [];
+  const resultDetails: Array<{
+    sheet: string;
+    resultIndex: number;
+    originalRowEstimate: number;
+    columnCount: number;
+    columnRange: string;
+  }> = [];
+  let hasHeaders = false;
+  let globalResultIndex = 0;
+
+  results.forEach((sheetData, index) => {
+    const sheetName = sheetNames[index];
+    const sheetValues = mapApiValuesToTableData(sheetData.values);
+
+    if (sheetValues.length === 0) return;
+
+    if (!hasHeaders && keepHeaders && allResults.length === 0) {
+      const originalHeaders = sheetValues[0] ? sheetValues[0].slice(1) : [];
+      allResults.push([...originalHeaders, "Source"] as CellValue[]);
+      hasHeaders = true;
+
+      sheetValues.slice(1).forEach((row, rowIndex) => {
+        const originalRow = row && row[0]
+          ? parseInt(String(row[0]))
+          : rowIndex + 2;
+        const dataColumns = row ? row.slice(1) : [];
+        const rowWithSource = [...dataColumns, sheetName] as CellValue[];
+
+        allResults.push(rowWithSource);
+        const columnCount = dataColumns.length;
+        const endColumn = columnCount > 0
+          ? String.fromCharCode(64 + columnCount)
+          : "A";
+
+        resultDetails.push({
+          sheet: sheetName,
+          resultIndex: globalResultIndex++,
+          originalRowEstimate: originalRow,
+          columnCount: columnCount,
+          columnRange: columnCount > 0 ? `A-${endColumn}` : "A",
+        });
+      });
+    } else {
+      const startIndex = keepHeaders && hasHeaders ? 1 : 0;
+
+      sheetValues.slice(startIndex).forEach((row, rowIndex) => {
+        const originalRow = row && row[0]
+          ? parseInt(String(row[0]))
+          : rowIndex + startIndex + 1;
+        const dataColumns = row ? row.slice(1) : [];
+        const rowWithSource = [...dataColumns, sheetName] as CellValue[];
+
+        allResults.push(rowWithSource);
+        const columnCount = dataColumns.length;
+        const endColumn = columnCount > 0
+          ? String.fromCharCode(64 + columnCount)
+          : "A";
+
+        resultDetails.push({
+          sheet: sheetName,
+          resultIndex: globalResultIndex++,
+          originalRowEstimate: originalRow,
+          columnCount: columnCount,
+          columnRange: columnCount > 0 ? `A-${endColumn}` : "A",
+        });
+      });
+    }
+  });
+
+  if (errorHandler) {
+    validateQueryResults(allResults, errorHandler);
+  }
+
+  const hasDataBeyondHeaders = allResults.length > (keepHeaders ? 1 : 0);
+  const resultCount = Math.max(0, allResults.length - (keepHeaders ? 1 : 0));
+
+  return {
+    range: `Multiple sheets!A1:Z${allResults.length}`,
+    majorDimension,
+    values: allResults,
+    meta: {
+      totalResults: resultCount,
+      hasResults: hasDataBeyondHeaders,
+      query: query || "",
+      searchedSheets: sheetNames,
+      message: hasDataBeyondHeaders
+        ? `Found ${resultCount} result(s) across ${sheetNames.length} sheet(s)`
+        : "No data found matching the query criteria",
+      resultDetails: resultDetails,
+    },
   };
 }
