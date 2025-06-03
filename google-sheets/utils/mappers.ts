@@ -22,11 +22,12 @@ import type {
   UpdateValuesResponse,
   ValueRange,
 } from "./types.ts";
-import { columnNumberToLetter, isValidCellReference } from "./rangeUtils.ts";
+import {
+  buildFullRange,
+  columnNumberToLetter,
+  isValidCellReference,
+} from "./rangeUtils.ts";
 
-/**
- * Cleans and validates a cell value
- */
 export function cleanCellValue(value: CellValue): string | number | boolean {
   if (value === null || value === undefined) return "";
   if (typeof value === "string") return value;
@@ -35,18 +36,12 @@ export function cleanCellValue(value: CellValue): string | number | boolean {
   return String(value);
 }
 
-/**
- * Converts simple tabular data to API format
- */
 export function mapTableDataToApiValues(
   data: TableData,
 ): (string | number | boolean)[][] {
   return data.map((row) => row.map((cell) => cleanCellValue(cell)));
 }
 
-/**
- * Converts SimpleValueRange to API ValueRange
- */
 export function mapSimpleValueRangeToApi(simple: SimpleValueRange): ValueRange {
   return {
     range: simple.range,
@@ -55,9 +50,6 @@ export function mapSimpleValueRangeToApi(simple: SimpleValueRange): ValueRange {
   };
 }
 
-/**
- * Converts simple props to API updateValues format
- */
 export function mapSimpleUpdatePropsToApi(props: SimpleUpdateProps): {
   body: ValueRange;
   params: {
@@ -91,9 +83,6 @@ export function mapSimpleUpdatePropsToApi(props: SimpleUpdateProps): {
   return { body, params };
 }
 
-/**
- * Converts simple props to API batchUpdate format
- */
 export function mapSimpleBatchUpdatePropsToApi(props: SimpleBatchUpdateProps): {
   body: BatchUpdateValuesRequest;
   params: {
@@ -120,9 +109,6 @@ export function mapSimpleBatchUpdatePropsToApi(props: SimpleBatchUpdateProps): {
   return { body, params };
 }
 
-/**
- * Converts API values to simple tabular data
- */
 export function mapApiValuesToTableData(
   values?: CellValue[][],
 ): TableData {
@@ -130,9 +116,6 @@ export function mapApiValuesToTableData(
   return values.map((row) => row.map((cell) => cell as CellValue));
 }
 
-/**
- * Converts API ValueRange to SimpleValueRange
- */
 export function mapApiValueRangeToSimple(
   apiRange: ValueRange,
 ): SimpleValueRange {
@@ -143,9 +126,6 @@ export function mapApiValueRangeToSimple(
   };
 }
 
-/**
- * Converts API updateValues response to simple format
- */
 export function mapApiUpdateResponseToSimple(
   apiResponse: UpdateValuesResponse,
 ): SimpleUpdateResponse {
@@ -161,9 +141,6 @@ export function mapApiUpdateResponseToSimple(
   };
 }
 
-/**
- * Converts API batchUpdate response to simple format
- */
 export function mapApiBatchUpdateResponseToSimple(
   apiResponse: BatchUpdateValuesResponse,
 ): SimpleBatchUpdateResponse {
@@ -179,9 +156,6 @@ export function mapApiBatchUpdateResponseToSimple(
   };
 }
 
-/**
- * Converts API error to simple format
- */
 export function mapApiErrorToSimple(error: unknown): SimpleError {
   if (typeof error === "string") {
     return { message: error };
@@ -203,9 +177,6 @@ export function mapApiErrorToSimple(error: unknown): SimpleError {
   };
 }
 
-/**
- * Attempts to parse an API error text
- */
 export function parseApiErrorText(errorText: string): SimpleError {
   try {
     const parsed = JSON.parse(errorText);
@@ -217,10 +188,6 @@ export function parseApiErrorText(errorText: string): SimpleError {
   }
 }
 
-/**
- * Validates if a range is in the correct format
- * Supports formats like: A1, A1:B2, Sheet1!A1, Sheet1!A1:B2
- */
 export function validateRange(range: string): boolean {
   const rangePart = range.includes("!") ? range.split("!")[1] : range;
 
@@ -232,18 +199,12 @@ export function validateRange(range: string): boolean {
   }
 }
 
-/**
- * Validates if table data is valid
- */
 export function validateTableData(data: TableData): boolean {
   if (!Array.isArray(data)) return false;
   if (data.length === 0) return true;
   return data.every((row) => Array.isArray(row));
 }
 
-/**
- * Validates simple update props
- */
 export function validateSimpleUpdateProps(props: SimpleUpdateProps): string[] {
   const errors: string[] = [];
 
@@ -266,9 +227,6 @@ export function validateSimpleUpdateProps(props: SimpleUpdateProps): string[] {
   return errors;
 }
 
-/**
- * Validates simple batch update props
- */
 export function validateSimpleBatchUpdateProps(
   props: SimpleBatchUpdateProps,
 ): string[] {
@@ -309,10 +267,6 @@ export function validateSimpleBatchUpdateProps(
   return errors;
 }
 
-/**
- * Maps the complete spreadsheet metadata response to an optimized version for LLM consumption
- * Extracts only the essential information needed for most operations
- */
 export function mapSpreadsheetToOptimized(
   spreadsheetData: Spreadsheet,
   dataRanges?: Record<string, { range: string; filledCells: number }>,
@@ -338,62 +292,76 @@ export function mapSpreadsheetToOptimized(
   };
 }
 
-/**
- * Checks if a cell has content (not empty, null, or undefined)
- */
 function isCellFilled(cell: CellValue): boolean {
   return cleanCellValue(cell) !== "";
 }
 
-/**
- * Calculates the data range and filled cells count from sheet values
- * Returns the range in A1 notation (e.g., "A1:C10") and the number of filled cells
- */
 export function calculateDataRange(
   values: CellValue[][],
   sheetTitle: string,
 ): { range: string; filledCells: number } | null {
-  if (!values || values.length === 0) {
-    return null;
-  }
+  if (!values || values.length === 0) return null;
 
-  let lastRow = 0;
-  let lastColumn = 0;
-  let filledCells = 0;
+  let maxRow = 0;
+  let maxCol = 0;
 
-  for (let i = 0; i < values.length; i++) {
-    const row = values[i];
-    if (row && row.length > 0) {
-      const hasData = row.some(isCellFilled);
-      if (hasData) {
-        lastRow = i + 1;
-        for (let j = row.length - 1; j >= 0; j--) {
-          if (isCellFilled(row[j])) {
-            lastColumn = Math.max(lastColumn, j + 1);
-            break;
-          }
-        }
+  for (let rowIndex = 0; rowIndex < values.length; rowIndex++) {
+    const row = values[rowIndex];
+    if (!row) continue;
+
+    for (let colIndex = 0; colIndex < row.length; colIndex++) {
+      const cell = row[colIndex];
+      if (isCellFilled(cell)) {
+        maxRow = Math.max(maxRow, rowIndex + 1);
+        maxCol = Math.max(maxCol, colIndex + 1);
       }
     }
   }
 
-  for (let i = 0; i < values.length; i++) {
-    const row = values[i];
-    if (row) {
-      for (let j = 0; j < row.length; j++) {
-        if (isCellFilled(row[j])) {
-          filledCells++;
-        }
-      }
-    }
-  }
+  if (maxRow === 0 || maxCol === 0) return null;
 
-  if (lastRow === 0 || lastColumn === 0) {
-    return null;
-  }
+  const endColumn = columnNumberToLetter(maxCol);
+  const range = `${sheetTitle}!A1:${endColumn}${maxRow}`;
 
-  const columnLetter = columnNumberToLetter(lastColumn);
-  const range = `${sheetTitle}!A1:${columnLetter}${lastRow}`;
+  return {
+    range,
+    filledCells: maxRow * maxCol,
+  };
+}
 
-  return { range, filledCells };
+/**
+ * Interface for action props used in batchUpdateValues
+ */
+export interface ActionBatchUpdateProps {
+  first_cell_location?: string;
+  includeValuesInResponse?: boolean;
+  sheet_name: string;
+  spreadsheet_id: string;
+  valueInputOption?: "RAW" | "USER_ENTERED";
+  values: string[][];
+}
+
+/**
+ * Converts action-specific props to SimpleBatchUpdateProps format
+ */
+export function mapActionPropsToSimpleBatchUpdate(
+  props: ActionBatchUpdateProps,
+): SimpleBatchUpdateProps {
+  const firstCell = props.first_cell_location || "A1";
+  const range = buildFullRange(props.sheet_name, firstCell, props.values);
+
+  const simpleData: SimpleValueRange[] = [{
+    range: range,
+    values: props.values,
+    majorDimension: "ROWS",
+  }];
+
+  return {
+    spreadsheetId: props.spreadsheet_id,
+    data: simpleData,
+    valueInputOption: props.valueInputOption || "USER_ENTERED",
+    includeValuesInResponse: props.includeValuesInResponse || false,
+    responseValueRenderOption: "FORMATTED_VALUE",
+    responseDateTimeRenderOption: "SERIAL_NUMBER",
+  };
 }

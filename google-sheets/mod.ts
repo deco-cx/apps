@@ -5,6 +5,7 @@ import { McpContext } from "../mcp/context.ts";
 import {
   GOOGLE_OAUTH_URL,
   GOOGLE_OAUTH_URL_AUTH,
+  GOOGLE_SHEETS_ERROR_MESSAGES,
   GOOGLE_SHEETS_URL,
   SCOPES,
 } from "./utils/constant.ts";
@@ -16,6 +17,10 @@ import {
   OAuthProvider,
   OAuthTokens,
 } from "../mcp/oauth.ts";
+import {
+  createErrorHandler,
+  ErrorHandler,
+} from "../mcp/utils/errorHandling.ts";
 
 export const GoogleProvider: OAuthProvider = {
   name: "Google",
@@ -34,6 +39,7 @@ export interface Props {
 
 export interface State extends Props {
   client: OAuthClients<GoogleSheetsClient, GoogleAuthClient>;
+  errorHandler: ErrorHandler;
 }
 
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
@@ -82,10 +88,16 @@ export default function App(
     },
   });
 
+  const errorHandler = createErrorHandler({
+    errorMessages: GOOGLE_SHEETS_ERROR_MESSAGES,
+    defaultErrorMessage: "Google Sheets operation failed",
+  });
+
   const state: State = {
     ...props,
     tokens,
     client,
+    errorHandler,
   };
 
   return {
