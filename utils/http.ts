@@ -1,5 +1,12 @@
 import { type RequestInit } from "@deco/deco";
 import { fetchSafe } from "./fetch.ts";
+
+// Check if DEBUG_HTTP env var is set
+const DEBUG_HTTP = Deno.env.get("DEBUG_HTTP") === "true";
+if (DEBUG_HTTP) {
+  console.log("DEBUG_HTTP mode is:", DEBUG_HTTP ? "enabled" : "disabled");
+}
+
 const HTTP_VERBS = new Set(
   [
     "GET",
@@ -79,6 +86,46 @@ export interface HttpClientOptions {
   // Keep empty segments in the URL
   keepEmptySegments?: boolean;
 }
+
+/**
+ * Print a curl-like representation of the request for debugging
+ */
+function debugRequest(
+  url: string,
+  method: string,
+  headers: Headers,
+  body?: BodyInit | null,
+): void {
+  // if (!DEBUG_HTTP) return;
+  console.log("Calling debugRequest for URL:", url);
+
+  console.log("\n----- HTTP Request -----");
+  console.log(`curl -X ${method} "${url}" \\`);
+
+  // Add headers
+  headers.forEach((value, key) => {
+    console.log(`  -H "${key}: ${value}" \\`);
+  });
+
+  // Add body if present
+  if (body) {
+    if (typeof body === "string") {
+      console.log(`  -d '${body.replace(/'/g, "\\'")}' \\`);
+    } else if (body instanceof URLSearchParams) {
+      console.log(`  -d '${body.toString().replace(/'/g, "\\'")}' \\`);
+    } else if (body instanceof FormData) {
+      console.log(`  -F "form data not displayed" \\`);
+    } else {
+      console.log(
+        `  -d 'body of type ${body.constructor.name} not displayed' \\`,
+      );
+    }
+  }
+
+  console.log("  --compressed");
+  console.log("-----------------------\n");
+}
+
 export const createHttpClient = <T>(
   {
     base: maybeBase,
@@ -90,6 +137,7 @@ export const createHttpClient = <T>(
 ): ClientOf<T> => {
   // Base should always endwith / so when concatenating with path we get the right URL
   const base = maybeBase.at(-1) === "/" ? maybeBase : `${maybeBase}/`;
+
   return new Proxy({} as ClientOf<T>, {
     get: (_target, prop) => {
       if (prop === Symbol.toStringTag || prop === Symbol.toPrimitive) {
@@ -99,6 +147,7 @@ export const createHttpClient = <T>(
         throw new TypeError(`HttpClient: Uknown path ${typeof prop}`);
       }
       const [method, path] = prop.split(" ");
+
       // @ts-expect-error if not inside, throws
       if (!HTTP_VERBS.has(method)) {
         throw new TypeError(`HttpClient: Verb ${method} is not allowed`);
@@ -108,6 +157,7 @@ export const createHttpClient = <T>(
         init?: RequestInit,
       ) => {
         const mapped = new Map(Object.entries(params));
+
         const compiled = path
           .split("/")
           .flatMap((segment) => {
@@ -117,8 +167,8 @@ export const createHttpClient = <T>(
               return segment;
             }
             const name = segment.slice(1, !isRequred ? -1 : undefined);
+
             const param = mapped.get(name);
-            mapped.delete(name);
             if (param === undefined && isRequred) {
               throw new TypeError(`HttpClient: Missing ${name} at ${path}`);
             }
@@ -130,7 +180,9 @@ export const createHttpClient = <T>(
               : typeof x === "number"
           )
           .join("/");
+
         const url = new URL(compiled, base);
+
         mapped.forEach((value, key) => {
           if (value === undefined) {
             return;
@@ -138,6 +190,7 @@ export const createHttpClient = <T>(
           const arrayed = Array.isArray(value) ? value : [value];
           arrayed.forEach((item) => url.searchParams.append(key, `${item}`));
         });
+
         const isJSON = init?.body != null &&
           typeof init.body !== "string" &&
           !(init.body instanceof ReadableStream) &&
@@ -145,10 +198,18 @@ export const createHttpClient = <T>(
           !(init.body instanceof URLSearchParams) &&
           !(init.body instanceof Blob) &&
           !(init.body instanceof ArrayBuffer);
+
         const headers = new Headers(init?.headers);
         defaultHeaders?.forEach((value, key) => headers.set(key, value));
         isJSON && headers.set("content-type", "application/json");
+
         const body = isJSON ? JSON.stringify(init.body) : init?.body;
+
+        // Debug log if DEBUG_HTTP is enabled
+        if (DEBUG_HTTP) {
+          debugRequest(url.href, method, headers, body);
+        }
+
         return fetcher(url.href, {
           ...init,
           headers: processHeaders(headers),

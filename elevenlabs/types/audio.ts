@@ -1,30 +1,62 @@
+import type { AudioModelV1, SharedVoicesOptions } from "./audio-provider.ts";
+
 /**
  * The payload for audio generation requests.
  */
 export interface AudioPayload {
-  /** The model to use for generation */
-  model: string;
-  /** The text prompt to generate audio from */
+  /**
+   * The text to generate audio from.
+   * Note: Only applicable for text‐based audio generation models (not for audio transformation).
+   */
   prompt?: string;
-  /** Base64 encoded audio input for voice changing/audio processing */
+  /**
+   * Audio content as base64 string.
+   * Used for audio‐processing models like voice‐conversion, STT, etc.
+   */
   audio?: string;
-  /** Additional headers to include in the request */
+  /**
+   * The AudioModelV1 to generate or transform audio with.
+   */
+  model: AudioModelV1;
+  /**
+   * Headers to be included in the request.
+   */
   headers?: Record<string, string>;
-  /** Provider-specific options */
+  /**
+   * Provider‐specific options. For ElevenLabs, this may include:
+   * voiceId: string — The voice ID to apply to the text
+   * model_id: string — The TTS model to generate with
+   * voice_settings: object — Stability and other voice settings
+   * and other parameters specific to different endpoints.
+   *
+   * For "shared-voices" endpoint, the sharedVoices object should be used.
+   */
   providerOptions?: {
     elevenLabs?: {
-      /** The voice ID to use for text-to-speech */
       voiceId?: string;
-      /** The model ID to use */
       model_id?: string;
-      /** Whether to remove background noise */
+      voice_settings?: {
+        stability?: number;
+        similarity_boost?: number;
+        style?: number;
+        use_speaker_boost?: boolean;
+      };
       remove_background_noise?: boolean;
-      /** Random seed for reproducibility */
       seed?: number;
-      /** Voice settings as a JSON object */
-      voice_settings?: Record<string, unknown>;
-      /** Any other ElevenLabs-specific options */
-      [key: string]: unknown;
+      fileUrls?: string[];
+      name?: string;
+      description?: string;
+      labels?: string;
+      language_code?: string;
+      filename?: string;
+      tag_audio_events?: boolean;
+      num_speakers?: number;
+      timestamps_granularity?: string;
+      diarize?: boolean;
+      isolation_type?: string;
+      duration_seconds?: number;
+      prompt_influence?: number;
+      sharedVoices?: SharedVoicesOptions;
     };
   };
 }
@@ -33,12 +65,17 @@ export interface AudioPayload {
  * The response from audio generation requests.
  */
 export interface AudioResponse {
-  /** Base64 encoded audio output */
+  /**
+   * The generated audio as a base64 string.
+   * Present in responses from most audio generation models.
+   */
   audio?: string;
-  /** Array of base64 encoded audio outputs (for multi-audio responses) */
+  /**
+   * Multiple generated audio files, when an endpoint returns choices.
+   */
   audios?: string[];
-  /** Voice ID for voice cloning */
-  voice_id?: string;
-  /** Whether voice requires verification */
-  requires_verification?: boolean;
+  /**
+   * Any response‐specific data fields.
+   */
+  [key: string]: unknown;
 }

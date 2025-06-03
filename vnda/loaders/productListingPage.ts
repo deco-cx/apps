@@ -5,6 +5,7 @@ import type {
 import { SortOption } from "../../commerce/types.ts";
 import { STALE } from "../../utils/fetch.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import { safeJsonSerialize } from "../../website/utils/html.ts";
 import type { AppContext } from "../mod.ts";
 import { ProductSearchResult, Sort } from "../utils/client/types.ts";
 import { Tag } from "../utils/openapi/vnda.openapi.gen.ts";
@@ -241,7 +242,9 @@ const searchLoader = async (
 
   return {
     "@type": "ProductListingPage",
-    seo: getSEOFromTag(categories, url, seo.at(-1), hasTypeTags, isSearchPage),
+    seo: safeJsonSerialize(
+      getSEOFromTag(categories, url, seo.at(-1), hasTypeTags, isSearchPage),
+    ),
     breadcrumb: isSearchPage
       ? {
         "@type": "BreadcrumbList",

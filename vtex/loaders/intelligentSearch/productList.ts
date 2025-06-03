@@ -9,14 +9,14 @@ import {
 } from "../../utils/intelligentSearch.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
-import { toProduct } from "../../utils/transform.ts";
+import { getSkipSimulationBehaviorFromBag } from "../../utils/simulationBehavior.ts";
+import { sortProducts, toProduct } from "../../utils/transform.ts";
 import type { Item, ProductID, Sort } from "../../utils/types.ts";
+import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 import {
   LabelledFuzzy,
   mapLabelledFuzzyToFuzzy,
 } from "./productListingPage.ts";
-import { sortProducts } from "../../utils/transform.ts";
-import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 
 /**
  * @title Collection ID
@@ -109,6 +109,11 @@ export interface CommonProps {
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
+  /**
+   * @title Simulation Behavior
+   * @description Defines the simulation behavior.
+   */
+  simulationBehavior?: "default" | "skip" | "only1P";
 }
 
 /**
@@ -142,6 +147,7 @@ const fromProps = ({ props }: Props) => {
       sort: props.sort || "",
       selectedFacets: [{ key: "", value: props.facets }],
       hideUnavailableItems: props.hideUnavailableItems,
+      simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
 
@@ -152,6 +158,7 @@ const fromProps = ({ props }: Props) => {
       sort: "",
       selectedFacets: [],
       hideUnavailableItems: props.hideUnavailableItems,
+      simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
 
@@ -163,6 +170,7 @@ const fromProps = ({ props }: Props) => {
       fuzzy: mapLabelledFuzzyToFuzzy(props.fuzzy),
       selectedFacets: [],
       hideUnavailableItems: props.hideUnavailableItems,
+      simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
 
@@ -173,6 +181,7 @@ const fromProps = ({ props }: Props) => {
       sort: props.sort || "",
       selectedFacets: [{ key: "productClusterIds", value: props.collection }],
       hideUnavailableItems: props.hideUnavailableItems,
+      simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
 
@@ -196,8 +205,14 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
-  const props = expandedProps.props ??
+  const _props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
+  const props = {
+    ..._props,
+    simulationBehavior: getSkipSimulationBehaviorFromBag(ctx)
+      ? "skip"
+      : _props.simulationBehavior || "default",
+  };
   const { vcsDeprecated } = ctx;
   const { url } = req;
   const segment = getSegmentFromBag(ctx);
@@ -254,6 +269,7 @@ const getSearchParams = (
         "hideUnavailableItems",
         (props.hideUnavailableItems ?? false).toString(),
       ],
+      ["simulationBehavior", props.simulationBehavior || "default"],
     ];
   }
 
@@ -267,6 +283,7 @@ const getSearchParams = (
         "hideUnavailableItems",
         (props.hideUnavailableItems ?? false).toString(),
       ],
+      ["simulationBehavior", props.simulationBehavior || "default"],
     ];
   }
 
@@ -279,6 +296,7 @@ const getSearchParams = (
         "hideUnavailableItems",
         (props.hideUnavailableItems ?? false).toString(),
       ],
+      ["simulationBehavior", props.simulationBehavior || "default"],
     ];
   }
 
@@ -292,17 +310,22 @@ export const cacheKey = (
   req: Request,
   ctx: AppContext,
 ) => {
-  const props = expandedProps.props ??
+  const _props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
+  const props = {
+    ..._props,
+    simulationBehavior: getSkipSimulationBehaviorFromBag(ctx)
+      ? "skip"
+      : _props.simulationBehavior || "default",
+  };
 
   const url = new URL(req.url);
 
-  if (
-    // Avoid cache on loader call over call and on search pages
-    (!isQueryList(props) && url.searchParams.has("q")) || ctx.isInvoke
-  ) {
+  // Avoid cache on loader call over call as it should be handled by the caller
+  if (ctx.isInvoke) {
     return null;
   }
+
   const segment = getSegmentFromBag(ctx)?.token ?? "";
   const params = new URLSearchParams([
     ...getSearchParams(props, url.searchParams),

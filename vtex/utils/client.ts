@@ -1,4 +1,4 @@
-import { Userorderslist } from "./openapi/vcs.openapi.gen.ts";
+import { Userorderdetails, Userorderslist } from "./openapi/vcs.openapi.gen.ts";
 import {
   Brand,
   Category,
@@ -9,6 +9,7 @@ import {
   LegacyProduct,
   LegacySort,
   OrderForm,
+  OrderFormOrder,
   PageType,
   PortalSuggestion,
   ProductSearchResult,
@@ -244,11 +245,24 @@ export interface VTEXCommerceStable {
     response: CreateNewDocument;
     body: Record<string, unknown>;
   };
+  "PATCH /api/dataentities/:acronym/documents/:documentId": {
+    response: CreateNewDocument;
+    body: Record<string, unknown>;
+  };
   "GET /api/catalog_system/pub/brand/list": {
     response: Brand[];
   };
   "GET /api/oms/user/orders": {
     response: Userorderslist;
+  };
+  "GET /api/oms/user/orders/:orderId": {
+    response: Userorderdetails;
+  };
+  "GET /api/checkout/pub/orders/:orderId": {
+    response: OrderFormOrder;
+  };
+  "GET /api/checkout/pub/orders/order-group/:orderGroupId": {
+    response: OrderFormOrder[];
   };
 }
 

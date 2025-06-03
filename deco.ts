@@ -10,6 +10,9 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("discohook"),
+    app("js-bundler"),
+    app("jira"),
     app("deno-deploy"),
     app("exa"),
     app("figma"),
@@ -56,6 +59,7 @@ const config = {
     app("streamshop"),
     app("brasilapi"),
     app("readwise"),
+    app("rd-station-marketing"),
     app("website"),
     app("commerce"),
     app("workflows"),
@@ -66,6 +70,7 @@ const config = {
     app("htmx"),
     app("sap"),
     app("tiptap-cloud"),
+    app("browser-use"),
     ...compatibilityApps,
   ],
 };

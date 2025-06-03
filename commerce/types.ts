@@ -417,7 +417,27 @@ export interface Person extends Omit<Thing, "@type"> {
   taxID?: string;
   /** The telephone number. */
   telephone?: string;
+  /** The birth date of the person. */
+  birthDate?: string;
+  /** User's corporate name */
+  corporateName?: string;
+  /** User's corporate document */
+  corporateDocument?: string;
+  /** User's corporate trade name */
+  tradeName?: string;
+  /** User's business phone */
+  businessPhone?: string;
+  /** Whether the user is a corporation or not */
+  isCorporate?: boolean;
+  /** Custom fields */
+  customFields?: CustomFields[];
 }
+
+interface CustomFields {
+  key: string;
+  value: string;
+}
+
 // NON SCHEMA.ORG Compliant. Should be removed ASAP
 export interface Author extends Omit<Thing, "@type"> {
   "@type": "Author";
@@ -612,6 +632,25 @@ export interface PostalAddress extends Omit<ContactPoint, "@type"> {
   /** The street address. For example, 1600 Amphitheatre Pkwy. */
   streetAddress?: string;
 }
+
+export interface PostalAddressVTEX extends Omit<ContactPoint, "@type"> {
+  "@type": "PostalAddress";
+  /** The country. For example, USA. You can also provide the two-letter ISO 3166-1 alpha-2 country code. */
+  addressCountry?: string;
+  /** The locality in which the street address is, and which is in the region. For example, Mountain View. */
+  addressLocality?: string;
+  /** The region in which the locality is, and which is in the country. For example, California. */
+  addressRegion?: string;
+  /** The postal code. For example, 94043. */
+  postalCode?: string;
+  /** The street address. For example, 1600 Amphitheatre Pkwy. */
+  streetAddress?: string;
+  receiverName: string | null;
+  addressName?: string;
+  complement: string | null;
+  addressId: string;
+}
+
 export interface LocationFeatureSpecification
   extends Omit<PropertyValue, "@type"> {
   "@type": "LocationFeatureSpecification";

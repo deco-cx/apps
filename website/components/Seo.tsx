@@ -1,7 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
-import type { ImageWidget } from "../../admin/widgets.ts";
-import { stripHTML } from "../utils/html.ts";
 import { JSX } from "preact";
+import type { ImageWidget } from "../../admin/widgets.ts";
+import { safeJsonSerialize, stripHTML } from "../utils/html.ts";
 
 export const renderTemplateString = (template: string, value: string) =>
   template.replace("%s", value);
@@ -87,16 +87,18 @@ function Component({
       <link rel="icon" href={favicon} />
 
       {/* Twitter tags */}
-      <meta property="twitter:title" content={title} />
-      <meta property="twitter:description" content={description} />
-      <meta property="twitter:image" content={image} />
-      <meta property="twitter:card" content={twitterCard} />
+      {title && <meta property="twitter:title" content={title} />}
+      {description && (
+        <meta property="twitter:description" content={description} />
+      )}
+      {image && <meta property="twitter:image" content={image} />}
+      {twitterCard && <meta property="twitter:card" content={twitterCard} />}
 
       {/* OpenGraph tags */}
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:type" content={type} />
-      <meta property="og:image" content={image} />
+      {title && <meta property="og:title" content={title} />}
+      {description && <meta property="og:description" content={description} />}
+      {type && <meta property="og:type" content={type} />}
+      {image && <meta property="og:image" content={image} />}
 
       {/* Link tags */}
       {canonical && (
@@ -111,10 +113,10 @@ function Component({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+            __html: safeJsonSerialize({
               "@context": "https://schema.org",
               ...json,
-            }),
+            }, { returnAsString: true }),
           }}
         />
       ))}

@@ -1,9 +1,16 @@
+import { redirect } from "@deco/deco";
 import type { ProductListingPage } from "../../../commerce/types.ts";
 import { parseRange } from "../../../commerce/utils/filters.ts";
 import { STALE } from "../../../utils/fetch.ts";
+<<<<<<< HEAD
+=======
+import { safeJsonSerialize } from "../../../website/utils/html.ts";
+import sendEvent from "../../actions/analytics/sendEvent.ts";
+>>>>>>> fcdedc6d904fddadb0d79c78863aced9da2bce16
 import { AppContext } from "../../mod.ts";
 import {
   isFilterParam,
+  pageTypesFromUrl,
   toPath,
   withDefaultFacets,
   withDefaultParams,
@@ -14,8 +21,8 @@ import {
   pageTypesToSeo,
 } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
-import { pageTypesFromUrl } from "../../utils/intelligentSearch.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
+import { getSkipSimulationBehaviorFromBag } from "../../utils/simulationBehavior.ts";
 import { slugify } from "../../utils/slugify.ts";
 import {
   filtersFromURL,
@@ -35,7 +42,7 @@ import type {
 } from "../../utils/types.ts";
 import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
-import { redirect } from "@deco/deco";
+
 /** this type is more friendly user to fuzzy type that is 0, 1 or auto. */
 export type LabelledFuzzy = "automatic" | "disabled" | "enabled";
 /**
@@ -63,6 +70,18 @@ const LEGACY_TO_IS: Record<string, Sort> = {
   OrderByReleaseDateDESC: "release:desc",
   OrderByBestDiscountDESC: "discount:desc",
 };
+
+const sortValues = [
+  "price:desc",
+  "price:asc",
+  "orders:desc",
+  "name:desc",
+  "name:asc",
+  "release:desc",
+  "discount:desc",
+  "relevance:desc",
+];
+
 export const mapLabelledFuzzyToFuzzy = (
   labelledFuzzy?: LabelledFuzzy,
 ): Fuzzy | undefined => {
@@ -157,9 +176,21 @@ export interface Props {
    * @description Further change loader behaviour
    */
   advancedConfigs?: AdvancedLoaderConfig;
+  /**
+   * @title Simulation Behavior
+   * @description Defines the simulation behavior.
+   */
+  simulationBehavior?: "default" | "skip" | "only1P";
 }
-const searchArgsOf = (props: Props, url: URL) => {
+const searchArgsOf = (props: Props, url: URL, ctx: AppContext) => {
   const hideUnavailableItems = props.hideUnavailableItems;
+  const simulationBehavior = getSkipSimulationBehaviorFromBag(ctx)
+    ? "skip" as const
+    : (url.searchParams.get("simulationBehavior") as
+      | "skip"
+      | "default"
+      | "only1P") ||
+      props.simulationBehavior || "default";
   const countFromSearchParams = url.searchParams.get("PS");
   const count = Number(countFromSearchParams ?? props.count ?? 12);
   const query = props.query ?? url.searchParams.get("q") ?? "";
@@ -171,10 +202,13 @@ const searchArgsOf = (props: Props, url: URL) => {
         : 0,
       VTEX_MAX_PAGES - currentPageoffset,
     );
-  const sort = (url.searchParams.get("sort") as Sort) ??
+  let sort = (url.searchParams.get("sort") as Sort) ??
     LEGACY_TO_IS[url.searchParams.get("O") ?? ""] ??
     props.sort ??
     sortOptions[0].value;
+  if (!sort || !sortValues.includes(sort)) {
+    sort = sortOptions[0].value as Sort;
+  }
   const selectedFacets = mergeFacets(
     props.selectedFacets ?? [],
     filtersFromURL(url),
@@ -190,6 +224,7 @@ const searchArgsOf = (props: Props, url: URL) => {
     count,
     hideUnavailableItems,
     selectedFacets,
+    simulationBehavior,
   };
 };
 const PAGE_TYPE_TO_MAP_PARAM = {
@@ -320,10 +355,12 @@ const loader = async (
   if (!isInSeachFormat && !pathQuery) {
     return null;
   }
+
   const locale = segment?.payload?.cultureInfo ??
     ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   const params = withDefaultParams({ ...searchArgs, page, locale });
+
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
     vcsDeprecated[
@@ -458,7 +495,7 @@ const loader = async (
       pageTypes: allPageTypes.map(parsePageType),
     },
     sortOptions,
-    seo: pageTypesToSeo(
+    seo: safeJsonSerialize(pageTypesToSeo(
       currentPageTypes,
       baseUrl,
       hasPreviousPage ? paramnPage : undefined,
@@ -489,6 +526,12 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
       ).join("\\"),
     ],
     ["segment", segment],
+    [
+      "simulationBehavior",
+      getSkipSimulationBehaviorFromBag(ctx)
+        ? "skip"
+        : props.simulationBehavior || "default",
+    ],
   ]);
   url.searchParams.forEach((value, key) => {
     if (!ALLOWED_PARAMS.has(key.toLowerCase()) && !isFilterParam(key)) {
