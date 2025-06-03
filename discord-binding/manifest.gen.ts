@@ -2,8 +2,8 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/bindings/input.ts";
-import * as $$$$$$$$$1 from "./actions/bindings/output.ts";
+import * as $$$$$$$$$0 from "./actions/channels/invoke.ts";
+import * as $$$$$$$$$1 from "./actions/channels/output.ts";
 import * as $$$$$$$$$2 from "./actions/oauth/callback.ts";
 import * as $$$0 from "./loaders/oauth/start.ts";
 
@@ -12,8 +12,8 @@ const manifest = {
     "discord-binding/loaders/oauth/start.ts": $$$0,
   },
   "actions": {
-    "discord-binding/actions/bindings/input.ts": $$$$$$$$$0,
-    "discord-binding/actions/bindings/output.ts": $$$$$$$$$1,
+    "discord-binding/actions/channels/invoke.ts": $$$$$$$$$0,
+    "discord-binding/actions/channels/output.ts": $$$$$$$$$1,
     "discord-binding/actions/oauth/callback.ts": $$$$$$$$$2,
   },
   "name": "discord-binding",

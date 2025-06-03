@@ -2,10 +2,10 @@ import { OnChannelLinkedProps } from "../../../mcp/bindings.ts";
 import type { AppContext } from "../../mod.ts";
 
 /**
- * @name ON_BINDING_CREATED
- * @description This action is triggered when slack binding is created
+ * @name ON_CHANNEL_LINKED
+ * @description This action is triggered when slack binding is linked
  */
-export default async function created(
+export default async function linked(
   props: OnChannelLinkedProps,
   _req: Request,
   ctx: AppContext,

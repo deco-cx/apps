@@ -15,12 +15,14 @@ export interface Callbacks {
 export interface OnChannelLinkedProps {
   triggerId: string;
   workspace: string;
+  discriminator: string;
   callbacks: Callbacks;
 }
 
 export interface OnChannelUnlinkedProps {
   triggerId: string;
   workspace: string;
+  discriminator: string;
 }
 
 export interface OnEventReceivedProps<TPayload = any> {

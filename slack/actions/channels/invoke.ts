@@ -2,7 +2,7 @@ import { OnChannelLinkedProps, processStream } from "../../../mcp/bindings.ts";
 import type { AppContext, SlackWebhookPayload } from "../../mod.ts";
 
 /**
- * @name ON_BINDING_INVOKED
+ * @name ON_CHANNEL_INVOKED
  * @description This action is triggered when slack sends a webhook event
  */
 export default async function invoke(

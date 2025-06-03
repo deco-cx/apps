@@ -5,11 +5,11 @@ import { AppContext } from "../../mod.ts";
 import { verifyKey } from "npm:discord-interactions@4.3.0";
 
 /**
- * @name ON_AGENT_INPUT
- * @title On Discord Input
+ * @name ON_CHANNEL_INVOKED
+ * @title On Discord Invoked
  * @description This action is triggered when Discord sends a webhook event
  */
-export default async function input(
+export default async function invoke(
   props: OnEventReceivedProps<DiscordWebhookPayload>,
   req: Request,
   ctx: AppContext,
