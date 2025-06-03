@@ -17,8 +17,30 @@ fragment TimelineEvent on Event {
 }
 `;
 
+export const OrderLineItems = gql`
+fragment OrderLineItems on Order {
+  lineItems(first: 100) {
+    edges {
+      node {
+        id
+        title
+        quantity
+        sku
+        variantTitle
+        originalUnitPriceSet {
+          presentmentMoney {
+            amount
+            currencyCode
+          }
+        }
+      }
+    }
+  }
+}
+`;
+
 export const GetOrderDetails = {
-  fragments: [TimeLineEvent],
+  fragments: [TimeLineEvent, OrderLineItems],
   query: gql`
     query GetOrders($query: String!) {
   orders(first: 1, query: $query) {
@@ -27,6 +49,7 @@ export const GetOrderDetails = {
       name
       email
       createdAt
+      displayFinancialStatus
       totalPriceSet {
         presentmentMoney {
           amount
@@ -36,6 +59,7 @@ export const GetOrderDetails = {
       paymentCollectionDetails {
         additionalPaymentCollectionUrl
       } 
+      ... OrderLineItems
       events(first: 100) {
         edges {
           cursor

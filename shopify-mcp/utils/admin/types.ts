@@ -20,9 +20,37 @@ export interface Node {
   name: string;
   email: string;
   createdAt: string;
+  displayFinancialStatus: string
   totalPriceSet: TotalPriceSet;
   paymentCollectionDetails: PaymentCollectionDetails;
+  lineItems: LineItems;
   events: Events;
+}
+
+export interface LineItems {
+  edges: LineItemEdge[];
+}
+
+export interface LineItemEdge {
+  node: LineItemNode;
+}
+
+export interface LineItemNode {
+  id: string;
+  title: string;
+  quantity: number;
+  sku?: string;
+  variantTitle: string;
+  originalUnitPriceSet: OriginalUnitPriceSet;
+}
+
+export interface OriginalUnitPriceSet {
+  presentmentMoney: PresentmentMoney;
+}
+
+export interface PresentmentMoney {
+  amount: string;
+  currencyCode: string;
 }
 
 export interface TotalPriceSet {
