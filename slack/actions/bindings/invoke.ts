@@ -23,8 +23,23 @@ export default async function invoke(
   if (!bindingProps) {
     return;
   }
+
   const config = await ctx.getConfiguration(bindingProps.installId);
+  const botId = config.botUserId;
+  // avoid loops
+  if (
+    botId &&
+    props.type === "app_mention" &&
+    props.user === botId
+  ) {
+    return;
+  }
   const client = ctx.slackClientFor(config);
+  const streamURL = new URL(bindingProps.callbacks.stream);
+  streamURL.searchParams.set(
+    "__d",
+    `slack-${props.event.team}-${props.event.channel}`,
+  );
   let buffer = "";
   processStream({
     streamProps: {
@@ -56,5 +71,5 @@ export default async function invoke(
         }
       });
     },
-  }, bindingProps.callbacks.stream);
+  }, streamURL.href);
 }

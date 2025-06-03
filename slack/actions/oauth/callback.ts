@@ -49,6 +49,7 @@ export default async function callback(
   const currentCtx = await ctx.getConfiguration();
   await ctx.configure({
     ...currentCtx,
+    botUserId: tokenData.bot_user_id,
     botToken: tokenData.access_token, // Bot token for API calls
     userToken: tokenData.authed_user.access_token, // User token if needed
     teamId: tokenData.team.id,

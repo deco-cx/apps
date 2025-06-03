@@ -28,6 +28,9 @@ export const SlackProvider: OAuthProvider = {
 
 export interface SlackWebhookPayload {
   event_id: string;
+  type: string;
+  user: string;
+  bot_id: string;
   event: {
     text: string;
     team: string;
@@ -39,6 +42,10 @@ export interface Props {
   tokens?: OAuthTokens;
   clientSecret?: string;
   clientId?: string;
+  /**
+   * @description Slack Bot User ID
+   */
+  botUserId?: string;
   /**
    * @description Slack Team/Workspace ID
    */
