@@ -16,6 +16,10 @@ export default async function link(
     await ctx.appStorage.setItem(teamId, {
       installId: ctx.installId,
       ...props,
+      channels: {
+        ...(config.channels ?? {}),
+        [props.discriminator]: props.callbacks,
+      },
     });
   }
 }

@@ -35,7 +35,9 @@ export default async function invoke(
     return;
   }
   const client = ctx.slackClientFor(config);
-  const streamURL = new URL(bindingProps.callbacks.stream);
+  const streamCallbackUrl = config.channels?.[props.event.channel]?.stream ??
+    bindingProps.callbacks.stream;
+  const streamURL = new URL(streamCallbackUrl);
   streamURL.searchParams.set(
     "__d",
     `slack-${props.event.team}-${props.event.channel}`,
@@ -53,10 +55,10 @@ export default async function invoke(
         resourceId: props.event.channel,
       },
     },
-    onTextPart: (part) => {
+    onTextPart: (part: string) => {
       buffer += part;
     },
-    onErrorPart: (err) => {
+    onErrorPart: (err: string) => {
       console.error("error on part", err);
     },
     onFinishMessagePart: () => {
