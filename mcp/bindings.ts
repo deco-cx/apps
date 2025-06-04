@@ -13,14 +13,12 @@ export interface Callbacks {
 }
 
 export interface LinkChannelProps {
-  triggerId: string;
   workspace: string;
   discriminator: string;
   callbacks: Callbacks;
 }
 
 export interface UnlinkChannelProps {
-  triggerId: string;
   workspace: string;
   discriminator: string;
 }
