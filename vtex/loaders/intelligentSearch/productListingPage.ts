@@ -328,7 +328,6 @@ const loader = async (
   });
 
 
-  const currentPageoffset = props.pageOffset ?? 1;
   let pathToUse = url.href.replace(url.origin, "");
 
   if (pathToUse === "/" || pathToUse === "/*") {
