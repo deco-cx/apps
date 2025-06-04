@@ -32,3 +32,5 @@ export const GOOGLE_SHEETS_ERROR_MESSAGES = {
 } as const;
 
 export const TEMP_QUERY_SHEET_NAME = "temp_query_sheet";
+export const FORMULA_ADD_ROW_NUMBER =
+  '=ARRAYFORMULA(IF(LEN(A2:A); ROW(A2:A) - ROW(A2) + 1; ""))';
