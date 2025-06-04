@@ -2,11 +2,8 @@ import { redirect } from "@deco/deco";
 import type { ProductListingPage } from "../../../commerce/types.ts";
 import { parseRange } from "../../../commerce/utils/filters.ts";
 import { STALE } from "../../../utils/fetch.ts";
-<<<<<<< HEAD
-=======
 import { safeJsonSerialize } from "../../../website/utils/html.ts";
 import sendEvent from "../../actions/analytics/sendEvent.ts";
->>>>>>> fcdedc6d904fddadb0d79c78863aced9da2bce16
 import { AppContext } from "../../mod.ts";
 import {
   isFilterParam,
@@ -499,8 +496,8 @@ const loader = async (
       currentPageTypes,
       baseUrl,
       hasPreviousPage ? paramnPage : undefined,
-    ),
-  };
+    )),
+  }
 };
 export const cache = "stale-while-revalidate";
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
