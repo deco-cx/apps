@@ -12,14 +12,14 @@ export interface Callbacks {
   generateObject: string;
 }
 
-export interface OnChannelLinkedProps {
+export interface LinkChannelProps {
   triggerId: string;
   workspace: string;
   discriminator: string;
   callbacks: Callbacks;
 }
 
-export interface OnChannelUnlinkedProps {
+export interface UnlinkChannelProps {
   triggerId: string;
   workspace: string;
   discriminator: string;
