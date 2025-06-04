@@ -1,5 +1,8 @@
 import { AppContext } from "../mod.ts";
-import { TEMP_QUERY_SHEET_NAME } from "../utils/constant.ts";
+import {
+  FORMULA_ADD_ROW_NUMBER,
+  TEMP_QUERY_SHEET_NAME,
+} from "../utils/constant.ts";
 import { ValueRange } from "../utils/types.ts";
 import { SheetsQueryBuilder } from "../utils/queryBulder.ts";
 
@@ -154,7 +157,7 @@ async function addRowNumbersFormula(
 ): Promise<{ column: string; range: string }> {
   const column = await findFirstEmptyColumn(ctx, spreadsheetId, sheetName);
   const range = `${column}1`;
-  const formula = '=ARRAYFORMULA(IF(LEN(A2:A); ROW(A2:A) - ROW(A2) + 1; ""))';
+  const formula = FORMULA_ADD_ROW_NUMBER;
 
   const result = await ctx.invoke["google-sheets"].actions.addFormula({
     spreadsheetId,
