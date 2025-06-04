@@ -105,13 +105,13 @@ interface GenerationResult {
 const POLLING_CONFIG = {
   MAX_ATTEMPTS: 60,
   INTERVAL_MS: 1500,
-  TIMEOUT_MESSAGE: "Polling timeout: Image generation took too long"
+  TIMEOUT_MESSAGE: "Polling timeout: Image generation took too long",
 } as const;
 
 const CONTENT_TYPES = {
-  png: 'image/png',
-  jpeg: 'image/jpeg',
-  jpg: 'image/jpeg',
+  png: "image/png",
+  jpeg: "image/jpeg",
+  jpg: "image/jpeg",
 } as const;
 
 const DEFAULT_VALUES = {
@@ -119,7 +119,7 @@ const DEFAULT_VALUES = {
   seed: null,
   prompt_upsampling: false,
   safety_tolerance: 2,
-  output_format: "png"
+  output_format: "png",
 } as const;
 
 /**
@@ -135,11 +135,15 @@ export default async function generateImageAction(
 
   try {
     const requestPayload = createRequestPayload(config);
-    
+
     if (config.presignedUrls?.length) {
-      return await handleAsyncGeneration(fluxClient, requestPayload, config.presignedUrls);
+      return await handleAsyncGeneration(
+        fluxClient,
+        requestPayload,
+        config.presignedUrls,
+      );
     }
-    
+
     return await handleSyncGeneration(fluxClient, requestPayload);
   } catch (error) {
     return handleError(error);
@@ -154,7 +158,8 @@ function normalizeProps(props: Props) {
     ...props,
     aspect_ratio: props.aspect_ratio ?? DEFAULT_VALUES.aspect_ratio,
     seed: props.seed ?? DEFAULT_VALUES.seed,
-    prompt_upsampling: props.prompt_upsampling ?? DEFAULT_VALUES.prompt_upsampling,
+    prompt_upsampling: props.prompt_upsampling ??
+      DEFAULT_VALUES.prompt_upsampling,
     safety_tolerance: props.safety_tolerance ?? DEFAULT_VALUES.safety_tolerance,
     output_format: props.output_format ?? DEFAULT_VALUES.output_format,
   };
@@ -163,7 +168,9 @@ function normalizeProps(props: Props) {
 /**
  * Creates the request payload for FLUX API
  */
-function createRequestPayload(config: ReturnType<typeof normalizeProps>): FluxImageGenerationRequest {
+function createRequestPayload(
+  config: ReturnType<typeof normalizeProps>,
+): FluxImageGenerationRequest {
   return {
     prompt: config.prompt,
     aspect_ratio: config.aspect_ratio,
@@ -182,7 +189,7 @@ function createRequestPayload(config: ReturnType<typeof normalizeProps>): FluxIm
 async function handleAsyncGeneration(
   fluxClient: ReturnType<typeof import("../client.ts").createFluxClient>,
   requestPayload: FluxImageGenerationRequest,
-  presignedUrls: string[]
+  presignedUrls: string[],
 ): Promise<GenerationResult> {
   const response = await fluxClient["POST /v1/flux-kontext-pro"]({}, {
     body: requestPayload,
@@ -190,17 +197,25 @@ async function handleAsyncGeneration(
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Initial FLUX request failed: ${response.status} ${errorText}`);
+    throw new Error(
+      `Initial FLUX request failed: ${response.status} ${errorText}`,
+    );
   }
 
   const result = await response.json();
-  
+
   // Fire and forget async processing
-  queueAsyncProcessing(result.id, fluxClient, presignedUrls, requestPayload.output_format || "jpeg");
+  queueAsyncProcessing(
+    result.id,
+    fluxClient,
+    presignedUrls,
+    requestPayload.output_format || "jpeg",
+  );
 
   return {
     success: true,
-    message: "Image generation started. The image will be uploaded to the provided URLs when ready.",
+    message:
+      "Image generation started. The image will be uploaded to the provided URLs when ready.",
   };
 }
 
@@ -209,7 +224,7 @@ async function handleAsyncGeneration(
  */
 async function handleSyncGeneration(
   fluxClient: ReturnType<typeof import("../client.ts").createFluxClient>,
-  requestPayload: FluxImageGenerationRequest
+  requestPayload: FluxImageGenerationRequest,
 ): Promise<GenerationResult> {
   const response = await fluxClient["POST /v1/flux-kontext-pro"]({}, {
     body: requestPayload,
@@ -222,14 +237,15 @@ async function handleSyncGeneration(
     return {
       success: true,
       imageUrl: finalResult.result.sample,
-      message: "Image generated successfully. Note: The URL is valid for 10 minutes.",
+      message:
+        "Image generated successfully. Note: The URL is valid for 10 minutes.",
     };
   }
-  
+
   if (finalResult.status === "Error") {
     throw new Error(finalResult.error || "Image generation failed");
   }
-  
+
   throw new Error(`Unexpected status: ${finalResult.status}`);
 }
 
@@ -240,11 +256,16 @@ function queueAsyncProcessing(
   requestId: string,
   fluxClient: ReturnType<typeof import("../client.ts").createFluxClient>,
   presignedUrls: string[],
-  outputFormat: string
+  outputFormat: string,
 ): void {
   setTimeout(async () => {
     try {
-      await processImageGenerationAsync(requestId, fluxClient, presignedUrls, outputFormat);
+      await processImageGenerationAsync(
+        requestId,
+        fluxClient,
+        presignedUrls,
+        outputFormat,
+      );
     } catch (error) {
       console.error("Async image generation failed:", error);
       await handleAsyncError(presignedUrls, error);
@@ -255,12 +276,19 @@ function queueAsyncProcessing(
 /**
  * Handles errors in async processing by writing to presigned URLs
  */
-async function handleAsyncError(presignedUrls: string[], error: unknown): Promise<void> {
-  const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-  
+async function handleAsyncError(
+  presignedUrls: string[],
+  error: unknown,
+): Promise<void> {
+  const errorMessage = error instanceof Error
+    ? error.message
+    : "Unknown error occurred";
+
   try {
     await Promise.all(
-      presignedUrls.map(url => writeErrorToPresignedUrl(url, `Generation failed: ${errorMessage}`))
+      presignedUrls.map((url) =>
+        writeErrorToPresignedUrl(url, `Generation failed: ${errorMessage}`)
+      ),
     );
   } catch (writeError) {
     console.error("Failed to write error to presigned URLs:", writeError);
@@ -278,7 +306,9 @@ async function pollForResult(
     await sleep(POLLING_CONFIG.INTERVAL_MS);
 
     try {
-      const response = await fluxClient["GET /v1/get_result"]({ id: requestId });
+      const response = await fluxClient["GET /v1/get_result"]({
+        id: requestId,
+      });
       const result = await response.json();
 
       console.log(`Polling attempt ${attempt + 1}: Status ${result.status}`);
@@ -288,7 +318,7 @@ async function pollForResult(
       }
     } catch (error) {
       console.error(`Polling attempt ${attempt + 1} failed:`, error);
-      
+
       if (attempt === POLLING_CONFIG.MAX_ATTEMPTS - 1) {
         throw error;
       }
@@ -327,11 +357,11 @@ async function processImageGenerationAsync(
  */
 async function downloadImage(imageUrl: string): Promise<ArrayBuffer> {
   const response = await fetch(imageUrl);
-  
+
   if (!response.ok) {
     throw new Error(`Failed to download image: ${response.status}`);
   }
-  
+
   return await response.arrayBuffer();
 }
 
@@ -341,10 +371,12 @@ async function downloadImage(imageUrl: string): Promise<ArrayBuffer> {
 async function uploadImageToAllUrls(
   imageBuffer: ArrayBuffer,
   presignedUrls: string[],
-  outputFormat: string
+  outputFormat: string,
 ): Promise<void> {
   await Promise.all(
-    presignedUrls.map(url => uploadImageToPresignedUrl(imageBuffer, url, outputFormat))
+    presignedUrls.map((url) =>
+      uploadImageToPresignedUrl(imageBuffer, url, outputFormat)
+    ),
   );
 }
 
@@ -357,8 +389,10 @@ async function uploadImageToPresignedUrl(
   format: string,
 ): Promise<void> {
   const contentType = detectContentTypeFromUrl(presignedUrl, format);
-  
-  console.log(`Uploading image with Content-Type: ${contentType} to URL: ${presignedUrl}`);
+
+  console.log(
+    `Uploading image with Content-Type: ${contentType} to URL: ${presignedUrl}`,
+  );
 
   const response = await fetch(presignedUrl, {
     method: "PUT",
@@ -382,9 +416,11 @@ async function writeErrorToPresignedUrl(
   errorMessage: string,
 ): Promise<void> {
   const errorBuffer = new TextEncoder().encode(errorMessage);
-  const contentType = detectContentTypeFromUrl(presignedUrl, 'jpeg');
+  const contentType = detectContentTypeFromUrl(presignedUrl, "jpeg");
 
-  console.log(`Writing error with Content-Type: ${contentType} to URL: ${presignedUrl}`);
+  console.log(
+    `Writing error with Content-Type: ${contentType} to URL: ${presignedUrl}`,
+  );
 
   const response = await fetch(presignedUrl, {
     method: "PUT",
@@ -402,20 +438,26 @@ async function writeErrorToPresignedUrl(
 /**
  * Detects content type from URL path with fallback
  */
-function detectContentTypeFromUrl(presignedUrl: string, fallbackFormat: string): string {
+function detectContentTypeFromUrl(
+  presignedUrl: string,
+  fallbackFormat: string,
+): string {
   try {
     const url = new URL(presignedUrl);
     const pathname = url.pathname.toLowerCase();
-    
+
     for (const [extension, contentType] of Object.entries(CONTENT_TYPES)) {
       if (pathname.endsWith(`.${extension}`)) {
         return contentType;
       }
     }
   } catch (error) {
-    console.warn('Failed to parse presigned URL, using fallback content type:', error);
+    console.warn(
+      "Failed to parse presigned URL, using fallback content type:",
+      error,
+    );
   }
-  
+
   return `image/${fallbackFormat}`;
 }
 
@@ -435,7 +477,7 @@ async function safeGetResponseText(response: Response): Promise<string> {
  */
 function handleError(error: unknown): GenerationResult {
   console.error("Image generation error:", error);
-  
+
   return {
     success: false,
     error: error instanceof Error ? error.message : "Unknown error occurred",
@@ -446,5 +488,5 @@ function handleError(error: unknown): GenerationResult {
  * Promisified setTimeout for cleaner async code
  */
 function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
