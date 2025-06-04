@@ -37,12 +37,11 @@ export class SheetsQueryBuilder {
   }
 
   searchAcrossColumns(term: string, columns: string[]): this {
-    const lowerTerm = term.toLowerCase();
     const conditions = columns.map(
       (col) =>
         `${
           SheetsQueryBuilder.columnLetterOrNameToCol(col, this._headerMap)
-        } CONTAINS '${lowerTerm}'`,
+        } CONTAINS '${term}'`,
     );
     this._where.push(...conditions);
     return this;
