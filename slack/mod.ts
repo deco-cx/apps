@@ -67,6 +67,12 @@ export interface Props {
    * @description Callbacks for the slack binding
    */
   callbacks?: Callbacks;
+
+  /**
+   * @description Channels that the slack binding is linked to
+   * @hide true
+   */
+  channels?: Record<string, Callbacks>;
 }
 
 export interface State extends Props {

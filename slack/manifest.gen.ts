@@ -2,9 +2,9 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/bindings/created.ts";
-import * as $$$$$$$$$1 from "./actions/bindings/deleted.ts";
-import * as $$$$$$$$$2 from "./actions/bindings/invoke.ts";
+import * as $$$$$$$$$0 from "./actions/channels/invoke.ts";
+import * as $$$$$$$$$1 from "./actions/channels/link.ts";
+import * as $$$$$$$$$2 from "./actions/channels/unlink.ts";
 import * as $$$$$$$$$3 from "./actions/messages/post.ts";
 import * as $$$$$$$$$4 from "./actions/messages/react.ts";
 import * as $$$$$$$$$5 from "./actions/messages/threads/reply.ts";
@@ -27,9 +27,9 @@ const manifest = {
     "slack/loaders/users.ts": $$$5,
   },
   "actions": {
-    "slack/actions/bindings/created.ts": $$$$$$$$$0,
-    "slack/actions/bindings/deleted.ts": $$$$$$$$$1,
-    "slack/actions/bindings/invoke.ts": $$$$$$$$$2,
+    "slack/actions/channels/invoke.ts": $$$$$$$$$0,
+    "slack/actions/channels/link.ts": $$$$$$$$$1,
+    "slack/actions/channels/unlink.ts": $$$$$$$$$2,
     "slack/actions/messages/post.ts": $$$$$$$$$3,
     "slack/actions/messages/react.ts": $$$$$$$$$4,
     "slack/actions/messages/threads/reply.ts": $$$$$$$$$5,

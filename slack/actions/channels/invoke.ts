@@ -1,8 +1,8 @@
-import { OnCreatedBindingProps, processStream } from "../../../mcp/bindings.ts";
+import { LinkChannelProps, processStream } from "../../../mcp/bindings.ts";
 import type { AppContext, SlackWebhookPayload } from "../../mod.ts";
 
 /**
- * @name ON_BINDING_INVOKED
+ * @name ON_CHANNEL_INVOKED
  * @description This action is triggered when slack sends a webhook event
  */
 export default async function invoke(
@@ -16,7 +16,7 @@ export default async function invoke(
   }
 
   const bindingProps =
-    await ctx.appStorage.getItem<OnCreatedBindingProps & { installId: string }>(
+    await ctx.appStorage.getItem<LinkChannelProps & { installId: string }>(
       props.event.team,
     ) ??
       undefined;
@@ -35,7 +35,9 @@ export default async function invoke(
     return;
   }
   const client = ctx.slackClientFor(config);
-  const streamURL = new URL(bindingProps.callbacks.stream);
+  const streamCallbackUrl = config.channels?.[props.event.channel]?.stream ??
+    bindingProps.callbacks.stream;
+  const streamURL = new URL(streamCallbackUrl);
   streamURL.searchParams.set(
     "__d",
     `slack-${props.event.team}-${props.event.channel}`,
@@ -53,10 +55,10 @@ export default async function invoke(
         resourceId: props.event.channel,
       },
     },
-    onTextPart: (part) => {
+    onTextPart: (part: string) => {
       buffer += part;
     },
-    onErrorPart: (err) => {
+    onErrorPart: (err: string) => {
       console.error("error on part", err);
     },
     onFinishMessagePart: () => {
