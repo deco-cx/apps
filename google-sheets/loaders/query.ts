@@ -3,8 +3,8 @@ import {
   FORMULA_ADD_ROW_NUMBER,
   TEMP_QUERY_SHEET_NAME,
 } from "../utils/constant.ts";
-import { ValueRange } from "../utils/types.ts";
 import { SheetsQueryBuilder } from "../utils/queryBulder.ts";
+import { ValueRange } from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -66,6 +66,12 @@ export interface Props {
    * @description Como datas e horas devem ser representadas na resposta
    */
   dateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
+
+  /**
+   * @title Incluir Coluna de Número de Linha
+   * @description Se deve incluir a coluna de número de linha na resposta
+   */
+  includeRowNumber?: boolean;
 }
 
 async function createTempQuerySheet(
@@ -194,6 +200,7 @@ const loader = async (
     majorDimension = "ROWS",
     valueRenderOption = "FORMATTED_VALUE",
     dateTimeRenderOption = "SERIAL_NUMBER",
+    includeRowNumber = false,
   } = props;
 
   let copySheetName = "";
@@ -226,13 +233,13 @@ const loader = async (
     queryBuilder.header(headerRow);
     queryBuilder.headerMap(headers.headerMap);
 
-    let _rowNumberColumn = { column: "", range: "" };
-
-    _rowNumberColumn = await addRowNumbersFormula(
-      ctx,
-      spreadsheetId,
-      copySheetName,
-    );
+    if (includeRowNumber) {
+      await addRowNumbersFormula(
+        ctx,
+        spreadsheetId,
+        copySheetName,
+      );
+    }
 
     if (select && select.length > 0) {
       queryBuilder.select(select);
@@ -292,10 +299,18 @@ const loader = async (
       throw error;
     }
   } catch (error) {
-    await Promise.all([
-      deleteTempSheet(ctx, spreadsheetId, tempSheetName),
-      deleteTempSheet(ctx, spreadsheetId, copySheetName),
-    ]);
+    const promises = [];
+
+    if (tempSheetName) {
+      promises.push(deleteTempSheet(ctx, spreadsheetId, tempSheetName));
+    }
+
+    if (copySheetName) {
+      promises.push(deleteTempSheet(ctx, spreadsheetId, copySheetName));
+    }
+
+    await Promise.all(promises);
+
     throw error;
   }
 };

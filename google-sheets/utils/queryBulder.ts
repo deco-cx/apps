@@ -40,9 +40,9 @@ export class SheetsQueryBuilder {
     const lowerTerm = term.toLowerCase();
     const conditions = columns.map(
       (col) =>
-        `LOWER(${
+        `${
           SheetsQueryBuilder.columnLetterOrNameToCol(col, this._headerMap)
-        }) CONTAINS '${lowerTerm}'`,
+        } CONTAINS '${lowerTerm}'`,
     );
     this._where.push(...conditions);
     return this;
