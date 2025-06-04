@@ -23,7 +23,7 @@ export interface Props {
   isBreadcrumbProductName?: boolean;
 }
 
-export const cache = "stale-while-revalidate";
+export const cache = "no-cache";
 
 export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
   const customAttributes = getCustomFields(props.customFields, ["ALL"]);
