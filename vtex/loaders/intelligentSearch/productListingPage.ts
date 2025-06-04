@@ -3,7 +3,6 @@ import type { ProductListingPage } from "../../../commerce/types.ts";
 import { parseRange } from "../../../commerce/utils/filters.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { safeJsonSerialize } from "../../../website/utils/html.ts";
-import sendEvent from "../../actions/analytics/sendEvent.ts";
 import { AppContext } from "../../mod.ts";
 import {
   isFilterParam,
