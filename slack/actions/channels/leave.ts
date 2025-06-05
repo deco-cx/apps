@@ -1,12 +1,12 @@
-import { UnlinkChannelProps } from "../../../mcp/bindings.ts";
+import { LeaveChannelProps } from "../../../mcp/bindings.ts";
 import type { AppContext } from "../../mod.ts";
 
 /**
- * @name UNLINK_CHANNEL
+ * @name LEAVE_CHANNEL
  * @description This action is triggered when slack binding is unlinked
  */
-export default async function unlink(
-  props: UnlinkChannelProps,
+export default async function leave(
+  props: LeaveChannelProps,
   _req: Request,
   ctx: AppContext,
 ) {

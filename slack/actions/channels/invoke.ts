@@ -1,8 +1,8 @@
-import { LinkChannelProps, processStream } from "../../../mcp/bindings.ts";
+import { JoinChannelProps, processStream } from "../../../mcp/bindings.ts";
 import type { AppContext, SlackWebhookPayload } from "../../mod.ts";
 
 /**
- * @name ON_CHANNEL_INVOKED
+ * @name SEND_MESSAGE
  * @description This action is triggered when slack sends a webhook event
  */
 export default async function invoke(
@@ -15,11 +15,10 @@ export default async function invoke(
     return { challenge };
   }
   const linkProps =
-    await ctx.appStorage.getItem<LinkChannelProps & { installId: string }>(
+    await ctx.appStorage.getItem<JoinChannelProps & { installId: string }>(
       ctx.cb.forTeam(props.event.team, props.event.channel),
     ) ??
       undefined;
-  console.log("invoking channel", props, linkProps);
   if (!linkProps) {
     return;
   }

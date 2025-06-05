@@ -12,13 +12,13 @@ export interface Callbacks {
   generateObject: string;
 }
 
-export interface LinkChannelProps {
+export interface JoinChannelProps {
   workspace: string;
   discriminator: string;
   callbacks: Callbacks;
 }
 
-export interface UnlinkChannelProps {
+export interface LeaveChannelProps {
   workspace: string;
   discriminator: string;
 }
