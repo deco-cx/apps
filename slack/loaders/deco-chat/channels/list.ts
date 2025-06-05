@@ -13,12 +13,9 @@ export default async function leave(
   _req: Request,
   ctx: AppContext,
 ): Promise<ListChannelsResponse> {
-  if (!ctx.teamId) {
-    throw new Error("Team ID is required");
-  }
-  const channels = await ctx.slack.getChannels(ctx.teamId);
+  const channels = await ctx.invoke.slack.loaders.channels({});
   return {
-    channels: channels.data.channels.map((ch) => {
+    channels: channels.channels.map((ch) => {
       return {
         label: ch.name,
         value: ch.id,
