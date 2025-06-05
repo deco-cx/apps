@@ -174,22 +174,28 @@ export class SlackClient {
    * @description Posts a new message to a channel
    * @param channelId The channel ID to post to
    * @param text The message text
+   * @param opts Optional parameters: thread_ts for threading, blocks for Block Kit formatting
    */
   async postMessage(
     channelId: string,
     text: string,
-    opts: { thread_ts?: string } = {},
+    opts: { thread_ts?: string; blocks?: unknown[] } = {},
   ): Promise<
     { channel: string; ts: string; message: SlackMessage; ok: boolean }
   > {
+    const payload: Record<string, unknown> = {
+      channel: channelId,
+      text: text,
+      ...opts,
+    };
+    // Remove text if blocks are provided and text is empty (Slack requires at least one of them)
+    if (opts.blocks && opts.blocks.length > 0 && !text) {
+      delete payload.text;
+    }
     const response = await fetch("https://slack.com/api/chat.postMessage", {
       method: "POST",
       headers: this.botHeaders,
-      body: JSON.stringify({
-        channel: channelId,
-        text: text,
-        ...opts,
-      }),
+      body: JSON.stringify(payload),
     });
 
     return response.json();
