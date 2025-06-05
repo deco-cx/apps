@@ -1,10 +1,8 @@
-
-
 export interface ChatContextRequest {
   query: string;
 }
 
- export interface FileReference {
+export interface FileReference {
   status: string;
   id: string;
   name: string;
@@ -17,19 +15,19 @@ export interface ChatContextRequest {
   error_message: null | string;
 }
 
- export interface Reference {
+export interface Reference {
   type: string;
   file: FileReference;
   pages: number[];
 }
 
- export interface Snippet {
+export interface Snippet {
   type: string;
   content: string;
   score: number;
   reference: Reference;
 }
 
- export interface ChatContextResponse {
+export interface ChatContextResponse {
   snippets: Snippet[];
 }
