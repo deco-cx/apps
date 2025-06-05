@@ -29,10 +29,6 @@ const action = async (
   ctx: AppContext,
 ): Promise<QueryResult> => {
   try {
-    if (!ctx.assistant) {
-      throw new Error("Assistant name is required on the context");
-    }
-
     const response = await ctx.client
       ["POST /assistant/chat/:assistant_name/context"]({
         assistant_name: ctx.assistant,
