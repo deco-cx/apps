@@ -15,16 +15,16 @@ export default async function invoke(
     return { challenge };
   }
 
-  const bindingProps =
+  const linkProps =
     await ctx.appStorage.getItem<LinkChannelProps & { installId: string }>(
       props.event.team,
     ) ??
       undefined;
-  if (!bindingProps) {
+  if (!linkProps) {
     return;
   }
 
-  const config = await ctx.getConfiguration(bindingProps.installId);
+  const config = await ctx.getConfiguration(linkProps.installId);
   const botId = config.botUserId;
   // avoid loops
   if (
@@ -35,8 +35,8 @@ export default async function invoke(
     return;
   }
   const client = ctx.slackClientFor(config);
-  const streamCallbackUrl = config.channels?.[props.event.channel]?.stream ??
-    bindingProps.callbacks.stream;
+  const streamCallbackUrl = linkProps.callbacks?.stream ??
+    config?.callbacks?.stream;
   const streamURL = new URL(streamCallbackUrl);
   streamURL.searchParams.set(
     "__d",

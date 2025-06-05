@@ -13,13 +13,12 @@ export default async function link(
   const config = await ctx.getConfiguration(ctx.installId);
   const teamId = ctx.teamId ?? config.teamId;
   if (teamId) {
-    await ctx.appStorage.setItem(teamId, {
-      installId: ctx.installId,
-      ...props,
-      channels: {
-        ...(config.channels ?? {}),
-        [props.discriminator]: props.callbacks,
+    await ctx.appStorage.setItem<LinkChannelProps & { installId: string }>(
+      ctx.cb.forTeam(teamId, props.discriminator),
+      {
+        installId: ctx.installId,
+        ...props,
       },
-    });
+    );
   }
 }
