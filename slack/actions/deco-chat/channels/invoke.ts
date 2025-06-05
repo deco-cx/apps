@@ -41,6 +41,10 @@ export default async function invoke(
     "__d",
     `slack-${props.event.team}-${props.event.channel}`,
   );
+  const toolCallMessageTs: Record<
+    string,
+    { ts: string; name: string; arguments: Record<string, unknown> }
+  > = {};
   let buffer = "";
   processStream({
     streamProps: {
@@ -54,14 +58,45 @@ export default async function invoke(
         resourceId: props.event.channel,
       },
     },
+    onToolCallPart: async (toolCall) => {
+      const message = `🛠️ Running tool: *${toolCall.toolName}*\nArguments: \`${
+        JSON.stringify(toolCall.args)
+      }\`\nStatus: _Processing..._`;
+      const response = await client.postMessage(props.event.channel, message, {
+        thread_ts: props.event.ts, // or the main message ts if you want to thread
+      });
+      if (response.ok) {
+        toolCallMessageTs[toolCall.toolCallId] = {
+          ts: response.ts,
+          name: toolCall.toolName,
+          arguments: toolCall.args,
+        };
+      }
+    },
+    onToolResultPart: async (toolCall) => {
+      const call = toolCallMessageTs[toolCall.toolCallId];
+      if (call) {
+        const message = `🛠️ Tool: *${call.name}*\nArguments: \`${
+          JSON.stringify(call.arguments)
+        }\`\n✅ Result: \`${JSON.stringify(toolCall.result)}\``;
+        await client.updateMessage(props.event.channel, call.ts, message);
+      }
+    },
     onTextPart: (part: string) => {
       buffer += part;
     },
-    onErrorPart: (err: string) => {
-      console.error("error on part", err);
+    onErrorPart: async (err: string) => {
+      await client.postMessage(props.event.channel, `❌ Error: ${err}`, {
+        thread_ts: props.event.ts,
+      });
     },
-    onFinishMessagePart: () => {
-      client.postMessage(props.event.channel, buffer).then((response) => {
+    onFinishMessagePart: async () => {
+      if (linkProps.agentLink && linkProps.agentName) {
+        buffer = `<${linkProps.agentLink}|${linkProps.agentName}>: ${buffer}`;
+      }
+      await client.postMessage(props.event.channel, buffer, {
+        thread_ts: props.event.ts,
+      }).then((response) => {
         if (!response.ok) {
           console.error(
             "error sending message to slack",
