@@ -580,3 +580,12 @@ export interface OptimizedSpreadsheetMetadata {
     filledCells?: number;
   }>;
 }
+
+export interface ActionBatchUpdateProps {
+  first_cell_location?: string;
+  includeValuesInResponse?: boolean;
+  sheet_name: string;
+  spreadsheet_id: string;
+  valueInputOption?: "RAW" | "USER_ENTERED";
+  values: string[][];
+}
