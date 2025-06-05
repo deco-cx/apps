@@ -1,9 +1,9 @@
-import { JoinChannelProps } from "../../../mcp/bindings.ts";
-import type { AppContext } from "../../mod.ts";
+import { JoinChannelProps } from "../../../../mcp/bindings.ts";
+import type { AppContext } from "../../../mod.ts";
 
 /**
- * @name JOIN_CHANNEL
- * @description This action is triggered when slack binding is linked
+ * @name DECO_CHAT_CHANNELS_JOIN
+ * @description This action is triggered when channel is selected
  */
 export default async function join(
   props: JoinChannelProps,

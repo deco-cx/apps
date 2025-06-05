@@ -49,6 +49,19 @@ export interface StreamOptions<
   };
 }
 
+export interface ListChannelsProps {
+  workspace: string;
+}
+
+export interface ChannelItem {
+  label: string;
+  value: string;
+}
+
+export interface ListChannelsResponse {
+  channels: ChannelItem[];
+}
+
 export interface HandleStreamProps<
   TMetadata extends Record<string, unknown> = Record<string, unknown>,
 > extends ProcessDataStreamParameters {

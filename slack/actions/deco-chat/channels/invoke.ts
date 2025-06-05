@@ -1,8 +1,8 @@
-import { JoinChannelProps, processStream } from "../../../mcp/bindings.ts";
-import type { AppContext, SlackWebhookPayload } from "../../mod.ts";
+import { JoinChannelProps, processStream } from "../../../../mcp/bindings.ts";
+import type { AppContext, SlackWebhookPayload } from "../../../mod.ts";
 
 /**
- * @name SEND_MESSAGE
+ * @name DECO_CHAT_CHANNELS_INVOKE
  * @description This action is triggered when slack sends a webhook event
  */
 export default async function invoke(
