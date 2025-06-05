@@ -14,12 +14,12 @@ export default async function invoke(
   if (challenge) {
     return { challenge };
   }
-
   const linkProps =
     await ctx.appStorage.getItem<LinkChannelProps & { installId: string }>(
       ctx.cb.forTeam(props.event.team, props.event.channel),
     ) ??
       undefined;
+  console.log("invoking channel", props, linkProps);
   if (!linkProps) {
     return;
   }
