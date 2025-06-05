@@ -6,9 +6,9 @@ import * as $$$$$$$$$0 from "./actions/search.ts";
 
 const manifest = {
   "actions": {
-    "pinecone/actions/search.ts": $$$$$$$$$0,
+    "pinecone-assistant/actions/search.ts": $$$$$$$$$0,
   },
-  "name": "pinecone",
+  "name": "pinecone-assistant",
   "baseUrl": import.meta.url,
 };
 

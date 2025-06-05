@@ -17,19 +17,9 @@ export interface Props {
   host: string;
 
   /**
-   * @description Pinecone namespace
-   */
-  namespace?: string;
-
-  /**
-   * @description Fields to retrieve from the search results
-   */
-  fields?: string[];
-
-  /**
    * @description Assistant name
    */
-  assistant?: string;
+  assistant: string;
 }
 
 export interface State extends Props {
@@ -39,8 +29,8 @@ export interface State extends Props {
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
- * @title Pinecone
- * @description Integração com Pinecone
+ * @title Pinecone Assistant
+ * @description Pinecone Assistant integration
  * @category IA
  * @logo https://avatars.githubusercontent.com/u/54333248?s=200&v=4
  */
