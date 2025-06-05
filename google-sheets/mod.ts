@@ -79,15 +79,12 @@ export default function App(
     tokens,
     options,
     onTokenRefresh: async (newTokens: OAuthTokens) => {
-      console.log("onTokenRefresh called");
       if (ctx) {
-        console.log("ctx is defined");
         await ctx.configure({
           ...ctx,
           tokens: newTokens,
         });
       }
-      console.log("onTokenRefresh finished");
     },
   });
 
