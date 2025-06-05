@@ -35,6 +35,7 @@ export interface SlackWebhookPayload {
     text: string;
     team: string;
     channel: string;
+    ts: string;
   };
 }
 

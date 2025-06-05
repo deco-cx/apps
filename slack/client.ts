@@ -153,6 +153,24 @@ export class SlackClient {
   }
 
   /**
+   * @description Joins a Slack channel
+   * @param channelId The ID of the channel to join
+   */
+  async joinChannel(
+    channelId: string,
+  ): Promise<SlackResponse<{ channel: SlackChannel }>> {
+    const response = await fetch("https://slack.com/api/conversations.join", {
+      method: "POST",
+      headers: this.botHeaders,
+      body: JSON.stringify({
+        channel: channelId,
+      }),
+    });
+
+    return response.json();
+  }
+
+  /**
    * @description Posts a new message to a channel
    * @param channelId The channel ID to post to
    * @param text The message text
@@ -160,8 +178,9 @@ export class SlackClient {
   async postMessage(
     channelId: string,
     text: string,
+    opts: { thread_ts?: string } = {},
   ): Promise<
-    SlackResponse<{ channel: string; ts: string; message: SlackMessage }>
+    { channel: string; ts: string; message: SlackMessage; ok: boolean }
   > {
     const response = await fetch("https://slack.com/api/chat.postMessage", {
       method: "POST",
@@ -169,6 +188,7 @@ export class SlackClient {
       body: JSON.stringify({
         channel: channelId,
         text: text,
+        ...opts,
       }),
     });
 
@@ -324,6 +344,33 @@ export class SlackClient {
       headers: this.botHeaders,
     });
 
+    return response.json();
+  }
+
+  /**
+   * @description Updates an existing message in a channel
+   * @param channelId The channel ID containing the message
+   * @param ts The timestamp of the message to update
+   * @param text The new message text
+   */
+  async updateMessage(
+    channelId: string,
+    ts: string,
+    text: string,
+    opts: { thread_ts?: string } = {},
+  ): Promise<
+    { channel: string; ts: string; message: SlackMessage; ok: boolean }
+  > {
+    const response = await fetch("https://slack.com/api/chat.update", {
+      method: "POST",
+      headers: this.botHeaders,
+      body: JSON.stringify({
+        channel: channelId,
+        ts: ts,
+        text: text,
+        ...opts,
+      }),
+    });
     return response.json();
   }
 }
