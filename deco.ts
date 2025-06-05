@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("pinecone-assistant"),
     app("shopify-mcp"),
     app("google-gmail"),
     app("github"),
