@@ -1,5 +1,5 @@
+import type { ChannelType, SlackChannel } from "../client.ts";
 import type { AppContext } from "../mod.ts";
-import type { ChannelType, SlackChannel, SlackResponse } from "../client.ts";
 
 export interface Props {
   /**
@@ -27,7 +27,7 @@ export default async function listChannels(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<SlackResponse<{ channels: SlackChannel[] }>> {
+): Promise<{ channels: SlackChannel[] }> {
   const { limit, cursor, types } = props;
   const teamId = ctx.teamId;
 
