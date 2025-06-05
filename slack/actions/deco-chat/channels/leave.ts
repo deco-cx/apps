@@ -1,9 +1,9 @@
-import { LeaveChannelProps } from "../../../mcp/bindings.ts";
-import type { AppContext } from "../../mod.ts";
+import { LeaveChannelProps } from "../../../../mcp/bindings.ts";
+import type { AppContext } from "../../../mod.ts";
 
 /**
- * @name LEAVE_CHANNEL
- * @description This action is triggered when slack binding is unlinked
+ * @name DECO_CHAT_CHANNELS_LEAVE
+ * @description This action is triggered when slack integration is left
  */
 export default async function leave(
   props: LeaveChannelProps,
