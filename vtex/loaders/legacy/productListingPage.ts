@@ -439,7 +439,9 @@ const loader = async (
   };
 };
 
-export const cache = "stale-while-revalidate";
+export const cache = {
+  maxAge: 60 * 30, // 30 minutes
+};
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(props.pageHref || req.url);

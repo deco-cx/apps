@@ -301,7 +301,9 @@ const getSearchParams = (
   return [];
 };
 
-export const cache = "stale-while-revalidate";
+export const cache = {
+  maxAge: 60 * 30, // 30 minutes
+};
 
 export const cacheKey = (
   expandedProps: Props,
