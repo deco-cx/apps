@@ -59,11 +59,41 @@ export default async function invoke(
       },
     },
     onToolCallPart: async (toolCall) => {
-      const message = `🛠️ Running tool: *${toolCall.toolName}*\nArguments: \`${
-        JSON.stringify(toolCall.args)
-      }\`\nStatus: _Processing..._`;
-      const response = await client.postMessage(props.event.channel, message, {
-        thread_ts: props.event.ts, // or the main message ts if you want to thread
+      const blocks = [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `🛠️ Running tool: *${toolCall.toolName}*`,
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "*Arguments:*",
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "```" + JSON.stringify(toolCall.args, null, 2) + "```",
+          },
+        },
+        {
+          type: "context",
+          elements: [
+            {
+              type: "mrkdwn",
+              text: "_Status: Processing..._",
+            },
+          ],
+        },
+      ];
+      const response = await client.postMessage(props.event.channel, "", {
+        thread_ts: props.event.ts,
+        blocks,
       });
       if (response.ok) {
         toolCallMessageTs[toolCall.toolCallId] = {

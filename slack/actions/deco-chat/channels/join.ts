@@ -26,7 +26,7 @@ export default async function join(
     if (props.agentName && props.agentLink) {
       await ctx.slack.postMessage(
         props.discriminator,
-        `<${props.agentLink}|${props.agentName}> has joined the channel!. To interact with me, just mention @deco.chat in your messages!`,
+        `<${props.agentLink}|${props.agentName}> has joined the channel! To interact with me, just mention @deco.chat in your messages!`,
       ).catch((err) => {
         console.error("error posting welcome", err);
       });
