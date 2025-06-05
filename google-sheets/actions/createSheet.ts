@@ -40,9 +40,10 @@ export interface Props {
 }
 
 /**
- * @name CREATE_SHEET
+ * @name CREATE_TAB
  * @title Create Sheet
  * @description Creates a new sheet in a Google Sheets spreadsheet
+ * @internal true
  */
 const action = async (
   props: Props,

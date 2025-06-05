@@ -22,9 +22,10 @@ export interface Props {
 }
 
 /**
- * @name COPY_SHEET
+ * @name COPY_TAB
  * @title Copy Sheet
  * @description Creates a copy of a sheet within the same spreadsheet
+ * @internal true
  */
 const action = async (
   props: Props,

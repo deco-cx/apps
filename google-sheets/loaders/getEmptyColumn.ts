@@ -57,8 +57,9 @@ const loader = async (
       });
 
     if (!response.ok) {
-      throw new Error(
-        `Erro ao buscar dados da planilha: ${response.statusText}`,
+      ctx.errorHandler.toHttpError(
+        response.status,
+        `Error to get empty column: ${response.statusText}`,
       );
     }
 
@@ -76,7 +77,7 @@ const loader = async (
       index: columnIndex,
     };
   } catch (error) {
-    ctx.errorHandler.toHttpError(error, "Erro ao encontrar coluna vazia");
+    ctx.errorHandler.toHttpError(error, "Error to get empty column");
     return { column: "A", index: 0 };
   }
 };

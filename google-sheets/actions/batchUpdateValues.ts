@@ -50,6 +50,7 @@ export interface Props {
  * @name BATCH_UPDATE_SPREADSHEET_VALUES
  * @title Batch Update Spreadsheet Values
  * @description Updates values in a Google Sheets spreadsheet in a simple and intuitive way. Just specify the sheet name, starting cell and data, and the system will automatically calculate the required range.
+ * @internal true
  */
 const action = async (
   props: Props,

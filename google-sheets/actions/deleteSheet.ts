@@ -35,9 +35,10 @@ export interface Props {
 }
 
 /**
- * @name DELETE_SHEET
+ * @name DELETE_TAB
  * @title Delete Sheet
  * @description Deletes a sheet from a Google Sheets spreadsheet
+ * @internal true
  */
 const action = async (
   props: Props,
