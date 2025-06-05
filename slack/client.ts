@@ -132,7 +132,7 @@ export class SlackClient {
     limit: number = 100,
     cursor?: string,
     types: ChannelType[] = ["public_channel"],
-  ): Promise<SlackResponse<{ channels: SlackChannel[] }>> {
+  ): Promise<{ channels: SlackChannel[] }> {
     const params = new URLSearchParams({
       types: types.join(","),
       exclude_archived: "true",
