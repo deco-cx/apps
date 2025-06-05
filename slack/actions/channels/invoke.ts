@@ -17,7 +17,7 @@ export default async function invoke(
 
   const linkProps =
     await ctx.appStorage.getItem<LinkChannelProps & { installId: string }>(
-      props.event.team,
+      ctx.cb.forTeam(props.event.team, props.event.channel),
     ) ??
       undefined;
   if (!linkProps) {
@@ -73,5 +73,7 @@ export default async function invoke(
         }
       });
     },
-  }, streamURL.href);
+  }, streamURL.href).catch((err) => {
+    console.error("error streaming to slack", err, linkProps, config, props);
+  });
 }
