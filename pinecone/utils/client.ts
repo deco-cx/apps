@@ -1,4 +1,9 @@
-import { SearchRequest, SearchResponse, ChatContextRequest, ChatContextResponse } from "./types.ts";
+import {
+  ChatContextRequest,
+  ChatContextResponse,
+  SearchRequest,
+  SearchResponse,
+} from "./types.ts";
 
 export interface PineconeAPI {
   "POST /records/namespaces/:namespace/search": {
@@ -9,5 +14,5 @@ export interface PineconeAPI {
   "POST /chat/:assistant_name/context": {
     response: ChatContextResponse;
     body: ChatContextRequest;
-  }
+  };
 }

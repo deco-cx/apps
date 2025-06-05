@@ -56,7 +56,7 @@ export default function App(
   const client = createHttpClient<PineconeAPI>({
     base: props.host,
     headers: new Headers({
-      "Authorization": `Bearer ${apiKey}`,
+      "Api-Key": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
       "X-Pinecone-API-Version": "2025-01-01",
     }),
