@@ -101,11 +101,10 @@ export class SheetsQueryBuilder {
     return `=QUERY(${range}; "${query}"; ${this._header})`;
   }
 
-  /** Conta o total de colunas a partir do range (ex: A2:E → 5 colunas) */
   private getColumnCountFromRange(): number {
     const [, end] = this._range.split(":");
     const columnLetters = end.match(/[A-Z]+/)?.[0] || "A";
-    return SheetsQueryBuilder.letterToNumber(columnLetters) + 1; // +1 pois adicionamos a coluna do número
+    return SheetsQueryBuilder.letterToNumber(columnLetters) + 1;
   }
 
   static columnLetterOrNameToCol(
