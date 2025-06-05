@@ -221,6 +221,19 @@ query GetProduct(
 `,
 });
 
+export const ResolveURL = {
+  operationName: "ResolveURL",
+  query: gql`
+    query ResolveURL($url: String!) {
+      route(url: $url){
+        relative_url
+        redirect_code
+        type
+      }
+    }
+  `,
+};
+
 export const GetCategoryUid = {
   operationName: "GetCategoryUid",
   query: gql`

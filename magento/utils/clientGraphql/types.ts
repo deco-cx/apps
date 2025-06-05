@@ -237,6 +237,14 @@ export interface CategoryGraphQL {
   };
 }
 
+export interface ResolveURLGraphQL {
+  route: {
+    relative_url: string;
+    redirect_code: number;
+    type: string;
+  };
+}
+
 export interface PLPGraphQL {
   products: {
     items: SimpleProductGraphQL[];
