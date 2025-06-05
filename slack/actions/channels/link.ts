@@ -12,6 +12,7 @@ export default async function link(
 ) {
   const config = await ctx.getConfiguration(ctx.installId);
   const teamId = ctx.teamId ?? config.teamId;
+  console.log("linking channel", teamId, props);
   if (teamId) {
     await ctx.appStorage.setItem<LinkChannelProps & { installId: string }>(
       ctx.cb.forTeam(teamId, props.discriminator),
