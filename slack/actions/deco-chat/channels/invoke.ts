@@ -106,10 +106,55 @@ export default async function invoke(
     onToolResultPart: async (toolCall) => {
       const call = toolCallMessageTs[toolCall.toolCallId];
       if (call) {
-        const message = `🛠️ Tool: *${call.name}*\nArguments: \`${
-          JSON.stringify(call.arguments)
-        }\`\n✅ Result: \`${JSON.stringify(toolCall.result)}\``;
-        await client.updateMessage(props.event.channel, call.ts, message);
+        const blocks = [
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: `🛠️ Tool: *${call.name}*`,
+            },
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "*Arguments:*",
+            },
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "```" + JSON.stringify(call.arguments, null, 2) + "```",
+            },
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "*Result:*",
+            },
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "```" + JSON.stringify(toolCall.result, null, 2) + "```",
+            },
+          },
+          {
+            type: "context",
+            elements: [
+              {
+                type: "mrkdwn",
+                text: "✅ Result received.",
+              },
+            ],
+          },
+        ];
+        await client.updateMessage(props.event.channel, call.ts, "", {
+          blocks,
+        });
       }
     },
     onTextPart: (part: string) => {
