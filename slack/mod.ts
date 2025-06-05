@@ -67,17 +67,14 @@ export interface Props {
    * @description Callbacks for the slack binding
    */
   callbacks?: Callbacks;
-
-  /**
-   * @description Channels that the slack binding is linked to
-   * @hide true
-   */
-  channels?: Record<string, Callbacks>;
 }
 
 export interface State extends Props {
   slack: SlackClient;
   slackClientFor: (p: Props) => SlackClient;
+  cb: {
+    forTeam: (teamId: string, channel: string) => string;
+  };
 }
 
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
@@ -137,6 +134,11 @@ export default function App(
     ...appProps,
     slack: slackClientFor(appProps),
     slackClientFor,
+    cb: {
+      forTeam: (teamId: string, channel: string) => {
+        return `${teamId}-${channel}`;
+      },
+    },
   };
 
   return {

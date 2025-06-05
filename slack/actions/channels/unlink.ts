@@ -1,5 +1,5 @@
 import { UnlinkChannelProps } from "../../../mcp/bindings.ts";
-import type { AppContext, Props } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 
 /**
  * @name UNLINK_CHANNEL
@@ -15,8 +15,7 @@ export default async function unlink(
   if (!teamId) {
     return;
   }
-  const item = await ctx.appStorage.getItem<Props>(teamId);
-  if (!item) return;
-  delete item.channels?.[props.discriminator];
-  await ctx.appStorage.setItem(teamId, item);
+  await ctx.appStorage.removeItem(
+    ctx.cb.forTeam(teamId, props.discriminator),
+  );
 }
