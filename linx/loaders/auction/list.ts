@@ -37,8 +37,8 @@ const loader = async (
     throw new Error("/leilao.json returned another model than Auction");
   }
 
-  const products = auctions.Model.ProductAuctions.map((auction) =>
-    toAuction(auction, { cdn })
+  const products = auctions.Model.ProductAuctions.map((auction, index) =>
+    toAuction(auction, { cdn }, auctions.Model.Grid.Products[index])
   );
   const facets = toFilters(auctions.Model.Grid.Facets, url);
   const pageCount = auctions.Model.Grid.PageCount;
