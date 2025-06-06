@@ -1,7 +1,8 @@
+import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import { stripHTMLFromObject } from "../../website/utils/html.ts";
+import { getRecordsByPath } from "../core/records.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost, BlogPostPage } from "../types.ts";
-import { getRecordsByPath } from "../core/records.ts";
-import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
@@ -42,12 +43,12 @@ export default async function BlogPostPageLoader(
   return {
     "@type": "BlogPostPage",
     post,
-    seo: {
+    seo: stripHTMLFromObject({
       title: post?.seo?.title || post?.title,
       description: post?.seo?.description || post?.excerpt,
       canonical: post?.seo?.canonical || url.href,
       image: post?.seo?.image || post?.image,
       noIndexing: post?.seo?.noIndexing || false,
-    },
+    }),
   };
 }

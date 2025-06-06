@@ -1,4 +1,5 @@
 import type { ProductListingPage } from "../../commerce/types.ts";
+import { stripHTMLFromObject } from "../../website/utils/html.ts";
 import { AppContext } from "../../shopify/mod.ts";
 import {
   ProductsByCollection,
@@ -219,13 +220,13 @@ const loader = async (
       recordPerPage: count,
     },
     sortOptions: isSearch ? searchSortOptions : sortOptions,
-    seo: {
+    seo: stripHTMLFromObject({
       title: collectionTitle || "",
       description: collectionDescription || "",
       canonical: `${url.origin}${url.pathname}${
         page >= 1 ? `?page=${page}` : ""
       }`,
-    },
+    }),
   };
 };
 

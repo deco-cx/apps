@@ -1,4 +1,5 @@
 import { ProductDetailsPage } from "../../commerce/types.ts";
+import { stripHTMLFromObject } from "../../website/utils/html.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { getUrl, toBreadcrumbList, toProduct } from "../utils/transform.ts";
@@ -42,13 +43,13 @@ const loader = async (
       numberOfItems: itemListElement.length,
     },
     product,
-    seo: {
+    seo: stripHTMLFromObject({
       title: data.estrutura.seo.title,
       description: data.estrutura.seo.description,
       canonical:
         getUrl(new URL(data.estrutura.seo.canonical).pathname, url.origin).href,
       noIndexing: !data.estrutura.seo.indexar,
-    },
+    }),
   };
 };
 

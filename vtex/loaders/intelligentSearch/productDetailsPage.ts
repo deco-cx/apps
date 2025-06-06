@@ -1,4 +1,5 @@
 import type { ProductDetailsPage } from "../../../commerce/types.ts";
+import { stripHTMLFromObject } from "../../../website/utils/html.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
@@ -152,10 +153,10 @@ const loader = async (
       ? await withIsSimilarTo(req, ctx, page.product)
       : page.product,
     seo: isPageProduct && seo
-      ? {
+      ? stripHTMLFromObject({
         ...seo,
         noIndexing: props.indexingSkus ? false : seo.noIndexing,
-      }
+      })
       : null,
   };
 };

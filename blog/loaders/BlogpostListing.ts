@@ -13,6 +13,7 @@ import { AppContext } from "../mod.ts";
 import { BlogPost, BlogPostListingPage, SortBy } from "../types.ts";
 import handlePosts, { slicePosts } from "../core/handlePosts.ts";
 import { getRecordsByPath } from "../core/records.ts";
+import { stripHTMLFromObject } from "../../website/utils/html.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
@@ -96,10 +97,10 @@ export default async function BlogPostList(
     return {
       posts: slicedPosts,
       pageInfo: toPageInfo(handledPosts, postsPerPage, pageNumber, params),
-      seo: {
+      seo: stripHTMLFromObject({
         title: category?.name ?? "",
         canonical: new URL(url.pathname, url.origin).href,
-      },
+      }),
     };
   } catch (e) {
     logger.error(e);

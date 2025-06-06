@@ -1,4 +1,5 @@
 import type { ProductDetailsPage } from "../../../commerce/types.ts";
+import { stripHTMLFromObject } from "../../../website/utils/html.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
@@ -99,14 +100,14 @@ async function loader(
     product: props.similars
       ? await withIsSimilarTo(req, ctx, page.product)
       : page.product,
-    seo: {
+    seo: stripHTMLFromObject({
       title: product.productTitle || product.productName,
       description: props.advancedConfigs?.preferDescription
         ? product.description
         : product.metaTagDescription,
       canonical: new URL(`/${product.linkText}/p`, url.origin).href,
       noIndexing: props.indexingSkus ? false : !!skuId,
-    },
+    }),
   };
 }
 

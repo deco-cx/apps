@@ -3,6 +3,7 @@ import type {
   ProductListingPage,
 } from "../../commerce/types.ts";
 import { SortOption } from "../../commerce/types.ts";
+import { stripHTMLFromObject } from "../../website/utils/html.ts";
 import { STALE } from "../../utils/fetch.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import type { AppContext } from "../mod.ts";
@@ -241,7 +242,9 @@ const searchLoader = async (
 
   return {
     "@type": "ProductListingPage",
-    seo: getSEOFromTag(categories, url, seo.at(-1), hasTypeTags, isSearchPage),
+    seo: stripHTMLFromObject(
+      getSEOFromTag(categories, url, seo.at(-1), hasTypeTags, isSearchPage),
+    ),
     breadcrumb: isSearchPage
       ? {
         "@type": "BreadcrumbList",
