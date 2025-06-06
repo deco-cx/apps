@@ -19582,6 +19582,60 @@ per_page: string
 }
 response: Userorderslist
 }
+/**
+ * Retrieves information from a previously created sesssion.
+ * 
+ * >⚠️ The Session Manager API uses the `vtex_session` and `vtex_segment` cookies to store the data required to identify the user and the session. These cookies are stored in the user's browser when the session is created and sent automatically in every request to that domain. You will have to reproduce that by sending these cookies as headers to Session Manager API in order for it to work outside of a browser environment.
+ * 
+ * ## Permissions
+ * 
+ * This endpoint does not require [authentication](https://developers.vtex.com/docs/guides/authentication) or [permissions](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3).
+ */
+"GET /api/sessions": {
+searchParams: {
+/**
+ * Items are the keys of the values you wish to get. They follow the format `namespace1.key1,namespace2.key2`.
+ * 
+ * If you wish to recover the data sent on [Create new session](https://developers.vtex.com/docs/api-reference/session-manager-api#post-/api/sessions), it should be `public.{key}`, replacing `{key}` with the name of the custom property you created. Following the example request presented in [Create new session](https://developers.vtex.com/docs/api-reference/session-manager-api#post-/api/sessions), it would be `public.variable1,public.variable2`.
+ * 
+ * If you want to retrieve all keys from Session Manager, you can use the wildcard operator (`*`) as a value for this query parameter.
+ */
+items: string
+}
+response: GetSessionResponse
+}
+/**
+ * Creates a new session and returns a session token and a segment token. Also stores `vtex_session` and `vtex_segment` cookies, with the same values returned in the response.
+ * 
+ * All parameters in the body that are not within the public namespace will be ignored. Query string items will automatically be added to the public namespace.
+ * 
+ * >⚠️ The Session Manager API uses the `vtex_session` and `vtex_segment` cookies to store the data required to identify the user and the session. These cookies are stored in the user's browser when the session is created and sent automatically in every request to that domain. You will have to reproduce that by sending these cookies as headers in other requests to Session Manager API in order for it to work outside of a browser environment.
+ * 
+ * ## Permissions
+ * 
+ * This endpoint does not require [authentication](https://developers.vtex.com/docs/guides/authentication) or [permissions](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3).
+ */
+"POST /api/sessions": {
+body: CreateEditSessionRequest
+response: CreateEditSessionResponse
+}
+/**
+ * Edits information from a previously created sesssion.
+ * 
+ * This endpoint works the same way as the [Create new session](https://developers.vtex.com/docs/api-reference/session-manager-api#post-/api/sessions) endpoint, but when the request is sent with a `vtex_session` and the `vtex_segment` cookies in the header, it retrieves the session first and then applies the changes instead of generating a new one.
+ * 
+ * Only keys inside the `public` namespace in the request body are considered, and query parameters are automatically added to the public namespace.
+ * 
+ * >⚠️ The Session Manager API uses the `vtex_session` and `vtex_segment` cookies to store the data required to identify the user and the session. These cookies are stored in the user's browser when the session is created and sent automatically in every request to that domain. You will have to reproduce that by sending these cookies as headers to Session Manager API in order for it to work outside of a browser environment.
+ * 
+ * ## Permissions
+ * 
+ * This endpoint does not require [authentication](https://developers.vtex.com/docs/guides/authentication) or [permissions](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3).
+ */
+"PATCH /api/sessions": {
+body: CreateEditSessionRequest
+response: CreateEditSessionResponse
+}
 }
 /**
  * Pickup point information.
@@ -22020,4 +22074,166 @@ SumOfSquares: number
 Facets: {
 
 }
+}
+/**
+ * Session information.
+ */
+export interface GetSessionResponse {
+/**
+ * Session ID.
+ */
+id?: string
+/**
+ * Object with namespaces, each containing a set of information about the session.
+ */
+namespaces?: {
+/**
+ * Account information related to the session.
+ */
+account?: {
+/**
+ * VTEX account ID.
+ */
+id?: {
+/**
+ * Value of the VTEX account ID.
+ */
+value?: string
+/**
+ * Determines whether or not the connection should be kept alive.
+ */
+keepAlive?: boolean
+}
+/**
+ * VTEX account name.
+ */
+accountName?: {
+/**
+ * Value of the VTEX account name.
+ */
+value?: string
+}
+}
+/**
+ * Store information related to the session.
+ */
+store?: {
+/**
+ * [Trade policy](https://help.vtex.com/en/tutorial/how-trade-policies-work--6Xef8PZiFm40kg2STrMkMV) ID.
+ */
+channel?: {
+/**
+ * Value of the [Trade policy](https://help.vtex.com/en/tutorial/how-trade-policies-work--6Xef8PZiFm40kg2STrMkMV) ID.
+ */
+value?: string
+}
+/**
+ * Country code.
+ */
+countryCode?: {
+/**
+ * Value of the country code.
+ */
+value?: string
+}
+/**
+ * Locale that provides culture-specific information, such as the language, sublanguage, country/region, calendar, and conventions associated with a particular culture. Read [this documentation](https://learn.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo?view=net-7.0#culture-names-and-identifiers) for more details.
+ */
+cultureInfo?: {
+/**
+ * Value of the `cultureInfo` property.
+ */
+value?: string
+}
+/**
+ * Currency code.
+ */
+currencyCode?: {
+/**
+ * Value of the currency code.
+ */
+value?: string
+}
+/**
+ * Currency symbol.
+ */
+currencySymbol?: {
+/**
+ * Value of the currency symbol.
+ */
+value?: string
+}
+/**
+ * Defines whether or not the channel is private.
+ */
+channelPrivacy?: {
+/**
+ * Value containing the channel's privacy option.
+ */
+value?: string
+}
+}
+/**
+ * Public and editable information related to the session.
+ */
+public?: {
+/**
+ * Custom property.
+ */
+[k: string]: {
+/**
+ * Value of the custom property.
+ */
+value?: string
+}
+}
+/**
+ * Checkout information related to the session.
+ */
+checkout?: {
+/**
+ * ID of the session's region.
+ */
+regionId?: {
+/**
+ * Value of the Region ID.
+ */
+value?: string
+}
+}
+}
+}
+/**
+ * Session information.
+ */
+export interface CreateEditSessionRequest {
+public: Public
+}
+/**
+ * Public information.
+ */
+export interface Public {
+/**
+ * Custom property.
+ */
+additionalProperties?: {
+/**
+ * Value of the custom property.
+ */
+value?: string
+}
+[k: string]: any
+}
+/**
+ * Object containing session token and segment token.
+ */
+export interface CreateEditSessionResponse {
+/**
+ * Token that identifies the user's individual session.
+ */
+sessionToken?: string
+/**
+ * Token that identifies the user's segment, shared with other users with similar navigation parameters.
+ */
+segmentToken?: string
 }
