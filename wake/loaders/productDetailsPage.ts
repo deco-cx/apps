@@ -12,6 +12,7 @@ import {
 import { parseHeaders } from "../utils/parseHeaders.ts";
 import { getPartnerCookie } from "../utils/partner.ts";
 import { parseSlug, toBreadcrumbList, toProduct } from "../utils/transform.ts";
+import { stripHTMLFromObject } from "../../website/utils/html.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -157,13 +158,14 @@ async function loader(
         };
       }) ?? [],
     },
-    seo: {
+    seo: stripHTMLFromObject({
       canonical: product.isVariantOf?.url ?? "",
       title: wakeProductOrBuyList.productName ?? "",
-      description:
-        wakeProductOrBuyList.seo?.find((m) => m?.name === "description")
-          ?.content ?? "",
-    },
+      description: wakeProductOrBuyList.seo?.find((m) =>
+        m?.name === "description"
+      )
+        ?.content ?? "",
+    }),
   };
 }
 

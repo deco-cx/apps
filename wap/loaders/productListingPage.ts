@@ -8,6 +8,7 @@ import {
 } from "../utils/transform.ts";
 import { WapProductsListPage } from "../utils/type.ts";
 import { TypedResponse } from "../../utils/http.ts";
+import { stripHTMLFromObject } from "../../website/utils/html.ts";
 
 type ORDER_OPTS = "Favoritos" | "Maior Preço" | "Menor Preço" | "Popularidade";
 
@@ -171,13 +172,13 @@ const loader = async (
       records: data.info.total,
       recordPerPage: limit,
     },
-    seo: {
+    seo: stripHTMLFromObject({
       title: data.estrutura.seo.title,
       description: data.estrutura.seo.description,
       // TODO canonical
       canonical:
         getUrl(new URL(data.estrutura.seo.canonical).pathname, url.origin).href,
-    },
+    }),
   };
 };
 

@@ -1,6 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
 import type { ImageWidget } from "../../admin/widgets.ts";
-import { stripHTML } from "../utils/html.ts";
+import { stripHTML, stripHTMLFromObject } from "../utils/html.ts";
 import { JSX } from "preact";
 
 export const renderTemplateString = (template: string, value: string) =>
@@ -93,11 +93,11 @@ function Component({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+            __html: stripHTMLFromObject({
               "@context": "https://schema.org",
               // @ts-expect-error Trust me, I'm an engineer
               ...json,
-            }),
+            }, { returnAsString: true }),
           }}
         />
       ))}

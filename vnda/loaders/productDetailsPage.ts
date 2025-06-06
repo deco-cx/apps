@@ -1,4 +1,5 @@
 import type { ProductDetailsPage } from "../../commerce/types.ts";
+import { stripHTMLFromObject } from "../../website/utils/html.ts";
 import { STALE } from "../../utils/fetch.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
@@ -118,11 +119,11 @@ async function loader(
       numberOfItems: segments.length,
     },
     product,
-    seo: {
+    seo: stripHTMLFromObject({
       title: seo?.title || (product.name ?? ""),
       description: seo?.description || (product.description ?? ""),
       canonical: new URL(`/${segments.join("/")}`, url).href,
-    },
+    }),
   };
 }
 

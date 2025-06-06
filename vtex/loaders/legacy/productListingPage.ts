@@ -1,6 +1,6 @@
-import { LegacyItem } from "../../utils/types.ts";
 import type { Filter, ProductListingPage } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
+import { stripHTMLFromObject } from "../../../website/utils/html.ts";
 import { AppContext } from "../../mod.ts";
 import {
   getMapAndTerm,
@@ -19,6 +19,7 @@ import type {
   AdvancedLoaderConfig,
   Item,
   LegacyFacet,
+  LegacyItem,
   LegacyProduct,
   LegacySort,
 } from "../../utils/types.ts";
@@ -431,10 +432,12 @@ const loader = async (
       pageTypes: allPageTypes.map(parsePageType),
     },
     sortOptions,
-    seo: pageTypesToSeo(
-      currentPageTypes,
-      baseUrl,
-      hasPreviousPage ? currentPage : undefined,
+    seo: stripHTMLFromObject(
+      pageTypesToSeo(
+        currentPageTypes,
+        baseUrl,
+        hasPreviousPage ? currentPage : undefined,
+      ),
     ),
   };
 };

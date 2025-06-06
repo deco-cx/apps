@@ -32,6 +32,7 @@ import { Model as ProductAuctionDetail } from "./types/auctionDetailJSON.ts";
 import { Product as LinxProductGetByIdJSON } from "./types/productByIdJSON.ts";
 import { Associations } from "./types/associationsJSON.ts";
 import { Auction } from "./types/auctionAPI.ts";
+import { stripHTMLFromObject } from "../../website/utils/html.ts";
 
 type LinxProductGroup =
   | LinxProductGroupList
@@ -424,11 +425,11 @@ export const toProductDetails = (
       ...options,
       associations,
     }),
-    seo: {
+    seo: stripHTMLFromObject({
       title: pageInfo.PageTitle,
       description: pageInfo.MetaDescription ?? "",
       canonical: pageInfo.CanonicalLink,
-    },
+    }),
   };
 };
 

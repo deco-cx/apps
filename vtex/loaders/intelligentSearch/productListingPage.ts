@@ -1,5 +1,6 @@
 import type { ProductListingPage } from "../../../commerce/types.ts";
 import { parseRange } from "../../../commerce/utils/filters.ts";
+import { stripHTMLFromObject } from "../../../website/utils/html.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import sendEvent from "../../actions/analytics/sendEvent.ts";
 import { AppContext } from "../../mod.ts";
@@ -422,10 +423,12 @@ const loader = async (
       pageTypes: allPageTypes.map(parsePageType),
     },
     sortOptions,
-    seo: pageTypesToSeo(
-      currentPageTypes,
-      baseUrl,
-      hasPreviousPage ? currentPage : undefined,
+    seo: stripHTMLFromObject(
+      pageTypesToSeo(
+        currentPageTypes,
+        baseUrl,
+        hasPreviousPage ? currentPage : undefined,
+      ),
     ),
   };
 };

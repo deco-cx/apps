@@ -36,6 +36,7 @@ import {
 } from "../utils/transform.ts";
 import { Filters } from "./productList.ts";
 import { logger } from "@deco/deco/o11y";
+import { stripHTMLFromObject } from "../../website/utils/html.ts";
 
 export type Sort =
   | "NAME:ASC"
@@ -320,11 +321,11 @@ const searchLoader = async (
     },
     sortOptions: SORT_OPTIONS,
     breadcrumb,
-    seo: {
+    seo: stripHTMLFromObject({
       description: description || "",
       title: title || "",
       canonical,
-    },
+    }),
     products: products
       ?.filter((p): p is ProductFragment => Boolean(p))
       .map((variant) => {
