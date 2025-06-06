@@ -5,6 +5,10 @@ import { BART_URL } from "./utils/constants.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { Secret } from "../website/loaders/secret.ts";
 import { fetchSafe } from "../utils/fetch.ts";
+import {
+  createErrorHandler,
+  ErrorHandler,
+} from "../mcp/utils/errorHandling.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -18,6 +22,7 @@ export interface Props {
 
 export interface State extends Omit<Props, "token"> {
   api: ReturnType<typeof createHttpClient<Client>>;
+  errorHandler: ErrorHandler;
 }
 
 /**
@@ -37,7 +42,12 @@ export default function App(props: Props): App<Manifest, State> {
     fetcher: fetchSafe,
   });
 
-  const state = { ...props, api };
+  const errorHandler = createErrorHandler({
+    errorMessages: {},
+    defaultErrorMessage: "Barte operation failed",
+  });
+
+  const state = { ...props, api, errorHandler };
 
   return {
     state,

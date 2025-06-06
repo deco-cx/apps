@@ -27,13 +27,21 @@ const action = async (
   const { api } = ctx;
   const { uuid, value } = props;
 
-  const response = await api["PATCH /charges/partial-refund/:uuid"]({
-    uuid,
-  }, { body: { value } });
+  try {
+    const response = await api["PATCH /charges/partial-refund/:uuid"]({
+      uuid,
+    }, { body: { value } });
 
-  const result = await response.json();
+    if (!response.ok) {
+      ctx.errorHandler.toHttpError(response, "Error to partial refund");
+    }
 
-  return result;
+    const result = await response.json();
+
+    return result;
+  } catch (error) {
+    ctx.errorHandler.toHttpError(error, "Error to partial refund");
+  }
 };
 
 export default action;
