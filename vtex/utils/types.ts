@@ -363,20 +363,22 @@ export interface ShippingData {
 }
 
 export interface Address {
-  addressType: string;
-  receiverName: null;
+  addressType?: string;
+  receiverName: string | null;
   addressId: string;
-  isDisposable: boolean;
-  postalCode: string;
-  city: string;
-  state: string;
-  country: string;
-  street: string;
-  number: null | string;
-  neighborhood: string;
-  complement: null | string;
-  reference: null;
-  geoCoordinates: number[];
+  isDisposable?: boolean;
+  postalCode?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  street?: string;
+  number?: string;
+  neighborhood?: string;
+  addressName?: string;
+  complement: string | null;
+  reference?: string;
+  geoCoordinates?: number[];
+  name?: string;
 }
 
 export interface LogisticsInfo {
@@ -1527,4 +1529,28 @@ export interface AdvancedLoaderConfig {
 
 export type Maybe<T> = T | null | undefined;
 
+
+export interface AddressInput {
+  name?: string;
+  addressName: string;
+  addressType?: string;
+  city?: string;
+  complement?: string;
+  country?: string;
+  geoCoordinates?: number[];
+  neighborhood?: string;
+  number?: string;
+  postalCode?: string;
+  receiverName?: string;
+  reference?: string;
+  state?: string;
+  street?: string;
+}
+
+export interface SavedAddress {
+  id: string;
+  cacheId: string;
+}
+
 export type SimulationBehavior = "default" | "skip" | "only1P";
+
