@@ -19,17 +19,17 @@ export interface Props {
      */
     expirationDateFinal?: string;
     /**
-     * @title Payment Method
-     * @description The payment method of the charges.
-     * @example DEBIT_CARD
+     * @title Status
+     * @description The status of the charges.
+     * @example PENDING
      */
-    status: ChargeStatus;
+    status?: ChargeStatus;
     /**
      * @title Payment Method
      * @description The payment method of the charges.
      * @example DEBIT_CARD
      */
-    paymentMethod: PaymentMethod;
+    paymentMethod?: PaymentMethod;
     /**
      * @title Notification Email
      * @description The email to be notified when the charge is created.
