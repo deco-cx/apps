@@ -25,14 +25,16 @@ import * as $$$$$$$$$19 from "./actions/cart/updateUser.ts";
 import * as $$$$$$$$$20 from "./actions/masterdata/createDocument.ts";
 import * as $$$$$$$$$21 from "./actions/masterdata/updateDocument.ts";
 import * as $$$$$$$$$22 from "./actions/newsletter/subscribe.ts";
-import * as $$$$$$$$$23 from "./actions/notifyme.ts";
-import * as $$$$$$$$$24 from "./actions/review/submit.ts";
-import * as $$$$$$$$$25 from "./actions/session/createSession.ts";
-import * as $$$$$$$$$26 from "./actions/session/deleteSession.ts";
-import * as $$$$$$$$$27 from "./actions/session/editSession.ts";
-import * as $$$$$$$$$28 from "./actions/trigger.ts";
-import * as $$$$$$$$$29 from "./actions/wishlist/addItem.ts";
-import * as $$$$$$$$$30 from "./actions/wishlist/removeItem.ts";
+import * as $$$$$$$$$23 from "./actions/newsletter/updateNewsletterOptIn.ts";
+import * as $$$$$$$$$24 from "./actions/notifyme.ts";
+import * as $$$$$$$$$25 from "./actions/profile/updateProfile.ts";
+import * as $$$$$$$$$26 from "./actions/review/submit.ts";
+import * as $$$$$$$$$27 from "./actions/session/createSession.ts";
+import * as $$$$$$$$$28 from "./actions/session/deleteSession.ts";
+import * as $$$$$$$$$29 from "./actions/session/editSession.ts";
+import * as $$$$$$$$$30 from "./actions/trigger.ts";
+import * as $$$$$$$$$31 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$32 from "./actions/wishlist/removeItem.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/address/getAddressByPostalCode.ts";
 import * as $$$1 from "./loaders/address/getUserAddresses.ts";
@@ -70,14 +72,16 @@ import * as $$$32 from "./loaders/product/extensions/list.ts";
 import * as $$$33 from "./loaders/product/extensions/listingPage.ts";
 import * as $$$34 from "./loaders/product/extensions/suggestions.ts";
 import * as $$$35 from "./loaders/product/wishlist.ts";
-import * as $$$36 from "./loaders/promotion/getPromotionById.ts";
-import * as $$$37 from "./loaders/proxy.ts";
-import * as $$$38 from "./loaders/session/getSession.ts";
-import * as $$$39 from "./loaders/session/getUserSessions.ts";
-import * as $$$40 from "./loaders/user.ts";
-import * as $$$41 from "./loaders/wishlist.ts";
-import * as $$$42 from "./loaders/workflow/product.ts";
-import * as $$$43 from "./loaders/workflow/products.ts";
+import * as $$$36 from "./loaders/profile/getCurrentProfile.ts";
+import * as $$$37 from "./loaders/profile/getProfileByEmail.ts";
+import * as $$$38 from "./loaders/promotion/getPromotionById.ts";
+import * as $$$39 from "./loaders/proxy.ts";
+import * as $$$40 from "./loaders/session/getSession.ts";
+import * as $$$41 from "./loaders/session/getUserSessions.ts";
+import * as $$$42 from "./loaders/user.ts";
+import * as $$$43 from "./loaders/wishlist.ts";
+import * as $$$44 from "./loaders/workflow/product.ts";
+import * as $$$45 from "./loaders/workflow/products.ts";
 import * as $$$$$$0 from "./sections/Analytics/Vtex.tsx";
 import * as $$$$$$$$$$0 from "./workflows/events.ts";
 import * as $$$$$$$$$$1 from "./workflows/product/index.ts";
@@ -120,14 +124,16 @@ const manifest = {
     "vtex/loaders/product/extensions/listingPage.ts": $$$33,
     "vtex/loaders/product/extensions/suggestions.ts": $$$34,
     "vtex/loaders/product/wishlist.ts": $$$35,
-    "vtex/loaders/promotion/getPromotionById.ts": $$$36,
-    "vtex/loaders/proxy.ts": $$$37,
-    "vtex/loaders/session/getSession.ts": $$$38,
-    "vtex/loaders/session/getUserSessions.ts": $$$39,
-    "vtex/loaders/user.ts": $$$40,
-    "vtex/loaders/wishlist.ts": $$$41,
-    "vtex/loaders/workflow/product.ts": $$$42,
-    "vtex/loaders/workflow/products.ts": $$$43,
+    "vtex/loaders/profile/getCurrentProfile.ts": $$$36,
+    "vtex/loaders/profile/getProfileByEmail.ts": $$$37,
+    "vtex/loaders/promotion/getPromotionById.ts": $$$38,
+    "vtex/loaders/proxy.ts": $$$39,
+    "vtex/loaders/session/getSession.ts": $$$40,
+    "vtex/loaders/session/getUserSessions.ts": $$$41,
+    "vtex/loaders/user.ts": $$$42,
+    "vtex/loaders/wishlist.ts": $$$43,
+    "vtex/loaders/workflow/product.ts": $$$44,
+    "vtex/loaders/workflow/products.ts": $$$45,
   },
   "handlers": {
     "vtex/handlers/sitemap.ts": $$$$0,
@@ -159,14 +165,16 @@ const manifest = {
     "vtex/actions/masterdata/createDocument.ts": $$$$$$$$$20,
     "vtex/actions/masterdata/updateDocument.ts": $$$$$$$$$21,
     "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$22,
-    "vtex/actions/notifyme.ts": $$$$$$$$$23,
-    "vtex/actions/review/submit.ts": $$$$$$$$$24,
-    "vtex/actions/session/createSession.ts": $$$$$$$$$25,
-    "vtex/actions/session/deleteSession.ts": $$$$$$$$$26,
-    "vtex/actions/session/editSession.ts": $$$$$$$$$27,
-    "vtex/actions/trigger.ts": $$$$$$$$$28,
-    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$29,
-    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$30,
+    "vtex/actions/newsletter/updateNewsletterOptIn.ts": $$$$$$$$$23,
+    "vtex/actions/notifyme.ts": $$$$$$$$$24,
+    "vtex/actions/profile/updateProfile.ts": $$$$$$$$$25,
+    "vtex/actions/review/submit.ts": $$$$$$$$$26,
+    "vtex/actions/session/createSession.ts": $$$$$$$$$27,
+    "vtex/actions/session/deleteSession.ts": $$$$$$$$$28,
+    "vtex/actions/session/editSession.ts": $$$$$$$$$29,
+    "vtex/actions/trigger.ts": $$$$$$$$$30,
+    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$31,
+    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$32,
   },
   "workflows": {
     "vtex/workflows/events.ts": $$$$$$$$$$0,
