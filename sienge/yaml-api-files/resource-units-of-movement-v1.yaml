@@ -1,0 +1,170 @@
+swagger: "2.0"
+info:
+  title: Unidades de Movimento de Insumos da Obra
+  description: API de Unidades de movimento de insumo da obra.
+  version: "1.0"
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Unidades de movimento
+    description: Dados das unidades de movimento.
+paths:
+  "/building-cost-estimations/{buildingId}/resource-units-of-movement":
+    get:
+      operationId: getbuildingCostEstimationsIdResourceunitsOdMovement
+      tags:
+        - Unidades de movimento
+      summary: >-
+        Retorna um array com as unidades de movimento dos insumos da obra.
+        Retorna somente as unidades ativas dos insumos ativos.
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: query
+          name: resourceId
+          description: Código do Insumo, quando passado trás somente as unidades de movimento desse insumo
+          required: false
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array com as unidades de movimento da respectiva obra.
+            Retorna somente as unidades de movimento ativa dos insumos ativos.
+            Se não existir nenhuma, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseUnitsOfMovement"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Obra não encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  GetResponseUnitsOfMovement:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/UnitOfMovementDto"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        example: 1
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        example: 100
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+  UnitOfMovementDto:
+    type: object
+    properties:
+      id:
+        description: Id da unidade de movimento.
+        type: integer
+        example: 1
+      isDefault:
+        description: Se é unidade de movimento para o insumo.
+        type: boolean
+        example: true
+      conversionFactor:
+        description: Fator de conversão
+        type: number
+        example: 2222222222.000000
+      unitOfMeasureId:
+        description: Id da unidade de medida
+        type: integer
+        example: 2
+      unitOfMeasureSymbol:
+        description: Símbolo da unidade de medida
+        type: string
+        example: kg
+      unitOfMeasureDescription:
+        description: Descrição da unidade de medida
+        type: string
+        example: Tonelada
+      resourceId:
+        description: Id do insumo
+        type: integer
+        example: 1001
+      resourceDescription:
+        description: Descrição do Insumo
+        type: string
+        example: Cimento
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API

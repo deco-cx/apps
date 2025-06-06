@@ -9,14 +9,18 @@ import {
 } from "../../utils/intelligentSearch.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
-import { toProduct } from "../../utils/transform.ts";
-import type { Item, ProductID, Sort } from "../../utils/types.ts";
+import { sortProducts, toProduct } from "../../utils/transform.ts";
+import type {
+  Item,
+  ProductID,
+  SimulationBehavior,
+  Sort,
+} from "../../utils/types.ts";
+import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 import {
   LabelledFuzzy,
   mapLabelledFuzzyToFuzzy,
 } from "./productListingPage.ts";
-import { sortProducts } from "../../utils/transform.ts";
-import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 
 /**
  * @title Collection ID
@@ -47,7 +51,7 @@ export interface FacetsProps extends CommonProps {
    * @description query to use on search
    * @examples "shoes"\n"blue shoes"
    */
-  query: string;
+  query?: string;
   /**
    * @title Facets string
    * @description (e.g.: 'catergory-1/moda-feminina/category-2/calcados')
@@ -109,6 +113,11 @@ export interface CommonProps {
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
+  /**
+   * @title Simulation Behavior
+   * @description Defines the simulation behavior.
+   */
+  simulationBehavior?: SimulationBehavior;
 }
 
 /**
@@ -142,6 +151,7 @@ const fromProps = ({ props }: Props) => {
       sort: props.sort || "",
       selectedFacets: [{ key: "", value: props.facets }],
       hideUnavailableItems: props.hideUnavailableItems,
+      simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
 
@@ -152,6 +162,7 @@ const fromProps = ({ props }: Props) => {
       sort: "",
       selectedFacets: [],
       hideUnavailableItems: props.hideUnavailableItems,
+      simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
 
@@ -163,6 +174,7 @@ const fromProps = ({ props }: Props) => {
       fuzzy: mapLabelledFuzzyToFuzzy(props.fuzzy),
       selectedFacets: [],
       hideUnavailableItems: props.hideUnavailableItems,
+      simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
 
@@ -173,6 +185,7 @@ const fromProps = ({ props }: Props) => {
       sort: props.sort || "",
       selectedFacets: [{ key: "productClusterIds", value: props.collection }],
       hideUnavailableItems: props.hideUnavailableItems,
+      simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
 
@@ -246,7 +259,7 @@ const getSearchParams = (
 ): Entry[] => {
   if (isFacetsList(props)) {
     return [
-      ["query", props.query ?? searchParams.get("q")],
+      ["query", props?.query || searchParams.get("q") || ""],
       ["count", (props.count || searchParams.get("count") || 12).toString()],
       ["sort", props.sort || searchParams.get("sort") || ""],
       ["selectedFacets", props.facets],
@@ -254,6 +267,7 @@ const getSearchParams = (
         "hideUnavailableItems",
         (props.hideUnavailableItems ?? false).toString(),
       ],
+      ["simulationBehavior", props.simulationBehavior || "default"],
     ];
   }
 
@@ -267,6 +281,7 @@ const getSearchParams = (
         "hideUnavailableItems",
         (props.hideUnavailableItems ?? false).toString(),
       ],
+      ["simulationBehavior", props.simulationBehavior || "default"],
     ];
   }
 
@@ -279,6 +294,7 @@ const getSearchParams = (
         "hideUnavailableItems",
         (props.hideUnavailableItems ?? false).toString(),
       ],
+      ["simulationBehavior", props.simulationBehavior || "default"],
     ];
   }
 
@@ -296,12 +312,14 @@ export const cacheKey = (
     (expandedProps as unknown as Props["props"]);
 
   const url = new URL(req.url);
+
   if (
-    url.searchParams.has("q") ||
-    ctx.isInvoke && isProductIDList(props)
+    // Avoid cache on loader call over call and on search pages
+    (!isQueryList(props) && url.searchParams.has("q")) || ctx.isInvoke
   ) {
     return null;
   }
+
   const segment = getSegmentFromBag(ctx)?.token ?? "";
   const params = new URLSearchParams([
     ...getSearchParams(props, url.searchParams),

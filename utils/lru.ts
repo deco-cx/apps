@@ -16,7 +16,9 @@ export const LRU = <K, T>(max: number) => {
     set: (key: K, value: T) => {
       if (cache.size > max) {
         const lru = cache.keys().next().value;
-        cache.delete(lru);
+        if (lru !== undefined) {
+          cache.delete(lru);
+        }
       }
       cache.set(key, value);
     },

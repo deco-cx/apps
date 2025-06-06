@@ -1,0 +1,1071 @@
+swagger: "2.0"
+info:
+  description: API de Contratos do Suprimentos.
+  version: "1.0"
+  title: Contratos do Suprimentos
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+schemes:
+  - https
+paths:
+  "/supply-contracts/all":
+    get:
+      operationId: getSupplyContractsAll
+      tags:
+        - Contratos
+      summary: Consulta lista de contratos
+      consumes:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/contractStartDate"
+        - $ref: "#/parameters/contractEndDate"
+        - $ref: "#/parameters/companyId"
+        - $ref: "#/parameters/buildingId"
+        - $ref: "#/parameters/limit"
+        - $ref: "#/parameters/offset"
+        - $ref: "#/parameters/statusApproval"
+        - $ref: "#/parameters/authorization"
+        - $ref: "#/parameters/consistency"
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            allOf:
+              - $ref: "#/definitions/PaginationResultSupplyContractsAll"
+            properties:
+              results:
+                type: array
+                description: Lista de contratos retornados como resultado da pesquisa.
+                items:
+                  $ref: "#/definitions/ContractDTO"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+
+  "/supply-contracts":
+    get:
+      operationId: getSupplyContracts
+      tags:
+        - Contratos
+      summary: Consultar contrato
+      parameters:
+        - $ref: "#/parameters/documentId"
+        - $ref: "#/parameters/contractNumber"
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/ContractComCaucao"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+
+  "/supply-contracts/attachments/all":
+    get:
+      operationId: getSupplyContractsAtachmentsAll
+      tags:
+        - Anexos do Contrato
+      summary: Lista de anexos do contrato
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/documentId"
+        - $ref: "#/parameters/contractNumber"
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/PaginatedResponseOfContractAttachment"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+
+  "/supply-contracts/attachments":
+    get:
+      operationId: getSupplyContractsAttachments
+      tags:
+        - Anexos do Contrato
+      summary: Retorna o anexo do contrato
+      produces:
+        - application/pdf
+        - text/plain
+      parameters:
+        - $ref: "#/parameters/documentId"
+        - $ref: "#/parameters/contractNumber"
+        - $ref: "#/parameters/contractAttachmentNumber"
+      responses:
+        "200":
+          description: Quando utilizada chamada padrão, retorna o anexo. <br/>Quando definir no header Accept como <b>text/plain</b>, retorna o anexo no formato base 64<br/>
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+
+    post:
+      operationId: postSupplyContractsAttachments
+      tags:
+        - Anexos do Contrato
+      summary: Inclui anexo do contrato
+      parameters:
+        - $ref: "#/parameters/documentId"
+        - $ref: "#/parameters/contractNumber"
+        - $ref: "#/parameters/description"
+        - $ref: "#/parameters/attachment"
+      consumes:
+        - multipart/form-data
+      responses:
+        "201":
+          description: Anexo inserido com sucesso
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "422":
+          $ref: "#/responses/422"
+        "500":
+          $ref: "#/responses/500"
+
+  "/supply-contracts/buildings":
+    get:
+      operationId: getSupplyContractsBuildings
+      tags:
+        - Obras
+      summary: Consultar obras do contrato com unidades construtivas
+      parameters:
+        - $ref: "#/parameters/documentId"
+        - $ref: "#/parameters/contractNumber"
+        - $ref: "#/parameters/limit"
+        - $ref: "#/parameters/offset"
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            allOf:
+              - $ref: "#/definitions/PaginationResultSupplyContractsBuildings"
+            properties:
+              results:
+                type: array
+                description: Lista de obras retornados como resultado da pesquisa.
+                items:
+                  $ref: "#/definitions/Building"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+
+  "/supply-contracts/items":
+    get:
+      operationId: getSupplyContractsItems
+      tags:
+        - Itens do Contrato
+      summary: >-
+        Retorna um array com os itens do contrato identificados pelo contrato
+        (documentId, contractNumber) e pertencentes a uma planilha (buildingId, buildingUnitId).
+      parameters:
+        - $ref: "#/parameters/documentId"
+        - $ref: "#/parameters/contractNumber"
+        - in: query
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: query
+          name: buildingUnitId
+          description: Código da unidade construtiva da obra, que identifica a planilha
+          required: true
+          type: integer
+          format: int32
+        - $ref: "#/parameters/limit"
+        - $ref: "#/parameters/offset"
+      responses:
+        "200":
+          description: >-
+            Retorna um array com os itens do contrato pertencentes
+            a obra e unidade construtiva. Caso não existam, retorna um
+            array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseContractItems"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+
+  "/supply-contracts/authorize":
+    patch:
+      operationId: patchSupplyContractsAuthorize
+      tags:
+        - Autorização do Contrato
+      summary: Autoriza um Contrato que está aguardando autorização
+      description: Somente irá enviar as notificações caso esteja configurado para 'Sempre enviar aviso ao responsável'
+      parameters:
+        - $ref: "#/parameters/documentId"
+        - $ref: "#/parameters/contractNumber"
+        - $ref: "#/parameters/observationAuthorize"
+      responses:
+        "204":
+          description: Autorizado com sucesso.
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "422":
+          $ref: "#/responses/422"
+        "500":
+          $ref: "#/responses/500"
+
+  "/supply-contracts/disapprove":
+    patch:
+      operationId: patchSupplyContractsDisapprove
+      tags:
+        - Reprovação do Contrato
+      summary: Reprova um Contrato que está aguardando autorização.
+      description: Somente irá enviar as notificações caso esteja configurado para 'Sempre enviar aviso ao responsável'
+      parameters:
+        - $ref: "#/parameters/documentId"
+        - $ref: "#/parameters/contractNumber"
+        - $ref: "#/parameters/observationDisapprove"
+      responses:
+        "204":
+          description: Reprovado com sucesso.
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "422":
+          $ref: "#/responses/422"
+        "500":
+          $ref: "#/responses/500"
+
+#-------------------------------------------------------------
+definitions:
+  PaginationResultSupplyContractsAll:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de objetos retornados como resultado da pesquisa.
+        items:
+          $ref: "#/definitions/ContractDTO"
+
+  PaginationResultSupplyContractsBuildings:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de objetos retornados como resultado da pesquisa.
+        items:
+          $ref: "#/definitions/Building"
+
+  Building:
+    type: object
+    properties:
+      buildingId:
+        type: integer
+        format: int32
+        description: Id (código interno) da Obra
+      buildingIdView:
+        type: integer
+        format: int32
+        description: Código da Obra no Sienge
+      buildingName:
+        type: string
+        description: Nome da Obra
+      costCenterId:
+        type: integer
+        format: int32
+        description: Id (código interno) do Centro de Custo
+      costCenterIdView:
+        type: integer
+        format: int32
+        description: Código do Centro de Custo no Sienge
+      departmentId:
+        type: integer
+        format: int32
+        description: código do Departamento
+      constructUnits:
+        type: array
+        description: Lista de unidades contrutiva
+        items:
+          $ref: "#/definitions/constructUnit"
+
+  GetResponseContractItems:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/ContractItemsDto"
+  ContractItemsDto:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: código do item de contrato.
+      wbsCode:
+        type: string
+        description: Código de referência do item representando sua posição na planilha de contrato.
+        example: 01.001.000.001
+      level:
+        type: integer
+        description: Nível hierárquico do item na planilha, partindo de 0 até o nível do serviço.
+        example: 4
+      auxiliaryCode:
+        type: string
+        description: Código auxiliar do item de contrato.
+        example: M1354
+      resourceId:
+        description: Código do insumo. Null quando for um item de contrato de serviço.
+        type: integer
+        example: 1001
+      workItemId:
+        description: Código do serviço. Null quando for um item de contrato de insumo.
+        type: integer
+        example: 100
+      description:
+        type: string
+        description: Descrição do item de contrato.
+        example: Contratação de serviços de pavimentação.
+      detailId:
+        type: integer
+        format: int32
+        description: Código do detalhe do insumo no item de contrato.
+      detailDescription:
+        type: string
+        description: Descrição do detalhe do item de contrato.
+        example: CP II E 32
+      trademarkId:
+        type: integer
+        format: int32
+        description: Código da marca do insumo no item de contrato.
+      trademarkDescription:
+        type: string
+        description: Descrição da marca do insumo no item de contrato.
+        example: ACME
+      additionalInformation:
+        type: string
+        description: Complemento do contrato. Esse valor só estará presente em itens de contrato do tipo serviço.
+        example: null.
+      quantity:
+        type: number
+        description: Quantidade do item de contrato com precisão de 4 casas
+        example: 3000.2348
+      unitOfMeasure:
+        description: Símbolo da unidade de medida.
+        type: string
+        example: kg
+      laborPrice:
+        description: Preço unitário de mão de obra com precisão de 4 casas.
+        type: number
+        example: 9.0005
+      materialPrice:
+        description: Preço unitário de material com precisão de 4 casas.
+        type: number
+        example: 16.2314
+      hasAddendum:
+        description: Indica se o item de contrato possui aditivo.
+        type: boolean
+        example: true
+      budgetCategories:
+        type: array
+        description: >-
+          Apropriações financeiras do item de contrato.
+        items:
+          $ref: "#/definitions/BudgetCategoriesItemGetDto"
+      buildingAppropriations:
+        description: >-
+          Apropriações de obra do item de contrato.
+          Esse conjunto de itens representa um rateio
+          da quantidade contratada do item de contrato, entre um ou
+          mais itens do orçamento da obra do centro de custo do contrato.
+          Os itens de orçamento referenciados em cada item de apropriação devem
+          ser do nível (na estrutura analítica do orçamento) correspondente
+          ao nível de apropriação definido na respectiva obra
+          (por exemplo: etapa, subetapa, serviço etc.).
+          Importante: se a obra do contrato possuir nível de apropriação
+          definido como "obra" o array estará vazio.
+        type: array
+        items:
+          $ref: "#/definitions/BuildingAppropriationItemGetDto"
+
+  BudgetCategoriesItemGetDto:
+    type: object
+    properties:
+      paymentCategoryId:
+        type: string
+        example: "2010101"
+        description: "Código do plano financeiro (sem máscara)"
+      percentage:
+        type: number
+        example: 100.000000000000
+        description: >-
+          Percentual apropriado do item do contrato, com precisão de até 12 casas decimais.
+        format: double
+  BuildingAppropriationItemGetDto:
+    type: object
+    properties:
+      buildingUnitId:
+        description: Código da unidade construtiva.
+        type: integer
+        example: 2
+      sheetItemId:
+        description: Identificador do item de orçamento.
+        type: integer
+        example: 42
+      wbsCode:
+        description: Código de referência do item do orçamento.
+        type: string
+        example: "01.001.001.001"
+      percentage:
+        description: Percentual de rateio do respectivo item de orçamento nas apropriações de obra sendo um número maior que zero, menor ou igual a 100, com precisão de até 12 casas decimais.
+        type: number
+        example: 100.0
+      quantity:
+        description: Quantidade do respectivo item de orçamento nas apropriações de obra, sendo um número com precisão de até 4 casas decimais.
+        type: number
+        example: 1340.8374
+      measuredQuantity:
+        description: Quantidade medida do Item de Contrato que foi apropriada para o respectivo item de orçamento nas apropriações de obra, sendo um número com precisão de até 4 casas decimais.
+        type: number
+        example: 932.2534
+
+  constructUnit:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Id do documento.
+      name:
+        type: string
+        description: Nome da Unidade Construtiva.
+      status:
+        type: string
+        description: Código situação da Unidade Construtiva.
+        example: "[L = RELEASED, B = LOCKED]"
+      areaQuantity:
+        type: number
+        description: Quantidade da Área, com precisão de até 4 casas decimais.
+        example: 484.7895
+
+  ContractDTO:
+    type: object
+    properties:
+      documentId:
+        type: string
+        description: Id do documento.
+      contractNumber:
+        type: string
+        description: Número do Contrato.
+      supplierId:
+        type: integer
+        description: Id do fornecedor.
+      supplierName:
+        type: string
+        description: Nome do fornecedor.
+      customerId:
+        type: integer
+        description: Id do cliente.
+      companyId:
+        type: integer
+        description: Id da empresa.
+      companyName:
+        type: string
+        description: Nome da empresa.
+      responsibleId:
+        type: string
+        description: Id do responsável pelo contrato
+        example: "NOME"
+      responsibleName:
+        type: string
+        description: Nome do responsável pelo contrato
+        example: "NOME SOBRENOME"
+      status:
+        type: string
+        description: Descrição da situação do contrato. [PENDING, PARTIALLY_MEASURED, FULLY_MEASURED, RESCINDED, COMPLETED]
+        example: PENDING
+        enum:
+          - PENDING
+          - PARTIALLY_MEASURED
+          - FULLY_MEASURED
+          - RESCINDED
+          - COMPLETED
+      statusId:
+        type: integer
+        format: int32
+        description: Código da situação do contrato.
+      statusApproval:
+        type: string
+        description: Código da situação de aprovação do contrato. Todo contrato nasce com situação *APPROVED* e somente será alterado para *DISAPPROVED* se for reprovado. [DISAPPROVED, APPROVED]
+        example: APPROVED
+        enum:
+          - APPROVED
+          - DISAPPROVED
+      isAuthorized:
+        type: boolean
+        example: false
+        description: Retornará *true* se o contrato estiver autorizado, caso contrário retornará *false*.
+      contractDate:
+        type: string
+        description: Data do contrato
+        example: "2018-03-11"
+      startDate:
+        type: string
+        description: Data de início do contrato
+        example: "2019-04-12"
+      endDate:
+        type: string
+        description: Data de término do contrato
+        example: "2020-05-13"
+      object:
+        type: string
+        description: Objeto do contrato
+        example: "Contrato de prestação de serviços para execução de alvenarias."
+      internalNotes:
+        type: string
+        description: Observações internas do contrato
+        example: "Uma observação do contrato"
+      contractType:
+        type: string
+        description: Código da situação do contrato [CONTRACTOR, CONTRACTED]
+        example: CONTRACTOR
+        enum:
+          - CONTRACTOR
+          - CONTRACTED
+      registrationType:
+        type: string
+        description: Tipo de cadastro atual do contrato, podendo ser completo ou rápido. Um contrato rápido que foi convertido para completo será apresentado apenas como contrato completo [COMPLETE, FAST]
+        example: COMPLETE
+        enum:
+          - COMPLETE
+          - FAST
+      itemType:
+        type: string
+        description: Tipo de item do contrato, podendo ser de Insumo ou de Serviço [RESOURCE, WORKITEM]
+        example: RESOURCE
+        enum:
+          - RESOURCE
+          - WORKITEM
+      totalLaborValue:
+        type: number
+        example: 1455.15
+        description: Soma dos totais de mão de obra das obras associadas
+      totalMaterialValue:
+        type: number
+        example: 1155.15
+        description: Soma dos totais de material das obras associadas
+      consistent:
+        type: boolean
+        example: False
+        description: Retornará *true* se o contrato estiver consistente, caso contrário retornará *false*.
+      buildings:
+        type: array
+        description: lista de obras do contrato.
+        items:
+          $ref: "#/definitions/BuildingDTO"
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/LinkCustomerCreditor"
+
+  BuildingDTO:
+    type: object
+    properties:
+      buildingId:
+        type: integer
+        description: Código da obra.
+      name:
+        type: string
+        description: Nome da obra.
+
+  GetContractDTO:
+    type: object
+    properties:
+      documentId:
+        type: string
+        description: Id do documento.
+      contractNumber:
+        type: string
+        description: Número do Contrato.
+      supplierId:
+        type: integer
+        description: Id do fornecedor.
+      customerId:
+        type: integer
+        description: Id do cliente.
+      companyId:
+        type: integer
+        description: Id da empresa.
+      responsibleId:
+        type: string
+        description: Id do responsável pelo contrato
+        example: "NOME"
+      responsibleName:
+        type: string
+        description: Nome do responsável pelo contrato
+        example: "NOME SOBRENOME"
+      status:
+        type: string
+        description: Descrição da situação do contrato. [PENDING, PARTIALLY_MEASURED, FULLY_MEASURED, RESCINDED, COMPLETED]
+        example: PENDING
+        enum:
+          - PENDING
+          - PARTIALLY_MEASURED
+          - FULLY_MEASURED
+          - RESCINDED
+          - COMPLETED
+      statusApproval:
+        type: string
+        description: Código da situação de aprovação do contrato. Todo contrato nasce com situação *APPROVED* e somente será alterado para *DISAPPROVED* se for reprovado. [DISAPPROVED, APPROVED]
+        example: APPROVED
+        enum:
+          - APPROVED
+          - DISAPPROVED
+      isAuthorized:
+        type: boolean
+        example: false
+        description: Retornará *true* se o contrato estiver autorizado, caso contrário retornará *false*.
+      contractDate:
+        type: string
+        description: Data do contrato
+        example: "2018-03-11"
+      startDate:
+        type: string
+        description: Data de início do contrato
+        example: "2019-04-12"
+      endDate:
+        type: string
+        description: Data de término do contrato
+        example: "2020-05-13"
+      object:
+        type: string
+        description: Objeto do contrato
+        example: "Contrato de prestação de serviços para execução de alvenarias."
+      internalNotes:
+        type: string
+        description: Observações internas do contrato
+        example: "Uma observação do contrato"
+      contractType:
+        type: string
+        description: Código da situação do contrato [CONTRACTOR, CONTRACTED]
+        example: CONTRACTOR
+        enum:
+          - CONTRACTOR
+          - CONTRACTED
+      registrationType:
+        type: string
+        description: Tipo de cadastro atual do contrato, podendo ser completo ou rápido. Um contrato rápido que foi convertido para completo será apresentado apenas como contrato completo [COMPLETE, FAST]
+        example: COMPLETE
+        enum:
+          - COMPLETE
+          - FAST
+      itemType:
+        type: string
+        description: Tipo de item do contrato, podendo ser de Insumo ou de Serviço [RESOURCE, WORKITEM]
+        example: RESOURCE
+        enum:
+          - RESOURCE
+          - WORKITEM
+      totalLaborValue:
+        type: number
+        example: 1455.15
+        description: Soma dos totais de mão de obra das obras associadas
+      laborBalance:
+        type: number
+        example: 1200.15
+        description: Saldo dos valores de mão de obra das obras associadas
+      totalMaterialValue:
+        type: number
+        example: 1155.15
+        description: Soma dos totais de material das obras associadas
+      materialBalance:
+        type: number
+        example: 1100.25
+        description: Saldo dos valores de material das obras associadas
+      consistent:
+        type: boolean
+        example: False
+        description: Retornará *true* se o contrato estiver consistente, caso contrário retornará *false*.
+      securityDeposit:
+        $ref: "#/definitions/SecurityDeposit"
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/LinkCustomerCreditor"
+
+  ContractAttachmentDto:
+    type: object
+    properties:
+      documentId:
+        type: string
+        example: "CT"
+        description: Id do documento.
+      contractNumber:
+        type: string
+        example: "1234"
+        description: Número do Contrato.
+      contractAttachmentNumber:
+        type: number
+        example: 1
+        description: Número do anexo do Contrato.
+      name:
+        type: string
+        example: contrato_servico.pdf
+        description: Nome do arquivo de anexo do Contrato.
+      description:
+        type: string
+        example: Anexo contendo um contrato de serviços.
+        description: Descrição do anexo do Contrato.
+  ContractComCaucao:
+    allOf:
+      - $ref: "#/definitions/GetContractDTO"
+      - type: object
+        properties:
+          securityDeposit:
+            $ref: "#/definitions/SecurityDeposit"
+
+  SecurityDeposit:
+    type: object
+    properties:
+      securityDepositPercentage:
+        type: number
+        example: 12.15
+        description: Percentual do caução.
+      dueDate:
+        type: string
+        description: Data de vencimento no Formato ISO 8601 yyyy-MM-dd.
+        example: "2018-03-11"
+      documentId:
+        type: string
+        description: Código do (tipo de) documento.
+        example: "CAU"
+      indexerId:
+        type: integer
+        description: Código do indexador.
+        example: 4
+      billIssueDate:
+        description: Data de emissão do título.
+        type: string
+        example: DUE_DATE
+        enum:
+          - DUE_DATE
+          - BILL_REGISTRATION_DATE
+      incidenceOver:
+        description: Incidência do caução sobre o preço de material e/ou mão de obra.
+        type: string
+        example: MATERIAL_AND_LABOUR
+        enum:
+          - MATERIAL_AND_LABOUR
+          - MATERIAL
+          - LABOUR
+      hasTaxWithhold:
+        description: Haverá retenções de impostos sobre os títulos da caução.
+        type: boolean
+        example: true
+      hasDirectBillingDiscount:
+        description: Considerar desconto de faturamento direto no cálculo da caução.
+        type: boolean
+        example: true
+      considerContractItemPaymentCategories:
+        type: boolean
+        description: Deve apropriar conforme contas dos itens do contrato.
+        example: true
+      paymentCategoryId:
+        type: string
+        description: Identificador da conta do plano financeiro.
+        example: "2012011"
+      securityDepositBalance:
+        type: number
+        description: Saldo da caução
+        example: 1300.35
+
+  #---------DEFINIÇOES PADROZINADAS----------------------------
+  LinkCustomerCreditor:
+    type: object
+    properties:
+      rel:
+        type: string
+        description: Nome da recurso associado
+        example: customers ou Creditors
+      href:
+        type: string
+        description: URL do recurso associado
+        example: "https://../v1/customers/costumerId ou https://../v1/creditors/creditorId"
+  ApiError:
+    type: object
+    description: Objeto que encapsula os atributos de erros da API
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+      errors:
+        type: array
+        items:
+          $ref: "#/definitions/ApiExceptionFieldError"
+  ApiExceptionFieldError:
+    type: object
+    description: >-
+      Objeto que encapsula os atributos de erros da API referente aos dados de
+      entrada
+    required:
+      - field
+      - message
+    properties:
+      field:
+        type: string
+        description: Campo no qual foi passado o valor inválido
+      message:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API referente ao valor inválido utilizado nos dados de entrada
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        example: 1
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada.
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        example: 100
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+
+  PaginatedResponseOfContractAttachment:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de Anexos do Contrato retornados como resultado da requisição.
+        items:
+          $ref: "#/definitions/ContractAttachmentDto"
+
+  ObservationDTO:
+    type: object
+    properties:
+      observation:
+        type: string
+        maxLength: 300
+        example: Texto enviado via Api
+        description: Observação que será concatenada as observações de autorização e desautorização.
+#------------------------ Responses--------------------------
+responses:
+  "400":
+    description: Requisição mal formada
+    schema:
+      $ref: "#/definitions/ApiError"
+  "404":
+    description: O recurso requisitado não foi encontrado
+    schema:
+      $ref: "#/definitions/ApiError"
+  "422":
+    description: |
+      Entidade não processável.
+
+
+      Ocorreu algum erro semântico que impede a criação da medição. Provavelmente, os dados informados não passaram nas validações e regras de negócio realizadas no Sienge para criação de medições. Alguns exemplos dessas validações (podem haver outros) são:
+      * A data de vencimento deve ser igual ou posterior à data da medição;
+      * Existem medições anteriores ainda não finalizadas;
+      * Já existem outras medições com data posterior à data informada nesta;
+      * Algum item está sendo medido acima da quantidade contratada (quando o contrato não está configurado para permitir isso).
+    schema:
+      $ref: "#/definitions/ApiError"
+  "500":
+    description: Erro interno
+    schema:
+      $ref: "#/definitions/ApiError"
+
+#---------Parametros ----------------------------------------
+parameters:
+  constructUnitId:
+    in: path
+    name: constructUnitId
+    description: Id da unidade construtiva
+    type: integer
+    format: int32
+    required: true
+  documentId:
+    in: query
+    name: documentId
+    type: string
+    required: true
+    description: Id do documento.
+
+  contractNumber:
+    in: query
+    name: contractNumber
+    type: string
+    required: true
+    description: Número do contrato
+
+  description:
+    in: query
+    name: description
+    description: "Descrição do anexo | Máximo: 500 caracteres "
+    required: true
+    type: string
+    maxLength: 500
+
+  attachment:
+    in: formData
+    name: file
+    type: file
+    description: >-
+      Arquivo para inserção | Tipo: multipart/form-data | Tamanho máximo:
+      70 MB | Tamanho máximo do nome do arquivo: 100 caracteres | Somente 1 Anexo por requisição.
+      Caso seja enviado mais de 1 Anexo, o Sienge vai aceitar somente o primeiro selecionado.
+    required: true
+
+  contractAttachmentNumber:
+    in: query
+    name: contractAttachmentNumber
+    type: string
+    required: true
+    description: Número do anexo do contrato
+
+  contractStartDate:
+    in: query
+    name: contractStartDate
+    required: true
+    description: "Período inicial do contrato, formato: yyyy-MM-dd"
+    type: string
+
+  contractEndDate:
+    in: query
+    name: contractEndDate
+    required: true
+    description: "Período final do contrato, formato: yyyy-MM-dd"
+    type: string
+
+  companyId:
+    in: query
+    name: companyId
+    description: Código da empresa
+    type: integer
+    format: int32
+
+  buildingId:
+    in: query
+    name: buildingId
+    description: Código da obra
+    type: integer
+    format: int32
+
+  limit:
+    in: query
+    name: limit
+    description: >-
+      Quantidade máxima de resultados da pesquisa a serem retornados.
+      Valor default é 100 e o valor máximo permitido é 200
+    required: false
+    type: integer
+    default: 100
+    maximum: 200
+    minimum: 1
+    format: int32
+
+  offset:
+    in: query
+    name: offset
+    description: >-
+      Deslocamento entre o começo da lista e um dado elemento. Valor
+      default é 0
+    required: false
+    type: integer
+    default: 0
+    format: int32
+
+  statusApproval:
+    in: query
+    name: statusApproval
+    description: Código da situação de aprovação do contrato. [D=DISAPPROVED, A=APPROVED]
+    type: string
+
+  authorization:
+    in: query
+    name: authorization
+    description: Status de autorização do contrato. [T=Todos, S=Reprovados, A=Aprovados, N=Aguardando autorização]
+    type: string
+
+  consistency:
+    in: query
+    name: consistency
+    description: Status da situação de consistência do contrato. [T=Todos, S=Consistente, N=Inconsistente, I=Inclusao]
+    type: string
+
+  observationAuthorize:
+    in: body
+    required: false
+    name: observation
+    description: Observação relacionada a autorização do contrato
+    schema:
+      $ref: "#/definitions/ObservationDTO"
+
+  observationDisapprove:
+    in: body
+    required: false
+    name: observation
+    description: Observação relacionada a reprovação do contrato
+    schema:
+      $ref: "#/definitions/ObservationDTO"

@@ -1,0 +1,362 @@
+swagger: "2.0"
+info:
+  title: Insumos do Orçamento da Obra
+  description: API de Insumos do Orçamento da Obra.
+  version: "1.0"
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Insumos do Orçamento da Obra.
+    description: API de insumos do orçamento da obra.
+paths:
+  "/building-cost-estimations/{buildingId}/resources":
+    get:
+      tags:
+        - Insumos
+      operationId: getBuildingCostEstimationsResources
+      summary: Retorna um array com todos os insumos ativos do orçamento de uma obra
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - name: resourceGroups
+          in: query
+          description: >-
+            Códigos dos grupos de insumo. Exemplo: ['02', '01.001']
+          required: false
+          type: array
+          items:
+            type: string
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array com todos os insumos ativos existentes no orçamento
+            da respectiva obra. Se não existir nenhum, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseResources"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Obra não encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+    post:
+      tags:
+        - Insumos
+      operationId: postBuildingCostEstimationsResources
+      summary: Inclui um insumo no orçamento de uma obra.
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: >-
+            Insumo a ser cadastrado no orçamento da obra.<br>Deve ser um insumo
+            ativo já existente na tabela do custos unitários utilizada pela
+            obra, pois os dados desse novo insumo serão copiados a partir dessa
+            referência.
+          required: true
+          schema:
+            $ref: "#/definitions/ResourceDTOForPost"
+      responses:
+        "201":
+          description: Insumo cadastrado com sucesso no orçamento da obra.
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Obra não encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: >-
+            Ocorreu um dos seguintes erros&#58; <br/><br/> Código da obra
+            informado refere-se a uma obra encerrada <br/> Código do insumo
+            informado refere-se a um insumo inativo <br/> Insumo não existente
+            na tabela de custos unitários utilizada pela obra
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/building-cost-estimations/{buildingId}/resources/{id}":
+    get:
+      tags:
+        - Insumos
+      operationId: getBuildingCostEstimationsResource
+      summary: Retorna um insumo do orçamento de uma obra
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: path
+          name: id
+          description: Código do insumo
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um objeto com os dados do insumo correspondente ao código.
+          schema:
+            $ref: "#/definitions/ResourceDTO"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Insumo ou Obra não encontrado(a).
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+    patch:
+      tags:
+        - Insumos
+      operationId: patchBuildingCostEstimationsResource
+      summary: Atualiza o código auxiliar de um insumo no orçamento de uma obra
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: path
+          name: id
+          description: Código do insumo
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: >-
+            Código auxiliar do insumo a ser atualizado na obra.<br>Deve ser um insumo
+            ativo de uma obra existente e não encerrada. O código auxiliar deve possuir
+            no máximo 25 caracteres.
+          required: true
+          schema:
+            $ref: "#/definitions/ResourceCodeDTO"
+      responses:
+        "204":
+          description: Código auxiliar do insumo atualizado com sucesso no orçamento da obra.
+        "404":
+          description: Insumo ou Obra não encontrado(a).
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: >-
+            Código do insumo informado refere-se a um Insumo inativo, Obra está encerrada ou
+            o tamanho máximo de 25 caracteres para o código auxiliar foi excedido.
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  GetResponseResources:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/ResourceDTO"
+
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        example: 1
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        example: 100
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200
+
+  ResourceDetailDTO:
+    type: object
+    properties:
+      id:
+        description: Id do detalhe
+        type: integer
+        example: 1
+      description:
+        description: Descrição do detalhe
+        type: string
+        example: CP-320
+      detailCode:
+        description: Código auxiliar do detalhe
+        type: string
+        example: DT-01
+
+  ResourceTrademarkDTO:
+    type: object
+    properties:
+      id:
+        description: Id da marca
+        type: integer
+        example: 123
+      description:
+        description: Descrição da marca
+        type: string
+        example: Lorem ipsum
+
+  ResourceDTO:
+    type: object
+    properties:
+      id:
+        description: Id do insumo
+        type: integer
+        example: 1001
+      description:
+        description: Descrição do insumo
+        type: string
+        example: Cimento Portland
+      unitOfMeasure:
+        description: Símbolo da unidade de medida básica do insumo
+        type: string
+        example: kg
+      category:
+        description: Tipo do insumo
+        type: string
+        enum:
+          - EQUIPMENT
+          - LABOR
+          - INCREMENTAL_COST_ITEM
+          - MATERIAL
+          - TRANSPORT_ITEM
+          - OTHER
+          - OFFICE_SUPPLY
+          - FUELS_AND_LUBRICANTS
+          - MAINTENANCE_MATERIAL
+        example: MATERIAL
+      resourceCode:
+        description: Código auxiliar do insumo
+        type: string
+        example: M1354
+      barcode:
+        description: >-
+          Código de barras do insumo, considerando a unidade de medida básica,
+          sem detalhe nem marca especificados.
+        type: string
+        example: "7613033174728"
+      details:
+        description: Detalhes ativos do insumo
+        type: array
+        items:
+          $ref: "#/definitions/ResourceDetailDTO"
+      trademarks:
+        description: Marcas ativas do insumo
+        type: array
+        items:
+          $ref: "#/definitions/ResourceTrademarkDTO"
+
+  ResourceDTOForPost:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        description: Id do insumo
+        type: integer
+        example: 1001
+
+  ResourceCodeDTO:
+    type: object
+    required:
+      - resourceCode
+    properties:
+      resourceCode:
+        description: Código auxiliar do insumo
+        type: string
+        example: "I-01"
+
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API

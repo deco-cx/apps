@@ -1,0 +1,321 @@
+swagger: "2.0"
+info:
+  title: Cotações de preços
+  description: API bulk data de cotações de preços.
+  version: "1.0"
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/bulk-data/v1"
+paths:
+  "/purchase-quotations":
+    get:
+      operationId: getBulkPurchaseQuotations
+      tags:
+        - Cotações de preços
+      summary: >-
+        Retorna um array com todas as cotações de preços contendo itens, fornecedores e negociações.
+      consumes:
+        - application/json
+      parameters:
+        - name: startDate
+          in: query
+          description: >-
+            Data de início da busca (data da cotação)
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: endDate
+          in: query
+          description: >-
+            Data de fim da busca (data da cotação)
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: originatedPurchaseOrder
+          in: query
+          description: >-
+            Parâmetro para filtrar apenas cotações que originaram pedidos de compra.
+            Esse parâmetro é falso como padrão.
+          required: false
+          type: boolean
+          default: false
+      responses:
+        "200":
+          description: >-
+            Retorna um array com todas as cotações de preços contendo os itens da cotação, fornecedores e suas negociações.
+            Se não existir nenhum, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponsePurchaseQuotationDTO"
+        "400":
+          description: >-
+            Ocorreu um erro um dos seguintes erros:
+              - O parâmetro startDate não foi informado.
+              - O parâmetro endDate não foi informado.
+              - O parâmetro endDate informado é maior que o startDate.
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  GetResponsePurchaseQuotationDTO:
+    type: object
+    properties:
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/PurchaseQuotationDTO"
+  PurchaseQuotationDTO:
+    type: object
+    description: Cotação com seus insumos, fornecedores e negociações.
+    properties:
+      purchaseQuotationId:
+        description: Código da cotação.
+        type: integer
+        example: 7
+      registeredDate:
+        description: Data de registro da cotação no formato yyyy-MM-dd.
+        type: string
+        example: "2022-08-01"
+      lastModification:
+        description: Data da última modificação na cotação no formato yyyy-MM-dd.
+        type: string
+        example: "2022-08-10"
+      purchaseQuotationDate:
+        description: Data da cotação no formato yyyy-MM-dd.
+        type: string
+        example: "2022-08-05"
+      sentDate:
+        description: Data do envio da cotação no formato yyyy-MM-dd.
+        type: string
+        example: "2022-08-09"
+      responseDeadline:
+        description: Prazo de resposta da cotação no formato yyyy-MM-dd.
+        type: string
+        example: "2022-08-15"
+      notes:
+        description: Observação interna da cotação.
+        type: string
+        example: "Observações da cotação"
+      minNumberOfSuppliers:
+        description: Número mínimo de fornecedores da cotação.
+        type: integer
+        example: 1
+      suggestedNumberOfSuppliers:
+        description: Número de fornecedores a sugerir da cotação.
+        type: integer
+        example: 3
+      buyerId:
+        description: Comprador da cotação.
+        type: string
+        example: JOAO
+      purchaseQuotationItems:
+        description: >-
+          Insumos da cotação.
+        type: array
+        items:
+          $ref: "#/definitions/PurchaseQuotationItemDTO"
+      purchaseQuotationSuppliers:
+        description: >-
+          Fornecedores da cotação, dentro de cada fornecedor são retornadas suas respectivas negociações.
+        type: array
+        items:
+          $ref: "#/definitions/PurchaseQuotationSupplierDTO"
+      api-error:
+        description: Quando não ocorrer nenhuma falha no carregamento das cotações de preço, esse campo não estará presente nos objetos retornados. Se durante o carregamento ocorrer alguma falha no lado do servidor, o array de cotações de preço será fechado com os itens carregados até então, e um objeto extra será adicionado ao final do array contendo apenas este campo preenchido com a respectiva mensagem de erro.
+        type: string
+  PurchaseQuotationItemDTO:
+    type: object
+    description: Insumo da cotação.
+    properties:
+      purchaseQuotationItemId:
+        description: Código do item da cotação.
+        type: integer
+        example: 1
+      buildingId:
+        description: Código da obra para o qual o insumo foi cotado.
+        type: integer
+        example: 7
+      productId:
+        description: Código do insumo cotado.
+        type: integer
+        example: 100
+      productDescription:
+        description: Nome do insumo cotado.
+        type: string
+        example: Aço
+      detailId:
+        description: Código do detalhe do insumo.
+        type: integer
+        example: 5
+      detailDescription:
+        description: Descrição do detalhe do insumo.
+        type: string
+        example: CA60 4.2mm
+      trademarkId:
+        description: Código da marca do insumo.
+        type: integer
+        example: 2
+      trademarkDescription:
+        description: Marca do insumo.
+        type: string
+        example: Marca do aço
+      quantity:
+        description: Quantidade cotada.
+        type: number
+        example: 100.9
+      unitySimbol:
+        description: Símbolo da unidade de medida.
+        type: string
+        example: kg
+      notes:
+        description: Observação interna do insumo cotado.
+        type: string
+        example: Aço para obra xyz
+  PurchaseQuotationSupplierDTO:
+    type: object
+    description: Fornecedor da cotação e suas negociações.
+    properties:
+      supplierId:
+        description: Código do fornecedor.
+        type: integer
+        example: 77
+      negotiations:
+        description: Negociações com o fornecedor.
+        type: array
+        items:
+          $ref: "#/definitions/PurchaseQuotationNegotiationDTO"
+  PurchaseQuotationNegotiationDTO:
+    type: object
+    description: Negociação do fornecedor com seus respectivos insumos negociados.
+    properties:
+      negotiationId:
+        description: Código da negociação com o fornecedor.
+        type: integer
+        example: 1
+      registeredDate:
+        description: Data de registro da negociação no formato yyyy-MM-dd.
+        type: string
+        example: "2022-08-10"
+      responseDate:
+        description: Data da resposta da negociação no formato yyyy-MM-dd.
+        type: string
+        example: "2022-08-11"
+      expirationDate:
+        description: Data de validade da negociação no formato yyyy-MM-dd.
+        type: string
+        example: "2022-08-15"
+      sellersName:
+        description: Nome do vendedor.
+        type: string
+        example: Vendedor
+      totalValue:
+        description: Valor total da negociação.
+        type: number
+        example: 88.9
+      discount:
+        description: Desconto da negociação.
+        type: number
+        example: 10.1
+      freight:
+        description: Frete geral.
+        type: number
+        example: 0
+      itemsFreight:
+        description: Frete dos itens negociados.
+        type: number
+        example: 0
+      negotiationItems:
+        description: Insumos da negociação.
+        type: array
+        items:
+          $ref: "#/definitions/PurchaseQuotationNegotiationItemDTO"
+  PurchaseQuotationNegotiationItemDTO:
+    type: object
+    description: Item da negociação.
+    properties:
+      purchaseQuotationItemId:
+        description: Código do item da cotação, serve para identificar a qual item da cotação este item de negociação se refere.
+        type: integer
+        example: 1
+      productId:
+        description: Código do insumo da negociação.
+        type: integer
+        example: 100
+      productDescription:
+        description: Nome do insumo cotado.
+        type: string
+        example: Aço
+      detailId:
+        description: Código do detalhe do insumo.
+        type: integer
+        example: 5
+      detailDescription:
+        description: Descrição do detalhe do insumo.
+        type: string
+        example: CA60 4.2mm
+      trademarkId:
+        description: Código da marca do insumo.
+        type: integer
+        example: 2
+      trademarkDescription:
+        description: Marca do insumo.
+        type: string
+        example: Marca do aço
+      quotedQuantity:
+        description: Quantidade cotada deste insumo.
+        type: number
+        example: 100.9
+      negotiatedQuantity:
+        description: Quantidade negociada deste insumo.
+        type: number
+        example: 90
+      unitPrice:
+        description: Preço unitário.
+        type: number
+        example: 1.1
+      discount:
+        description: Desconto.
+        type: number
+        example: 10.1
+      discountPercentage:
+        description: Desconto percentual aplicado ao insumo.
+        type: number
+        example: 0
+      increasePercentage:
+        description: Aumento percentual aplicado ao insumo.
+        type: number
+        example: 0
+      ipiTaxPercentage:
+        description: Percentual de IPI aplicado ao insumo.
+        type: number
+        example: 0
+      issTaxPercentage:
+        description: Percentual de ISS aplicado ao insumo.
+        type: number
+        example: 0
+      icmsTaxPercentage:
+        description: Percentual de ICMS aplicado ao insumo.
+        type: number
+        example: 0
+      freightUnitPrice:
+        description: Frete unitário do insumo.
+        type: number
+        example: 0
+      reference:
+        description: Referência do item negociado.
+        type: string
+        example: Referência do item
+      selectedOption:
+        description: Indica este item foi selecionado para compra.
+        type: boolean
+        example: true
+  ApiError:
+    type: object
+    properties:
+      data:
+        type: array
+        items:
+          type: object
+          properties:
+            api-error:
+              type: string
+              example: Data inicial da cotação não pode ser superior a data final. Verifique as datas informadas nos campos 'startDate' e 'endDate'.

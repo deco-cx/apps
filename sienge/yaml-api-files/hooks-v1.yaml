@@ -1,0 +1,224 @@
+swagger: "2.0"
+info:
+  description: "API de Consulta, inclusão e exclusão de WebHooks."
+  version: "1.0"
+  title: Gerenciamento de WebHooks
+host: "api.sienge.com.br"
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: "WebHooks"
+schemes:
+  - "https"
+paths:
+  /hooks:
+    get:
+      operationId: getHooks
+      tags:
+        - "WebHooks"
+      summary: "Consulta paginada de WebHooks"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "query"
+          name: "limit"
+          description: "Quantidade máxima de resultados da pesquisa a serem retornados."
+          type: "integer"
+          format: "int32"
+          default: 100
+          minimum: 1
+          maximum: 200
+        - in: "query"
+          name: "offset"
+          description: "Deslocamento entre o começo da lista e um dado elemento."
+          type: "integer"
+          format: "int32"
+          default: 0
+      responses:
+        "200":
+          description: "Operação bem sucedida"
+          schema:
+            $ref: "#/definitions/PaginatedResponse"
+        "400":
+          description: "Requisição mal formada"
+          schema:
+            $ref: "#/definitions/ApiError"
+    post:
+      operationId: postHooks
+      tags:
+        - "WebHooks"
+      summary: "Insere um novo WebHook"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "WebHook para inserção"
+          required: true
+          schema:
+            $ref: "#/definitions/HookCreate"
+      responses:
+        "200":
+          description: "Operação bem sucedida"
+          schema:
+            $ref: "#/definitions/Hook"
+        "400":
+          description: "Requisição mal formada"
+          schema:
+            $ref: "#/definitions/ApiError"
+  /hooks/{hookId}:
+    get:
+      operationId: getHooksId
+      tags:
+        - "WebHooks"
+      summary: "Consulta um WebHook específico por ID"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "hookId"
+          in: "path"
+          description: "Id do WebHook"
+          required: true
+          type: "string"
+          format: "uuid"
+      responses:
+        "200":
+          description: "Operação bem sucedida"
+          schema:
+            $ref: "#/definitions/Hook"
+        "400":
+          description: "Requisição mal formada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: "O recurso requisitado não foi encontrado"
+          schema:
+            $ref: "#/definitions/ApiError"
+    delete:
+      operationId: deleteHooksId
+      tags:
+        - "WebHooks"
+      summary: "Remove um WebHook específico por ID"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "hookId"
+          in: "path"
+          description: "Id do WebHook"
+          required: true
+          type: "string"
+          format: "uuid"
+      responses:
+        "200":
+          description: "Operação bem sucedida"
+        "400":
+          description: "Requisição mal formada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: "O recurso requisitado não foi encontrado"
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  PaginatedResponse:
+    type: "object"
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: "array"
+        description: "Lista de anexos de Pedidos de Compra retornadas como resultado da requisi��o"
+        items:
+          $ref: "#/definitions/Hook"
+  ResultSetMetadata:
+    type: "object"
+    properties:
+      count:
+        type: "integer"
+        format: "int64"
+        description: "Total de resultados disponíveis na base de dados como resultado da pesquisa efetuada."
+      offset:
+        type: "integer"
+        format: "int32"
+        description: "Deslocamento entre o começo da lista e um dado elemento."
+        default: 100
+      limit:
+        type: "integer"
+        format: "int32"
+        description: "Quantidade máxima de resultados da consulta a serem retornados."
+        default: 100
+        minimum: 1
+        maximum: 200
+  Hook:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        example: "caa132c2-6473-4ec4-8756-b3baa9c3c4c4"
+        description: "Id do WebHook."
+      url:
+        type: "string"
+        example: "https://mycompany.com/api/webhook-callback"
+        description: "URL que será enviado uma requisição quando algum evento ocorrer."
+      token:
+        type: "string"
+        example: "my-secret-token"
+        description: "Bearer token que será enviado no header da requisição."
+      events:
+        type: "array"
+        items:
+          type: "string"
+        example: ["USER_CREATED"]
+        description: "Lista de eventos que deseja ser notificado."
+  HookCreate:
+    type: "object"
+    required:
+      - "url"
+      - "events"
+    properties:
+      url:
+        type: "string"
+        example: "https://mycompany.com/api/webhook-callback"
+        description: "URL que será enviado uma requisição quando algum evento ocorrer."
+      token:
+        type: "string"
+        example: "my-secret-token"
+        description: "Bearer token que será enviado no header da requisição."
+      events:
+        type: "array"
+        items:
+          type: "string"
+        example: ["USER_CREATED"]
+        description: "Lista de eventos que deseja ser notificado."
+  ApiError:
+    type: "object"
+    description: "Objeto que encapsula os atributos de erros da API."
+    properties:
+      status:
+        type: "string"
+        description: "Status http"
+      developerMessage:
+        type: "string"
+        description: "Mensagem de erro pertinente a ser reportada ao desenvolvedor que está consumidor da API."
+      userMessage:
+        type: "array"
+        description: "Lista contendo mensagem de errors relavantes para o utilizador final"
+        items:
+          type: "string"
+      errors:
+        type: "array"
+        description: "Lista com erros de validação dos atributos de entrada da API. Este campo fica visível apenas quando possuir erros de validação"
+        items:
+          $ref: "#/definitions/ApiExceptionFieldError"
+  ApiExceptionFieldError:
+    type: "object"
+    description: "Objeto que encapsula os erros de validação dos atributos de entrada da API."
+    properties:
+      field:
+        type: "string"
+        description: "Campo que possui valor inválido"
+      message:
+        type: "string"
+        description: "Mensagem de erro pertinente a ser reportada ao developer consumidor da API referente ao valor inválida utilizado nos dados de entrada."

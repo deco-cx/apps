@@ -101,7 +101,9 @@ async function loader(
       : page.product,
     seo: {
       title: product.productTitle || product.productName,
-      description: product.metaTagDescription,
+      description: props.advancedConfigs?.preferDescription
+        ? product.description
+        : product.metaTagDescription,
       canonical: new URL(`/${product.linkText}/p`, url.origin).href,
       noIndexing: props.indexingSkus ? false : !!skuId,
     },

@@ -1,0 +1,225 @@
+swagger: "2.0"
+info:
+  description: Consulta de Tabelas de Preços.
+  version: "1.0"
+  title: Tabela de Preços
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Tabela de Preços
+    description: API de tabela de preços
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  "/price-tables":
+    get:
+      operationId: getPricetables
+      tags:
+        - Tabela de Preços
+      summary: Busca a última versão das tabelas de preços.
+      parameters:
+        - in: query
+          type: integer
+          name: companyId
+          description: O código da empresa.
+        - in: query
+          type: integer
+          name: enterpriseId
+          description: O código do empreendimento.
+        - in: query
+          type: integer
+          name: enterpriseIdView
+          description: O código externo do empreendimento.
+        - in: query
+          type: integer
+          name: projectId
+          description: O código do projeto do empreendimento.
+        - in: query
+          type: string
+          name: tableName
+          description: Nome da tabela de preços.
+        - in: query
+          type: string
+          name: startOfTerm
+          description: Data de início de vigência. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+        - in: query
+          type: string
+          name: endOfTerm
+          description: Data final de vigência. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+        - in: query
+          type: integer
+          name: offset
+          description: O número de itens a pular antes de começar a coletar o conjunto de resultados.
+        - in: query
+          type: integer
+          name: limit
+          description: O número de itens a serem devolvidos.
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Tabelas de preços retornadas.
+          schema:
+            $ref: "#/definitions/PriceTablesGetAll"
+        "500":
+          description: Erro interno no servidor.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+
+definitions:
+  PriceTablesGetAll:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de tabelas de preços retornadas como resultado da pesquisa.
+        items:
+          $ref: "#/definitions/PriceTables"
+
+  PriceTables:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código da tabela de preços.
+      version:
+        type: integer
+        format: int32
+        description: Número da versão.
+      companyId:
+        type: integer
+        format: int32
+        description: Código da empresa.
+      enterpriseId:
+        type: integer
+        format: int32
+        description: Código do empreendimento.
+      enterpriseIdView:
+        type: integer
+        format: int32
+        description: Código externo do empreendimento.
+      projectId:
+        type: integer
+        format: int32
+        description: Código do projeto do empreendimento.
+      tableName:
+        type: string
+        description: Nome da tabela de preços.
+      tableVersionName:
+        type: string
+        description: Nome da versão.
+      startOfTerm:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2020-11-24)"
+        description: Data de início de vigência.
+      endOfTerm:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2020-11-24)"
+        description: Data de fim de vigência.
+      notes:
+        type: string
+        description: Observações.
+      paymentConditions:
+        type: array
+        description: Condições de pagamento.
+        items:
+          $ref: "#/definitions/PriceTablesConditions"
+      units:
+        type: array
+        description: Unidades com valores especiais.
+        items:
+          $ref: "#/definitions/PriceTablesUnits"
+
+  PriceTablesConditions:
+    type: object
+    properties:
+      order:
+        type: integer
+        format: int32
+        description: Número de ordem da condição.
+      paymentConditionType:
+        type: string
+        description: Tipo de condição de pagamento.
+      installmentsNumber:
+        type: integer
+        format: int32
+        description: Quantidade de parcelas.
+      series:
+        type: integer
+        format: int32
+        description: Número de série da condição.
+      interestType:
+        type: string
+        description: Tipo de juros.
+      percentageByPeriod:
+        type: number
+        description: Porcentagem de juros por período.
+      unitValuePercentage:
+        type: number
+        description: Porcentagem do valor da unidade.
+      indexer:
+        type: string
+        description: Tipo de indexador.
+      baseDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2020-11-24)"
+        description: Data base de juros.
+
+  PriceTablesUnits:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Número de identificação da unidade.
+      indexedQuantity:
+        type: number
+        description: Quantidade indexada.
+
+  ResultSetMetadata:
+    type: object
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada.
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http.
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor.
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário.
+        example: Client description message

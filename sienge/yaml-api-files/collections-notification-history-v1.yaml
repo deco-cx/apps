@@ -1,0 +1,116 @@
+swagger: "2.0"
+info:
+  description: API de histórico de notificação de cobranças.
+  version: 1.0.0
+  title: Histórico de Notificação de Cobranças
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  "/collections-notification-history/{collectionNotificationHistoryId}":
+    get:
+      tags:
+        - Collections Notification History
+      summary: Busca o histórico da notificação de cobrança no Sienge
+      operationId: buscaHistoricoNotificacaoCobranca
+      parameters:
+        - name: collectionNotificationHistoryId
+          in: path
+          description: Código do histórico da notificação de cobrança a ser apresentado
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Histórico de notificação de cobrança encontrado
+          schema:
+            $ref: "#/definitions/CollectionNotificationHistory"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "404":
+          description: Histórico de notificação de cobrança não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  CollectionNotificationHistory:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código do histórico da notificação de cobrança
+      sentEmail:
+        type: string
+        description: Enviou e-mail. "S" (Sim) ou "N" (Não)
+      sentSMS:
+        type: string
+        description: Enviou SMS. "S" (Sim) ou "N" (Não)
+      notificationRegistered:
+        type: string
+        description: Enviou a notificação para webhook. "S" (Sim) ou "N" (Não)
+      client:
+        type: string
+        description: Id e Nome do cliente concatenado
+      receivableBillId:
+        type: integer
+        format: int32
+        description: Número do título
+      installmentId:
+        type: integer
+        format: int32
+        description: Número da parcela
+      sentDate:
+        type: string
+        description: Data de envio
+      dueDate:
+        type: string
+        description: Data de vencimento
+      installmentValue:
+        type: string
+        description: Valor da parcela
+      notificationMessage:
+        type: string
+        description: Mensagem de feedback da notificação
+      emailAddress:
+        type: string
+        description: Endereço de e-mail
+      emailSubject:
+        type: string
+        description: Assunto do e-mail
+      emailMessage:
+        type: string
+        description: Mensagem do e-mail
+      smsSubject:
+        type: string
+        description: Assunto do SMS
+      smsMessage:
+        type: string
+        description: Mensagem do SMS
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para analise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.

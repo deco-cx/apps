@@ -1,0 +1,361 @@
+swagger: "2.0"
+info:
+  title: Calendários de Obra
+  description: API de Calendários da Obra.
+  version: "1.0"
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Calendários
+    description: Calendário de obra
+  - name: Folgas
+    description: Folgas do Calendário
+paths:
+  "/building-projects/{buildingId}/calendar":
+    get:
+      tags:
+        - Calendários
+      operationId: getBuildingProjectCalendar
+      summary: >-
+        Retorna um objeto JSON com as configurações do calendário usado no planejamento da obra. O planejamento em questão é identificado pelo respectivo código da obra (buildingId), considerando por padrão a versão atual do planejamento.
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+
+      responses:
+        "200":
+          description: >-
+            Retorna um objeto JSON com as datas de início e término do calendário da obra, se está considerando feriados e folgas do cadastro geral e se está considerando sábados e domingos como dias de trabalho.
+          schema:
+            $ref: "#/definitions/CalendarDto"
+        "404":
+          description: Obra não existe ou o calendário ainda não foi criado.
+          schema:
+            $ref: "#/definitions/ApiError"
+
+    put:
+      tags:
+        - Calendários
+      operationId: putBuildingProjectCalendar
+      summary: >-
+        Insere um calendário em uma nova versão da planilha de planejamento de uma obra. O planejamento em questão é identificado pelo respectivo código da obra (buildingId), considerando por padrão a versão atual do planejamento.
+
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: >-
+          required: true
+          schema:
+            $ref: "#/definitions/CalendarDto"
+      responses:
+        "200":
+          description: >-
+            Retorna um objeto JSON com as datas de início e término da obra do jeito que elas foram salvas no Sienge.
+            Essas datas podem não coincidir com as datas enviadas no PUT.
+            No Sienge ocorrem algumas validações de datas para manter a consistência do planejamento, mantendo a duração das tarefas em dias e, para tal, prorroga
+            a data final da obra se necessário. Então caso deseje alterar as datas do calendário de modo que a duração das tarefas não caibam dentro do período da obra,
+            o fim da obra será prorrogado para as tarefas manterem suas durações.
+            As tarefas sempre serão priorizadas, então se for tentado alterar uma data de início da obra e houver alguma tarefa que se inicia antes dessa data,
+            a data desta tarefa será adotada como a inicial da obra.
+            O Sienge ajusta as datas de ínicio e término para dias úteis, ou seja caso as datas enviadas não forem dias úteis, o sistema adota e salva o próxima dia útil.
+          schema:
+            $ref: "#/definitions/PutCalendarResponse"
+        "400":
+          description: Requisição mal formada. Pode ser causada por algum campo obrigatório ausente ou fora da formatação.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Obra não existe ou o calendário ainda não foi criado.
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/building-projects/{buildingId}/calendar/days-off":
+    get:
+      tags:
+        - Folgas
+      operationId: getBuildingProjectCalendarDayoffs
+      summary: >-
+        Retorna um array com as datas dos dias de folga no período da obra e suas descrições. O planejamento em questão é identificado pelo respectivo código da obra (buildingId), considerando por padrão a versão atual do planejamento.
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: query
+          name: offset
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array com a lista de datas de folga e a descrição dentro do período da obra; Retorna um array vazio caso não existam dias de folga no período.
+          schema:
+            $ref: "#/definitions/GetResponseDayOff"
+        "404":
+          description: Obra não existe ou o calendário ainda não foi criado.
+          schema:
+            $ref: "#/definitions/ApiError"
+
+    post:
+      tags:
+        - Folgas
+      operationId: postBuildingProjectCalendarDayoffs
+      summary: >-
+        Insere folgas no calendário da obra em uma nova versão da planilha de planejamento. O planejamento em questão é identificado pelo respectivo código da obra (buildingId), considerando por padrão a versão atual do planejamento.
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: >-
+            Array de folgas.
+            Caso já exista uma folga com a mesma data, sua descrição será sobrescrita.
+              Data da Folga: Campo obrigatório. Deve observar o intervalo de início e fim da obra.
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/DayOffDTO"
+            example:
+              - date: "2020-12-25"
+                description: "natal"
+              - date: "2020-05-01"
+                description: "dia do trabalho"
+      responses:
+        "201":
+          description: >-
+            Sem conteúdo.
+        "400":
+          description: Requisição mal formada. Pode ser causada por algum campo obrigatório ausente ou fora da formatação.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Obra não existe ou o calendário ainda não foi criado.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: Retorna as folgas fora do periodo de execução da obra. Quando ocorre essa situação, nenhuma folga foi inserida no calendário. É necessário corrigir as datas e reenviar todas as folgas anteriormente enviadas.
+          schema:
+            $ref: "#/definitions/ApiError422"
+
+    delete:
+      tags:
+        - Folgas
+      operationId: deleteBuildingProjectCalendarDayoffs
+      summary: >-
+        Remove folgas do calendário da obra em uma nova versão da planilha de planejamento. O planejamento em questão é identificado pelo respectivo código da obra (buildingId), considerando por padrão a versão atual do planejamento.
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: >-
+            Array com a data das folgas. date: Campo obrigatório. Deve existir folga nessa data no calendário da obra.
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/DayOffDTOForDelete"
+            example:
+              - date: "2020-12-25"
+              - date: "2020-05-01"
+      responses:
+        "204":
+          description: >-
+            Sem conteúdo.
+        "400":
+          description: Requisição mal formada. Pode ser causada por algum campo obrigatório ausente ou fora da formatação.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Obra não existe ou o calendário ainda não foi criado.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: Retorna as folgas não encontradas no calendário da obra. Quando ocorre essa situação, nenhuma folga foi removida do calendário. É necessário corrigir as datas e reenviar todas as folgas anteriormente enviadas.
+          schema:
+            $ref: "#/definitions/ApiError422"
+definitions:
+  CalendarDto:
+    type: object
+    properties:
+      projectStartDate:
+        description: Data de início da obra no formato yyyy-MM-dd
+        type: string
+        example: "2016-06-23"
+      projectFinishDate:
+        description: Data de término da obra no formato yyyy-MM-dd
+        type: string
+        example: "2019-10-30"
+      considerHolidaysAndDaysOffInGeneralRegister:
+        description: Indica se os feriados e folgas do cadastro geral estão sendo considerados
+        type: boolean
+      considerSaturdaysAsWorkingDay:
+        description: Indica se os sábados são considerados dias de trabalho
+        type: boolean
+      considerSundaysAsWorkingDay:
+        description: Indica se os domingos são considerados dias de trabalho
+        type: boolean
+
+  PutCalendarResponse:
+    type: object
+    properties:
+      projectStartDate:
+        description: Data de início da obra no formato yyyy-MM-dd
+        type: string
+        example: "2016-06-23"
+      projectFinishDate:
+        description: Data de término da obra no formato yyyy-MM-dd
+        type: string
+        example: "2019-10-30"
+  GetResponseDayOff:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/DayOffDTO"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        example: 1
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        example: 100
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+  DayOffDTO:
+    type: object
+    properties:
+      date:
+        description: Data da folga no calendário em formato yyyy-MM-dd
+        type: string
+        example: "2016-12-25"
+      description:
+        description: Descrição da folga no calendário
+        type: string
+        example: "natal"
+  DayOffDTOForDelete:
+    type: object
+    properties:
+      date:
+        description: Data da folga no calendário em formato yyyy-MM-dd
+        type: string
+        example: "2016-12-25"
+
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relevantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API
+
+  ApiError422:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relevantes para o utilizador final
+        items:
+          type: string
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/DayOffDTO"
+        description: Um array contendo as folgas fora do período de execução da obra.
+    description: Objeto que encapsula os atributos de erros da API

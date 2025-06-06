@@ -1,0 +1,510 @@
+swagger: "2.0"
+info:
+  description: API de títulos do contas a receber.
+  version: 1.0.1
+  title: Títulos do Contas a Receber
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Títulos
+    description: API para listagem de títulos
+  - name: Parcelas do título
+    description: API para listagem de parcelas do título
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /accounts-receivable/receivable-bills:
+    get:
+      tags:
+        - Títulos
+      summary: Busca os títulos do cliente no Sienge
+      operationId: findReceivableBills
+      parameters:
+        - name: customerId
+          in: query
+          description: "Número do código do cliente | Exemplo: 57"
+          required: true
+          type: integer
+          format: int32
+        - name: companyId
+          in: query
+          description: Código da empresa
+          required: false
+          type: integer
+        - name: costCenterId
+          in: query
+          description: Código do centro de custo
+          required: false
+          type: integer
+        - name: paidOff
+          in: query
+          description: Filtrar apenas títulos quitados
+          required: false
+          type: boolean
+          default: false
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Títulos encontrados
+          schema:
+            $ref: "#/definitions/GetResponseBills"
+        "404":
+          description: Título não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  /accounts-receivable/receivable-bills/{receivableBillId}:
+    get:
+      tags:
+        - Títulos
+      summary: Busca os títulos no Sienge pelo número
+      operationId: findReceivableBillsForID
+      parameters:
+        - name: receivableBillId
+          in: path
+          description: "Número do título | Exemplo: 300"
+          required: true
+          type: integer
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Títulos encontrados
+          schema:
+            $ref: "#/definitions/BillByID"
+        "404":
+          description: Título não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  /accounts-receivable/receivable-bills/{receivableBillId}/installments:
+    get:
+      tags:
+        - Parcelas do título
+      summary: Busca as parcelas do título
+      operationId: findReceivableInstallments
+      parameters:
+        - name: receivableBillId
+          in: path
+          description: "Número do título em que as parcelas estão vinculadas | Exemplo: 1151"
+          required: true
+          type: integer
+          format: int32
+        - name: carrierIdIn
+          in: query
+          description: "Id dos portadores para incluir na consulta | Exemplo: 120, 263"
+          type: integer
+          format: int32
+        - name: carrierIdNotIn
+          in: query
+          description: >-
+            Id dos portadores para excluir da consulta  | Exemplo: 120, 263
+          required: false
+          type: array
+          items:
+            type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Parcelas encontradas
+          schema:
+            $ref: "#/definitions/GetResponseInstallments"
+        "404":
+          description: Parcelas não encontradas
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  /accounts-receivable/receivable-bills/{receivableBillId}/installments/{installmentId}/change-due-date:
+    patch:
+      tags:
+        - Parcelas do título
+      summary: Altera data de vencimento da parcela e o status da cobrança para Em Aberto. Será possível registrar nova cobrança na sequência. Não será possível alterar parcelas com baixas e a nova data de vencimento não poderá ser menor que a data corrente.
+      operationId: changeDueDate
+      consumes:
+        - application/json
+      parameters:
+        - name: receivableBillId
+          in: path
+          description: "Número do título em que as parcelas estão vinculadas | Exemplo: 1151"
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: "Número da parcela | Exemplo: 2"
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Informações necessárias para alterar data de vencimento
+          required: true
+          schema:
+            $ref: "#/definitions/InstallmentDueDate"
+      responses:
+        "204":
+          description: Parcela alterada com sucesso
+        "400":
+          description: Não foi possível alterar parcela pois os dados estão inválidos
+        "422":
+          description: Não foi possível processar
+        "404":
+          description: Não foi encontrado o título e parcela
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  /accounts-receivable/{receivableBillId}/budget-categories:
+    get:
+      tags:
+        - Apropriação financeira do título
+      summary: Busca as apropriações financeiras do título
+      operationId: getAccountsReceivableIDBudgetCategories
+      parameters:
+        - name: receivableBillId
+          in: path
+          description: Número do título em que as apropriações financeiras estão vinculados
+          required: true
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Apropriações financeiras encontradas
+          schema:
+            $ref: "#/definitions/GetResponseBudgetCategories"
+        "404":
+          description: Apropriações financeiras não encontradas
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  GetResponseBills:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de títulos
+        items:
+          $ref: "#/definitions/Bill"
+  Bill:
+    type: object
+    properties:
+      customerId:
+        type: integer
+        format: int32
+        description: Número do código do cliente
+      receivableBillId:
+        type: integer
+        format: int32
+        description: Número do título
+      documentId:
+        type: string
+        description: "Código do documento | Exemplo: CT"
+      documentNumber:
+        type: string
+        description: "Número do documento | Exemplo: UND102B"
+      issueDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Data de emissão
+        example: "2018-12-22"
+      receivableBillValue:
+        type: number
+        format: double
+        description: "Valor do título bruto | Exemplo: 100.00"
+      companyId:
+        type: integer
+        format: int32
+        description: Código da empresa do título
+      defaulting:
+        type: boolean
+        description: Em situação de inadimplência
+      subjudice:
+        type: boolean
+        description: Em situação sub judice
+      note:
+        type: string
+        description: observação constante do título
+      payOffDate:
+        type: string
+        format: date
+        description: Data de quitação (Formato ISO 8601 yyyy-MM-dd)
+        example: "2025-02-09"
+  BillByID:
+    type: object
+    properties:
+      customerId:
+        type: integer
+        format: int32
+        description: Número do código do cliente
+      receivableBillId:
+        type: integer
+        format: int32
+        description: Número do título
+      documentId:
+        type: string
+        description: "Código do documento | Exemplo: CT"
+      documentNumber:
+        type: string
+        description: "Número do documento | Exemplo: UND102B"
+      issueDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Data de emissão
+        example: "2018-12-22"
+      receivableBillValue:
+        type: number
+        format: double
+        description: "Valor do título bruto | Exemplo: 100.00"
+      companyId:
+        type: integer
+        format: int32
+        description: Código da empresa do título
+      defaulting:
+        type: boolean
+        description: Em situação de inadimplência
+      subjudice:
+        type: boolean
+        description: Em situação sub judice
+      note:
+        type: string
+        description: observação constante do título
+      normal:
+        type: boolean
+        description: Em situação normal
+      inBilling:
+        type: boolean
+        description: Em situação Em cobrança
+  Installment:
+    type: object
+    properties:
+      receivableBillId:
+        type: integer
+        format: int32
+        description: Número do título
+      installmentId:
+        type: integer
+        format: int32
+        description: Número da parcela
+      carrierId:
+        type: integer
+        format: int32
+        description: Número do portador
+      conditionTypeId:
+        type: string
+        description: Código da condição de pagamento
+        example: PM
+      dueDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-10)"
+        description: Data de vencimento
+        example: "2018-01-10"
+      balanceDue:
+        type: number
+        format: double
+        description: Saldo devedor original
+        example: 1000.00
+      generatedTicket:
+        type: boolean
+        description: Possui cobrança/boleto gerado
+  InstallmentDueDate:
+    type: object
+    required:
+      - newDueDate
+    properties:
+      newDueDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd)"
+        example: "2021-05-25"
+        description: Nova data de vencimento da parcela.
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para analise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.
+  GetResponseInstallments:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de Parcelas do título
+        items:
+          $ref: "#/definitions/Installment"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200
+  GetResponseBudgetCategories:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de apropriações financeiras do título
+        items:
+          $ref: "#/definitions/BudgetCategories"
+  BudgetCategories:
+    type: object
+    properties:
+      costCenterId:
+        type: integer
+        format: int32
+        description: Código do centro de custo
+      paymentCategoriesId:
+        type: string
+        description: "Código do plano financeiro (sem máscara) | Exemplo: 2010101"
+        minLength: 1
+        maxLength: 9
+      percentage:
+        type: number
+        description: >-
+          Percentual apropriado do centro de custo |  Máximo de casas decimais:
+          12 | Exemplo: 100.00
+        format: double
+        maximum: 100
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/Link"
+  Link:
+    type: object
+    properties:
+      rel:
+        type: string
+        description: Nome da recurso associado
+        example: accounts-receivable
+      href:
+        type: string
+        description: URL do recurso associado
+        example: "http://../v1/accounts-receivable/1"

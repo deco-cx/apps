@@ -1,0 +1,184 @@
+swagger: "2.0"
+info:
+  description: API de Conta-corrente.
+  version: 1.0.0
+  title: Contas-Correntes
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Checking Accounts
+    description: API para listagem de contas-correntes
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  "/checking-accounts":
+    get:
+      tags:
+        - Checking Accounts
+      summary: Busca uma lista de contas-correntes ordenando pelo número da conta
+      operationId: getCheckingAccounts
+      parameters:
+        - name: companyId
+          in: query
+          description: Código da empresa cadastrada no Sienge
+          required: false
+          type: integer
+        - name: accountNumber
+          in: query
+          description: Número da conta-corrente
+          required: false
+          type: string
+        - name: accountStatus
+          in: query
+          description: >-
+            Os status de uma conta corrente são: "ENABLED" - Ativa, "DISABLED" - Inativa. Caso não seja passado nenhum status por padrão os valores devolvidos serão as contas ativas ("ENABLED"). Pode-se ainda passar "ALL" para trazer as contas "Ativas" e "Inativas".
+          required: false
+          type: string
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Contas-correntes encontradas
+          schema:
+            $ref: "#/definitions/GetResponseDocument"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  CheckingAccount:
+    type: object
+    description: Conta-corrente
+    properties:
+      accountNumber:
+        type: string
+        description: Número da conta-corrente
+        example: "12288-8"
+      accountName:
+        type: string
+        description: Nome da conta-corrente
+        example: "Conta Empreendimento"
+      agencyNumber:
+        type: string
+        description: Número da Agência
+        example: "001111"
+      accountType:
+        $ref: "#/definitions/CheckingAccountType"
+      companyId:
+        type: integer
+        format: int32
+        description: Código da empresa
+        example: 1
+      companyName:
+        type: string
+        description: Nome da empresa
+        example: "Softplan"
+      bankNumber:
+        type: string
+        description: Código do banco
+        example: "341"
+      bankName:
+        type: string
+        description: Nome do banco
+        example: "Banco Itaú Unibanco"
+      accountStatus:
+        type: string
+        description: Status da conta corrente
+        example: "ENABLED"
+  CheckingAccountType:
+    type: object
+    description: Tipo de conta-corrente
+    properties:
+      id:
+        type: string
+        description: Código do tipo de conta-corrente
+        example: "B"
+      description:
+        type: string
+        description: Descrição do tipo de conta-corrente
+        example: "Bancária"
+  GetResponseDocument:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de contas-correntes retornadas como resultado da pesquisa
+        items:
+          $ref: "#/definitions/CheckingAccount"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para analise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.

@@ -18,6 +18,9 @@ const PATHS_TO_PROXY = [
   "/XMLData/*",
   "/_v/*",
 ];
+
+export const VTEX_PATHS_THAT_REQUIRES_SAME_REFERER = ["/no-cache/AviseMe.aspx"];
+
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
 const buildProxyRoutes = (
@@ -25,6 +28,7 @@ const buildProxyRoutes = (
     publicUrl,
     extraPaths,
     includeSiteMap,
+    includePathToDecoSitemap,
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
     includeScriptsToHead,
@@ -33,6 +37,7 @@ const buildProxyRoutes = (
     publicUrl?: string;
     extraPaths: string[];
     includeSiteMap?: string[];
+    includePathToDecoSitemap?: string[];
     generateDecoSiteMap?: boolean;
     excludePathsFromDecoSiteMap: string[];
     includeScriptsToHead?: {
@@ -71,23 +76,8 @@ const buildProxyRoutes = (
         includeScriptsToHead,
         includeScriptsToBody,
         removeDirtyCookies: true,
+        pathsThatRequireSameReferer: VTEX_PATHS_THAT_REQUIRES_SAME_REFERER,
       };
-      // we have this check because we need to add
-      // the referer header to the AviseMe route
-      if (pathTemplate.includes("AviseMe")) {
-        return {
-          pathTemplate,
-          handler: {
-            value: {
-              ...handlerValue,
-              customHeaders: [{
-                key: "referer",
-                value: urlToProxy,
-              }],
-            },
-          },
-        };
-      }
 
       return ({
         pathTemplate,
@@ -106,6 +96,7 @@ const buildProxyRoutes = (
         handler: {
           value: {
             excludePaths: excludePathsFromDecoSiteMap,
+            includePaths: includePathToDecoSitemap,
             __resolveType: "website/handlers/sitemap.ts",
           },
         },
@@ -147,6 +138,10 @@ export interface Props {
    */
   includeSiteMap?: string[];
   /**
+   * @title Paths to include in the deco sitemap
+   */
+  includePathToDecoSitemap?: string[];
+  /**
    * @title If deco site map should be exposed at /deco-sitemap.xml
    */
   generateDecoSiteMap?: boolean;
@@ -175,6 +170,7 @@ function loader(
   {
     extraPathsToProxy = [],
     includeSiteMap = [],
+    includePathToDecoSitemap = [],
     generateDecoSiteMap = true,
     excludePathsFromDecoSiteMap = [],
     includeScriptsToHead = { includes: [] },
@@ -187,6 +183,7 @@ function loader(
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
     includeSiteMap,
+    includePathToDecoSitemap,
     publicUrl: ctx.publicUrl,
     extraPaths: extraPathsToProxy,
     includeScriptsToHead,
