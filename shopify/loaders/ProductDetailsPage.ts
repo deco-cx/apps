@@ -6,9 +6,11 @@ import {
   GetProductQuery,
   GetProductQueryVariables,
   HasMetafieldsMetafieldsArgs,
+  LanguageCode,
+  CountryCode
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { GetProduct } from "../utils/storefront/queries.ts";
-import { Metafield } from "../utils/types.ts";
+import { LanguageContextArgs, Metafield } from "../utils/types.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -17,6 +19,18 @@ export interface Props {
    * @description search for metafields
    */
   metafields?: Metafield[];
+  /**
+   * @title Language Code
+   * @description Language code for the storefront API
+   * @example "EN" for English, "FR" for French, etc.
+   */
+  languageCode?: LanguageCode;
+  /**
+   * @title Country Code
+   * @description Country code for the storefront API
+   * @example "US" for United States, "FR" for France, etc.
+   */
+  countryCode?: CountryCode;
 }
 
 /**
@@ -29,7 +43,7 @@ const loader = async (
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> => {
   const { storefront } = ctx;
-  const { slug } = props;
+  const { slug, languageCode = "PT", countryCode = "BR" } = props;
   const metafields = props.metafields || [];
 
   const splitted = slug?.split("-");
@@ -39,9 +53,9 @@ const loader = async (
 
   const data = await storefront.query<
     GetProductQuery,
-    GetProductQueryVariables & HasMetafieldsMetafieldsArgs
+    GetProductQueryVariables & HasMetafieldsMetafieldsArgs & LanguageContextArgs
   >({
-    variables: { handle, identifiers: metafields },
+    variables: { handle, identifiers: metafields, languageCode, countryCode },
     ...GetProduct,
   });
 

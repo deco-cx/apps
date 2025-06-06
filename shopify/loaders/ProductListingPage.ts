@@ -13,9 +13,11 @@ import {
   QueryRootCollectionArgs,
   QueryRootSearchArgs,
   SearchResultItemConnection,
+  LanguageCode,
+  CountryCode
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toFilter, toProduct } from "../utils/transform.ts";
-import { Metafield } from "../utils/types.ts";
+import { LanguageContextArgs, Metafield } from "../utils/types.ts";
 import {
   getFiltersByUrl,
   searchSortOptions,
@@ -69,6 +71,18 @@ export interface Props {
    * @description The URL of the page, used to override URL from request
    */
   pageHref?: string;
+  /**
+   * @title Language Code
+   * @description Language code for the storefront API
+   * @example "EN" for English, "FR" for French, etc.
+   */
+  languageCode?: LanguageCode;
+  /**
+   * @title Country Code
+   * @description Country code for the storefront API
+   * @example "US" for United States, "FR" for France, etc.
+   */
+  countryCode?: CountryCode;
 }
 
 /**
@@ -94,6 +108,8 @@ const loader = async (
   const startCursor = props.startCursor ||
     url.searchParams.get("startCursor") || "";
   const metafields = props.metafields || [];
+  const languageCode = props?.languageCode || "PT";
+  const countryCode = props?.countryCode || "BR";
 
   const isSearch = Boolean(query);
   let hasNextPage = false;
@@ -113,7 +129,7 @@ const loader = async (
   if (isSearch) {
     const data = await storefront.query<
       QueryRoot,
-      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs
+      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs & LanguageContextArgs
     >({
       variables: {
         ...(!endCursor && { first: count }),
@@ -123,6 +139,8 @@ const loader = async (
         query: query,
         productFilters: getFiltersByUrl(url),
         identifiers: metafields,
+        languageCode,
+        countryCode,
         ...searchSortShopify[sort],
       },
       ...SearchProducts,
@@ -136,15 +154,16 @@ const loader = async (
       data?.search?.pageInfo.hasPreviousPage ?? false,
     );
   } else {
-    // TODO: understand how accept more than one path
-    // example: /collections/first-collection/second-collection
-    const pathname = props.collectionName || url.pathname.split("/")[1];
+    // Support for multiple paths, such as /{lang}/collections/first-collection/second-collection
+    // Always takes the last non-empty segment as pathname
+    const pathname = props.collectionName || url.pathname.split("/").filter(Boolean).pop();
 
     const data = await storefront.query<
       QueryRoot,
       & QueryRootCollectionArgs
       & CollectionProductsArgs
       & HasMetafieldsMetafieldsArgs
+      & LanguageContextArgs
     >({
       variables: {
         ...(!endCursor && { first: count }),
@@ -154,6 +173,8 @@ const loader = async (
         identifiers: metafields,
         handle: pathname,
         filters: getFiltersByUrl(url),
+        languageCode,
+        countryCode,
         ...sortShopify[sort],
       },
       ...ProductsByCollection,
@@ -203,7 +224,7 @@ const loader = async (
       "@type": "BreadcrumbList",
       itemListElement: [{
         "@type": "ListItem" as const,
-        name: isSearch ? query : url.pathname.split("/")[1],
+        name: isSearch ? query : url.pathname.split("/").filter(Boolean).pop(),
         item: isSearch ? url.href : url.pathname,
         position: 2,
       }],
