@@ -1670,3 +1670,39 @@ export interface ProfileInput {
   stateRegistration?: Maybe<string>;
   isCorporate?: Maybe<boolean>;
 }
+
+export interface AuthResponse {
+  authStatus: string | "WrongCredentials" | "BlockedUser" | "Success";
+  promptMFA: boolean;
+  clientToken: string | null;
+  authCookie: {
+    Name: string;
+    Value: string;
+  } | null;
+  accountAuthCookie: {
+    Name: string;
+    Value: string;
+  } | null;
+  expiresIn: number;
+  userId: string | null;
+  phoneNumber: string | null;
+  scope: string | null;
+}
+
+export interface AuthProvider {
+  providerName: string;
+  className: string;
+  expectedContext: unknown[];
+}
+
+export interface StartAuthentication {
+  authenticationToken: string | null;
+  oauthProviders: AuthProvider[];
+  showClassicAuthentication: boolean;
+  showAccessKeyAuthentication: boolean;
+  showPasskeyAuthentication: boolean;
+  authCookie: string | null;
+  isAuthenticated: boolean;
+  selectedProvider: string | null;
+  samlProviders: unknown[];
+}
