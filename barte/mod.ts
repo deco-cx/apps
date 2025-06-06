@@ -13,7 +13,7 @@ export interface Props {
    * @title API token
    * @description The token to access the Barte API
    */
-  token?: Secret;
+  token?: Secret | string;
 }
 
 export interface State extends Omit<Props, "token"> {
@@ -29,11 +29,11 @@ export interface State extends Omit<Props, "token"> {
 export default function App(props: Props): App<Manifest, State> {
   const { token } = props;
 
-  const _stringToken = typeof token === "string" ? token : token?.get?.() ?? "";
+  const stringToken = typeof token === "string" ? token : token?.get?.() ?? "";
 
   const api = createHttpClient<Client>({
     base: BART_URL,
-    headers: new Headers({ "Authorization": `Bearer ${_stringToken}` }),
+    headers: new Headers({ "X-Token-Api": `${stringToken}` }),
     fetcher: fetchSafe,
   });
 

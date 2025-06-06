@@ -3,8 +3,12 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$$$$0 from "./actions/partialRefund.ts";
+import * as $$$0 from "./loaders/getCharges.ts";
 
 const manifest = {
+  "loaders": {
+    "barte/loaders/getCharges.ts": $$$0,
+  },
   "actions": {
     "barte/actions/partialRefund.ts": $$$$$$$$$0,
   },
