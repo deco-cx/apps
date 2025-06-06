@@ -14,6 +14,8 @@ export interface Callbacks {
 
 export interface JoinChannelProps {
   workspace: string;
+  agentName: string;
+  agentLink: string;
   discriminator: string;
   callbacks: Callbacks;
 }

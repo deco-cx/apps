@@ -71,8 +71,8 @@ function processHeaders(headers: CellValue[][]): HeadersResult {
 
 /**
  * @name GET_SHEET_HEADERS
- * @title Obter Cabeçalhos da Planilha
- * @description Obtém os cabeçalhos de uma aba de planilha do Google Sheets
+ * @title Get Sheet Headers
+ * @description Get the headers of a sheet in a Google Sheets spreadsheet
  */
 const loader = async (
   props: Props,
@@ -89,15 +89,11 @@ const loader = async (
   } = props;
 
   try {
-    // Garantir que estamos buscando apenas a linha do cabeçalho
     const rangeStart = range.split(":")[0];
     const rangeEnd = range.split(":")[1].replace(/[0-9]/g, "");
-
-    // Construir o range para obter apenas a linha do cabeçalho
     const headerRange =
       `${sheetName}!${rangeStart}${headerRow}:${rangeEnd}${headerRow}`;
 
-    // Buscar os headers
     const response = await ctx.client
       ["GET /v4/spreadsheets/:spreadsheetId/values/:range"]({
         spreadsheetId,
@@ -107,14 +103,21 @@ const loader = async (
       });
 
     if (!response.ok) {
-      throw new Error(`Erro ao buscar cabeçalhos: ${response.statusText}`);
+      ctx.errorHandler.toHttpError(
+        response,
+        `Error to get sheet headers: ${response.statusText}`,
+      );
     }
 
     const data = await response.json();
-    return processHeaders(data.values || []);
+
+    if (!data.values || !data.values[0]) {
+      return { labels: {}, headerMap: new Map(), headerValues: [] };
+    }
+
+    return processHeaders(data.values);
   } catch (error) {
-    ctx.errorHandler.toHttpError(error, "Erro ao obter cabeçalhos da planilha");
-    return { labels: {}, headerMap: new Map(), headerValues: [] };
+    ctx.errorHandler.toHttpError(error, "Error to get sheet headers");
   }
 };
 

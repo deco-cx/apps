@@ -41,6 +41,10 @@ export default async function invoke(
     "__d",
     `slack-${props.event.team}-${props.event.channel}`,
   );
+  const toolCallMessageTs: Record<
+    string,
+    { ts: string; name: string; arguments: Record<string, unknown> }
+  > = {};
   let buffer = "";
   processStream({
     streamProps: {
@@ -54,14 +58,120 @@ export default async function invoke(
         resourceId: props.event.channel,
       },
     },
+    onToolCallPart: async (toolCall) => {
+      const blocks = [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `🛠️ Running tool: *${toolCall.toolName}*`,
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "*Arguments:*",
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "```" + JSON.stringify(toolCall.args, null, 2) + "```",
+          },
+        },
+        {
+          type: "context",
+          elements: [
+            {
+              type: "mrkdwn",
+              text: "_Status: Processing..._",
+            },
+          ],
+        },
+      ];
+      const response = await client.postMessage(props.event.channel, "", {
+        thread_ts: props.event.ts,
+        blocks,
+      });
+      if (response.ok) {
+        toolCallMessageTs[toolCall.toolCallId] = {
+          ts: response.ts,
+          name: toolCall.toolName,
+          arguments: toolCall.args,
+        };
+      }
+    },
+    onToolResultPart: async (toolCall) => {
+      const call = toolCallMessageTs[toolCall.toolCallId];
+      if (call) {
+        const blocks = [
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: `🛠️ Tool: *${call.name}*`,
+            },
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "*Arguments:*",
+            },
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "```" + JSON.stringify(call.arguments, null, 2) + "```",
+            },
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "*Result:*",
+            },
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "```" + JSON.stringify(toolCall.result, null, 2) + "```",
+            },
+          },
+          {
+            type: "context",
+            elements: [
+              {
+                type: "mrkdwn",
+                text: "✅ Result received.",
+              },
+            ],
+          },
+        ];
+        await client.updateMessage(props.event.channel, call.ts, "", {
+          blocks,
+        });
+      }
+    },
     onTextPart: (part: string) => {
       buffer += part;
     },
-    onErrorPart: (err: string) => {
-      console.error("error on part", err);
+    onErrorPart: async (err: string) => {
+      await client.postMessage(props.event.channel, `❌ Error: ${err}`, {
+        thread_ts: props.event.ts,
+      });
     },
-    onFinishMessagePart: () => {
-      client.postMessage(props.event.channel, buffer).then((response) => {
+    onFinishMessagePart: async () => {
+      if (linkProps.agentLink && linkProps.agentName) {
+        buffer = `<${linkProps.agentLink}|${linkProps.agentName}>: ${buffer}`;
+      }
+      await client.postMessage(props.event.channel, buffer, {
+        thread_ts: props.event.ts,
+      }).then((response) => {
         if (!response.ok) {
           console.error(
             "error sending message to slack",

@@ -153,23 +153,49 @@ export class SlackClient {
   }
 
   /**
-   * @description Posts a new message to a channel
-   * @param channelId The channel ID to post to
-   * @param text The message text
+   * @description Joins a Slack channel
+   * @param channelId The ID of the channel to join
    */
-  async postMessage(
+  async joinChannel(
     channelId: string,
-    text: string,
-  ): Promise<
-    SlackResponse<{ channel: string; ts: string; message: SlackMessage }>
-  > {
-    const response = await fetch("https://slack.com/api/chat.postMessage", {
+  ): Promise<SlackResponse<{ channel: SlackChannel }>> {
+    const response = await fetch("https://slack.com/api/conversations.join", {
       method: "POST",
       headers: this.botHeaders,
       body: JSON.stringify({
         channel: channelId,
-        text: text,
       }),
+    });
+
+    return response.json();
+  }
+
+  /**
+   * @description Posts a new message to a channel
+   * @param channelId The channel ID to post to
+   * @param text The message text
+   * @param opts Optional parameters: thread_ts for threading, blocks for Block Kit formatting
+   */
+  async postMessage(
+    channelId: string,
+    text: string,
+    opts: { thread_ts?: string; blocks?: unknown[] } = {},
+  ): Promise<
+    { channel: string; ts: string; message: SlackMessage; ok: boolean }
+  > {
+    const payload: Record<string, unknown> = {
+      channel: channelId,
+      text: text,
+      ...opts,
+    };
+    // Remove text if blocks are provided and text is empty (Slack requires at least one of them)
+    if (opts.blocks && opts.blocks.length > 0 && !text) {
+      delete payload.text;
+    }
+    const response = await fetch("https://slack.com/api/chat.postMessage", {
+      method: "POST",
+      headers: this.botHeaders,
+      body: JSON.stringify(payload),
     });
 
     return response.json();
@@ -324,6 +350,39 @@ export class SlackClient {
       headers: this.botHeaders,
     });
 
+    return response.json();
+  }
+
+  /**
+   * @description Updates an existing message in a channel
+   * @param channelId The channel ID containing the message
+   * @param ts The timestamp of the message to update
+   * @param text The new message text
+   * @param opts Optional parameters: thread_ts for threading, blocks for Block Kit formatting
+   */
+  async updateMessage(
+    channelId: string,
+    ts: string,
+    text: string,
+    opts: { thread_ts?: string; blocks?: unknown[] } = {},
+  ): Promise<
+    { channel: string; ts: string; message: SlackMessage; ok: boolean }
+  > {
+    const payload: Record<string, unknown> = {
+      channel: channelId,
+      ts: ts,
+      text: text,
+      ...opts,
+    };
+    // Remove text if blocks are provided and text is empty (Slack requires at least one of them)
+    if (opts.blocks && opts.blocks.length > 0 && !text) {
+      delete payload.text;
+    }
+    const response = await fetch("https://slack.com/api/chat.update", {
+      method: "POST",
+      headers: this.botHeaders,
+      body: JSON.stringify(payload),
+    });
     return response.json();
   }
 }
