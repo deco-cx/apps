@@ -27,12 +27,16 @@ fragment OrderLineItems on Order {
         quantity
         sku
         variantTitle
-        originalUnitPriceSet {
-          presentmentMoney {
-            amount
-            currencyCode
+        discountedUnitPriceAfterAllDiscountsSet {
+            presentmentMoney {
+              amount
+              currencyCode
+            }
+            shopMoney {
+              amount
+              currencyCode
+            }
           }
-        }
       }
     }
   }

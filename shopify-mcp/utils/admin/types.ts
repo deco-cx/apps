@@ -47,16 +47,7 @@ export interface LineItemNode {
   quantity: number;
   sku?: string;
   variantTitle: string;
-  originalUnitPriceSet: OriginalUnitPriceSet;
-}
-
-export interface OriginalUnitPriceSet {
-  presentmentMoney: PresentmentMoney;
-}
-
-export interface PresentmentMoney {
-  amount: string;
-  currencyCode: string;
+  discountedUnitPriceAfterAllDiscountsSet: DiscountedUnitPriceAfterAllDiscountsSet;
 }
 
 export interface TotalPriceSet {
@@ -106,4 +97,19 @@ export interface ThrottleStatus {
   maximumAvailable: number;
   currentlyAvailable: number;
   restoreRate: number;
+}
+
+export interface DiscountedUnitPriceAfterAllDiscountsSet {
+  presentmentMoney: PresentmentMoney;
+  shopMoney: ShopMoney;
+}
+
+export interface PresentmentMoney {
+  amount: string;
+  currencyCode: string;
+}
+
+export interface ShopMoney {
+  amount: string;
+  currencyCode: string;
 }
