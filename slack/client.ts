@@ -1,3 +1,6 @@
+import { OAuthClients } from "../mcp/utils/types.ts";
+import { SlackApiClient, SlackAuthClient } from "./utils/client.ts";
+
 /**
  * @description Response from Slack API with success/error information
  */
@@ -84,16 +87,38 @@ export interface SlackUser {
 }
 
 /**
+ * @description Response from Slack auth.test endpoint
+ */
+export interface SlackAuthTestResponse {
+  ok: boolean;
+  url: string;
+  team: string;
+  user: string;
+  team_id: string;
+  user_id: string;
+  bot_id?: string;
+  is_enterprise_install?: boolean;
+  enterprise_id?: string;
+}
+
+export type ChannelType = "public_channel" | "private_channel" | "mpim" | "im";
+
+/**
  * @description Client for interacting with Slack APIs
  */
 export class SlackClient {
   private botHeaders: { Authorization: string; "Content-Type": string };
+  private oauthClient?: OAuthClients<SlackApiClient, SlackAuthClient>;
 
-  constructor(botToken: string) {
+  constructor(
+    botToken: string,
+    oauthClient?: OAuthClients<SlackApiClient, SlackAuthClient>,
+  ) {
     this.botHeaders = {
       Authorization: `Bearer ${botToken}`,
       "Content-Type": "application/json",
     };
+    this.oauthClient = oauthClient;
   }
 
   /**
@@ -106,9 +131,10 @@ export class SlackClient {
     teamId: string,
     limit: number = 100,
     cursor?: string,
-  ): Promise<SlackResponse<{ channels: SlackChannel[] }>> {
+    types: ChannelType[] = ["public_channel"],
+  ): Promise<{ channels: SlackChannel[] }> {
     const params = new URLSearchParams({
-      types: "public_channel",
+      types: types.join(","),
       exclude_archived: "true",
       limit: Math.min(limit, 200).toString(),
       team_id: teamId,
@@ -127,23 +153,49 @@ export class SlackClient {
   }
 
   /**
-   * @description Posts a new message to a channel
-   * @param channelId The channel ID to post to
-   * @param text The message text
+   * @description Joins a Slack channel
+   * @param channelId The ID of the channel to join
    */
-  async postMessage(
+  async joinChannel(
     channelId: string,
-    text: string,
-  ): Promise<
-    SlackResponse<{ channel: string; ts: string; message: SlackMessage }>
-  > {
-    const response = await fetch("https://slack.com/api/chat.postMessage", {
+  ): Promise<SlackResponse<{ channel: SlackChannel }>> {
+    const response = await fetch("https://slack.com/api/conversations.join", {
       method: "POST",
       headers: this.botHeaders,
       body: JSON.stringify({
         channel: channelId,
-        text: text,
       }),
+    });
+
+    return response.json();
+  }
+
+  /**
+   * @description Posts a new message to a channel
+   * @param channelId The channel ID to post to
+   * @param text The message text
+   * @param opts Optional parameters: thread_ts for threading, blocks for Block Kit formatting
+   */
+  async postMessage(
+    channelId: string,
+    text: string,
+    opts: { thread_ts?: string; blocks?: unknown[] } = {},
+  ): Promise<
+    { channel: string; ts: string; message: SlackMessage; ok: boolean }
+  > {
+    const payload: Record<string, unknown> = {
+      channel: channelId,
+      text: text,
+      ...opts,
+    };
+    // Remove text if blocks are provided and text is empty (Slack requires at least one of them)
+    if (opts.blocks && opts.blocks.length > 0 && !text) {
+      delete payload.text;
+    }
+    const response = await fetch("https://slack.com/api/chat.postMessage", {
+      method: "POST",
+      headers: this.botHeaders,
+      body: JSON.stringify(payload),
     });
 
     return response.json();
@@ -287,6 +339,50 @@ export class SlackClient {
       { headers: this.botHeaders },
     );
 
+    return response.json();
+  }
+
+  /**
+   * @description Tests authentication and returns basic information about the authenticated user/team
+   */
+  async testAuth(): Promise<SlackResponse<SlackAuthTestResponse>> {
+    const response = await fetch("https://slack.com/api/auth.test", {
+      headers: this.botHeaders,
+    });
+
+    return response.json();
+  }
+
+  /**
+   * @description Updates an existing message in a channel
+   * @param channelId The channel ID containing the message
+   * @param ts The timestamp of the message to update
+   * @param text The new message text
+   * @param opts Optional parameters: thread_ts for threading, blocks for Block Kit formatting
+   */
+  async updateMessage(
+    channelId: string,
+    ts: string,
+    text: string,
+    opts: { thread_ts?: string; blocks?: unknown[] } = {},
+  ): Promise<
+    { channel: string; ts: string; message: SlackMessage; ok: boolean }
+  > {
+    const payload: Record<string, unknown> = {
+      channel: channelId,
+      ts: ts,
+      text: text,
+      ...opts,
+    };
+    // Remove text if blocks are provided and text is empty (Slack requires at least one of them)
+    if (opts.blocks && opts.blocks.length > 0 && !text) {
+      delete payload.text;
+    }
+    const response = await fetch("https://slack.com/api/chat.update", {
+      method: "POST",
+      headers: this.botHeaders,
+      body: JSON.stringify(payload),
+    });
     return response.json();
   }
 }

@@ -1,5 +1,7 @@
 import { forbidden } from "@deco/deco";
 import { fetchSafe, STALE } from "../../utils/fetch.ts";
+import { AppContext } from "../mod.ts";
+
 interface Props {
   /**
    * @description Asset src like: https://fonts.gstatic.com/...
@@ -7,8 +9,24 @@ interface Props {
   src: string;
 }
 
-const loader = async (props: Props, request: Request): Promise<Response> => {
+const loader = async (
+  props: Props,
+  request: Request,
+  ctx: AppContext,
+): Promise<Response> => {
   const url = new URL(props.src);
+
+  if (ctx.disableProxy) {
+    return new Response("Proxy disabled", { status: 403 });
+  }
+
+  if (
+    ctx.whitelistPatterns &&
+    ctx.whitelistPatterns.length > 0 &&
+    !ctx.whitelistPatterns.some((pattern) => pattern.test(url))
+  ) {
+    return new Response("Proxy disabled for this source", { status: 403 });
+  }
 
   // Whitelist allowed protocols
   const allowedProtocols = ["https:", "http:"];

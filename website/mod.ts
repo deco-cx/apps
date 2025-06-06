@@ -142,13 +142,35 @@ export interface Props {
    * @hide true
    */
   sendToClickHouse?: boolean;
+
+  /**
+   * @title Disable image/asset proxy for this site
+   * @description Disable image/asset proxy for this site
+   */
+  disableProxy?: boolean;
+
+  /**
+   * @title Whilelist URL Patterns
+   * @description Patterns that will be allowed to be proxied through images and assets (example: https://*.deco.cx/images/*). An empty array will allow all URLs.
+   */
+  whilelistURLs?: string[];
+
+  /**
+   * @hide
+   */
+  whitelistPatterns?: URLPattern[];
 }
 /**
  * @title Website
  */
 export default function App({ ...state }: Props): App<Manifest, Props> {
   return {
-    state,
+    state: {
+      ...state,
+      whitelistPatterns: state.whilelistURLs?.map((pattern) =>
+        new URLPattern(pattern)
+      ),
+    },
     manifest: {
       ...manifest,
       sections: {
