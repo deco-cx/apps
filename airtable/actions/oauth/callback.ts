@@ -1,5 +1,11 @@
 import type { AppContext } from "../../mod.ts";
 import { OAUTH_URL_TOKEN } from "../../utils/constants.ts";
+import { fetchBasesAndTables } from "../../utils/ui-templates/airtable-client.ts";
+import {
+  AirtableBase,
+  AirtableTable,
+  generateSelectionPage,
+} from "../../utils/ui-templates/page-generator.ts";
 
 interface OAuthTokenResponse {
   access_token: string;
@@ -46,6 +52,12 @@ export interface Props {
    * @description The same redirect URI used in the authorization request
    */
   redirectUri: string;
+
+  /**
+   * @title Query Params
+   * @description The query parameters from the request
+   */
+  queryParams: Record<string, string>;
 }
 
 // Function to extract code_verifier from state
@@ -66,6 +78,47 @@ function extractCodeVerifier(state: string): string | null {
   }
 }
 
+async function _saveBase(
+  baseId: string,
+  installId: string,
+  appName: string,
+  _req: Request,
+  ctx: AppContext,
+) {
+  const currentCtx = await ctx.getConfiguration();
+  await ctx.configure({
+    ...currentCtx,
+    baseId: baseId,
+  });
+  return {
+    installId,
+    appName: appName + "teste",
+  };
+}
+
+interface StateProvider {
+  original_state?: string;
+  code_verifier?: string;
+}
+interface State {
+  appName: string;
+  installId: string;
+  invokeApp: string;
+  returnUrl?: string | null;
+  redirectUri?: string | null;
+}
+
+function decodeState(state: string): State & StateProvider {
+  const decoded = atob(decodeURIComponent(state));
+  const parsed = JSON.parse(decoded) as State & StateProvider;
+
+  if (parsed.original_state) {
+    return decodeState(parsed.original_state);
+  }
+
+  return parsed;
+}
+
 /**
  * @title OAuth Callback
  * @description Exchanges the authorization code for access tokens with PKCE support
@@ -78,10 +131,55 @@ export default async function callback(
     clientId,
     clientSecret,
     redirectUri,
+    queryParams,
   }: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<{ installId: string; error?: string }> {
+): Promise<Response | Record<string, unknown>> {
+  const { isSaveBase, skip } = queryParams;
+
+  if (isSaveBase) {
+    const { baseId, selectedBases, selectedTables } = queryParams;
+    const teste = decodeState(state);
+    console.log("Estado decodificado:", teste);
+
+    // Se usuário pulou a seleção, retorna apenas o installId
+    if (skip === "true") {
+      console.log("Usuário pulou a seleção de bases/tabelas");
+      return {
+        installId: teste.installId,
+        appName: teste.appName + " - Configuração Pulada",
+        message:
+          "Configuração concluída sem seleção específica de bases/tabelas",
+      };
+    }
+
+    console.log("Bases selecionadas:", selectedBases);
+    console.log("Tabelas selecionadas:", selectedTables);
+
+    // Processa as bases e tabelas selecionadas
+    const basesArray = selectedBases ? selectedBases.split(",") : [];
+    const tablesArray = selectedTables ? selectedTables.split(",") : [];
+
+    // Salva a configuração com as seleções do usuário
+    const currentCtx = await ctx.getConfiguration();
+    await ctx.configure({
+      ...currentCtx,
+      selectedBases: basesArray,
+      selectedTables: tablesArray,
+      baseId: baseId || basesArray[0], // usa o primeiro baseId se não especificado
+    });
+
+    return {
+      installId: teste.installId,
+      appName: teste.appName + " - Configurado",
+      message:
+        `Configuração salva com sucesso! Bases: ${basesArray.length}, Tabelas: ${tablesArray.length}`,
+      selectedBases: basesArray,
+      selectedTables: tablesArray,
+    };
+  }
+
   try {
     const uri = redirectUri || new URL("/oauth/callback", _req.url).href;
 
@@ -139,7 +237,42 @@ export default async function callback(
       clientId: clientId,
     });
 
-    return { installId };
+    const newURL = _req.url + "&isSaveBase=true&baseId=app1234567890";
+
+    // Busca bases e tabelas reais do Airtable usando os tokens obtidos
+    let bases: AirtableBase[] = [];
+    let tables: AirtableTable[] = [];
+
+    try {
+      const data = await fetchBasesAndTables(tokenData);
+      bases = data.bases;
+      tables = data.tables;
+    } catch (error) {
+      console.error("Erro ao buscar dados do Airtable:", error);
+      bases = [
+        { id: "app1234567890", name: "Base Exemplo", recordCount: 0 },
+      ];
+      tables = [
+        {
+          id: "tbl1111111111",
+          name: "Tabela Exemplo",
+          recordCount: 0,
+          baseId: "app1234567890",
+        },
+      ];
+    }
+
+    // Gera o HTML com a interface de seleção
+    const selectionHtml = generateSelectionPage({
+      bases,
+      tables,
+      callbackUrl: newURL,
+    });
+
+    // Use selectionHtml em vez de htmlWithRedirect para mostrar a interface de seleção
+    return new Response(selectionHtml, {
+      headers: { "Content-Type": "text/html" },
+    });
   } catch (error) {
     console.error("OAuth callback error:", error);
     return {

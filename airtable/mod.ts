@@ -44,6 +44,24 @@ export interface Props {
    * @description OAuth client ID for authentication
    */
   clientId?: string;
+
+  /**
+   * @title Base ID
+   * @description The ID of the selected base
+   */
+  baseId?: string;
+
+  /**
+   * @title Selected Bases
+   * @description Array of selected base IDs that AI can access
+   */
+  selectedBases?: string[];
+
+  /**
+   * @title Selected Tables
+   * @description Array of selected table IDs that AI can access
+   */
+  selectedTables?: string[];
 }
 
 export interface State extends Props {
