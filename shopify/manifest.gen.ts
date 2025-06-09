@@ -9,27 +9,29 @@ import * as $$$$$$$$$3 from "./actions/order/draftOrderCalculate.ts";
 import * as $$$$$$$$$4 from "./actions/user/signIn.ts";
 import * as $$$$$$$$$5 from "./actions/user/signUp.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
-import * as $$$5 from "./loaders/cart.ts";
-import * as $$$0 from "./loaders/Metaobject.ts";
-import * as $$$1 from "./loaders/ProductDetailsPage.ts";
-import * as $$$2 from "./loaders/ProductList.ts";
-import * as $$$3 from "./loaders/ProductListingPage.ts";
-import * as $$$6 from "./loaders/proxy.ts";
-import * as $$$4 from "./loaders/RelatedProducts.ts";
-import * as $$$7 from "./loaders/shop.ts";
-import * as $$$8 from "./loaders/user.ts";
+import * as $$$6 from "./loaders/cart.ts";
+import * as $$$0 from "./loaders/Collections.ts";
+import * as $$$1 from "./loaders/Metaobject.ts";
+import * as $$$2 from "./loaders/ProductDetailsPage.ts";
+import * as $$$3 from "./loaders/ProductList.ts";
+import * as $$$4 from "./loaders/ProductListingPage.ts";
+import * as $$$7 from "./loaders/proxy.ts";
+import * as $$$5 from "./loaders/RelatedProducts.ts";
+import * as $$$8 from "./loaders/shop.ts";
+import * as $$$9 from "./loaders/user.ts";
 
 const manifest = {
   "loaders": {
-    "shopify/loaders/cart.ts": $$$5,
-    "shopify/loaders/Metaobject.ts": $$$0,
-    "shopify/loaders/ProductDetailsPage.ts": $$$1,
-    "shopify/loaders/ProductList.ts": $$$2,
-    "shopify/loaders/ProductListingPage.ts": $$$3,
-    "shopify/loaders/proxy.ts": $$$6,
-    "shopify/loaders/RelatedProducts.ts": $$$4,
-    "shopify/loaders/shop.ts": $$$7,
-    "shopify/loaders/user.ts": $$$8,
+    "shopify/loaders/cart.ts": $$$6,
+    "shopify/loaders/Collections.ts": $$$0,
+    "shopify/loaders/Metaobject.ts": $$$1,
+    "shopify/loaders/ProductDetailsPage.ts": $$$2,
+    "shopify/loaders/ProductList.ts": $$$3,
+    "shopify/loaders/ProductListingPage.ts": $$$4,
+    "shopify/loaders/proxy.ts": $$$7,
+    "shopify/loaders/RelatedProducts.ts": $$$5,
+    "shopify/loaders/shop.ts": $$$8,
+    "shopify/loaders/user.ts": $$$9,
   },
   "handlers": {
     "shopify/handlers/sitemap.ts": $$$$0,
