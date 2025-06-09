@@ -7,6 +7,7 @@ import {
   ProtectedRange,
   Spreadsheet,
   UpdateValuesResponse,
+  UserInfo,
   ValueRange,
 } from "./types.ts";
 
@@ -31,6 +32,9 @@ export interface GoogleAuthClient {
 }
 
 export interface GoogleSheetsClient {
+  "GET /oauth2/v2/userinfo": {
+    response: UserInfo;
+  };
   "GET /v4/spreadsheets/:spreadsheetId": {
     response: Spreadsheet;
   };

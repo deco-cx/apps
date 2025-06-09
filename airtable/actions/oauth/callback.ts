@@ -81,7 +81,7 @@ export default async function callback(
   }: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<{ installId: string; error?: string }> {
+): Promise<{ installId: string; error?: string; account?: string }> {
   try {
     const uri = redirectUri || new URL("/oauth/callback", _req.url).href;
 
@@ -139,7 +139,11 @@ export default async function callback(
       clientId: clientId,
     });
 
-    return { installId };
+    const account = await ctx.invoke.airtable.loaders.whoami()
+      .then((user) => user.email)
+      .catch(console.error) || undefined;
+
+    return { installId, account };
   } catch (error) {
     console.error("OAuth callback error:", error);
     return {
