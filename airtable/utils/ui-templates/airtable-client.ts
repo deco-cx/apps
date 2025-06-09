@@ -48,7 +48,6 @@ export async function fetchUserBases(
     return data.bases.map((base) => ({
       id: base.id,
       name: base.name,
-      recordCount: 0,
     }));
   } catch (error) {
     console.error("Erro ao buscar bases do Airtable:", error);
@@ -86,7 +85,6 @@ export async function fetchBaseTables(
       id: table.id,
       name: table.name,
       baseId: baseId,
-      recordCount: 0,
     }));
   } catch (error) {
     console.error(`Erro ao buscar tabelas da base ${baseId}:`, error);

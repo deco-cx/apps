@@ -37,9 +37,9 @@ export function generateSelectionPage(
   }
 
   const processedHtml = htmlTemplate
-    .replace("'{{BASES_DATA}}'", JSON.stringify(bases))
-    .replace("'{{TABLES_DATA}}'", JSON.stringify(tables))
-    .replace("'{{CALLBACK_URL}}'", JSON.stringify(callbackUrl));
+    .replace('"{{BASES_DATA}}"', JSON.stringify(bases))
+    .replace('"{{TABLES_DATA}}"', JSON.stringify(tables))
+    .replace('"{{CALLBACK_URL}}"', JSON.stringify(callbackUrl));
 
   return processedHtml;
 }
