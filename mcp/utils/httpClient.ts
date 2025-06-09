@@ -16,6 +16,9 @@ import {
   OAuthClientOptions,
 } from "./config.ts";
 
+export const OAUTH_CLIENT_OVERRIDE_AUTH_HEADER_NAME =
+  "X-OAuth-Client-Override-Authorization";
+
 /**
  * Configuration for creating a unified OAuth client
  * @template TApiClient - API client type
@@ -43,6 +46,20 @@ export const createFetchWithAutoRefresh = <TAuthClient>(
     input: string | Request | URL,
     init?: DecoRequestInit,
   ): Promise<Response> => {
+    const inlineHeaders = new Headers(init?.headers);
+    const authHeaderOverride = inlineHeaders.get(
+      OAUTH_CLIENT_OVERRIDE_AUTH_HEADER_NAME,
+    );
+    if (authHeaderOverride) {
+      const headers = new Headers(init?.headers);
+      headers.delete(OAUTH_CLIENT_OVERRIDE_AUTH_HEADER_NAME);
+      headers.set("Authorization", authHeaderOverride);
+      return await fetchSafe(input, {
+        ...init,
+        headers,
+      });
+    }
+
     const tokens = await tokenRefresher.getTokens();
 
     if (isTokenExpiredByTime(tokens, bufferSeconds)) {
