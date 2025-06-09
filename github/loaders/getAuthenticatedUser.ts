@@ -1,5 +1,4 @@
 import { OverrideAuthHeaderProps } from "../../mcp/oauth.ts";
-import { OAUTH_CLIENT_OVERRIDE_AUTH_HEADER_NAME } from "../../mcp/utils/httpClient.ts";
 import { AppContext } from "../mod.ts";
 import type { SimpleUser } from "../utils/types.ts";
 
@@ -16,7 +15,7 @@ const loader = async (
   const opts: RequestInit = {};
   if (props.accessToken) {
     opts.headers = new Headers({
-      [OAUTH_CLIENT_OVERRIDE_AUTH_HEADER_NAME]: `Bearer ${props.accessToken}`,
+      "Authorization": `Bearer ${props.accessToken}`,
     });
   }
   const response = await ctx.client["GET /user"]({}, opts);

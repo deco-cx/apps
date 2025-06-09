@@ -54,6 +54,7 @@ export const createFetchWithAutoRefresh = <TAuthClient>(
       const headers = new Headers(init?.headers);
       headers.delete(OAUTH_CLIENT_OVERRIDE_AUTH_HEADER_NAME);
       headers.set("Authorization", authHeaderOverride);
+      console.log("authHeaderOverride", authHeaderOverride, headers);
       return await fetchSafe(input, {
         ...init,
         headers,
@@ -124,12 +125,15 @@ export const createOAuthHttpClient = <TApiClient, TAuthClient = TApiClient>(
     options.bufferSeconds,
   );
 
+  const accessToken = tokenRefresher.getAccessToken();
   const apiClient = createHttpClient<TApiClient>({
     base: config.apiBaseUrl,
     headers: new Headers({
       "Accept": headers.api.accept,
       "Content-Type": headers.api.contentType,
-      "Authorization": `Bearer ${tokenRefresher.getAccessToken()}`,
+      ...(accessToken ? {
+        "Authorization": `Bearer ${accessToken}`,
+      } : {}),
     }),
     fetcher: fetchWithAutoRefresh,
     ...options.apiClientConfig,
