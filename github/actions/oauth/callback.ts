@@ -38,7 +38,9 @@ export default async function callback(
     token_type: authResponse.token_type,
   });
 
-  const account = await ctx.invoke.github.loaders.getAuthenticatedUser()
+  const account = await ctx.invoke.github.loaders.getAuthenticatedUser({
+    accessToken: authResponse.access_token,
+  })
     .then((user) => user.login)
     .catch(console.error) || undefined;
 

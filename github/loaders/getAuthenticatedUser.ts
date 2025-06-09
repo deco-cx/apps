@@ -1,3 +1,5 @@
+import { OverrideAuthHeaderProps } from "../../mcp/oauth.ts";
+import { OAUTH_CLIENT_OVERRIDE_AUTH_HEADER_NAME } from "../../mcp/utils/httpClient.ts";
 import { AppContext } from "../mod.ts";
 import type { SimpleUser } from "../utils/types.ts";
 
@@ -7,11 +9,17 @@ import type { SimpleUser } from "../utils/types.ts";
  * @description Get the authenticated GitHub user.
  */
 const loader = async (
-  _props: unknown,
+  props: OverrideAuthHeaderProps,
   _req: Request,
   ctx: AppContext,
 ): Promise<SimpleUser> => {
-  const response = await ctx.client["GET /user"]({});
+  const opts: RequestInit = {};
+  if (props.accessToken) {
+    opts.headers = new Headers({
+      [OAUTH_CLIENT_OVERRIDE_AUTH_HEADER_NAME]: `Bearer ${props.accessToken}`,
+    });
+  }
+  const response = await ctx.client["GET /user"]({}, opts);
   return await response.json();
 };
 

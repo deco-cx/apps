@@ -3,17 +3,14 @@ import {
   getCurrentUser,
   GoogleUserInfo,
 } from "../../../mcp/utils/google/userInfo.ts";
-
-interface Props {
-  accessToken?: string;
-}
+import type { OverrideAuthHeaderProps } from "../../../mcp/oauth.ts";
 
 /**
  * @title Get Current User
  * @description Retrieves the current user's information
  */
 const loader = (
-  props: Props,
+  props: OverrideAuthHeaderProps,
   _req: Request,
   ctx: AppContext,
 ): Promise<GoogleUserInfo> =>
