@@ -1,5 +1,5 @@
-import { AppContext } from "../mod.ts";
-import { UserInfo } from "../utils/types.ts";
+import { AppContext } from "../../mod.ts";
+import { UserInfo } from "../../utils/types.ts";
 
 /**
  * @title Get Current User
