@@ -1,27 +1,4 @@
-import { EmailMessage, EmailsResponse, Example, UserInfo } from "./types.ts";
-
-export interface AuthClient {
-  "POST /token": {
-    searchParams: {
-      grant_type: string;
-      code?: string;
-      refresh_token?: string;
-      client_id: string;
-      client_secret: string;
-      redirect_uri?: string;
-    };
-    response: {
-      access_token: string;
-      refresh_token?: string;
-      expires_in?: number;
-      token_type?: string;
-      scope?: string;
-    };
-  };
-  "GET /oauth2/v2/userinfo": {
-    response: UserInfo;
-  };
-}
+import { EmailMessage, EmailsResponse, Example } from "./types.ts";
 
 export interface Client {
   "POST /v4/example": {

@@ -1,21 +1,36 @@
 import { AppContext } from "../../mod.ts";
-import { UserInfo } from "../../utils/types.ts";
+import { GoogleUserInfo } from "../../../mcp/utils/google/userInfo.ts";
+
+interface Props {
+  accessToken?: string;
+}
 
 /**
  * @title Get Current User
  * @description Retrieves the current user's information
  */
 const loader = async (
-  _props: unknown,
+  props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<UserInfo> => {
+): Promise<GoogleUserInfo> => {
   try {
-    const response = await ctx.client["GET /oauth2/v2/userinfo"]({});
+    const opts: RequestInit = {};
+
+    if (props.accessToken) {
+      opts.headers = {
+        Authorization: `Bearer ${props.accessToken}`,
+      };
+    }
+
+    const response = await ctx.userInfoClient["GET /oauth2/v2/userinfo"](
+      {},
+      opts,
+    );
 
     if (!response.ok) {
       const errorData = await response.text();
-      throw new Error(`Sheets API error: ${response.status} - ${errorData}`);
+      throw new Error(`Google API error: ${response.status} - ${errorData}`);
     }
 
     return await response.json();

@@ -35,7 +35,7 @@ export interface OAuthClientConfig<TApiClient, TAuthClient> {
  * @param tokenRefresher - Token refresh manager
  * @param bufferSeconds - Buffer seconds before expiration
  */
-const createFetchWithAutoRefresh = <TAuthClient>(
+export const createFetchWithAutoRefresh = <TAuthClient>(
   tokenRefresher: TokenRefresher<TAuthClient>,
   bufferSeconds: number = DEFAULT_BUFFER_SECONDS,
 ) => {

@@ -60,7 +60,3 @@ export interface EmailsResponse {
   nextPageToken?: string;
   resultSizeEstimate: number;
 }
-
-export interface UserInfo {
-  email: string;
-}
