@@ -141,42 +141,27 @@ export default async function callback(
   if (isSaveBase) {
     const { baseId, selectedBases, selectedTables } = queryParams;
     const teste = decodeState(state);
-    console.log("Estado decodificado:", teste);
 
-    // Se usuário pulou a seleção, retorna apenas o installId
     if (skip === "true") {
-      console.log("Usuário pulou a seleção de bases/tabelas");
       return {
         installId: teste.installId,
-        appName: teste.appName + " - Configuração Pulada",
-        message:
-          "Configuração concluída sem seleção específica de bases/tabelas",
       };
     }
 
-    console.log("Bases selecionadas:", selectedBases);
-    console.log("Tabelas selecionadas:", selectedTables);
-
-    // Processa as bases e tabelas selecionadas
     const basesArray = selectedBases ? selectedBases.split(",") : [];
     const tablesArray = selectedTables ? selectedTables.split(",") : [];
 
-    // Salva a configuração com as seleções do usuário
     const currentCtx = await ctx.getConfiguration();
     await ctx.configure({
       ...currentCtx,
       selectedBases: basesArray,
       selectedTables: tablesArray,
-      baseId: baseId || basesArray[0], // usa o primeiro baseId se não especificado
+      baseId: baseId || basesArray[0],
     });
 
     return {
       installId: teste.installId,
       appName: teste.appName + " - Configurado",
-      message:
-        `Configuração salva com sucesso! Bases: ${basesArray.length}, Tabelas: ${tablesArray.length}`,
-      selectedBases: basesArray,
-      selectedTables: tablesArray,
     };
   }
 
@@ -211,11 +196,6 @@ export default async function callback(
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Token exchange failed:", {
-        status: response.status,
-        statusText: response.statusText,
-        body: errorText,
-      });
       throw new Error(`Token exchange failed: ${response.status} ${errorText}`);
     }
 
@@ -237,44 +217,24 @@ export default async function callback(
       clientId: clientId,
     });
 
-    const newURL = _req.url + "&isSaveBase=true&baseId=app1234567890";
-
-    // Busca bases e tabelas reais do Airtable usando os tokens obtidos
+    const newURL = _req.url;
     let bases: AirtableBase[] = [];
     let tables: AirtableTable[] = [];
 
-    try {
-      const data = await fetchBasesAndTables(tokenData);
-      bases = data.bases;
-      tables = data.tables;
-    } catch (error) {
-      console.error("Erro ao buscar dados do Airtable:", error);
-      bases = [
-        { id: "app1234567890", name: "Base Exemplo", recordCount: 0 },
-      ];
-      tables = [
-        {
-          id: "tbl1111111111",
-          name: "Tabela Exemplo",
-          recordCount: 0,
-          baseId: "app1234567890",
-        },
-      ];
-    }
+    const data = await fetchBasesAndTables(tokenData);
+    bases = data.bases;
+    tables = data.tables;
 
-    // Gera o HTML com a interface de seleção
     const selectionHtml = generateSelectionPage({
       bases,
       tables,
       callbackUrl: newURL,
     });
 
-    // Use selectionHtml em vez de htmlWithRedirect para mostrar a interface de seleção
     return new Response(selectionHtml, {
       headers: { "Content-Type": "text/html" },
     });
   } catch (error) {
-    console.error("OAuth callback error:", error);
     return {
       installId,
       error: error instanceof Error ? error.message : "Unknown error",

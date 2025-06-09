@@ -23,7 +23,10 @@ export interface SelectionPageOptions {
 export function generateSelectionPage(
   { bases, tables, callbackUrl }: SelectionPageOptions,
 ): string {
-  const templatePath = new URL("./selection-page.html", import.meta.url);
+  const templatePath = new URL(
+    "./selection-page.template.html",
+    import.meta.url,
+  );
 
   let htmlTemplate: string;
   try {
@@ -34,9 +37,9 @@ export function generateSelectionPage(
   }
 
   const processedHtml = htmlTemplate
-    .replace("{{BASES_DATA}}", JSON.stringify(bases))
-    .replace("{{TABLES_DATA}}", JSON.stringify(tables))
-    .replace("{{CALLBACK_URL}}", JSON.stringify(callbackUrl));
+    .replace("'{{BASES_DATA}}'", JSON.stringify(bases))
+    .replace("'{{TABLES_DATA}}'", JSON.stringify(tables))
+    .replace("'{{CALLBACK_URL}}'", JSON.stringify(callbackUrl));
 
   return processedHtml;
 }
