@@ -1,7 +1,7 @@
 import { getCookies } from "std/http/cookie.ts";
-import { setCookie } from "std/http/mod.ts";
 import { AppContext } from "../../mod.ts";
 import { AuthResponse } from "../../utils/types.ts";
+import completeLogin from "../../utils/completeLogin.ts";
 
 export interface Props {
   email: string;
@@ -54,34 +54,7 @@ export default async function action(
   }
 
   const data: AuthResponse = await response.json();
-
-  if (data.authStatus === "Success") {
-    const VTEXID_EXPIRES = data.expiresIn;
-
-    if (data.authCookie) {
-      setCookie(ctx.response.headers, {
-        name: data.authCookie.Name,
-        value: data.authCookie.Value,
-        httpOnly: true,
-        maxAge: VTEXID_EXPIRES,
-        path: "/",
-        secure: true,
-      });
-    }
-
-    if (data.accountAuthCookie) {
-      setCookie(ctx.response.headers, {
-        name: data.accountAuthCookie.Name,
-        value: data.accountAuthCookie.Value,
-        httpOnly: true,
-        maxAge: VTEXID_EXPIRES,
-        path: "/",
-        secure: true,
-      });
-    }
-  }
-
-  await ctx.invoke.vtex.actions.session.editSession({});
+  await completeLogin(data, ctx);
 
   return data;
 }
