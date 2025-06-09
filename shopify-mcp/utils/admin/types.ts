@@ -47,7 +47,8 @@ export interface LineItemNode {
   quantity: number;
   sku?: string;
   variantTitle: string;
-  discountedUnitPriceAfterAllDiscountsSet: DiscountedUnitPriceAfterAllDiscountsSet;
+  discountedUnitPriceAfterAllDiscountsSet:
+    DiscountedUnitPriceAfterAllDiscountsSet;
 }
 
 export interface TotalPriceSet {
