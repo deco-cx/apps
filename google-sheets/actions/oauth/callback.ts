@@ -64,7 +64,7 @@ export default async function callback(
     clientId: clientId,
   });
 
-  const account = await ctx.invoke["google-sheets"].loaders.whoami()
+  const account = await ctx.invoke["google-sheets"].loaders.oauth.whoami()
     .then((user) => user.email)
     .catch(console.error) || undefined;
 

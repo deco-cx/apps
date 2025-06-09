@@ -29,12 +29,12 @@ export interface GoogleAuthClient {
       scope?: string;
     };
   };
-}
-
-export interface GoogleSheetsClient {
   "GET /oauth2/v2/userinfo": {
     response: UserInfo;
   };
+}
+
+export interface GoogleSheetsClient {
   "GET /v4/spreadsheets/:spreadsheetId": {
     response: Spreadsheet;
   };
