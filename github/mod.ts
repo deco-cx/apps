@@ -32,9 +32,11 @@ export default function App(props: Props): App<Manifest, State> {
     headers: new Headers({
       "Accept": "application/json",
       "Content-Type": "application/json",
-      ...(access_token ? {
-        "Authorization": `Bearer ${access_token}`,
-      } : {}),
+      ...(access_token
+        ? {
+          "Authorization": `Bearer ${access_token}`,
+        }
+        : {}),
     }),
     fetcher: fetchSafe,
   });

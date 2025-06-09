@@ -114,6 +114,7 @@ export default async function callback(
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Token exchange failed:", {
+        tokenRequestBody,
         status: response.status,
         statusText: response.statusText,
         body: errorText,
@@ -139,7 +140,9 @@ export default async function callback(
       clientId: clientId,
     });
 
-    const account = await ctx.invoke.airtable.loaders.whoami()
+    const account = await ctx.invoke.airtable.loaders.whoami({
+      accessToken: tokenData.access_token,
+    })
       .then((user) => user.email)
       .catch(console.error) || undefined;
 

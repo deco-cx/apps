@@ -131,9 +131,11 @@ export const createOAuthHttpClient = <TApiClient, TAuthClient = TApiClient>(
     headers: new Headers({
       "Accept": headers.api.accept,
       "Content-Type": headers.api.contentType,
-      ...(accessToken ? {
-        "Authorization": `Bearer ${accessToken}`,
-      } : {}),
+      ...(accessToken
+        ? {
+          "Authorization": `Bearer ${accessToken}`,
+        }
+        : {}),
     }),
     fetcher: fetchWithAutoRefresh,
     ...options.apiClientConfig,
