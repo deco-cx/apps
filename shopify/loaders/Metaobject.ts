@@ -187,7 +187,8 @@ const loader = async (
     if (id || (handle && metaobjectType)) {
       return { metaobject: flattenMetaobject(data?.metaobject) };
     } else if (metaobjectType) {
-      const flattenedNodes = data?.metaobjects?.nodes.map(flattenMetaobject).filter(Boolean) as MetaobjectNode[];
+      const flattenedNodes = data?.metaobjects?.nodes.map(flattenMetaobject)
+        .filter(Boolean) as MetaobjectNode[];
       return {
         metaobjects: {
           nodes: flattenedNodes,
@@ -195,7 +196,7 @@ const loader = async (
         } as FlexibleMetaobjectConnection,
       };
     }
-    
+
     return { metaobject: null, metaobjects: null };
   } catch (error) {
     console.error("Error fetching metaobjects:", error);
