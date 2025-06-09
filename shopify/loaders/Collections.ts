@@ -22,7 +22,7 @@ export interface CollectionResult extends Omit<Collection, "metafields"> {
   metafields: Record<string, any>;
 }
 
-const collectionInfoLoader = async (
+const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
@@ -118,4 +118,4 @@ const collectionInfoLoader = async (
   }
 };
 
-export default collectionInfoLoader;
+export default loader;
