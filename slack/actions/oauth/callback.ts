@@ -63,5 +63,5 @@ export default async function callback(
     },
   });
 
-  return { installId, name: tokenData.team.name };
+  return { installId, name: `Slack | ${tokenData.team.name}` };
 }
