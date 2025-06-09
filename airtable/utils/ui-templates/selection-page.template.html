@@ -742,20 +742,28 @@
         const urlParams = new URLSearchParams();
         urlParams.set("isSaveBase", "true");
 
+        // Processar bases selecionadas
         const selectedBasesArray = Array.from(selectedBases);
         if (selectedBasesArray.length > 0) {
-          urlParams.set("selectedBases", selectedBasesArray.join(","));
+          const basesData = selectedBasesArray.map((baseId) => {
+            const base = bases.find((b) => b.id === baseId);
+            return `${baseId}:${base ? base.name : ""}`;
+          });
+          urlParams.set("selectedBases", basesData.join(","));
         }
 
+        // Processar tabelas selecionadas
         const selectedTablesArray = Array.from(selectedTables);
         if (selectedTablesArray.length > 0) {
-          urlParams.set(
-            "selectedTables",
-            selectedTablesArray.join(","),
-          );
+          const tablesData = selectedTablesArray.map((tableId) => {
+            const table = tables.find((t) => t.id === tableId);
+            return `${tableId}:${table ? table.name : ""}`;
+          });
+          urlParams.set("selectedTables", tablesData.join(","));
         }
 
-        window.location.href = callbackUrl + "&" + urlParams.toString();
+        const finalUrl = callbackUrl + "&" + urlParams.toString();
+        window.location.href = finalUrl;
       }
     </script>
   </body>

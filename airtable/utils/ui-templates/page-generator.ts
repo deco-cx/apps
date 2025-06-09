@@ -17,9 +17,6 @@ export interface SelectionPageOptions {
   callbackUrl: string;
 }
 
-/**
- * Generates the Airtable selection page HTML by reading template and replacing placeholders
- */
 export function generateSelectionPage(
   { bases, tables, callbackUrl }: SelectionPageOptions,
 ): string {
@@ -44,9 +41,6 @@ export function generateSelectionPage(
   return processedHtml;
 }
 
-/**
- * Fallback page generation when template is not available
- */
 function generateFallbackPage(
   { bases, tables, callbackUrl }: SelectionPageOptions,
 ): string {

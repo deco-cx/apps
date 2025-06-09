@@ -78,24 +78,6 @@ function extractCodeVerifier(state: string): string | null {
   }
 }
 
-async function _saveBase(
-  baseId: string,
-  installId: string,
-  appName: string,
-  _req: Request,
-  ctx: AppContext,
-) {
-  const currentCtx = await ctx.getConfiguration();
-  await ctx.configure({
-    ...currentCtx,
-    baseId: baseId,
-  });
-  return {
-    installId,
-    appName: appName + "teste",
-  };
-}
-
 interface StateProvider {
   original_state?: string;
   code_verifier?: string;
@@ -139,7 +121,7 @@ export default async function callback(
   const { isSaveBase, skip } = queryParams;
 
   if (isSaveBase) {
-    const { baseId, selectedBases, selectedTables } = queryParams;
+    const { selectedBases, selectedTables } = queryParams;
     const teste = decodeState(state);
 
     if (skip === "true") {
@@ -148,20 +130,36 @@ export default async function callback(
       };
     }
 
-    const basesArray = selectedBases ? selectedBases.split(",") : [];
-    const tablesArray = selectedTables ? selectedTables.split(",") : [];
+    const basesArray = selectedBases
+      ? selectedBases.split(",").map((base) => {
+        const [id, name] = base.split(":");
+        return { id, name };
+      })
+      : [];
+
+    const tablesArray = selectedTables
+      ? selectedTables.split(",").map((table) => {
+        const [id, name] = table.split(":");
+        return { id, name };
+      })
+      : [];
 
     const currentCtx = await ctx.getConfiguration();
     await ctx.configure({
       ...currentCtx,
-      selectedBases: basesArray,
-      selectedTables: tablesArray,
-      baseId: baseId || basesArray[0],
+      permission: {
+        bases: basesArray,
+        tables: tablesArray,
+      },
     });
 
     return {
       installId: teste.installId,
-      appName: teste.appName + " - Configurado",
+      appName: teste.appName + " - " + "Bases: " + basesArray.map((b) =>
+        b.name
+      ).join(", ") + " - " + "Tables: " + tablesArray.map((t) =>
+        t.name
+      ).join(", "),
     };
   }
 

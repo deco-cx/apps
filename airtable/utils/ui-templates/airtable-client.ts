@@ -39,7 +39,7 @@ export async function fetchUserBases(
 
     if (!response.ok) {
       throw new Error(
-        `Erro ao buscar bases: ${response.status} ${response.statusText}`,
+        `Error fetching bases: ${response.status} ${response.statusText}`,
       );
     }
 
@@ -50,7 +50,7 @@ export async function fetchUserBases(
       name: base.name,
     }));
   } catch (error) {
-    console.error("Erro ao buscar bases do Airtable:", error);
+    console.error("Error fetching bases from Airtable:", error);
     return [];
   }
 }
@@ -75,7 +75,7 @@ export async function fetchBaseTables(
 
     if (!response.ok) {
       throw new Error(
-        `Erro ao buscar tabelas da base ${baseId}: ${response.status} ${response.statusText}`,
+        `Error fetching tables for base ${baseId}: ${response.status} ${response.statusText}`,
       );
     }
 
@@ -87,14 +87,11 @@ export async function fetchBaseTables(
       baseId: baseId,
     }));
   } catch (error) {
-    console.error(`Erro ao buscar tabelas da base ${baseId}:`, error);
+    console.error(`Error fetching tables for base ${baseId}:`, error);
     return [];
   }
 }
 
-/**
- * Busca bases e todas as tabelas relacionadas
- */
 export async function fetchBasesAndTables(tokens: OAuthTokens): Promise<{
   bases: AirtableBase[];
   tables: AirtableTable[];
@@ -115,7 +112,7 @@ export async function fetchBasesAndTables(tokens: OAuthTokens): Promise<{
       tables: allTables,
     };
   } catch (error) {
-    console.error("Erro ao buscar dados do Airtable:", error);
+    console.error("Error fetching Airtable data:", error);
     return {
       bases: [],
       tables: [],
