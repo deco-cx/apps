@@ -7,8 +7,8 @@ import {
   ProtectedRange,
   Spreadsheet,
   UpdateValuesResponse,
-  ValueRange,
   UserInfo,
+  ValueRange,
 } from "./types.ts";
 
 export interface GoogleAuthClient {
