@@ -1,5 +1,4 @@
-// shopify/loaders/FlexibleMetaobject.ts
-
+// Os seus imports originais serão mantidos
 import type { AppContext } from "../mod.ts";
 import type {
   Metaobject,
@@ -7,13 +6,14 @@ import type {
   QueryRoot,
 } from "../utils/storefront/storefront.graphql.gen.ts";
 
+// Suas interfaces originais serão mantidas
 export interface FlexibleMetaobjectProps {
-  metaobjectType?: string; // Opcional se 'id' for fornecido
-  handle?: string; // Handle textual do metaobjeto (para buscar com 'type')
-  id?: string; // GID do metaobjeto (ex: "gid://shopify/Metaobject/123")
+  metaobjectType?: string;
+  handle?: string;
+  id?: string;
   fields: string[];
-  first?: number; // Para listar metaobjetos por tipo
-  after?: string; // Para paginação ao listar
+  first?: number;
+  after?: string;
 }
 
 export interface MetaobjectNode extends Omit<Metaobject, "fields" | "field"> {
@@ -37,6 +37,22 @@ export interface FlexibleMetaobjectLoaderResult {
   metaobjects?: FlexibleMetaobjectConnection | null;
 }
 
+const buildGraphQLFields = (fieldKeys: string[]): string => {
+  return fieldKeys.map((key) =>
+    `${key}: field(key: "${key}") {
+      value
+      reference {
+        ... on MediaImage {
+          image {
+            url
+            altText
+          }
+        }
+      }
+    }`
+  ).join("\n");
+};
+
 const loader = async (
   props: FlexibleMetaobjectProps,
   _req: Request,
@@ -46,7 +62,7 @@ const loader = async (
   const {
     metaobjectType,
     handle,
-    id, // Novo parâmetro
+    id,
     fields = [],
     first = 10,
     after,
@@ -59,12 +75,14 @@ const loader = async (
     return { metaobject: null, metaobjects: null };
   }
 
-  const fieldsString = fields.join("\n");
+  // A string de campos agora é construída com a sintaxe correta.
+  const fieldsString = buildGraphQLFields(fields);
 
   let queryGQL: string;
   let queryVariables: Record<string, any>;
 
-  if (id) { // Prioridade para busca por GID
+  // A lógica para definir a query e as variáveis permanece a mesma
+  if (id) {
     queryGQL = `
       query GetMetaobjectById($id: ID!) {
         metaobject(id: $id) {
@@ -95,7 +113,7 @@ const loader = async (
         handle: handle,
       } as MetaobjectHandleInput,
     };
-  } else if (metaobjectType) { // Listar por tipo
+  } else if (metaobjectType) {
     queryGQL = `
       query GetMetaobjectsByType($type: String!, $first: Int!, $after: String) {
         metaobjects(type: $type, first: $first, after: $after, sortKey: HANDLE, reverse: false) {
@@ -141,19 +159,43 @@ const loader = async (
       },
     );
 
-    if (id || (handle && metaobjectType)) { // Se buscou um único objeto
-      const resultMetaobject = data.metaobject as
-        | MetaobjectNode
-        | null
-        | undefined;
-      return { metaobject: resultMetaobject };
-    } else if (metaobjectType) { // Se listou objetos
-      const resultMetaobjects = data.metaobjects as unknown as
-        | FlexibleMetaobjectConnection
-        | null
-        | undefined;
-      return { metaobjects: resultMetaobjects };
+    // Função auxiliar para "achatar" a resposta da API, facilitando o uso
+    const flattenMetaobject = (metaobject: any) => {
+      if (!metaobject) return null;
+
+      const flattened: Record<string, any> = {
+        id: metaobject.id,
+        handle: metaobject.handle,
+        type: metaobject.type,
+        updatedAt: metaobject.updatedAt,
+      };
+
+      for (const key of fields) {
+        if (metaobject[key]) {
+          if (metaobject[key].reference) {
+            // Se for um campo de referência (ex: imagem), o valor é o objeto de referência
+            flattened[key] = metaobject[key].reference;
+          } else {
+            // Caso contrário, é o valor simples
+            flattened[key] = metaobject[key].value;
+          }
+        }
+      }
+      return flattened as MetaobjectNode;
+    };
+
+    if (id || (handle && metaobjectType)) {
+      return { metaobject: flattenMetaobject(data?.metaobject) };
+    } else if (metaobjectType) {
+      const flattenedNodes = data?.metaobjects?.nodes.map(flattenMetaobject).filter(Boolean) as MetaobjectNode[];
+      return {
+        metaobjects: {
+          nodes: flattenedNodes,
+          pageInfo: data?.metaobjects?.pageInfo,
+        } as FlexibleMetaobjectConnection,
+      };
     }
+    
     return { metaobject: null, metaobjects: null };
   } catch (error) {
     console.error("Error fetching metaobjects:", error);
