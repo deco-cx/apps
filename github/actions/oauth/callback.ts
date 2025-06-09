@@ -13,7 +13,10 @@ export default async function callback(
   { code, redirectUri, clientSecret, clientId, installId }: Props,
   _req: Request,
   ctx: AppContext,
-) {
+): Promise<{
+  installId?: string;
+  account?: string;
+}> {
   const currentCtx = await ctx.getConfiguration();
   const response = await fetch(`${GITHUB_URL_OAUTH_ACCESS_TOKEN}`, {
     method: "POST",
