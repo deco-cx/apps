@@ -57,11 +57,13 @@ function Component({
   noIndexing,
   jsonLDs = [],
 }: Props) {
- 
   const [{ pageInfo = {}, seo = {} } = {}] = jsonLDs || [{}];
 
   const currentPage = pageInfo?.currentPage ?? false;
-  const isDepartament = jsonLDs[0] ? (pageInfo?.pageTypes && pageInfo?.pageTypes[0] === "Department") || (pageInfo?.pageTypes && pageInfo?.pageTypes[0] === "Search") : null;
+  const isDepartament = jsonLDs[0]
+    ? (pageInfo?.pageTypes && pageInfo?.pageTypes[0] === "Department") ||
+      (pageInfo?.pageTypes && pageInfo?.pageTypes[0] === "Search")
+    : null;
   const isPageMoreThanOne = currentPage && currentPage > 1;
 
   const twitterCard = type === "website" ? "summary" : "summary_large_image";
@@ -70,8 +72,10 @@ function Component({
   const url = canonical;
 
   const PAGE_REGEX = /\?page=([1-9]|[1-4][0-9]|50)/;
-  const matchUrl = seo && isDepartament? seo.canonical.match(PAGE_REGEX) : "";
-  const processedSeoCanonicalUrl = matchUrl ? seo.canonical.replace(PAGE_REGEX, "/page" + matchUrl[1]) : seo.canonical;
+  const matchUrl = seo && isDepartament ? seo.canonical.match(PAGE_REGEX) : "";
+  const processedSeoCanonicalUrl = matchUrl
+    ? seo.canonical.replace(PAGE_REGEX, "/page" + matchUrl[1])
+    : seo.canonical;
 
   return (
     <Head>
@@ -100,7 +104,10 @@ function Component({
 
       {/* Link tags */}
       {canonical && (
-        <link rel="canonical" href={isDepartament ? processedSeoCanonicalUrl : url} />
+        <link
+          rel="canonical"
+          href={isDepartament ? processedSeoCanonicalUrl : url}
+        />
       )}
 
       {/* No index, no follow */}

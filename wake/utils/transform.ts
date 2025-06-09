@@ -281,8 +281,10 @@ export const toProduct = (
   variant.attributes?.forEach((attr) =>
     additionalProperty.push({
       "@type": "PropertyValue",
+      additionalType: attr?.type ?? undefined,
       name: attr?.name ?? undefined,
       value: attr?.value ?? undefined,
+      propertyID: String(attr?.id) ?? undefined,
       valueReference: "SPECIFICATION",
     })
   );

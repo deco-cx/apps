@@ -1,4 +1,4 @@
-import type { ProductListingPage, Product } from "../../../commerce/types.ts";
+import type { Product, ProductListingPage } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
 import { Props } from "./productListingPage.ts";
 
@@ -7,10 +7,10 @@ const loader = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
-
-  const response = await ctx.invoke.vtex.loaders.intelligentSearch.productListingPage(
-    props,
-  );
+  const response = await ctx.invoke.vtex.loaders.intelligentSearch
+    .productListingPage(
+      props,
+    );
 
   if (!response) {
     return null;

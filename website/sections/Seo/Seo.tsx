@@ -2,7 +2,7 @@ import Seo, { Props as SeoProps } from "../../components/Seo.tsx";
 
 export function loader(props: SeoProps, req: Request): SeoProps {
   const referer = req.headers.get("referer");
-  return { ...props,canonical: referer! };
+  return { ...props, canonical: referer! };
 }
 
 /**
