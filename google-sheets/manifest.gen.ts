@@ -17,6 +17,7 @@ import * as $$$3 from "./loaders/getSpreadsheet.ts";
 import * as $$$4 from "./loaders/getValues.ts";
 import * as $$$5 from "./loaders/oauth/start.ts";
 import * as $$$6 from "./loaders/query.ts";
+import * as $$$7 from "./loaders/whoami.ts";
 
 const manifest = {
   "loaders": {
@@ -27,6 +28,7 @@ const manifest = {
     "google-sheets/loaders/getValues.ts": $$$4,
     "google-sheets/loaders/oauth/start.ts": $$$5,
     "google-sheets/loaders/query.ts": $$$6,
+    "google-sheets/loaders/whoami.ts": $$$7,
   },
   "actions": {
     "google-sheets/actions/addFormula.ts": $$$$$$$$$0,

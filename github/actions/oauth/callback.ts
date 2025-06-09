@@ -38,7 +38,17 @@ export default async function callback(
     token_type: authResponse.token_type,
   });
 
+  let description: string | undefined;
+
+  try {
+    const user = await ctx.invoke.github.loaders.getAuthenticatedUser();
+    description = user.login;
+  } catch (err) {
+    console.error(err);
+  }
+
   return {
     installId,
+    description,
   };
 }

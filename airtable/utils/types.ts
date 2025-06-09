@@ -120,3 +120,9 @@ export interface UpdateFieldBody {
 export interface Secret {
   get: () => string;
 }
+
+export interface WhoamiResponse {
+  id: string;
+  email?: string;
+  scopes?: string[];
+}

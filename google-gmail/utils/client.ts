@@ -1,4 +1,4 @@
-import { EmailMessage, EmailsResponse, Example } from "./types.ts";
+import { EmailMessage, EmailsResponse, Example, UserInfo } from "./types.ts";
 
 export interface AuthClient {
   "POST /token": {
@@ -21,6 +21,9 @@ export interface AuthClient {
 }
 
 export interface Client {
+  "GET /oauth2/v2/userinfo": {
+    response: UserInfo;
+  };
   "POST /v4/example": {
     response: Example;
     searchParams: {

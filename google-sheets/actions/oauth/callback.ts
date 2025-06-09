@@ -25,7 +25,7 @@ export default async function callback(
   { code, installId, clientId, clientSecret, redirectUri }: Props,
   req: Request,
   ctx: AppContext,
-): Promise<{ installId: string }> {
+): Promise<{ installId: string; description?: string }> {
   const { client } = ctx;
 
   const finalRedirectUri = redirectUri ||
@@ -64,5 +64,13 @@ export default async function callback(
     clientId: clientId,
   });
 
-  return { installId };
+  let description: string | undefined;
+  try {
+    const user = await ctx.invoke["google-sheets"].loaders.whoami();
+    description = user.email;
+  } catch (err) {
+    console.error(err);
+  }
+
+  return { installId, description };
 }
