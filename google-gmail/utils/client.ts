@@ -18,12 +18,12 @@ export interface AuthClient {
       scope?: string;
     };
   };
-}
-
-export interface Client {
   "GET /oauth2/v2/userinfo": {
     response: UserInfo;
   };
+}
+
+export interface Client {
   "POST /v4/example": {
     response: Example;
     searchParams: {
