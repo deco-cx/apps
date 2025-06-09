@@ -64,13 +64,9 @@ export default async function callback(
     clientId: clientId,
   });
 
-  let account: string | undefined;
-  try {
-    const user = await ctx.invoke["google-gmail"].loaders.whoami();
-    account = user.email;
-  } catch (err) {
-    console.error(err);
-  }
+  const account = await ctx.invoke["google-gmail"].loaders.whoami()
+    .then((user) => user.email)
+    .catch(console.error) || undefined;
 
   return { installId, account };
 }
