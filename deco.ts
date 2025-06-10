@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("google-calendar"),
     app("barte"),
     app("pinecone-assistant"),
     app("shopify-mcp"),
