@@ -589,7 +589,3 @@ export interface ActionBatchUpdateProps {
   valueInputOption?: "RAW" | "USER_ENTERED";
   values: string[][];
 }
-
-export interface UserInfo {
-  email: string;
-}

@@ -16,6 +16,9 @@ import {
   OAuthClientOptions,
 } from "./config.ts";
 
+export const OAUTH_CLIENT_OVERRIDE_AUTH_HEADER_NAME =
+  "X-OAuth-Client-Override-Authorization";
+
 /**
  * Configuration for creating a unified OAuth client
  * @template TApiClient - API client type
@@ -35,7 +38,7 @@ export interface OAuthClientConfig<TApiClient, TAuthClient> {
  * @param tokenRefresher - Token refresh manager
  * @param bufferSeconds - Buffer seconds before expiration
  */
-const createFetchWithAutoRefresh = <TAuthClient>(
+export const createFetchWithAutoRefresh = <TAuthClient>(
   tokenRefresher: TokenRefresher<TAuthClient>,
   bufferSeconds: number = DEFAULT_BUFFER_SECONDS,
 ) => {
@@ -43,6 +46,21 @@ const createFetchWithAutoRefresh = <TAuthClient>(
     input: string | Request | URL,
     init?: DecoRequestInit,
   ): Promise<Response> => {
+    const inlineHeaders = new Headers(init?.headers);
+    const authHeaderOverride = inlineHeaders.get(
+      OAUTH_CLIENT_OVERRIDE_AUTH_HEADER_NAME,
+    );
+    if (authHeaderOverride) {
+      const headers = new Headers(init?.headers);
+      headers.delete(OAUTH_CLIENT_OVERRIDE_AUTH_HEADER_NAME);
+      headers.set("Authorization", authHeaderOverride);
+      console.log("authHeaderOverride", authHeaderOverride, headers);
+      return await fetchSafe(input, {
+        ...init,
+        headers,
+      });
+    }
+
     const tokens = await tokenRefresher.getTokens();
 
     if (isTokenExpiredByTime(tokens, bufferSeconds)) {
@@ -107,12 +125,17 @@ export const createOAuthHttpClient = <TApiClient, TAuthClient = TApiClient>(
     options.bufferSeconds,
   );
 
+  const accessToken = tokenRefresher.getAccessToken();
   const apiClient = createHttpClient<TApiClient>({
     base: config.apiBaseUrl,
     headers: new Headers({
       "Accept": headers.api.accept,
       "Content-Type": headers.api.contentType,
-      "Authorization": `Bearer ${tokenRefresher.getAccessToken()}`,
+      ...(accessToken
+        ? {
+          "Authorization": `Bearer ${accessToken}`,
+        }
+        : {}),
     }),
     fetcher: fetchWithAutoRefresh,
     ...options.apiClientConfig,

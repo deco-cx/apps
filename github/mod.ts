@@ -31,8 +31,12 @@ export default function App(props: Props): App<Manifest, State> {
     base: GITHUB_URL,
     headers: new Headers({
       "Accept": "application/json",
-      "Authorization": `Bearer ${access_token}`,
       "Content-Type": "application/json",
+      ...(access_token
+        ? {
+          "Authorization": `Bearer ${access_token}`,
+        }
+        : {}),
     }),
     fetcher: fetchSafe,
   });

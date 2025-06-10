@@ -64,7 +64,9 @@ export default async function callback(
     clientId: clientId,
   });
 
-  const account = await ctx.invoke["google-gmail"].loaders.whoami()
+  const account = await ctx.invoke["google-gmail"].loaders.oauth.whoami({
+    accessToken: tokenData.access_token,
+  })
     .then((user) => user.email)
     .catch(console.error) || undefined;
 

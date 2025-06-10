@@ -1,3 +1,5 @@
+import { SCOPES } from "../../utils/constant.ts";
+
 export interface Props {
   clientId: string;
   redirectUri: string;
@@ -14,7 +16,7 @@ export default function start(props: Props) {
     client_id: props.clientId,
     redirect_uri: props.redirectUri,
     response_type: "code",
-    scope: "https://www.googleapis.com/auth/spreadsheets",
+    scope: SCOPES.join(" "),
     access_type: "offline",
     prompt: "consent",
     state: props.state,
