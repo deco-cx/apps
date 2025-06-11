@@ -476,14 +476,13 @@
             </div>
           </div>
 
-                      <div
-             id="select-all-header"
-             style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #292524; margin-bottom: 0"
-           >
-            </div>
+          <div
+            id="select-all-header"
+            style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #292524; margin-bottom: 0"
+          >
+          </div>
 
-            <div class="selection-list" id="selection-list">
-            </div>
+          <div class="selection-list" id="selection-list"></div>
         </div>
 
         <div class="button-section">
@@ -551,7 +550,7 @@
       function handleSearch() {
         const query = document.getElementById("search-input").value
           .toLowerCase();
-          
+
         if (!query.trim()) {
           filteredBases = [...bases];
           filteredTables = [...tables];
@@ -562,29 +561,35 @@
         const matchingBaseIds = new Set();
         const matchingTableIds = new Set();
         const baseIdsByTableId = new Map();
-        tables.forEach(table => {
+        tables.forEach((table) => {
           baseIdsByTableId.set(table.id, table.baseId);
         });
-        
-        bases.forEach(base => {
-          if ((base.name || "").toLowerCase().includes(query) || 
-              base.id.toLowerCase().includes(query)) {
+
+        bases.forEach((base) => {
+          if (
+            (base.name || "").toLowerCase().includes(query) ||
+            base.id.toLowerCase().includes(query)
+          ) {
             matchingBaseIds.add(base.id);
           }
         });
-        tables.forEach(table => {
-          if ((table.name || "").toLowerCase().includes(query) || 
-              table.id.toLowerCase().includes(query)) {
+        tables.forEach((table) => {
+          if (
+            (table.name || "").toLowerCase().includes(query) ||
+            table.id.toLowerCase().includes(query)
+          ) {
             matchingTableIds.add(table.id);
             if (table.baseId) {
               matchingBaseIds.add(table.baseId);
             }
           }
         });
-        filteredBases = bases.filter(base => matchingBaseIds.has(base.id));
-        
-        filteredTables = tables.filter(table => 
-          matchingTableIds.has(table.id) || 
+        filteredBases = bases.filter((base) =>
+          matchingBaseIds.has(base.id)
+        );
+
+        filteredTables = tables.filter((table) =>
+          matchingTableIds.has(table.id) ||
           matchingBaseIds.has(table.baseId)
         );
 
@@ -592,7 +597,7 @@
       }
 
       const filteredTablesSet = new Set();
-      
+
       function renderSelectionList() {
         const container = document.getElementById("selection-list");
         const headerContainer = document.getElementById(
@@ -607,43 +612,52 @@
         }
 
         filteredTablesSet.clear();
-        filteredTables.forEach(table => filteredTablesSet.add(table.id));
-        
+        filteredTables.forEach((table) =>
+          filteredTablesSet.add(table.id)
+        );
+
         const searchQuery = document.getElementById("search-input")
           .value.toLowerCase();
-          
+
         let basesToShow;
         if (searchQuery) {
           basesToShow = filteredBases;
         } else {
           const basesWithFilteredTablesMap = new Map();
-          
-          filteredTables.forEach(table => {
+
+          filteredTables.forEach((table) => {
             if (table.baseId) {
               basesWithFilteredTablesMap.set(table.baseId, true);
             }
           });
-          
-          basesToShow = bases.filter(base => 
+
+          basesToShow = bases.filter((base) =>
             basesWithFilteredTablesMap.has(base.id)
           );
         }
 
         if (searchQuery && filteredBases.length > 0) {
           const directMatchTableBaseIds = new Set();
-          
+
           for (const table of filteredTables) {
-            if (table.baseId && 
-                ((table.name || "").toLowerCase().includes(searchQuery) || 
-                  table.id.toLowerCase().includes(searchQuery))) {
+            if (
+              table.baseId &&
+              ((table.name || "").toLowerCase().includes(searchQuery) ||
+                table.id.toLowerCase().includes(searchQuery))
+            ) {
               directMatchTableBaseIds.add(table.baseId);
             }
           }
-          
-          if (directMatchTableBaseIds.size === 0 && filteredBases.length <= 10) {
-            filteredBases.forEach(base => expandedBases.add(base.id));
+
+          if (
+            directMatchTableBaseIds.size === 0 &&
+            filteredBases.length <= 10
+          ) {
+            filteredBases.forEach((base) => expandedBases.add(base.id));
           } else {
-            directMatchTableBaseIds.forEach(baseId => expandedBases.add(baseId));
+            directMatchTableBaseIds.forEach((baseId) =>
+              expandedBases.add(baseId)
+            );
           }
         }
 
@@ -674,10 +688,10 @@
       function createBaseItemHTML(base) {
         const isSelected = selectedBases.has(base.id);
         const isExpanded = expandedBases.has(base.id);
-        
+
         const baseTableIds = baseToTablesMap.get(base.id) || new Set();
-        const filteredBaseTables = tables.filter(table => 
-          table.baseId === base.id && 
+        const filteredBaseTables = tables.filter((table) =>
+          table.baseId === base.id &&
           filteredTablesSet.has(table.id)
         );
 
@@ -716,29 +730,31 @@
 
       let searchMatchingBaseIdsCache = new Set();
       let searchQueryCache = "";
-      
+
       function createTableItemHTML(table) {
         const isSelected = selectedTables.has(table.id);
         const searchQuery = document.getElementById("search-input")
           .value.toLowerCase();
-          
+
         if (searchQuery && searchQueryCache !== searchQuery) {
           searchMatchingBaseIdsCache.clear();
           searchQueryCache = searchQuery;
-          
-          bases.forEach(base => {
-            if ((base.name || "").toLowerCase().includes(searchQuery) ||
-                base.id.toLowerCase().includes(searchQuery)) {
+
+          bases.forEach((base) => {
+            if (
+              (base.name || "").toLowerCase().includes(searchQuery) ||
+              base.id.toLowerCase().includes(searchQuery)
+            ) {
               searchMatchingBaseIdsCache.add(base.id);
             }
           });
         }
-        
+
         const matchesDirectly = searchQuery &&
           ((table.name || "").toLowerCase().includes(searchQuery) ||
             table.id.toLowerCase().includes(searchQuery));
 
-        const baseMatchesSearch = searchQuery && 
+        const baseMatchesSearch = searchQuery &&
           searchMatchingBaseIdsCache.has(table.baseId);
 
         let highlightClass = "";
@@ -777,13 +793,13 @@
 
         if (selectedBases.has(baseId)) {
           selectedBases.delete(baseId);
-          
+
           for (const tableId of baseTableIds) {
             selectedTables.delete(tableId);
           }
         } else {
           selectedBases.add(baseId);
-          
+
           for (const tableId of baseTableIds) {
             selectedTables.add(tableId);
           }
@@ -793,10 +809,10 @@
       }
 
       const baseToTablesMap = new Map();
-      
+
       function buildBaseToTablesMap() {
         baseToTablesMap.clear();
-        tables.forEach(table => {
+        tables.forEach((table) => {
           if (table.baseId) {
             if (!baseToTablesMap.has(table.baseId)) {
               baseToTablesMap.set(table.baseId, new Set());
@@ -805,35 +821,36 @@
           }
         });
       }
-      
-      document.addEventListener("DOMContentLoaded", function() {
+
+      document.addEventListener("DOMContentLoaded", function () {
         buildBaseToTablesMap();
       }, { once: true });
-      
+
       function toggleTableSelection(tableId) {
         const table = tables.find((t) => t.id === tableId);
-        
+
         if (!table || !table.baseId) return;
-        
+
         if (selectedTables.has(tableId)) {
           selectedTables.delete(tableId);
-          
-          const baseTableIds = baseToTablesMap.get(table.baseId) || new Set();
+
+          const baseTableIds = baseToTablesMap.get(table.baseId) ||
+            new Set();
           let hasSelectedTables = false;
-          
+
           for (const id of baseTableIds) {
             if (selectedTables.has(id)) {
               hasSelectedTables = true;
               break;
             }
           }
-          
+
           if (!hasSelectedTables) {
             selectedBases.delete(table.baseId);
           }
         } else {
           selectedTables.add(tableId);
-          
+
           selectedBases.add(table.baseId);
         }
 
