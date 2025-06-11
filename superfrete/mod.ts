@@ -75,4 +75,4 @@ export default function SuperFreteApp(props: Props): App<Manifest, State> {
     state,
     manifest,
   };
-} 
+}

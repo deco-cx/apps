@@ -86,6 +86,7 @@ interface Props {
 }
 
 /**
+ * @name Criar Frete
  * @title Criar Frete
  * @description Envia um frete para a SuperFrete
  */
@@ -127,4 +128,4 @@ const action = async (
   return result;
 };
 
-export default action; 
+export default action;

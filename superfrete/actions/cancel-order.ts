@@ -13,6 +13,7 @@ interface CancelOrderResponse {
 }
 
 /**
+ * @name Cancelar Pedido
  * @title Cancelar Pedido
  * @description Cancela um pedido na SuperFrete
  */
@@ -29,11 +30,13 @@ const action = async (
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Erro ao cancelar pedido: ${response.status} - ${errorText}`);
+    throw new Error(
+      `Erro ao cancelar pedido: ${response.status} - ${errorText}`,
+    );
   }
 
   const result = await response.json();
   return result;
 };
 
-export default action; 
+export default action;

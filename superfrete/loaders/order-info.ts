@@ -10,6 +10,7 @@ interface Props {
 }
 
 /**
+ * @name Informações do Pedido
  * @title Informacoes do Pedido
  * @description Obtém informações detalhadas de um pedido específico na SuperFrete
  */
@@ -26,11 +27,13 @@ const loader = async (
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Erro ao buscar informações do pedido: ${response.status} - ${errorText}`);
+    throw new Error(
+      `Erro ao buscar informações do pedido: ${response.status} - ${errorText}`,
+    );
   }
 
   const result = await response.json();
   return result;
 };
 
-export default loader; 
+export default loader;
