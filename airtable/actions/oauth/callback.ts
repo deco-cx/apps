@@ -70,6 +70,7 @@ interface StateProvider {
   original_state?: string;
   code_verifier?: string;
 }
+
 interface State {
   appName: string;
   installId: string;
@@ -79,14 +80,19 @@ interface State {
 }
 
 function decodeState(state: string): State & StateProvider {
-  const decoded = atob(decodeURIComponent(state));
-  const parsed = JSON.parse(decoded) as State & StateProvider;
+  try {
+    const decoded = atob(decodeURIComponent(state));
+    const parsed = JSON.parse(decoded) as State & StateProvider;
 
-  if (parsed.original_state) {
-    return decodeState(parsed.original_state);
+    if (parsed.original_state) {
+      return decodeState(parsed.original_state);
+    }
+
+    return parsed;
+  } catch (error) {
+    console.error("Erro ao decodificar state:", error);
+    return {} as State & StateProvider;
   }
-
-  return parsed;
 }
 
 /**
@@ -139,7 +145,10 @@ export default async function callback(
       accessToken: ctx.tokens?.access_token,
     })
       .then((user) => user.email)
-      .catch(console.error) || undefined;
+      .catch((error) => {
+        console.error("Erro ao obter informações do usuário:", error);
+        return undefined;
+      }) || undefined;
 
     return {
       installId: stateData.installId,
@@ -202,14 +211,20 @@ export default async function callback(
     const newURL = req.url;
     const data = await fetchBasesAndTables(tokenData);
 
-    const selectionHtml = generateSelectionPage({
+    const selectionHtml = await generateSelectionPage({
       bases: data.bases,
       tables: data.tables,
       callbackUrl: newURL,
     });
 
     return new Response(selectionHtml, {
-      headers: { "Content-Type": "text/html" },
+      headers: {
+        "Content-Type": "text/html",
+        "Content-Security-Policy":
+          "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+      },
     });
   } catch (error) {
     return {

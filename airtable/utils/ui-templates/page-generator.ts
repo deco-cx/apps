@@ -17,19 +17,60 @@ export interface SelectionPageOptions {
   callbackUrl: string;
 }
 
-export function generateSelectionPage(
-  { bases, tables, callbackUrl }: SelectionPageOptions,
-): string {
-  const templatePath = new URL(
-    "./selection-page.template.html",
-    import.meta.url,
-  );
+let kvInstance: Deno.Kv | null = null;
 
+async function getKv() {
+  if (!kvInstance) {
+    try {
+      kvInstance = await Deno.openKv();
+
+      const templateKey = ["templates", "selection-page"];
+      const existingTemplate = await kvInstance.get(templateKey);
+
+      if (!existingTemplate.value) {
+        const templatePath = new URL(
+          "./selection-page.template.html",
+          import.meta.url,
+        );
+
+        try {
+          const htmlTemplate = Deno.readTextFileSync(templatePath);
+          await kvInstance.set(templateKey, htmlTemplate);
+        } catch (e) {
+          console.error("Error writing and reading the template:", e);
+        }
+      }
+    } catch (e) {
+      console.error("Error initializing KV:", e);
+      return null;
+    }
+  }
+  return kvInstance;
+}
+
+export async function generateSelectionPage(
+  { bases, tables, callbackUrl }: SelectionPageOptions,
+): Promise<string> {
   let htmlTemplate: string;
+
   try {
-    htmlTemplate = Deno.readTextFileSync(templatePath);
+    const kv = await getKv();
+    if (kv) {
+      const templateResult = await kv.get(["templates", "selection-page"]);
+      if (templateResult.value) {
+        htmlTemplate = templateResult.value as string;
+      } else {
+        throw new Error("Template not found in KV");
+      }
+    } else {
+      const templatePath = new URL(
+        "./selection-page.template.html",
+        import.meta.url,
+      );
+      htmlTemplate = Deno.readTextFileSync(templatePath);
+    }
   } catch (error) {
-    console.error("Failed to read HTML template:", error);
+    console.error("Error reading HTML template:", error);
     return generateFallbackPage({ bases, tables, callbackUrl });
   }
 
