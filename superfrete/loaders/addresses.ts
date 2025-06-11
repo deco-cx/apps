@@ -4,7 +4,7 @@ import type { Address } from "../client.ts";
 /**
  * @name List Addresses
  * @title List Addresses
- * @description Lista todos os endereços cadastrados do usuário na SuperFrete
+ * @description Lists all registered addresses of the user in SuperFrete
  */
 const loader = async (
   _props: unknown,

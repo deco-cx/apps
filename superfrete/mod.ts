@@ -10,20 +10,20 @@ export type AppContext = FnContext<State, Manifest>;
 export interface Props {
   /**
    * @title API Token
-   * @description Token de autenticação da API SuperFrete
+   * @description SuperFrete API authentication token
    */
   token?: string | Secret;
 
   /**
    * @title Environment
-   * @description Escolha o ambiente da API (sandbox para testes, production para produção)
+   * @description Choose API environment (sandbox for testing, production for live)
    * @default "sandbox"
    */
   environment?: "sandbox" | "production";
 
   /**
    * @title Timeout
-   * @description Tempo limite para requisições em millisegundos
+   * @description Request timeout in milliseconds
    * @default 30000
    */
   timeout?: number;

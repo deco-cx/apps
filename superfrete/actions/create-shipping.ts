@@ -4,13 +4,13 @@ import type { Order, ShippingRequest } from "../client.ts";
 interface Props {
   /**
    * @title Service ID
-   * @description ID do serviço de entrega (1: PAC, 2: Sedex, 17: Mini Envios)
+   * @description Delivery service ID (1: PAC, 2: Sedex, 17: Mini Envios)
    */
   service: number;
 
   /**
    * @title Sender
-   * @description Informações do remetente
+   * @description Sender information
    */
   from: {
     name: string;
@@ -31,7 +31,7 @@ interface Props {
 
   /**
    * @title Recipient
-   * @description Informações do destinatário
+   * @description Recipient information
    */
   to: {
     name: string;
@@ -52,7 +52,7 @@ interface Props {
 
   /**
    * @title Products
-   * @description Lista de produtos a serem enviados
+   * @description List of products to be shipped
    */
   products: Array<{
     quantity?: number;
@@ -64,7 +64,7 @@ interface Props {
 
   /**
    * @title Volumes
-   * @description Informações dos volumes/pacotes
+   * @description Volume/package information
    */
   volumes: Array<{
     weight: number;
@@ -75,7 +75,7 @@ interface Props {
 
   /**
    * @title Options
-   * @description Opções adicionais do frete
+   * @description Additional freight options
    */
   options?: {
     own_hand?: boolean;
@@ -88,7 +88,7 @@ interface Props {
 /**
  * @name Create Shipping
  * @title Create Shipping
- * @description Envia um frete para a SuperFrete
+ * @description Sends a freight to SuperFrete
  */
 const action = async (
   props: Props,

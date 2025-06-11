@@ -4,7 +4,7 @@ import type { User } from "../client.ts";
 /**
  * @name Get User Information
  * @title Get User Information
- * @description Obtém informações do usuário autenticado na SuperFrete
+ * @description Gets information from the authenticated user in SuperFrete
  */
 const loader = async (
   _props: unknown,

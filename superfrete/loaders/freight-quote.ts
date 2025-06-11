@@ -9,59 +9,59 @@ import type {
 interface Props {
   /**
    * @title From Postal Code
-   * @description CEP de origem da encomenda (formato XXXXX-XXX ou XXXXXXXX)
+   * @description Origin postal code (format XXXXX-XXX or XXXXXXXX)
    */
   fromPostalCode: string;
 
   /**
    * @title To Postal Code
-   * @description CEP de destino da encomenda (formato XXXXX-XXX ou XXXXXXXX)
+   * @description Destination postal code (format XXXXX-XXX or XXXXXXXX)
    */
   toPostalCode: string;
 
   /**
    * @title Services
-   * @description Códigos dos serviços de entrega (1: PAC, 2: Sedex, 17: Mini Envios)
+   * @description Delivery service codes (1: PAC, 2: Sedex, 17: Mini Envios)
    * @default "1,2"
    */
   services?: string;
 
   /**
    * @title Own Hand
-   * @description Indica se o serviço de Mão Própria deve ser considerado
+   * @description Indicates if Own Hand service should be considered
    * @default false
    */
   ownHand?: boolean;
 
   /**
    * @title Receipt Notification
-   * @description Indica se o serviço de Aviso de Recebimento deve ser considerado
+   * @description Indicates if Receipt Notification service should be considered
    * @default false
    */
   receipt?: boolean;
 
   /**
    * @title Insurance Value
-   * @description Valor declarado da encomenda para cálculo do seguro
+   * @description Declared value of the package for insurance calculation
    */
   insuranceValue?: number;
 
   /**
    * @title Use Insurance
-   * @description Indica se o seguro deve ser incluído no cálculo do frete
+   * @description Indicates if insurance should be included in freight calculation
    * @default false
    */
   useInsuranceValue?: boolean;
 
   /**
    * @title Package Dimensions
-   * @description Dimensões da caixa (quando já conhecidas). Se não informado, use produtos individuais
+   * @description Box dimensions (when already known). If not provided, use individual products
    */
   package?: Package;
 
   /**
    * @title Individual Products
-   * @description Lista de produtos individuais (a API calculará a caixa ideal)
+   * @description List of individual products (API will calculate ideal box)
    */
   products?: Product[];
 }
@@ -69,7 +69,7 @@ interface Props {
 /**
  * @name Calculate Freight Quote
  * @title Calculate Freight Quote
- * @description Calcula o valor do frete para uma encomenda baseado em CEPs e características dos produtos
+ * @description Calculates freight value for a package based on postal codes and product characteristics
  */
 const loader = async (
   props: Props,
