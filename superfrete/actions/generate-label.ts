@@ -4,7 +4,7 @@ import type { Order } from "../client.ts";
 interface Props {
   /**
    * @title Order ID
-   * @description ID do pedido na SuperFrete
+   * @description Order ID in SuperFrete
    */
   orderId: string;
 }
@@ -12,7 +12,7 @@ interface Props {
 /**
  * @name Generate Label
  * @title Generate Label
- * @description Finaliza o pedido e gera a etiqueta de envio na SuperFrete
+ * @description Finalizes the order and generates shipping label in SuperFrete
  */
 const action = async (
   props: Props,

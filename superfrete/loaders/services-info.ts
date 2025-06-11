@@ -4,7 +4,7 @@ import type { ServiceInfo } from "../client.ts";
 /**
  * @name Get Services Information
  * @title Get Services Information
- * @description Obtém informações sobre os serviços de entrega disponíveis na SuperFrete
+ * @description Gets information about available delivery services in SuperFrete
  */
 const loader = async (
   _props: unknown,

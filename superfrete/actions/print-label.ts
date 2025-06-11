@@ -3,7 +3,7 @@ import type { AppContext } from "../mod.ts";
 interface Props {
   /**
    * @title Order ID
-   * @description ID do pedido na SuperFrete
+   * @description Order ID in SuperFrete
    */
   orderId: string;
 }
@@ -15,7 +15,7 @@ interface PrintLabelResponse {
 /**
  * @name Print Label
  * @title Print Label
- * @description Obtém o link para impressão da etiqueta de um pedido na SuperFrete
+ * @description Gets the link for printing a shipping label in SuperFrete
  */
 const action = async (
   props: Props,
