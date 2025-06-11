@@ -8,67 +8,67 @@ import type {
 
 interface Props {
   /**
-   * @title CEP de Origem
+   * @title From Postal Code
    * @description CEP de origem da encomenda (formato XXXXX-XXX ou XXXXXXXX)
    */
   fromPostalCode: string;
 
   /**
-   * @title CEP de Destino
+   * @title To Postal Code
    * @description CEP de destino da encomenda (formato XXXXX-XXX ou XXXXXXXX)
    */
   toPostalCode: string;
 
   /**
-   * @title Servicos
+   * @title Services
    * @description Códigos dos serviços de entrega (1: PAC, 2: Sedex, 17: Mini Envios)
    * @default "1,2"
    */
   services?: string;
 
   /**
-   * @title Mao Propria
+   * @title Own Hand
    * @description Indica se o serviço de Mão Própria deve ser considerado
    * @default false
    */
   ownHand?: boolean;
 
   /**
-   * @title Aviso de Recebimento
+   * @title Receipt Notification
    * @description Indica se o serviço de Aviso de Recebimento deve ser considerado
    * @default false
    */
   receipt?: boolean;
 
   /**
-   * @title Valor do Seguro
+   * @title Insurance Value
    * @description Valor declarado da encomenda para cálculo do seguro
    */
   insuranceValue?: number;
 
   /**
-   * @title Usar Seguro
+   * @title Use Insurance
    * @description Indica se o seguro deve ser incluído no cálculo do frete
    * @default false
    */
   useInsuranceValue?: boolean;
 
   /**
-   * @title Dimensoes da Caixa
+   * @title Package Dimensions
    * @description Dimensões da caixa (quando já conhecidas). Se não informado, use produtos individuais
    */
   package?: Package;
 
   /**
-   * @title Produtos Individuais
+   * @title Individual Products
    * @description Lista de produtos individuais (a API calculará a caixa ideal)
    */
   products?: Product[];
 }
 
 /**
- * @name Cotação de Frete
- * @title Cotacao de Frete
+ * @name Calculate Freight Quote
+ * @title Calculate Freight Quote
  * @description Calcula o valor do frete para uma encomenda baseado em CEPs e características dos produtos
  */
 const loader = async (

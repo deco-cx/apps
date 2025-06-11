@@ -3,15 +3,15 @@ import type { OrderInfo } from "../client.ts";
 
 interface Props {
   /**
-   * @title ID do Pedido
+   * @title Order ID
    * @description ID do pedido na SuperFrete
    */
   orderId: string;
 }
 
 /**
- * @name Informações do Pedido
- * @title Informacoes do Pedido
+ * @name Get Order Information
+ * @title Get Order Information
  * @description Obtém informações detalhadas de um pedido específico na SuperFrete
  */
 const loader = async (

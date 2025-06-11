@@ -2,7 +2,7 @@ import type { AppContext } from "../mod.ts";
 
 interface Props {
   /**
-   * @title ID do Pedido
+   * @title Order ID
    * @description ID do pedido na SuperFrete
    */
   orderId: string;
@@ -13,8 +13,8 @@ interface CancelOrderResponse {
 }
 
 /**
- * @name Cancelar Pedido
- * @title Cancelar Pedido
+ * @name Cancel Order
+ * @title Cancel Order
  * @description Cancela um pedido na SuperFrete
  */
 const action = async (
