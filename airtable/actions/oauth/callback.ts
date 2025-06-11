@@ -1,11 +1,7 @@
 import type { AppContext } from "../../mod.ts";
 import { OAUTH_URL_TOKEN } from "../../utils/constants.ts";
 import { fetchBasesAndTables } from "../../utils/ui-templates/airtable-client.ts";
-import {
-  AirtableBase,
-  AirtableTable,
-  generateSelectionPage,
-} from "../../utils/ui-templates/page-generator.ts";
+import { generateSelectionPage } from "../../utils/ui-templates/page-generator.ts";
 
 interface OAuthTokenResponse {
   access_token: string;
@@ -60,20 +56,12 @@ export interface Props {
   queryParams: Record<string, string>;
 }
 
-// Function to extract code_verifier from state
 function extractCodeVerifier(state: string): string | null {
   try {
-    console.log("Attempting to parse state:", state);
     const stateData = JSON.parse(atob(state));
-    console.log("Parsed state data:", stateData);
     const codeVerifier = stateData.code_verifier || null;
-    console.log(
-      "Extracted code_verifier:",
-      codeVerifier ? "found" : "not found",
-    );
     return codeVerifier;
-  } catch (error) {
-    console.error("Failed to parse state parameter:", error);
+  } catch (_error) {
     return null;
   }
 }
@@ -115,33 +103,27 @@ export default async function callback(
     redirectUri,
     queryParams,
   }: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<Response | Record<string, unknown>> {
   const { isSaveBase, skip } = queryParams;
 
   if (isSaveBase) {
     const { selectedBases, selectedTables } = queryParams;
-    const teste = decodeState(state);
+    const stateData = decodeState(state);
 
     if (skip === "true") {
       return {
-        installId: teste.installId,
+        installId: stateData.installId,
       };
     }
 
     const basesArray = selectedBases
-      ? selectedBases.split(",").map((base) => {
-        const [id, name] = base.split(":");
-        return { id, name };
-      })
+      ? selectedBases.split(",").map((id) => ({ id }))
       : [];
 
     const tablesArray = selectedTables
-      ? selectedTables.split(",").map((table) => {
-        const [id, name] = table.split(":");
-        return { id, name };
-      })
+      ? selectedTables.split(",").map((id) => ({ id }))
       : [];
 
     const currentCtx = await ctx.getConfiguration();
@@ -154,17 +136,12 @@ export default async function callback(
     });
 
     return {
-      installId: teste.installId,
-      appName: teste.appName + " - " + "Bases: " + basesArray.map((b) =>
-        b.name
-      ).join(", ") + " - " + "Tables: " + tablesArray.map((t) =>
-        t.name
-      ).join(", "),
+      installId: stateData.installId,
     };
   }
 
   try {
-    const uri = redirectUri || new URL("/oauth/callback", _req.url).href;
+    const uri = redirectUri || new URL("/oauth/callback", req.url).href;
 
     const codeVerifier = extractCodeVerifier(state);
     if (!codeVerifier) {
@@ -215,17 +192,12 @@ export default async function callback(
       clientId: clientId,
     });
 
-    const newURL = _req.url;
-    let bases: AirtableBase[] = [];
-    let tables: AirtableTable[] = [];
-
+    const newURL = req.url;
     const data = await fetchBasesAndTables(tokenData);
-    bases = data.bases;
-    tables = data.tables;
 
     const selectionHtml = generateSelectionPage({
-      bases,
-      tables,
+      bases: data.bases,
+      tables: data.tables,
       callbackUrl: newURL,
     });
 

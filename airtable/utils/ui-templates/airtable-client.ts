@@ -23,9 +23,6 @@ export interface AirtableBaseSchema {
   }>;
 }
 
-/**
- * Busca todas as bases disponíveis para o usuário autenticado
- */
 export async function fetchUserBases(
   tokens: OAuthTokens,
 ): Promise<AirtableBase[]> {
@@ -55,9 +52,6 @@ export async function fetchUserBases(
   }
 }
 
-/**
- * Busca todas as tabelas de uma base específica
- */
 export async function fetchBaseTables(
   baseId: string,
   tokens: OAuthTokens,

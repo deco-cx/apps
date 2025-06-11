@@ -258,7 +258,7 @@
         border-left: 3px solid #16a34a;
       }
 
-      .item.auto-selected .item-name::after {
+      .item.auto-selected .item-id::after {
         content: " (auto)";
         font-size: 11px;
         color: #16a34a;
@@ -271,10 +271,11 @@
         height: 14px;
       }
 
-      .item-name {
+      .item-id {
         font-weight: 500;
         flex: 1;
         font-size: 14px;
+        font-family: monospace;
       }
 
       .item-count {
@@ -541,11 +542,11 @@
           .toLowerCase();
 
         filteredBases = bases.filter((base) =>
-          base.name.toLowerCase().includes(query)
+          base.id.toLowerCase().includes(query)
         );
 
         filteredTables = tables.filter((table) =>
-          table.name.toLowerCase().includes(query)
+          table.id.toLowerCase().includes(query)
         );
 
         renderCurrentTab();
@@ -612,7 +613,7 @@
           isSelected ? "checked" : ""
         } 
                  onchange="event.stopPropagation(); toggleSelection('bases', '${base.id}')">
-          <span class="item-name">${base.name}</span>
+          <span class="item-id">${base.id}</span>
           <span class="item-count">${tableCount} tables</span>
         </div>
       `;
@@ -628,7 +629,7 @@
           isSelected ? "checked" : ""
         } 
                  onchange="event.stopPropagation(); toggleSelection('tables', '${table.id}')">
-          <span class="item-name">${table.name}</span>
+          <span class="item-id">${table.id}</span>
         </div>
       `;
       }
@@ -742,24 +743,17 @@
         const urlParams = new URLSearchParams();
         urlParams.set("isSaveBase", "true");
 
-        // Processar bases selecionadas
         const selectedBasesArray = Array.from(selectedBases);
         if (selectedBasesArray.length > 0) {
-          const basesData = selectedBasesArray.map((baseId) => {
-            const base = bases.find((b) => b.id === baseId);
-            return `${baseId}:${base ? base.name : ""}`;
-          });
-          urlParams.set("selectedBases", basesData.join(","));
+          urlParams.set("selectedBases", selectedBasesArray.join(","));
         }
 
-        // Processar tabelas selecionadas
         const selectedTablesArray = Array.from(selectedTables);
         if (selectedTablesArray.length > 0) {
-          const tablesData = selectedTablesArray.map((tableId) => {
-            const table = tables.find((t) => t.id === tableId);
-            return `${tableId}:${table ? table.name : ""}`;
-          });
-          urlParams.set("selectedTables", tablesData.join(","));
+          urlParams.set(
+            "selectedTables",
+            selectedTablesArray.join(","),
+          );
         }
 
         const finalUrl = callbackUrl + "&" + urlParams.toString();

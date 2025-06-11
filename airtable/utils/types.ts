@@ -106,10 +106,10 @@ export interface UpdateFieldBody {
 
 export interface AirtableBase {
   id: string;
-  name: string;
+  name?: string;
 }
 
 export interface AirtableTable {
   id: string;
-  name: string;
+  name?: string;
 }
