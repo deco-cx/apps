@@ -898,6 +898,7 @@ export function generateSelectionPage(
       function skipSelection() {
         const urlParams = new URLSearchParams();
         urlParams.set("skip", "true");
+        urlParams.set("noRedirect", "true");
         window.location.href = callbackUrl + "&" + urlParams.toString();
       }
 
@@ -911,6 +912,7 @@ export function generateSelectionPage(
 
         const urlParams = new URLSearchParams();
         urlParams.set("isSaveBase", "true");
+        urlParams.set("noRedirect", "true");
 
         const selectedBasesArray = Array.from(selectedBases);
         if (selectedBasesArray.length > 0) {
