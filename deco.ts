@@ -13,6 +13,7 @@ const config = {
     app("barte"),
     app("pinecone-assistant"),
     app("shopify-mcp"),
+    app("superfrete"),
     app("google-gmail"),
     app("github"),
     app("turso-db"),
