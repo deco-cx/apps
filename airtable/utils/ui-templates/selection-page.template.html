@@ -589,8 +589,7 @@
         );
 
         filteredTables = tables.filter((table) =>
-          matchingTableIds.has(table.id) ||
-          matchingBaseIds.has(table.baseId)
+          matchingTableIds.has(table.id)
         );
 
         renderSelectionList();
