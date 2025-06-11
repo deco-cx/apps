@@ -2,7 +2,7 @@ import type { AppContext } from "../mod.ts";
 import type { User } from "../client.ts";
 
 /**
- * @name Informações do Usuário
+ * @name Informações do Usuário 
  * @title Informacoes do Usuario
  * @description Obtém informações do usuário autenticado na SuperFrete
  */
