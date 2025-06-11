@@ -8,7 +8,7 @@ import {
   OAUTH_URL_AUTH,
   SCOPES,
 } from "./utils/constant.ts";
-import { AuthClient, Client } from "./utils/client.ts";
+import { Client } from "./utils/client.ts";
 import {
   DEFAULT_OAUTH_HEADERS,
   OAuthClientOptions,
@@ -16,6 +16,11 @@ import {
   OAuthProvider,
   OAuthTokens,
 } from "../mcp/oauth.ts";
+import {
+  createGoogleOAuthUserInfoClient,
+  GoogleUserInfoClient,
+} from "../mcp/utils/google/userInfo.ts";
+import { GoogleAuthClient } from "../mcp/utils/google/authClient.ts";
 
 export const GoogleProvider: OAuthProvider = {
   name: "Google",
@@ -33,7 +38,8 @@ export interface Props {
 }
 
 export interface State extends Props {
-  client: OAuthClients<Client, AuthClient>;
+  client: OAuthClients<Client, GoogleAuthClient>;
+  userInfoClient: GoogleUserInfoClient;
 }
 
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
@@ -67,9 +73,23 @@ export default function App(
     },
   };
 
-  const client = createOAuthHttpClient<Client, AuthClient>({
+  const client = createOAuthHttpClient<Client, GoogleAuthClient>({
     provider: googleProvider,
     apiBaseUrl: API_URL,
+    tokens,
+    options,
+    onTokenRefresh: async (newTokens: OAuthTokens) => {
+      if (ctx) {
+        await ctx.configure({
+          ...ctx,
+          tokens: newTokens,
+        });
+      }
+    },
+  });
+
+  const userInfoClient = createGoogleOAuthUserInfoClient({
+    provider: googleProvider,
     tokens,
     options,
     onTokenRefresh: async (newTokens: OAuthTokens) => {
@@ -86,6 +106,7 @@ export default function App(
     ...props,
     tokens,
     client,
+    userInfoClient,
   };
 
   return {

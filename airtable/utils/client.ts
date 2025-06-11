@@ -12,9 +12,18 @@ import type {
   UpdateFieldBody,
   UpdateRecordsBody,
   UpdateTableBody,
+  WhoamiResponse,
 } from "./types.ts";
 
 export interface AirtableClient {
+  /**
+   * Get current user
+   * @see https://airtable.com/developers/web/api/get-user-id-scopes
+   */
+  "GET /v0/meta/whoami": {
+    response: WhoamiResponse;
+  };
+
   /**
    * List bases
    * @see https://airtable.com/developers/web/api/list-bases

@@ -16,6 +16,7 @@ import * as $$$2 from "./loaders/listBases.ts";
 import * as $$$3 from "./loaders/listRecords.ts";
 import * as $$$4 from "./loaders/oauth/start.ts";
 import * as $$$5 from "./loaders/searchRecords.ts";
+import * as $$$6 from "./loaders/whoami.ts";
 
 const manifest = {
   "loaders": {
@@ -25,6 +26,7 @@ const manifest = {
     "airtable/loaders/listRecords.ts": $$$3,
     "airtable/loaders/oauth/start.ts": $$$4,
     "airtable/loaders/searchRecords.ts": $$$5,
+    "airtable/loaders/whoami.ts": $$$6,
   },
   "actions": {
     "airtable/actions/createField.ts": $$$$$$$$$0,

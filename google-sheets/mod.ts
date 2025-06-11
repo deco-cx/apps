@@ -9,7 +9,7 @@ import {
   GOOGLE_SHEETS_URL,
   SCOPES,
 } from "./utils/constant.ts";
-import { GoogleAuthClient, GoogleSheetsClient } from "./utils/client.ts";
+import { GoogleSheetsClient } from "./utils/client.ts";
 import {
   DEFAULT_OAUTH_HEADERS,
   OAuthClientOptions,
@@ -21,6 +21,11 @@ import {
   createErrorHandler,
   ErrorHandler,
 } from "../mcp/utils/errorHandling.ts";
+import {
+  createGoogleOAuthUserInfoClient,
+  GoogleUserInfoClient,
+} from "../mcp/utils/google/userInfo.ts";
+import { GoogleAuthClient } from "../mcp/utils/google/authClient.ts";
 
 export const GoogleProvider: OAuthProvider = {
   name: "Google",
@@ -39,6 +44,7 @@ export interface Props {
 
 export interface State extends Props {
   client: OAuthClients<GoogleSheetsClient, GoogleAuthClient>;
+  userInfoClient: GoogleUserInfoClient;
   errorHandler: ErrorHandler;
 }
 
@@ -88,6 +94,20 @@ export default function App(
     },
   });
 
+  const userInfoClient = createGoogleOAuthUserInfoClient({
+    provider: googleProvider,
+    tokens,
+    options,
+    onTokenRefresh: async (newTokens: OAuthTokens) => {
+      if (ctx) {
+        await ctx.configure({
+          ...ctx,
+          tokens: newTokens,
+        });
+      }
+    },
+  });
+
   const errorHandler = createErrorHandler({
     errorMessages: GOOGLE_SHEETS_ERROR_MESSAGES,
     defaultErrorMessage: "Google Sheets operation failed",
@@ -97,6 +117,7 @@ export default function App(
     ...props,
     tokens,
     client,
+    userInfoClient,
     errorHandler,
   };
 

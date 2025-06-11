@@ -113,3 +113,9 @@ export interface AirtableTable {
   id: string;
   name?: string;
 }
+
+export interface WhoamiResponse {
+  id: string;
+  email?: string;
+  scopes?: string[];
+}
