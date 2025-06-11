@@ -34,11 +34,11 @@ export interface State extends Omit<Props, "token"> {
   api: ReturnType<typeof createHttpClient<SuperFreteClient>>;
   token: string;
 }
-
+ 
 /**
  * @name SuperFrete
- * @description Integração com a API da SuperFrete para cotação e gestão de fretes
- * @category Logística
+ * @description Integration with SuperFrete API for shipping quotes and management
+ * @category Logistics
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/superfrete/logo.png
  */
 export default function SuperFreteApp(props: Props): App<Manifest, State> {
