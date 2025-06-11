@@ -144,6 +144,14 @@ export const getFiltersByUrl = (url: URL) => {
           value: value,
         },
       });
+    } else if (key.startsWith("filter.v.t.shopify")) {
+      filters.push({
+        taxonomyMetafield: {
+          namespace: "shopify",
+          key: key.replace("filter.v.t.shopify.", ""),
+          value: value,
+        },
+      });
     }
   });
   return filters;
