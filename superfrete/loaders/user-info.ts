@@ -2,8 +2,8 @@ import type { AppContext } from "../mod.ts";
 import type { User } from "../client.ts";
 
 /**
- * @name Informações do Usuário 
- * @title Informacoes do Usuario
+ * @name Get User Information
+ * @title Get User Information
  * @description Obtém informações do usuário autenticado na SuperFrete
  */
 const loader = async (

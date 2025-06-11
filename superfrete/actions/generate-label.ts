@@ -3,15 +3,15 @@ import type { Order } from "../client.ts";
 
 interface Props {
   /**
-   * @title ID do Pedido
+   * @title Order ID
    * @description ID do pedido na SuperFrete
    */
   orderId: string;
 }
 
 /**
- * @name Gerar Etiqueta
- * @title Gerar Etiqueta
+ * @name Generate Label
+ * @title Generate Label
  * @description Finaliza o pedido e gera a etiqueta de envio na SuperFrete
  */
 const action = async (

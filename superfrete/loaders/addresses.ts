@@ -2,8 +2,8 @@ import type { AppContext } from "../mod.ts";
 import type { Address } from "../client.ts";
 
 /**
- * @name Listar Endereços
- * @title Listar Enderecos
+ * @name List Addresses
+ * @title List Addresses
  * @description Lista todos os endereços cadastrados do usuário na SuperFrete
  */
 const loader = async (

@@ -2,8 +2,8 @@ import type { AppContext } from "../mod.ts";
 import type { ServiceInfo } from "../client.ts";
 
 /**
- * @name Informações dos Serviços
- * @title Informacoes dos Servicos
+ * @name Get Services Information
+ * @title Get Services Information
  * @description Obtém informações sobre os serviços de entrega disponíveis na SuperFrete
  */
 const loader = async (

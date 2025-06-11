@@ -3,13 +3,13 @@ import type { Order, ShippingRequest } from "../client.ts";
 
 interface Props {
   /**
-   * @title ID do Servico
+   * @title Service ID
    * @description ID do serviço de entrega (1: PAC, 2: Sedex, 17: Mini Envios)
    */
   service: number;
 
   /**
-   * @title Remetente
+   * @title Sender
    * @description Informações do remetente
    */
   from: {
@@ -30,7 +30,7 @@ interface Props {
   };
 
   /**
-   * @title Destinatario
+   * @title Recipient
    * @description Informações do destinatário
    */
   to: {
@@ -51,7 +51,7 @@ interface Props {
   };
 
   /**
-   * @title Produtos
+   * @title Products
    * @description Lista de produtos a serem enviados
    */
   products: Array<{
@@ -74,7 +74,7 @@ interface Props {
   }>;
 
   /**
-   * @title Opcoes
+   * @title Options
    * @description Opções adicionais do frete
    */
   options?: {
@@ -86,8 +86,8 @@ interface Props {
 }
 
 /**
- * @name Criar Frete
- * @title Criar Frete
+ * @name Create Shipping
+ * @title Create Shipping
  * @description Envia um frete para a SuperFrete
  */
 const action = async (
