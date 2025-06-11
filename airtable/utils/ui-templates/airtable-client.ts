@@ -27,6 +27,10 @@ export async function fetchUserBases(
   tokens: OAuthTokens,
 ): Promise<AirtableBase[]> {
   try {
+    if (!tokens || !tokens.access_token) {
+      throw new Error("Token de acesso inválido");
+    }
+
     const response = await fetch(`${AIRTABLE_API_BASE_URL}/v0/meta/bases`, {
       headers: {
         "Authorization": `Bearer ${tokens.access_token}`,
@@ -57,6 +61,10 @@ export async function fetchBaseTables(
   tokens: OAuthTokens,
 ): Promise<AirtableTable[]> {
   try {
+    if (!baseId || !tokens || !tokens.access_token) {
+      throw new Error("ID da base ou token de acesso inválido");
+    }
+
     const response = await fetch(
       `${AIRTABLE_API_BASE_URL}/v0/meta/bases/${baseId}/tables`,
       {
@@ -91,8 +99,16 @@ export async function fetchBasesAndTables(tokens: OAuthTokens): Promise<{
   tables: AirtableTable[];
 }> {
   try {
+    if (!tokens || !tokens.access_token) {
+      throw new Error("Token de acesso inválido");
+    }
+
     const bases = await fetchUserBases(tokens);
     const allTables: AirtableTable[] = [];
+
+    if (bases.length === 0) {
+      return { bases: [], tables: [] };
+    }
 
     const tablePromises = bases.map((base) => fetchBaseTables(base.id, tokens));
     const tablesResults = await Promise.all(tablePromises);
