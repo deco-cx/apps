@@ -2,6 +2,7 @@ import type { AppContext } from "../mod.ts";
 import type { Address } from "../client.ts";
 
 /**
+ * @name Listar Endereços
  * @title Listar Enderecos
  * @description Lista todos os endereços cadastrados do usuário na SuperFrete
  */
@@ -14,11 +15,13 @@ const loader = async (
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Erro ao buscar endereços: ${response.status} - ${errorText}`);
+    throw new Error(
+      `Erro ao buscar endereços: ${response.status} - ${errorText}`,
+    );
   }
 
   const result = await response.json();
   return result;
 };
 
-export default loader; 
+export default loader;

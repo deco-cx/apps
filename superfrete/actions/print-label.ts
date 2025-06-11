@@ -13,6 +13,7 @@ interface PrintLabelResponse {
 }
 
 /**
+ * @name Imprimir Etiqueta
  * @title Link para Impressao da Etiqueta
  * @description Obtém o link para impressão da etiqueta de um pedido na SuperFrete
  */
@@ -29,11 +30,13 @@ const action = async (
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Erro ao obter link de impressão: ${response.status} - ${errorText}`);
+    throw new Error(
+      `Erro ao obter link de impressão: ${response.status} - ${errorText}`,
+    );
   }
 
   const result = await response.json();
   return result;
 };
 
-export default action; 
+export default action;

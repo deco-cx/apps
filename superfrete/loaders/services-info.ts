@@ -2,6 +2,7 @@ import type { AppContext } from "../mod.ts";
 import type { ServiceInfo } from "../client.ts";
 
 /**
+ * @name Informações dos Serviços
  * @title Informacoes dos Servicos
  * @description Obtém informações sobre os serviços de entrega disponíveis na SuperFrete
  */
@@ -14,11 +15,13 @@ const loader = async (
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Erro ao buscar informações dos serviços: ${response.status} - ${errorText}`);
+    throw new Error(
+      `Erro ao buscar informações dos serviços: ${response.status} - ${errorText}`,
+    );
   }
 
   const result = await response.json();
   return result;
 };
 
-export default loader; 
+export default loader;

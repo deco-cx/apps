@@ -67,6 +67,7 @@ interface Props {
 }
 
 /**
+ * @name Cotação de Frete
  * @title Cotacao de Frete
  * @description Calcula o valor do frete para uma encomenda baseado em CEPs e características dos produtos
  */
@@ -126,11 +127,13 @@ const loader = async (
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Erro ao calcular frete: ${response.status} - ${errorText}`);
+    throw new Error(
+      `Erro ao calcular frete: ${response.status} - ${errorText}`,
+    );
   }
 
   const result = await response.json();
   return result;
 };
 
-export default loader; 
+export default loader;

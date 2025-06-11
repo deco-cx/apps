@@ -294,4 +294,4 @@ export interface SuperFreteClient {
       message: string;
     };
   };
-} 
+}
