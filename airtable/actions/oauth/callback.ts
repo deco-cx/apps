@@ -143,7 +143,7 @@ export default async function callback(
 
     return {
       installId: stateData.installId,
-      account
+      account,
     };
   }
 

@@ -12,6 +12,7 @@
 
       body {
         font-family:
+          Inter,
           -apple-system,
           BlinkMacSystemFont,
           "Segoe UI",
@@ -19,8 +20,8 @@
           sans-serif;
         margin: 0;
         padding: 20px;
-        background: #f8f9fa;
-        color: #2d3748;
+        background: #2925244d;
+        color: #f5f5f4;
         line-height: 1.5;
         min-height: 100vh;
         display: flex;
@@ -29,133 +30,88 @@
       }
 
       .container {
-        width: 100%;
-        max-width: 32rem;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e2e8f0;
+        width: 425px;
+        height: 572px;
+        background: #292524;
+        border-radius: 16px;
+        overflow: hidden;
+        border: none;
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #2925244d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
       }
 
       .selection-header {
         padding: 24px 24px 16px;
-        border-bottom: 1px solid #e2e8f0;
-        text-align: center;
+        background: #292524;
       }
 
-      .selection-title {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: #1a202c;
-      }
-
-      .selection-subtitle {
-        color: #64748b;
-        font-size: 14px;
-        margin-bottom: 16px;
-      }
-
-      .info-tooltip {
-        position: relative;
-        display: inline-block;
-        margin-left: 8px;
-      }
-
-      .tooltip-trigger {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        background: #64748b;
-        color: white;
-        font-size: 11px;
-        text-align: center;
-        line-height: 16px;
-        cursor: help;
-        font-weight: bold;
-      }
-
-      .tooltip-trigger:hover {
-        background: #475569;
-      }
-
-      .tooltip-content {
-        position: absolute;
-        top: 24px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: white;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 16px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-        width: 320px;
-        z-index: 1000;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.2s ease;
-        font-size: 13px;
-        line-height: 1.4;
-      }
-
-      .info-tooltip:hover .tooltip-content {
-        opacity: 1;
-        visibility: visible;
-      }
-
-      .tooltip-section {
+      .header-logo-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         margin-bottom: 12px;
       }
 
-      .tooltip-section:last-child {
-        margin-bottom: 0;
+      .airtable-logo {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
       }
 
-      .tooltip-section strong {
-        color: #1e293b;
-        display: block;
-        margin-bottom: 6px;
+      .header-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #f5f5f4;
+        flex: 1;
+        text-align: left;
+        margin: 0 16px;
       }
 
-      .tooltip-section ul {
-        margin: 0;
-        padding-left: 16px;
-        color: #475569;
-      }
-
-      .tooltip-section li {
-        margin-bottom: 2px;
-      }
-
-      .tooltip-content::before {
-        content: "";
+      .close-button {
         position: absolute;
-        top: -8px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
-        border-bottom: 8px solid #e2e8f0;
+        width: 16px;
+        height: 16px;
+        right: 16px;
+        top: 16px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        opacity: 0.7;
+        border-radius: 2px;
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+        z-index: 10;
       }
 
-      .tooltip-content::after {
-        content: "";
-        position: absolute;
-        top: -7px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
-        border-bottom: 8px solid white;
+      .selection-subtitle {
+        color: #a8a29e;
+        font-size: 14px;
+        text-align: left;
       }
 
       .selection-content {
-        padding: 24px;
+        padding: 0px 24px 24px 24px;
+        background: rgba(0, 0, 0, 0);
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
       }
 
       .search-section {
@@ -165,196 +121,238 @@
       .search-box {
         width: 100%;
         padding: 8px 12px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #57534e;
         border-radius: 6px;
         font-size: 14px;
+        background: #292524;
+        color: #57534e;
         transition: border-color 0.2s;
       }
 
       .search-box:focus {
         outline: none;
-        border-color: #2563eb;
+        border-color: #57534e;
       }
 
-      .tabs {
-        display: flex;
-        border-bottom: 1px solid #e2e8f0;
-        margin-bottom: 12px;
+      .search-box::placeholder {
+        color: #57534e;
       }
 
-      .tab {
+      .selection-list {
+        background: #292524;
+        border-radius: 0;
+        overflow: hidden;
+        border: none;
+        margin-bottom: 16px;
         flex: 1;
-        padding: 8px 12px;
-        text-align: center;
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-weight: 500;
-        color: #64748b;
-        transition: all 0.2s;
-        border-bottom: 2px solid transparent;
-        font-size: 14px;
-      }
-
-      .tab.active {
-        color: #2563eb;
-        border-bottom-color: #2563eb;
-      }
-
-      .select-all-section {
-        padding: 8px 12px;
-        border-bottom: 1px solid #e2e8f0;
-        background: #f8fafc;
-        display: flex;
-        gap: 12px;
-      }
-
-      .select-all-btn {
-        background: none;
-        border: none;
-        color: #2563eb;
-        cursor: pointer;
-        font-size: 12px;
-        font-weight: 500;
-        text-decoration: underline;
-      }
-
-      .select-all-btn:hover {
-        color: #1d4ed8;
-      }
-
-      .items-container {
-        height: 200px;
         overflow-y: auto;
-        border: 1px solid #e2e8f0;
-        border-radius: 0 0 6px 6px;
-        background: #fafafa;
       }
 
-      .item {
-        display: flex;
-        align-items: center;
-        padding: 8px 12px;
-        border-bottom: 1px solid #e2e8f0;
-        cursor: pointer;
-        transition: background-color 0.2s;
-      }
-
-      .item:last-child {
+      .base-item {
         border-bottom: none;
       }
 
-      .item:hover {
-        background: #f1f5f9;
+      .base-item:last-child {
+        border-bottom: none;
       }
 
-      .item.selected {
-        background: #eff6ff;
-        border-left: 3px solid #2563eb;
-      }
-
-      .item.auto-selected {
-        background: #f0fdf4;
-        border-left: 3px solid #16a34a;
-      }
-
-      .item.auto-selected .item-id::after {
-        content: " (auto)";
-        font-size: 11px;
-        color: #16a34a;
-        font-weight: 400;
-      }
-
-      .item-checkbox {
-        margin-right: 8px;
-        width: 14px;
-        height: 14px;
-      }
-
-      .item-id {
-        font-weight: 500;
-        flex: 1;
-        font-size: 14px;
-        font-family: monospace;
-      }
-
-      .item-count {
-        color: #64748b;
-        font-size: 11px;
-        background: #f1f5f9;
-        padding: 2px 6px;
-        border-radius: 10px;
-      }
-
-      .selection-summary {
-        margin: 12px 0;
+      .base-header {
+        display: flex;
+        align-items: center;
         padding: 8px 12px;
-        background: #dbeafe;
-        border: 1px solid #93c5fd;
-        border-radius: 6px;
-        color: #1e40af;
-        font-size: 13px;
-        text-align: center;
-        min-height: 33px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        background: #292524;
+      }
+
+      .base-header:hover {
+        background: #292524;
+      }
+
+      .base-checkbox {
+        margin-right: 8px;
+        width: 16px;
+        height: 16px;
+        border-radius: 2px;
+        background: #f5f5f4;
+        border: 1px solid #f5f5f4;
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
       }
 
-      .selection-summary.empty {
-        background: transparent;
-        border: 1px solid transparent;
-        color: transparent;
+      .base-checkbox.checked {
+        background: #f5f5f4;
+        border-color: #f5f5f4;
+      }
+
+      .base-checkbox.unchecked {
+        background: #292524;
+        border-color: #57534e;
+      }
+
+      .check-icon {
+        width: 10px;
+        height: 7px;
+        stroke: #292524;
+        stroke-width: 1.3px;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+        opacity: 1;
+        transition: opacity 0.2s;
+      }
+
+      .base-checkbox.unchecked .check-icon {
+        opacity: 0;
+      }
+
+      .base-label {
+        font-weight: 500;
+        flex: 1;
+        font-size: 14px;
+        color: #f5f5f4;
+      }
+
+      .expand-icon {
+        width: 16px;
+        height: 16px;
+        transition: transform 0.2s;
+        fill: #57534e;
+      }
+
+      .base-item.expanded .expand-icon {
+        transform: rotate(90deg);
+      }
+
+      .tables-container {
+        display: none;
+        background: #292524;
+      }
+
+      .base-item.expanded .tables-container {
+        display: block;
+      }
+
+      .table-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px 8px 32px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        border-top: none;
+      }
+
+      .table-item:hover {
+        background: #292524;
+      }
+
+      .table-item.search-match {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .table-checkbox {
+        margin-right: 8px;
+        width: 16px;
+        height: 16px;
+        border-radius: 2px;
+        background: #f5f5f4;
+        border: 1px solid #f5f5f4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+
+      .table-checkbox.checked {
+        background: #f5f5f4;
+        border-color: #f5f5f4;
+      }
+
+      .table-checkbox.unchecked {
+        background: #292524;
+        border-color: #57534e;
+      }
+
+      .table-label {
+        font-weight: 400;
+        flex: 1;
+        font-size: 14px;
+        color: #f5f5f4;
       }
 
       .no-results {
         text-align: center;
         padding: 24px 16px;
-        color: #64748b;
+        color: #737373;
         font-size: 14px;
       }
 
       .button-section {
-        text-align: center;
-        margin-top: 16px;
+        border-top: 1px solid #57534e;
+        padding: 16px 24px;
         display: flex;
-        gap: 8px;
-        justify-content: center;
+        gap: 16px;
+        justify-content: flex-end;
+        background: #292524;
+        flex-shrink: 0;
       }
 
       .btn {
-        padding: 8px 16px;
-        border-radius: 6px;
+        padding: 8px 12px;
+        border-radius: 12px;
         font-weight: 500;
         cursor: pointer;
         font-size: 14px;
         transition: all 0.2s;
-        border: 1px solid transparent;
+        border: none;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .btn-primary {
-        background: #2563eb;
-        color: white;
-        border-color: #2563eb;
+        background: #f5f5f4;
+        color: #292524;
+        padding: 8px 12px;
       }
 
       .btn-primary:hover {
-        background: #1d4ed8;
+        background: #e7e5e4;
       }
 
       .btn-secondary {
-        background: white;
-        color: #374151;
-        border-color: #d1d5db;
+        background: transparent;
+        color: #a8a29e;
+        border: 1px solid #404040;
       }
 
       .btn-secondary:hover {
-        background: #f9fafb;
+        background: #404040;
+        color: #f5f5f4;
       }
 
       .btn:disabled {
         opacity: 0.6;
         cursor: not-allowed;
+      }
+
+      /* Scrollbar */
+      .selection-list::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .selection-list::-webkit-scrollbar-track {
+        background: #404040;
+      }
+
+      .selection-list::-webkit-scrollbar-thumb {
+        background: #525252;
+        border-radius: 3px;
       }
 
       /* Responsive */
@@ -372,358 +370,438 @@
           padding: 16px;
         }
 
-        .items-container {
-          height: 150px;
+        .header-title {
+          font-size: 16px;
+          margin: 0 12px;
         }
 
         .button-section {
           flex-direction: column;
+          padding: 16px;
         }
 
         .btn {
           width: 100%;
         }
-
-        .tooltip-content {
-          width: 280px;
-          left: -140px;
-          transform: none;
-        }
-
-        .tooltip-content::before,
-        .tooltip-content::after {
-          left: 144px;
-          transform: none;
-        }
-      }
-
-      .items-container::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      .items-container::-webkit-scrollbar-track {
-        background: #f1f5f9;
-      }
-
-      .items-container::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 3px;
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <div class="selection-header">
-        <div class="selection-title">
-          MCP Connector is requesting Airtable access
-          <span class="info-tooltip">
-            <span class="tooltip-trigger">ⓘ</span>
-            <div class="tooltip-content">
-              <div class="tooltip-section">
-                <strong>MCP Connector will be able to see:</strong>
-                <ul>
-                  <li>The data in your records</li>
-                  <li>
-                    The structure of your base, like table names or field types
-                  </li>
-                </ul>
-              </div>
-              <div class="tooltip-section">
-                <strong>MCP Connector will be able to edit:</strong>
-                <ul>
-                  <li>Your records, including creating and deleting records</li>
-                  <li>
-                    The structure of your base, like adding new fields or tables
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </span>
-        </div>
-        <div class="selection-subtitle">
-          Select the bases and tables you want to make available to MCP
-          Connector.
-        </div>
-      </div>
-
-      <div class="selection-content">
-        <div class="search-section">
-          <input
-            type="search"
-            id="search-input"
-            class="search-box"
-            placeholder="Search bases and tables..."
-            oninput="handleSearch()"
+    <div class="modal-overlay">
+      <div class="container">
+        <button class="close-button" onclick="skipSelection()">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            style="position: absolute; left: 25%; right: 25%; top: 25%; bottom: 25%"
           >
+            <path
+              d="M12 4L4 12M4 4L12 12"
+              stroke="#F8FAFC"
+              stroke-width="1.33"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+        <div class="selection-header">
+          <div class="header-logo-section">
+            <svg
+              class="airtable-logo"
+              width="32"
+              height="27.2"
+              viewBox="0 0 200 170"
+              xmlns="http://www.w3.org/2000/svg"
+              style="shape-rendering: geometricprecision"
+            >
+              <g>
+                <path
+                  fill="rgb(255, 186, 5)"
+                  d="M90.0389,12.3675 L24.0799,39.6605 C20.4119,41.1785 20.4499,46.3885 24.1409,47.8515 L90.3759,74.1175 C96.1959,76.4255 102.6769,76.4255 108.4959,74.1175 L174.7319,47.8515 C178.4219,46.3885 178.4609,41.1785 174.7919,39.6605 L108.8339,12.3675 C102.8159,9.8775 96.0559,9.8775 90.0389,12.3675"
+                >
+                </path>
+                <path
+                  fill="rgb(57, 202, 255)"
+                  d="M105.3122,88.4608 L105.3122,154.0768 C105.3122,157.1978 108.4592,159.3348 111.3602,158.1848 L185.1662,129.5368 C186.8512,128.8688 187.9562,127.2408 187.9562,125.4288 L187.9562,59.8128 C187.9562,56.6918 184.8092,54.5548 181.9082,55.7048 L108.1022,84.3528 C106.4182,85.0208 105.3122,86.6488 105.3122,88.4608"
+                >
+                </path>
+                <path
+                  fill="rgb(220, 4, 59)"
+                  d="M88.0781,91.8464 L66.1741,102.4224 L63.9501,103.4974 L17.7121,125.6524 C14.7811,127.0664 11.0401,124.9304 11.0401,121.6744 L11.0401,60.0884 C11.0401,58.9104 11.6441,57.8934 12.4541,57.1274 C12.7921,56.7884 13.1751,56.5094 13.5731,56.2884 C14.6781,55.6254 16.2541,55.4484 17.5941,55.9784 L87.7101,83.7594 C91.2741,85.1734 91.5541,90.1674 88.0781,91.8464"
+                >
+                </path>
+                <path
+                  fill="rgba(0, 0, 0, 0.25)"
+                  d="M88.0781,91.8464 L66.1741,102.4224 L12.4541,57.1274 C12.7921,56.7884 13.1751,56.5094 13.5731,56.2884 C14.6781,55.6254 16.2541,55.4484 17.5941,55.9784 L87.7101,83.7594 C91.2741,85.1734 91.5541,90.1674 88.0781,91.8464"
+                >
+                </path>
+              </g>
+            </svg>
+            <span class="header-title">Airtable</span>
+          </div>
+          <div class="selection-subtitle">
+            Select the bases and tables you want to make available in this
+            integration.
+          </div>
         </div>
 
-        <div class="tabs">
-          <button class="tab active" onclick="switchTab('bases')">
-            Bases (<span id="bases-count">0</span>)
-          </button>
-          <button class="tab" onclick="switchTab('tables')">
-            Tables (<span id="tables-count">0</span>)
-          </button>
-        </div>
-
-        <div class="content-area">
-          <div id="bases-tab" class="tab-content">
-            <div class="select-all-section">
-              <button class="select-all-btn" onclick="selectAll('bases')">
-                Select all
-              </button>
-              <button class="select-all-btn" onclick="clearAll('bases')">
-                Clear all
-              </button>
+        <div class="selection-content">
+          <div class="search-section">
+            <div style="position: relative">
+              <svg
+                style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none"
+                width="17"
+                height="16"
+                viewBox="0 0 17 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M6.83333 10.6667C5.62222 10.6667 4.59722 10.2472 3.75833 9.40833C2.91944 8.56944 2.5 7.54444 2.5 6.33333C2.5 5.12222 2.91944 4.09722 3.75833 3.25833C4.59722 2.41944 5.62222 2 6.83333 2C8.04444 2 9.06944 2.41944 9.90833 3.25833C10.7472 4.09722 11.1667 5.12222 11.1667 6.33333C11.1667 6.82222 11.0889 7.28333 10.9333 7.71667C10.7778 8.15 10.5667 8.53333 10.3 8.86667L14.0333 12.6C14.1556 12.7222 14.2167 12.8778 14.2167 13.0667C14.2167 13.2556 14.1556 13.4111 14.0333 13.5333C13.9111 13.6556 13.7556 13.7167 13.5667 13.7167C13.3778 13.7167 13.2222 13.6556 13.1 13.5333L9.36667 9.8C9.03333 10.0667 8.65 10.2778 8.21667 10.4333C7.78333 10.5889 7.32222 10.6667 6.83333 10.6667ZM6.83333 9.33333C7.66667 9.33333 8.375 9.04167 8.95833 8.45833C9.54167 7.875 9.83333 7.16667 9.83333 6.33333C9.83333 5.5 9.54167 4.79167 8.95833 4.20833C8.375 3.625 7.66667 3.33333 6.83333 3.33333C6 3.33333 5.29167 3.625 4.70833 4.20833C4.125 4.79167 3.83333 5.5 3.83333 6.33333C3.83333 7.16667 4.125 7.875 4.70833 8.45833C5.29167 9.04167 6 9.33333 6.83333 9.33333Z"
+                  fill="#57534E"
+                />
+              </svg>
+              <input
+                type="search"
+                id="search-input"
+                class="search-box"
+                placeholder="Search"
+                style="padding-left: 40px"
+                oninput="handleSearch()"
+              >
             </div>
-            <div id="bases-container" class="items-container"></div>
           </div>
 
-          <div id="tables-tab" class="tab-content" style="display: none">
-            <div class="select-all-section">
-              <button class="select-all-btn" onclick="selectAll('tables')">
-                Select all
-              </button>
-              <button class="select-all-btn" onclick="clearAll('tables')">
-                Clear all
-              </button>
-            </div>
-            <div id="tables-container" class="items-container"></div>
+          <div
+            id="select-all-header"
+            style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #292524; margin-bottom: 0"
+          >
+            <!-- Header será gerado pelo JavaScript -->
+          </div>
+
+          <div class="selection-list" id="selection-list">
+            <!-- Content será gerado pelo JavaScript -->
           </div>
         </div>
-
-        <div id="selection-summary" class="selection-summary empty">&nbsp;</div>
 
         <div class="button-section">
           <button class="btn btn-secondary" onclick="skipSelection()">
             Skip selection
           </button>
           <button class="btn btn-primary" onclick="confirmSelection()">
-            Continue
+            Save
           </button>
         </div>
       </div>
     </div>
 
     <script>
-      const bases = "{{BASES_DATA}}";
-      const tables = "{{TABLES_DATA}}";
+      // Obtém os dados e faz o parsing se necessário
+      const basesData = "{{BASES_DATA}}";
+      const tablesData = "{{TABLES_DATA}}";
       const callbackUrl = "{{CALLBACK_URL}}";
 
-      let currentTab = "bases";
+      let bases, tables;
+      try {
+        bases = typeof basesData === "string"
+          ? JSON.parse(basesData)
+          : basesData;
+        tables = typeof tablesData === "string"
+          ? JSON.parse(tablesData)
+          : tablesData;
+      } catch (e) {
+        bases = basesData;
+        tables = tablesData;
+      }
+
       let selectedBases = new Set();
       let selectedTables = new Set();
+      let expandedBases = new Set();
       let filteredBases = [...bases];
       let filteredTables = [...tables];
 
       document.addEventListener("DOMContentLoaded", function () {
-        updateCounts();
-        renderCurrentTab();
+        // Pré-selecionar apenas algumas bases (baseado no design do Figma)
+        preselectPartial();
+        renderSelectionList();
+        updateSelectionSummary();
       });
 
-      function switchTab(tab) {
-        currentTab = tab;
+      function preselectPartial() {
+        // Apenas algumas bases selecionadas (2 of 4)
+        if (bases.length >= 2) {
+          selectedBases.add(bases[0].id); // Base 01 selecionado
+          selectedBases.add(bases[1].id); // Base 02 selecionado
+        }
 
-        document.querySelectorAll(".tab").forEach((t) =>
-          t.classList.remove("active")
-        );
-        event.target.classList.add("active");
+        // Selecionar todas as tabelas das bases selecionadas
+        tables.forEach((table) => {
+          if (selectedBases.has(table.baseId)) {
+            selectedTables.add(table.id);
+          }
+        });
 
-        document.getElementById("bases-tab").style.display =
-          tab === "bases" ? "block" : "none";
-        document.getElementById("tables-tab").style.display =
-          tab === "tables" ? "block" : "none";
-
-        renderCurrentTab();
+        // Expandir apenas a primeira base por padrão
+        if (bases.length >= 1) {
+          expandedBases.add(bases[0].id);
+        }
       }
 
       function handleSearch() {
         const query = document.getElementById("search-input").value
           .toLowerCase();
 
-        filteredBases = bases.filter((base) =>
-          base.id.toLowerCase().includes(query)
-        );
-
+        // Primeiro filtra as tabelas que correspondem à pesquisa
         filteredTables = tables.filter((table) =>
+          (table.name || table.id).toLowerCase().includes(query) ||
           table.id.toLowerCase().includes(query)
         );
 
-        renderCurrentTab();
-      }
+        // Em seguida, filtra as bases que correspondem à pesquisa OU que contêm tabelas filtradas
+        filteredBases = bases.filter((base) =>
+          (base.name || base.id).toLowerCase().includes(query) ||
+          base.id.toLowerCase().includes(query) ||
+          // Inclui bases que têm tabelas correspondentes à pesquisa
+          filteredTables.some((table) => table.baseId === base.id)
+        );
 
-      function renderCurrentTab() {
-        if (currentTab === "bases") {
-          renderBases();
-        } else {
-          renderTables();
+        // Se encontrou tabelas mas nenhuma base, inclui as bases das tabelas encontradas
+        if (filteredTables.length > 0 && filteredBases.length === 0) {
+          const baseIds = new Set(
+            filteredTables.map((table) => table.baseId),
+          );
+          filteredBases = bases.filter((base) => baseIds.has(base.id));
         }
+
+        renderSelectionList();
         updateSelectionSummary();
-        syncOtherTab();
       }
 
-      function syncOtherTab() {
-        if (currentTab === "bases") {
-          syncTablesTab();
-        } else {
-          syncBasesTab();
+      function renderSelectionList() {
+        const container = document.getElementById("selection-list");
+        const headerContainer = document.getElementById(
+          "select-all-header",
+        );
+
+        if (filteredBases.length === 0) {
+          container.innerHTML =
+            '<div class="no-results">No bases found</div>';
+          headerContainer.innerHTML = "";
+          return;
         }
-      }
 
-      function syncTablesTab() {
-        const container = document.getElementById("tables-container");
-        container.innerHTML = filteredTables.length === 0
-          ? '<div class="no-results">No tables found</div>'
-          : filteredTables.map(createTableItemHTML).join("");
-      }
+        const searchQuery = document.getElementById("search-input")
+          .value.toLowerCase();
+        const basesToShow = searchQuery
+          ? filteredBases
+          : bases.filter((base) => {
+            const baseTables = tables.filter((table) =>
+              table.baseId === base.id
+            );
+            return baseTables.some((table) =>
+              filteredTables.includes(table)
+            );
+          });
 
-      function syncBasesTab() {
-        const container = document.getElementById("bases-container");
-        container.innerHTML = filteredBases.length === 0
-          ? '<div class="no-results">No bases found</div>'
-          : filteredBases.map(createBaseItemHTML).join("");
-      }
+        // Verificar se há um termo de pesquisa ativo
+        if (searchQuery) {
+          // Expandir automaticamente as bases que têm tabelas que correspondem à pesquisa
+          const basesWithMatchingTables = new Set();
+          filteredTables.forEach((table) => {
+            const baseId = table.baseId;
+            if (
+              baseId &&
+              (table.name || "").toLowerCase().includes(searchQuery)
+            ) {
+              basesWithMatchingTables.add(baseId);
+            }
+          });
 
-      function renderBases() {
-        const container = document.getElementById("bases-container");
-        container.innerHTML = filteredBases.length === 0
-          ? '<div class="no-results">No bases found</div>'
-          : filteredBases.map(createBaseItemHTML).join("");
-      }
+          // Adicionar essas bases ao conjunto de bases expandidas
+          basesWithMatchingTables.forEach((baseId) => {
+            expandedBases.add(baseId);
+          });
+        }
 
-      function renderTables() {
-        const container = document.getElementById("tables-container");
-        container.innerHTML = filteredTables.length === 0
-          ? '<div class="no-results">No tables found</div>'
-          : filteredTables.map(createTableItemHTML).join("");
+        // Header fixo com "Select all" e contagem
+        const selectAllChecked = selectedBases.size === bases.length
+          ? "checked"
+          : "unchecked";
+        const totalBases = selectedBases.size;
+        const totalBasesCount = bases.length;
+
+        const headerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px;" onclick="toggleSelectAll()">
+            <div class="base-checkbox ${selectAllChecked}" style="cursor: pointer;">
+              <svg class="check-icon" viewBox="0 0 16 12">
+                <path d="M1 6l4 4 8-8" />
+              </svg>
+            </div>
+            <span style="font-weight: 500; font-size: 14px; color: #f5f5f4; cursor: pointer;">Select all</span>
+          </div>
+          <span style="color: #57534E; font-size: 14px;">${totalBases} of ${totalBasesCount} bases selected</span>
+        `;
+
+        headerContainer.innerHTML = headerHTML;
+        container.innerHTML = basesToShow.map(createBaseItemHTML).join(
+          "",
+        );
       }
 
       function createBaseItemHTML(base) {
         const isSelected = selectedBases.has(base.id);
-        const isAuto = isSelected && isBaseAutoSelected(base.id);
-        const cssClass = isAuto
-          ? "auto-selected"
-          : (isSelected ? "selected" : "");
-        const tableCount =
-          tables.filter((table) => table.baseId === base.id).length;
+        const isExpanded = expandedBases.has(base.id);
+        const baseTables = tables.filter((table) =>
+          table.baseId === base.id
+        );
+        const filteredBaseTables = baseTables.filter((table) =>
+          filteredTables.includes(table)
+        );
+
+        // Verifica se esta base tem tabelas que correspondem à pesquisa
+        const searchQuery = document.getElementById("search-input")
+          .value.toLowerCase();
+        const hasMatchingTables = searchQuery &&
+          filteredBaseTables.length > 0;
+
+        // Forçar a expansão se houver tabelas correspondentes à pesquisa
+        const shouldBeExpanded = isExpanded || hasMatchingTables;
+
+        const tablesHTML = filteredBaseTables.map((table) =>
+          createTableItemHTML(table)
+        ).join("");
 
         return `
-        <div class="item ${cssClass}" onclick="toggleSelection('bases', '${base.id}')">
-          <input type="checkbox" class="item-checkbox" ${
-          isSelected ? "checked" : ""
-        } 
-                 onchange="event.stopPropagation(); toggleSelection('bases', '${base.id}')">
-          <span class="item-id">${base.id}</span>
-          <span class="item-count">${tableCount} tables</span>
-        </div>
-      `;
+          <div class="base-item ${shouldBeExpanded ? "expanded" : ""}">
+            <div class="base-header" onclick="toggleBaseExpansion('${base.id}')">
+              <div class="base-checkbox ${
+          isSelected ? "checked" : "unchecked"
+        }" onclick="event.stopPropagation(); toggleBaseSelection('${base.id}')">
+                <svg class="check-icon" viewBox="0 0 16 12">
+                  <path d="M1 6l4 4 8-8" />
+                </svg>
+              </div>
+              <span class="base-label">${base.name || base.id}</span>
+              <svg class="expand-icon" viewBox="0 0 16 16">
+                <path d="M6 12l6-6-6-6" />
+              </svg>
+            </div>
+            <div class="tables-container">
+              ${tablesHTML}
+            </div>
+          </div>
+        `;
       }
 
       function createTableItemHTML(table) {
         const isSelected = selectedTables.has(table.id);
-        const cssClass = isSelected ? "selected" : "";
+        const searchQuery = document.getElementById("search-input")
+          .value.toLowerCase();
+
+        // Verificar se esta tabela corresponde diretamente à pesquisa
+        const matchesSearch = searchQuery &&
+          ((table.name || "").toLowerCase().includes(searchQuery) ||
+            table.id.toLowerCase().includes(searchQuery));
+
+        // Adicionar classe para destacar visualmente as tabelas que correspondem à pesquisa
+        const highlightClass = matchesSearch ? "search-match" : "";
 
         return `
-        <div class="item ${cssClass}" onclick="toggleSelection('tables', '${table.id}')">
-          <input type="checkbox" class="item-checkbox" ${
-          isSelected ? "checked" : ""
-        } 
-                 onchange="event.stopPropagation(); toggleSelection('tables', '${table.id}')">
-          <span class="item-id">${table.id}</span>
-        </div>
-      `;
+          <div class="table-item ${highlightClass}" onclick="toggleTableSelection('${table.id}')">
+            <div class="table-checkbox ${
+          isSelected ? "checked" : "unchecked"
+        }">
+              <svg class="check-icon" viewBox="0 0 16 12">
+                <path d="M1 6l4 4 8-8" />
+              </svg>
+            </div>
+            <span class="table-label">${table.name || table.id}</span>
+          </div>
+        `;
       }
 
-      function isBaseAutoSelected(baseId) {
-        if (!selectedBases.has(baseId)) return false;
-        return tables.some((table) =>
-          table.baseId === baseId && selectedTables.has(table.id)
+      function toggleBaseExpansion(baseId) {
+        if (expandedBases.has(baseId)) {
+          expandedBases.delete(baseId);
+        } else {
+          expandedBases.add(baseId);
+        }
+        renderSelectionList();
+      }
+
+      function toggleBaseSelection(baseId) {
+        const baseTables = tables.filter((table) =>
+          table.baseId === baseId
         );
+
+        if (selectedBases.has(baseId)) {
+          // Desselecionar base e todas as suas tabelas
+          selectedBases.delete(baseId);
+          baseTables.forEach((table) =>
+            selectedTables.delete(table.id)
+          );
+        } else {
+          // Selecionar base e todas as suas tabelas
+          selectedBases.add(baseId);
+          baseTables.forEach((table) => selectedTables.add(table.id));
+        }
+
+        renderSelectionList();
+        updateSelectionSummary();
       }
 
-      function toggleSelection(type, id) {
-        const selectedSet = type === "bases"
-          ? selectedBases
-          : selectedTables;
+      function toggleTableSelection(tableId) {
+        const table = tables.find((t) => t.id === tableId);
 
-        if (selectedSet.has(id)) {
-          selectedSet.delete(id);
+        if (selectedTables.has(tableId)) {
+          selectedTables.delete(tableId);
 
-          if (type === "bases") {
-            tables.filter((table) => table.baseId === id)
-              .forEach((table) => selectedTables.delete(table.id));
+          // Verificar se ainda há tabelas selecionadas desta base
+          const baseTables = tables.filter((t) =>
+            t.baseId === table.baseId
+          );
+          const selectedBaseTables = baseTables.filter((t) =>
+            selectedTables.has(t.id)
+          );
+
+          if (selectedBaseTables.length === 0) {
+            selectedBases.delete(table.baseId);
           }
         } else {
-          selectedSet.add(id);
+          selectedTables.add(tableId);
 
-          if (type === "tables") {
-            const table = tables.find((t) => t.id === id);
-            if (table && table.baseId) {
-              selectedBases.add(table.baseId);
-            }
+          // Auto-selecionar a base se uma tabela for selecionada
+          if (table.baseId) {
+            selectedBases.add(table.baseId);
           }
         }
 
-        renderCurrentTab();
-        updateCounts();
+        renderSelectionList();
+        updateSelectionSummary();
       }
 
-      function selectAll(type) {
-        const items = type === "bases" ? filteredBases : filteredTables;
-        const selectedSet = type === "bases"
-          ? selectedBases
-          : selectedTables;
+      function toggleSelectAll() {
+        const allSelected = selectedBases.size === bases.length;
 
-        items.forEach((item) => {
-          selectedSet.add(item.id);
+        if (allSelected) {
+          // Desselecionar tudo
+          selectedBases.clear();
+          selectedTables.clear();
+        } else {
+          // Selecionar tudo
+          bases.forEach((base) => selectedBases.add(base.id));
+          tables.forEach((table) => selectedTables.add(table.id));
+        }
 
-          if (type === "tables" && item.baseId) {
-            selectedBases.add(item.baseId);
-          }
-        });
-
-        renderCurrentTab();
-        updateCounts();
-      }
-
-      function clearAll(type) {
-        const items = type === "bases" ? filteredBases : filteredTables;
-        const selectedSet = type === "bases"
-          ? selectedBases
-          : selectedTables;
-
-        items.forEach((item) => {
-          selectedSet.delete(item.id);
-
-          if (type === "bases") {
-            tables.filter((table) => table.baseId === item.id)
-              .forEach((table) => selectedTables.delete(table.id));
-          }
-        });
-
-        renderCurrentTab();
-        updateCounts();
-      }
-
-      function updateCounts() {
-        document.getElementById("bases-count").textContent =
-          selectedBases.size;
-        document.getElementById("tables-count").textContent =
-          selectedTables.size;
+        renderSelectionList();
+        updateSelectionSummary();
       }
 
       function updateSelectionSummary() {
-        const summary = document.getElementById("selection-summary");
-        const total = selectedBases.size + selectedTables.size;
-
-        if (total > 0) {
-          summary.className = "selection-summary";
-          summary.innerHTML =
-            `Selected: ${selectedBases.size} bases and ${selectedTables.size} tables (${total} total)`;
-        } else {
-          summary.className = "selection-summary empty";
-          summary.innerHTML = "&nbsp;";
-        }
+        // Esta função foi removida pois o summary não existe mais
+        // A contagem agora é mostrada no header "X of Y bases selected"
       }
 
       function skipSelection() {
