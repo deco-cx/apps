@@ -65,19 +65,16 @@ export interface ListRecordsOptions {
   returnFieldsByFieldId?: boolean;
 }
 
-// Specific type for the response of listing records
 export interface ListRecordsResponse {
   records: AirtableRecord[];
   offset?: string;
 }
 
-// For creating a single record
 export interface CreateRecordBody {
   fields: FieldSet;
   typecast?: boolean;
 }
 
-// For updating records
 export interface UpdateRecordsBody {
   records: Array<{ id: string; fields: FieldSet }>;
   typecast?: boolean;
@@ -90,35 +87,31 @@ export interface UpdateRecordsBody {
 export interface CreateTableBody {
   name: string;
   description?: string;
-  fields: Field[]; // The service method uses Field[] which implies id might not be there for new fields.
-  // However, Airtable API expects field definitions.
-  // Let's assume Field might have id undefined for new ones.
-  primaryFieldId?: string; // Or fieldIdToPrimaryFieldId depending on API version/docs.
-  // The service used `fields: Field[]` without primary field explicit in params.
-  // It's usually part of the fields definitions or a separate param.
+  fields: Field[];
+  primaryFieldId?: string;
 }
 
-// For updating a table
 export interface UpdateTableBody {
   name?: string;
   description?: string;
   primaryFieldId?: string;
 }
 
-// For creating a field (Omit 'id' as it's generated)
 export type CreateFieldBody = Omit<Field, "id">;
 
-// For updating a field
 export interface UpdateFieldBody {
   name?: string;
   description?: string;
-  // type?: string; // Type changes are complex and might not be supported or have caveats
-  // options?: unknown;
 }
 
-// Secret type from NewAppPrompt
-export interface Secret {
-  get: () => string;
+export interface AirtableBase {
+  id: string;
+  name?: string;
+}
+
+export interface AirtableTable {
+  id: string;
+  name?: string;
 }
 
 export interface WhoamiResponse {

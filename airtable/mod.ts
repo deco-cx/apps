@@ -16,6 +16,7 @@ import {
   OAuthProvider,
   OAuthTokens,
 } from "../mcp/oauth.ts";
+import type { AirtableBase, AirtableTable } from "./utils/types.ts";
 
 export const AirtableProvider: OAuthProvider = {
   name: "Airtable",
@@ -44,6 +45,24 @@ export interface Props {
    * @description OAuth client ID for authentication
    */
   clientId?: string;
+
+  /**
+   * @title Permission
+   * @description Permission to access the Airtable API and selected bases and tables
+   */
+  permission?: {
+    /**
+     * @title Bases
+     * @description Array of selected base IDs that AI can access
+     */
+    bases?: AirtableBase[];
+
+    /**
+     * @title Tables
+     * @description Array of selected table IDs that AI can access
+     */
+    tables?: AirtableTable[];
+  };
 }
 
 export interface State extends Props {

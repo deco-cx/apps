@@ -1,7 +1,11 @@
 import type { AppContext } from "../mod.ts";
 import type { BaseSchemaResponse } from "../utils/types.ts";
+import {
+  filterProps,
+  filterResponseByPermission,
+} from "../utils/permission-checker.ts";
 
-interface Props {
+interface Props extends Record<string, unknown> {
   /**
    * @title Base ID
    * @description The ID of the Airtable base (e.g., appXXXXXXXXXXXXXX).
@@ -24,11 +28,16 @@ const loader = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<BaseSchemaResponse | Response> => {
-  const { baseId, offset } = props;
-
   if (!ctx.client) {
     return new Response("OAuth authentication is required", { status: 401 });
   }
+
+  const filteredProps = filterProps(ctx, props);
+  if (filteredProps instanceof Response) {
+    return filteredProps;
+  }
+
+  const { baseId, offset } = filteredProps as Props;
 
   const params: { baseId: string; offset?: string } = { baseId };
   if (offset) {
@@ -43,7 +52,8 @@ const loader = async (
     throw new Error(`Error getting base schema: ${response.statusText}`);
   }
 
-  return response.json();
+  const data = await response.json();
+  return filterResponseByPermission(data, ctx.permission) as BaseSchemaResponse;
 };
 
 export default loader;

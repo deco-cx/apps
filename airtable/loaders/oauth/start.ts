@@ -32,7 +32,6 @@ export interface Props {
   codeVerifier?: string;
 }
 
-// Function to generate a random code verifier for PKCE
 function generateCodeVerifier(): string {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
@@ -42,7 +41,6 @@ function generateCodeVerifier(): string {
     .replace(/=/g, "");
 }
 
-// Function to generate code challenge from verifier
 async function generateCodeChallenge(verifier: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(verifier);
@@ -54,6 +52,7 @@ async function generateCodeChallenge(verifier: string): Promise<string> {
 }
 
 /**
+ * @name START_OAUTH_FLOW
  * @title Start OAuth Flow
  * @description Redirects to Airtable's OAuth authorization page with PKCE support
  */

@@ -1,5 +1,7 @@
 import type { AppContext } from "../../mod.ts";
 import { OAUTH_URL_TOKEN } from "../../utils/constants.ts";
+import { fetchBasesAndTables } from "../../utils/ui-templates/airtable-client.ts";
+import { generateSelectionPage } from "../../utils/ui-templates/page-generator.ts";
 
 interface OAuthTokenResponse {
   access_token: string;
@@ -46,24 +48,45 @@ export interface Props {
    * @description The same redirect URI used in the authorization request
    */
   redirectUri: string;
+
+  /**
+   * @title Query Params
+   * @description The query parameters from the request
+   */
+  queryParams: Record<string, string>;
 }
 
-// Function to extract code_verifier from state
 function extractCodeVerifier(state: string): string | null {
   try {
-    console.log("Attempting to parse state:", state);
     const stateData = JSON.parse(atob(state));
-    console.log("Parsed state data:", stateData);
     const codeVerifier = stateData.code_verifier || null;
-    console.log(
-      "Extracted code_verifier:",
-      codeVerifier ? "found" : "not found",
-    );
     return codeVerifier;
-  } catch (error) {
-    console.error("Failed to parse state parameter:", error);
+  } catch (_error) {
     return null;
   }
+}
+
+interface StateProvider {
+  original_state?: string;
+  code_verifier?: string;
+}
+interface State {
+  appName: string;
+  installId: string;
+  invokeApp: string;
+  returnUrl?: string | null;
+  redirectUri?: string | null;
+}
+
+function decodeState(state: string): State & StateProvider {
+  const decoded = atob(decodeURIComponent(state));
+  const parsed = JSON.parse(decoded) as State & StateProvider;
+
+  if (parsed.original_state) {
+    return decodeState(parsed.original_state);
+  }
+
+  return parsed;
 }
 
 /**
@@ -78,12 +101,54 @@ export default async function callback(
     clientId,
     clientSecret,
     redirectUri,
+    queryParams,
   }: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
-): Promise<{ installId: string; error?: string; account?: string }> {
+): Promise<Response | Record<string, unknown>> {
+  const { isSaveBase, skip } = queryParams;
+
+  if (isSaveBase) {
+    const { selectedBases, selectedTables } = queryParams;
+    const stateData = decodeState(state);
+
+    if (skip === "true") {
+      return {
+        installId: stateData.installId,
+      };
+    }
+
+    const basesArray = selectedBases
+      ? selectedBases.split(",").map((id) => ({ id }))
+      : [];
+
+    const tablesArray = selectedTables
+      ? selectedTables.split(",").map((id) => ({ id }))
+      : [];
+
+    const currentCtx = await ctx.getConfiguration();
+    await ctx.configure({
+      ...currentCtx,
+      permission: {
+        bases: basesArray,
+        tables: tablesArray,
+      },
+    });
+
+    const account = await ctx.invoke.airtable.loaders.whoami({
+      accessToken: ctx.tokens?.access_token,
+    })
+      .then((user) => user.email)
+      .catch(console.error) || undefined;
+
+    return {
+      installId: stateData.installId,
+      account,
+    };
+  }
+
   try {
-    const uri = redirectUri || new URL("/oauth/callback", _req.url).href;
+    const uri = redirectUri || new URL("/oauth/callback", req.url).href;
 
     const codeVerifier = extractCodeVerifier(state);
     if (!codeVerifier) {
@@ -113,12 +178,6 @@ export default async function callback(
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Token exchange failed:", {
-        tokenRequestBody,
-        status: response.status,
-        statusText: response.statusText,
-        body: errorText,
-      });
       throw new Error(`Token exchange failed: ${response.status} ${errorText}`);
     }
 
@@ -140,15 +199,19 @@ export default async function callback(
       clientId: clientId,
     });
 
-    const account = await ctx.invoke.airtable.loaders.whoami({
-      accessToken: tokenData.access_token,
-    })
-      .then((user) => user.email)
-      .catch(console.error) || undefined;
+    const newURL = req.url;
+    const data = await fetchBasesAndTables(tokenData);
 
-    return { installId, account };
+    const selectionHtml = generateSelectionPage({
+      bases: data.bases,
+      tables: data.tables,
+      callbackUrl: newURL,
+    });
+
+    return new Response(selectionHtml, {
+      headers: { "Content-Type": "text/html" },
+    });
   } catch (error) {
-    console.error("OAuth callback error:", error);
     return {
       installId,
       error: error instanceof Error ? error.message : "Unknown error",
