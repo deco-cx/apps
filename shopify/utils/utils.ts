@@ -152,6 +152,12 @@ export const getFiltersByUrl = (url: URL) => {
           value: value,
         },
       });
+    } else if (key.startsWith("filter.p.t.category")) {
+      filters.push({
+        category: {
+          id: value,
+        },
+      })
     }
   });
   return filters;
