@@ -6223,6 +6223,8 @@ export type ProductFilter = {
   productVendor?: InputMaybe<Scalars['String']['input']>;
   /** A product tag to filter on. */
   tag?: InputMaybe<Scalars['String']['input']>;
+  /** A standard product attribute metafield to filter on. */
+  taxonomyMetafield?: InputMaybe<TaxonomyMetafieldFilter>;
   /** A variant metafield to filter on. */
   variantMetafield?: InputMaybe<MetafieldFilter>;
   /** A variant option to filter on. */
@@ -7463,6 +7465,16 @@ export type SubmitThrottled = {
    *
    */
   pollAfter: Scalars['DateTime']['output'];
+};
+
+/** A filter used to view a subset of products in a collection matching a specific taxonomy metafield value. */
+export type TaxonomyMetafieldFilter = {
+  /** The key of the metafield to filter on. */
+  key: Scalars['String']['input'];
+  /** The namespace of the metafield to filter on. */
+  namespace: Scalars['String']['input'];
+  /** The value of the metafield. */
+  value: Scalars['String']['input'];
 };
 
 /**

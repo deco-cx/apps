@@ -20270,6 +20270,59 @@
           "possibleTypes": null
         },
         {
+          "kind": "INPUT_OBJECT",
+          "name": "TaxonomyMetafieldFilter",
+          "description": "A filter used to view a subset of products in a collection matching a specific taxonomy metafield value.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "key",
+              "description": "The key of the metafield to filter on.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "namespace",
+              "description": "The namespace of the metafield to filter on.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "value",
+              "description": "The value of the metafield.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "UNION",
           "name": "MetafieldParentResource",
           "description": "A resource that the metafield belongs to.",
@@ -27055,6 +27108,16 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "taxonomyMetafield",
+              "description": "A standard product attribute metafield to filter on.",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "TaxonomyMetafieldFilter",
                 "ofType": null
               },
               "defaultValue": null
