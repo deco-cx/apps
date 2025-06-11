@@ -135,8 +135,15 @@ export default async function callback(
       },
     });
 
+    const account = await ctx.invoke.airtable.loaders.whoami({
+      accessToken: ctx.tokens?.access_token,
+    })
+      .then((user) => user.email)
+      .catch(console.error) || undefined;
+
     return {
       installId: stateData.installId,
+      account
     };
   }
 
