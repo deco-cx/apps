@@ -118,9 +118,20 @@ export default async function callback(
     const { selectedBases, selectedTables } = queryParams;
     const stateData = decodeState(state);
 
+    const account = await ctx.invoke.airtable.loaders.whoami({
+      accessToken: ctx.tokens?.access_token,
+    })
+      .then((user) => user.email)
+      .catch((error) => {
+        console.error("Erro ao obter informações do usuário:", error);
+        return undefined;
+      }) || undefined;
+    console.log("account", account);
+
     if (skip === "true") {
       return {
         installId: stateData.installId,
+        account,
       };
     }
 
@@ -140,15 +151,6 @@ export default async function callback(
         tables: tablesArray,
       },
     });
-
-    const account = await ctx.invoke.airtable.loaders.whoami({
-      accessToken: ctx.tokens?.access_token,
-    })
-      .then((user) => user.email)
-      .catch((error) => {
-        console.error("Erro ao obter informações do usuário:", error);
-        return undefined;
-      }) || undefined;
 
     return {
       installId: stateData.installId,

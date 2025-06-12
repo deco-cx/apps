@@ -8,9 +8,9 @@ interface Props {
   baseId: string;
 
   /**
-   * @title Table ID or Name
+   * @title Table ID
    */
-  tableIdOrName: string;
+  tableId: string;
 
   /**
    * @title Record IDs to Delete
@@ -28,7 +28,7 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<{ records: Array<{ id: string; deleted: boolean }> } | Response> => {
-  const { baseId, tableIdOrName, recordIds } = props;
+  const { baseId, tableId, recordIds } = props;
 
   if (!ctx.client) {
     return new Response("OAuth authentication is required", { status: 401 });
@@ -50,8 +50,8 @@ const action = async (
     throw new Error("Maximum 10 records can be deleted at once");
   }
 
-  const response = await ctx.client["DELETE /v0/:baseId/:tableIdOrName"](
-    { baseId, tableIdOrName, "records[]": recordIds },
+  const response = await ctx.client["DELETE /v0/:baseId/:tableId"](
+    { baseId, tableId, "records[]": recordIds },
   );
 
   if (!response.ok) {
