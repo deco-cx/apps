@@ -169,18 +169,29 @@ export const createHttpClient = <T>(
         const compiled = path
           .split("/")
           .flatMap((segment) => {
-            const isTemplate = segment.at(0) === ":" || segment.at(0) === "*";
-            const isRequred = segment.at(-1) !== "?";
+            const isPathParameter = segment.at(0) === ":";
+            const isWildcard = segment.at(0) === "*";
+            const isRequired = segment.at(-1) !== "?";
+
+            const isTemplate = isPathParameter || isWildcard;
             if (!isTemplate) {
               return segment;
             }
-            const name = segment.slice(1, !isRequred ? -1 : undefined);
+
+            const templateChar = isWildcard ? "*" : ":";
+            const [_, nameWithOptional, ...rest] = segment.split(templateChar);
+            const name = isRequired
+              ? nameWithOptional
+              : nameWithOptional.slice(0, -1);
 
             const param = mapped.get(name);
-            if (param === undefined && isRequred) {
+            if (param === undefined && isRequired) {
               throw new TypeError(`HttpClient: Missing ${name} at ${path}`);
             }
-            return param;
+
+            return rest.length > 0
+              ? `${param}:${rest.join(templateChar)}`
+              : param;
           })
           .filter((x) =>
             typeof x === "string"
