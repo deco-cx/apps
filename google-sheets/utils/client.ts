@@ -68,7 +68,7 @@ export interface GoogleSheetsClient {
       responseDateTimeRenderOption?: string;
     };
   };
-  "POST /v4/spreadsheets/:spreadsheetId/values:batchUpdate": {
+  "POST /v4/spreadsheets/:spreadsheetId/values%3AbatchUpdate": {
     response: BatchUpdateValuesResponse;
     body: BatchUpdateValuesRequest;
   };
