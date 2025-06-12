@@ -1,5 +1,4 @@
 import { AppContext } from "../mod.ts";
-import { GOOGLE_SHEETS_URL } from "../utils/constant.ts";
 import type { SimpleBatchUpdateResponse } from "../utils/types.ts";
 import {
   mapActionPropsToSimpleBatchUpdate,
