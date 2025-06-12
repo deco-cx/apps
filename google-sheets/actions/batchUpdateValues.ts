@@ -90,7 +90,8 @@ const action = async (
     const { body } = mapSimpleBatchUpdatePropsToApi(simpleProps);
 
     const response = await ctx.client
-      ["POST /v4/spreadsheets/:spreadsheetId/values%3AbatchUpdate"]({
+      ["POST /v4/spreadsheets/:spreadsheetId:batchUpdate"]({
+        // @ts-expect-error Google thought putting : on the endpoint path was cool. Our client handles it, but the types are not inferred.
         spreadsheetId: props.spreadsheet_id,
       }, {
         body,
