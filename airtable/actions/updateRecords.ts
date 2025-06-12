@@ -17,9 +17,9 @@ interface Props {
   baseId: string;
 
   /**
-   * @title Table ID or Name
+   * @title Table ID
    */
-  tableIdOrName: string;
+  tableId: string;
 
   /**
    * @title Records to Update
@@ -51,7 +51,7 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<{ records: AirtableRecord[] } | Response> => {
-  const { baseId, tableIdOrName, records, typecast, performUpsert } = props;
+  const { baseId, tableId, records, typecast, performUpsert } = props;
 
   if (!ctx.client) {
     return new Response("OAuth authentication is required", { status: 401 });
@@ -67,8 +67,8 @@ const action = async (
     body.performUpsert = performUpsert;
   }
 
-  const response = await ctx.client["PATCH /v0/:baseId/:tableIdOrName"](
-    { baseId, tableIdOrName },
+  const response = await ctx.client["PATCH /v0/:baseId/:tableId"](
+    { baseId, tableId },
     { body },
   );
 

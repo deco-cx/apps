@@ -10,10 +10,10 @@ interface Props extends Record<string, unknown> {
   baseId: string;
 
   /**
-   * @title Table ID or Name
-   * @description The ID or name of the table within the base.
+   * @title Table ID
+   * @description The ID of the table within the base.
    */
-  tableIdOrName: string;
+  tableId: string;
 
   /**
    * @title Search Term
@@ -97,7 +97,7 @@ const loader = async (
     filterByFormula = `SEARCH("${searchTerm}", {*})`;
   }
 
-  const response = await ctx.client["GET /v0/:baseId/:tableIdOrName"]({
+  const response = await ctx.client["GET /v0/:baseId/:tableId"]({
     ...otherProps,
     filterByFormula,
   });
