@@ -10,8 +10,8 @@ interface Props extends Record<string, unknown> {
   baseId: string;
 
   /**
-   * @title Table ID or Name
-   * @description The ID or name of the table within the base.
+   * @title Table ID
+   * @description The ID of the table within the base.
    */
   tableId: string;
 
