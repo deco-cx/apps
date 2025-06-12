@@ -24,7 +24,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 export default function App(
   props: Props,
   _req: Request,
-  ctx?: McpContext<Props>,
+  _ctx?: McpContext<Props>,
 ) {
   const client = createHttpClient<AffinityAPI>({
     base: "https://api.affinity.co",

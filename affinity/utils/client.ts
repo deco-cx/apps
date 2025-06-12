@@ -31,4 +31,3 @@ export interface AffinityAPI {
     };
   };
 }
-
