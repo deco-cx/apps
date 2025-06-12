@@ -8,9 +8,9 @@ interface Props {
   baseId: string;
 
   /**
-   * @title Table ID or Name
+   * @title Table ID
    */
-  tableIdOrName: string;
+  tableId: string;
 
   /**
    * @title Record Fields
@@ -26,15 +26,16 @@ interface Props {
 }
 
 /**
+ * @name Create_New_Record
  * @title Create Airtable Record
- * @description Creates a new record in a specified table using OAuth.
+ * @description Creates multiple records. Your request body must include an array of up to 10 record objects. Each of these objects must have a key whose value is an internal object containing the cell values ​​of your record, indexed by field ID.
  */
 const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<AirtableRecord | Response> => {
-  const { baseId, tableIdOrName, fields, typecast } = props;
+  const { baseId, tableId, fields, typecast } = props;
 
   if (!ctx.client) {
     return new Response("OAuth authentication is required", { status: 401 });
@@ -45,14 +46,23 @@ const action = async (
     ...(typecast !== undefined && { typecast }),
   };
 
-  const response = await ctx.client["POST /v0/:baseId/:tableIdOrName"](
-    { baseId, tableIdOrName },
+  const response = await ctx.client["POST /v0/:baseId/:tableId"](
+    { baseId, tableId },
     { body },
   );
 
   if (!response.ok) {
     throw new Error(`Error creating record: ${response.statusText}`);
   }
+
+  const config = await ctx.getConfiguration();
+  await ctx.configure({
+    ...config,
+    permission: {
+      ...config.permission,
+      tables: [...(config.permission?.tables ?? []), { id: (await response.json()).id }],
+    },
+  });
 
   return response.json();
 };

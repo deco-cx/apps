@@ -16,8 +16,9 @@ interface Props extends CreateFieldBody {
 }
 
 /**
+ * @name Create_New_Field
  * @title Create Airtable Field
- * @description Creates a new field in a specified table using OAuth (Metadata API).
+ * @description Creates multiple records. See Field types for supported field types, the recording format for field options, and other specifications for specific field types. Supported field types have a recording format displayed.
  * @see https://airtable.com/developers/web/api/create-field
  */
 const action = async (

@@ -23,7 +23,7 @@ export interface AirtableClient {
   "GET /v0/meta/whoami": {
     response: WhoamiResponse;
   };
-  
+
   /**
    * List bases
    * @see https://airtable.com/developers/web/api/list-bases
@@ -66,7 +66,7 @@ export interface AirtableClient {
    * Let's define it for creating a single record as per the IAirtableService.createRecord
    * @see https://airtable.com/developers/web/api/create-records
    */
-  "POST /v0/:baseId/:tableIdOrName": {
+  "POST /v0/:baseId/:tableId": {
     body: CreateRecordBody; // { fields: FieldSet, typecast?: boolean }
     response: AirtableRecord;
   };
@@ -123,5 +123,34 @@ export interface AirtableClient {
   "PATCH /v0/meta/bases/:baseId/tables/:tableId/fields/:fieldId": {
     body: UpdateFieldBody; // { name?: string, description?: string }
     response: Field; // Returns the full Field object
+  };
+
+  /**
+   * Create base
+   * @see https://airtable.com/developers/web/api/create-base
+   */
+  "POST /v0/meta/bases": {
+    body: {
+      name: string;
+      workspaceId: string;
+      tables: Array<{
+        name: string;
+        description?: string;
+        fields: Array<{
+          name: string;
+          type: string;
+          description?: string;
+          options?: {
+            choices?: Array<{
+              name: string;
+              color?: string;
+            }>;
+            color?: string;
+            icon?: string;
+          };
+        }>;
+      }>;
+    };
+    response: { id: string; tables: Table[] };
   };
 }

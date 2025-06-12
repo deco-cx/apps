@@ -91,6 +91,7 @@ interface Props {
 }
 
 /**
+ * @name Create_New_Table
  * @title Create Airtable Table
  * @description Creates a new table within a specified base using OAuth (Metadata API).
  */
@@ -133,6 +134,18 @@ const action = async (
     const errorText = await response.text();
     throw new Error(`Error creating table: ${errorText}`);
   }
+
+  const config = await ctx.getConfiguration();
+  await ctx.configure({
+    ...config,
+    permission: {
+      ...config.permission,
+      tables: [
+        ...(config.permission?.tables ?? []),
+        { id: (await response.json()).id },
+      ],
+    },
+  });
 
   return response.json();
 };
