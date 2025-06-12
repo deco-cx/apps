@@ -1,7 +1,5 @@
 import {
   BatchUpdateSpreadsheetRequest,
-  BatchUpdateValuesRequest,
-  BatchUpdateValuesResponse,
   DeveloperMetadata,
   FilterView,
   ProtectedRange,
