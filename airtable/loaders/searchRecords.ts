@@ -60,14 +60,16 @@ interface Props extends Record<string, unknown> {
     direction: "asc" | "desc";
   }>;
 
-  /**
-   * @title Fields
-   * @description Array of field names to include in the response.
-   */
-  fields?: string[];
+  // TODO: Add fields to the response
+  // /**
+  //  * @title Fields
+  //  * @description Array of field names to include in the response.
+  //  */
+  // fields?: string[];
 }
 
 /**
+ * @name Search_Table_Records
  * @title Search Airtable Records
  * @description Searches for records in a specific table using OAuth with optional field filtering.
  */

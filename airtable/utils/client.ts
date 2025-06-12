@@ -23,7 +23,7 @@ export interface AirtableClient {
   "GET /v0/meta/whoami": {
     response: WhoamiResponse;
   };
-
+  
   /**
    * List bases
    * @see https://airtable.com/developers/web/api/list-bases

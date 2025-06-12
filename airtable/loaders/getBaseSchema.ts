@@ -20,6 +20,7 @@ interface Props extends Record<string, unknown> {
 }
 
 /**
+ * @name Get_Base_Schema
  * @title Get Airtable Base Schema
  * @description Fetches the schema (tables, fields, etc.) for a specific Airtable base using OAuth.
  */

@@ -11,6 +11,7 @@ interface Props {
 }
 
 /**
+ * @name List_Bases
  * @title List Airtable Bases
  * @description Fetches a list of bases accessible with OAuth token.
  */

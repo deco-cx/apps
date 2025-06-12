@@ -126,12 +126,11 @@ export default async function callback(
         console.error("Erro ao obter informações do usuário:", error);
         return undefined;
       }) || undefined;
-    console.log("account", account);
 
     if (skip === "true") {
       return {
         installId: stateData.installId,
-        account,
+        account: account ?? selectedBases + "," + selectedTables,
       };
     }
 

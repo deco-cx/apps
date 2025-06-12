@@ -23,6 +23,7 @@ interface Props extends Record<string, unknown> {
 }
 
 /**
+ * @name Get_Table_Record
  * @title Get Airtable Record
  * @description Fetches a specific record from an Airtable table using OAuth.
  */
