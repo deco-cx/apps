@@ -40,6 +40,7 @@ export interface State {
  * @logo https://smartenvios.com/wp-content/uploads/2022/12/logo-tiny-smartenvios.jpg
  */
 export default function App(props: Props): App<Manifest, State> {
+  console.log(props);
   const { token, baseUrl = "https://api.tiny.com.br/public-api/v3" } = props;
 
   // Handle different token types
