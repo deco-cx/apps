@@ -37,9 +37,9 @@ const action = async (
       mode: "check",
       baseId: props.baseId,
       tableIdOrName: props.tableId,
-    }) as any;
+    });
 
-  if (validationResult.error || !validationResult.hasPermission) {
+  if ("hasPermission" in validationResult && !validationResult.hasPermission) {
     return new Response(validationResult.message || "Access denied", {
       status: 403,
     });
@@ -47,7 +47,6 @@ const action = async (
 
   const { baseId, tableId, recordIds } = props;
 
-  // Validar record IDs
   const invalidIds = recordIds.filter((id) => !isValidRecordId(id));
   if (invalidIds.length > 0) {
     throw new Error(

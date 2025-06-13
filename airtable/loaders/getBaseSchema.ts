@@ -1,5 +1,9 @@
 import type { AppContext } from "../mod.ts";
-import type { BaseSchemaResponse } from "../utils/types.ts";
+import type {
+  BaseSchemaResponse,
+  ValidationFilterResult,
+  ValidationResult,
+} from "../utils/types.ts";
 
 interface Props extends Record<string, unknown> {
   /**
@@ -29,18 +33,19 @@ const loader = async (
     return new Response("OAuth authentication is required", { status: 401 });
   }
 
-  const propsValidationResult = await ctx.invoke["airtable"].loaders
-    .permissioning.validatePermissions({
+  const propsValidationResult: ValidationResult = await ctx.invoke["airtable"]
+    .loaders.permissioning.validatePermissions({
       mode: "filter",
       props: props,
-    }) as any;
+    });
 
-  if (propsValidationResult.error) {
+  if ("error" in propsValidationResult && propsValidationResult.error) {
     return new Response(propsValidationResult.error, { status: 403 });
   }
 
+  const propsFilterResult = propsValidationResult as ValidationFilterResult;
   const { baseId, offset } =
-    (propsValidationResult.filteredProps || props) as Props;
+    (propsFilterResult.filteredProps || props) as Props;
 
   const params: { baseId: string; offset?: string } = { baseId };
   if (offset) {
@@ -57,18 +62,19 @@ const loader = async (
 
   const data = await response.json();
 
-  const responseValidationResult = await ctx.invoke["airtable"].loaders
-    .permissioning.validatePermissions({
+  const responseValidationResult: ValidationResult = await ctx
+    .invoke["airtable"].loaders.permissioning.validatePermissions({
       mode: "filter",
       response: data,
-    }) as any;
+    });
 
-  if (responseValidationResult.error) {
+  if ("error" in responseValidationResult && responseValidationResult.error) {
     return new Response(responseValidationResult.error, { status: 403 });
   }
 
-  return (responseValidationResult.filteredResponse ||
-    data) as BaseSchemaResponse;
+  const responseFilterResult =
+    responseValidationResult as ValidationFilterResult;
+  return (responseFilterResult.filteredResponse || data) as BaseSchemaResponse;
 };
 
 export default loader;

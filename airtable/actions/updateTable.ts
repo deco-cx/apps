@@ -50,9 +50,9 @@ const action = async (
       mode: "check",
       baseId: props.baseId,
       tableIdOrName: props.tableId,
-    }) as any;
+    });
 
-  if (validationResult.error || !validationResult.hasPermission) {
+  if ("hasPermission" in validationResult && !validationResult.hasPermission) {
     return new Response(validationResult.message || "Access denied", {
       status: 403,
     });

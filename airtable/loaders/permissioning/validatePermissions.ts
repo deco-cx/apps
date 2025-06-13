@@ -1,14 +1,16 @@
 import { AppContext } from "../../mod.ts";
 import {
+  AllowedTablesBasesResponse,
   BaseSchemaResponse,
+  BaseWithTables,
   ListBasesResponse,
   ListRecordsResponse,
+  PermissionCheck,
+  PermissionResult,
+  ValidationErrorResult,
+  ValidationFilterResult,
+  ValidationResult,
 } from "../../utils/types.ts";
-
-interface PermissionCheck {
-  hasPermission: boolean;
-  message?: string;
-}
 
 interface ValidatePermissionsProps {
   mode: "check" | "filter";
@@ -27,21 +29,21 @@ const loader = async (
   props: ValidatePermissionsProps,
   _req: Request,
   ctx: AppContext,
-) => {
-  const allowedTablesBases = await ctx.invoke["airtable"].loaders.permissioning
-    .listAllowedTablesBases();
+): Promise<ValidationResult> => {
+  const allowedTablesBases: AllowedTablesBasesResponse = await ctx
+    .invoke["airtable"].loaders.permissioning.listAllowedTablesBases();
 
   if (allowedTablesBases.allCurrentAndFutureTableBases) {
     if (props.mode === "check") {
       return {
         hasPermission: true,
         message: "User has access to all current and future bases and tables",
-      };
+      } as PermissionCheck;
     } else if (props.mode === "filter") {
       return {
         filteredProps: props.props,
         filteredResponse: props.response,
-      };
+      } as ValidationFilterResult;
     }
   }
 
@@ -50,12 +52,12 @@ const loader = async (
     Object.keys(allowedTablesBases.permission).length === 0
   ) {
     if (props.mode === "check") {
-      return { hasPermission: true };
+      return { hasPermission: true } as PermissionCheck;
     } else if (props.mode === "filter") {
       return {
         filteredProps: props.props,
         filteredResponse: props.response,
-      };
+      } as ValidationFilterResult;
     }
   }
 
@@ -82,7 +84,7 @@ const loader = async (
           error: propsResult.error,
           filteredProps: null,
           filteredResponse: null,
-        };
+        } as ValidationErrorResult;
       }
 
       filteredProps = propsResult.props;
@@ -98,14 +100,14 @@ const loader = async (
     return {
       filteredProps,
       filteredResponse,
-    };
+    } as ValidationFilterResult;
   }
 
   return { error: "Invalid mode. Use 'check' or 'filter'" };
 };
 
 function validateSpecificPermission(
-  permission: Record<string, any>,
+  permission: Record<string, PermissionResult>,
   baseId?: string,
   tableIdOrName?: string,
 ): PermissionCheck {
@@ -119,8 +121,9 @@ function validateSpecificPermission(
       };
     }
 
-    if (tableIdOrName && hasBasePermission.tables) {
-      const hasTablePermission = hasBasePermission.tables[tableIdOrName];
+    if (tableIdOrName && hasBasePermission.type === "base") {
+      const baseWithTables = hasBasePermission as BaseWithTables;
+      const hasTablePermission = baseWithTables.tables[tableIdOrName];
 
       if (!hasTablePermission) {
         return {
@@ -149,7 +152,7 @@ function validateSpecificPermission(
 
 function filterPropsBasedOnPermissions(
   props: Record<string, unknown>,
-  permission: Record<string, any>,
+  permission: Record<string, PermissionResult>,
 ): { props?: Record<string, unknown>; error?: string } {
   if (props.baseId) {
     const hasBasePermission = permission[props.baseId as string];
@@ -160,9 +163,10 @@ function filterPropsBasedOnPermissions(
       };
     }
 
-    if (props.tableIdOrName && hasBasePermission.tables) {
+    if (props.tableIdOrName && hasBasePermission.type === "base") {
+      const baseWithTables = hasBasePermission as BaseWithTables;
       const hasTablePermission =
-        hasBasePermission.tables[props.tableIdOrName as string];
+        baseWithTables.tables[props.tableIdOrName as string];
 
       if (!hasTablePermission) {
         return {
@@ -189,7 +193,7 @@ function filterPropsBasedOnPermissions(
 
 function filterResponseByPermission(
   response: ListBasesResponse | ListRecordsResponse | BaseSchemaResponse,
-  permission: Record<string, any>,
+  permission: Record<string, PermissionResult>,
 ): ListBasesResponse | ListRecordsResponse | BaseSchemaResponse {
   const isBase = "bases" in response;
   const isRecord = "records" in response;

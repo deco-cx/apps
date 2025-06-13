@@ -152,3 +152,56 @@ export interface WhoamiResponse {
   email?: string;
   scopes?: string[];
 }
+
+export interface PermissionCheck {
+  hasPermission: boolean;
+  message?: string;
+}
+
+export interface ValidationFilterResult {
+  filteredProps?: Record<string, unknown>;
+  filteredResponse?:
+    | ListBasesResponse
+    | ListRecordsResponse
+    | BaseSchemaResponse;
+  error?: string;
+}
+
+export interface ValidationErrorResult {
+  error: string;
+  filteredProps: null;
+  filteredResponse: null;
+}
+
+export type ValidationResult =
+  | PermissionCheck
+  | ValidationFilterResult
+  | ValidationErrorResult
+  | { error: string };
+
+export interface BaseWithTables {
+  id: string;
+  name: string;
+  type: "base";
+  tables: Record<string, AirtableTable & { type: "table" }>;
+}
+
+export interface TablePermission {
+  id: string;
+  name: string;
+  type: "table";
+}
+
+export interface LegacyTablePermission {
+  id: string;
+  name: string;
+  type: "table";
+}
+
+export type PermissionResult = BaseWithTables | LegacyTablePermission;
+
+export interface AllowedTablesBasesResponse {
+  allCurrentAndFutureTableBases?: boolean;
+  description?: string;
+  permission?: Record<string, PermissionResult>;
+}

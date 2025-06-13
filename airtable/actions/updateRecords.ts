@@ -57,12 +57,15 @@ const action = async (
 
   const validationResult = await ctx.invoke["airtable"].loaders.permissioning
     .validatePermissions({
-      mode: "filter",
-      props: { ...props, tableIdOrName: props.tableId },
-    }) as any;
+      mode: "check",
+      baseId: props.baseId,
+      tableIdOrName: props.tableId,
+    });
 
-  if (validationResult.error) {
-    return new Response(validationResult.error, { status: 403 });
+  if ("hasPermission" in validationResult && !validationResult.hasPermission) {
+    return new Response(validationResult.message || "Access denied", {
+      status: 403,
+    });
   }
 
   const { baseId, tableId, records, typecast, performUpsert } = props;

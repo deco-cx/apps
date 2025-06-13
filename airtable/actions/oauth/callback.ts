@@ -1,9 +1,13 @@
 import type { AppContext } from "../../mod.ts";
 import { OAUTH_URL_TOKEN } from "../../utils/constants.ts";
-import { decodePermission } from "../../utils/permission-checker.ts";
-import { AirtableBase } from "../../utils/types.ts";
+import { AirtableBase, PermissionParams } from "../../utils/types.ts";
 import { fetchBasesAndTables } from "../../utils/ui-templates/airtable-client.ts";
 import { generateSelectionPage } from "../../utils/ui-templates/page-generator.ts";
+
+function decodePermission(permission: string): PermissionParams {
+  const permissionData = JSON.parse(atob(permission));
+  return permissionData as PermissionParams;
+}
 
 interface OAuthTokenResponse {
   access_token: string;

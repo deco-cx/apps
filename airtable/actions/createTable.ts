@@ -108,9 +108,9 @@ const action = async (
     .validatePermissions({
       mode: "check",
       baseId: props.baseId,
-    }) as any;
+    });
 
-  if (validationResult.error || !validationResult.hasPermission) {
+  if ("hasPermission" in validationResult && !validationResult.hasPermission) {
     return new Response(validationResult.message || "Access denied", {
       status: 403,
     });

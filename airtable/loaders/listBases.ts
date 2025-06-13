@@ -1,5 +1,9 @@
 import type { AppContext } from "../mod.ts";
-import type { ListBasesResponse } from "../utils/types.ts";
+import type {
+  ListBasesResponse,
+  ValidationFilterResult,
+  ValidationResult,
+} from "../utils/types.ts";
 
 interface Props {
   /**
@@ -35,17 +39,18 @@ const loader = async (
 
   const data = await response.json();
 
-  const validationResult = await ctx.invoke["airtable"].loaders.permissioning
-    .validatePermissions({
+  const validationResult: ValidationResult = await ctx.invoke["airtable"]
+    .loaders.permissioning.validatePermissions({
       mode: "filter",
       response: data,
-    }) as any;
+    });
 
-  if (validationResult.error) {
+  if ("error" in validationResult && validationResult.error) {
     return new Response(validationResult.error, { status: 403 });
   }
 
-  return (validationResult.filteredResponse || data) as ListBasesResponse;
+  const filterResult = validationResult as ValidationFilterResult;
+  return (filterResult.filteredResponse || data) as ListBasesResponse;
 };
 
 export default loader;
