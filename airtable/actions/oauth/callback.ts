@@ -136,7 +136,7 @@ export default async function callback(
         return undefined;
       }) || undefined;
 
-    let accountName = account
+    let accountName = account;
 
     if (continueQueryParam === "true") {
       await ctx.configure({
