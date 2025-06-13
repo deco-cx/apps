@@ -179,7 +179,6 @@ export default async function callback(
       if (hasExistingPermissions(currentCtx.permission)) {
         return createPermissionExistsError(stateData.installId, accountName);
       }
-
       const { bases, tables } = decodePermission(permissions);
 
       await ctx.configure({
