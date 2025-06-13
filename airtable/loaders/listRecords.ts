@@ -1,6 +1,5 @@
 import type { AppContext } from "../mod.ts";
 import type { ListRecordsResponse } from "../utils/types.ts";
-import { filterProps } from "../utils/permission-checker.ts";
 
 interface Props extends Record<string, unknown> {
   /**
@@ -76,13 +75,21 @@ const loader = async (
     return new Response("OAuth authentication is required", { status: 401 });
   }
 
-  const filteredProps = filterProps(ctx, props);
-  if (filteredProps instanceof Response) {
-    return filteredProps;
+  const propsValidationResult = await ctx.invoke["airtable"].loaders
+    .permissioning.validatePermissions({
+      mode: "filter",
+      props: { ...props, tableIdOrName: props.tableId },
+    }) as any;
+
+  if (propsValidationResult.error) {
+    return new Response(propsValidationResult.error, { status: 403 });
   }
 
+  const validatedProps =
+    (propsValidationResult.filteredProps || props) as Props;
+
   const response = await ctx.client["GET /v0/:baseId/:tableId"](
-    filteredProps as Props,
+    validatedProps,
   );
 
   if (!response.ok) {

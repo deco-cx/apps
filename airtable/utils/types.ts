@@ -104,12 +104,45 @@ export interface UpdateFieldBody {
   description?: string;
 }
 
+export interface Permission {
+  /**
+   * @title All Bases
+   * @description Whether AI can access all bases
+   */
+  allCurrentAndFutureTableBases?: boolean;
+
+  /**
+   * @title Bases
+   * @description Array of selected base IDs that AI can access
+   */
+  bases?: AirtableBase[];
+
+  /**
+   * @title Tables
+   * @description Array of selected table IDs that AI can access
+   */
+  tables?: AirtableTable[];
+}
+
+export interface PermissionParams {
+  bases: AirtableBase[];
+  tables: AirtableTable[];
+  timestamp: string;
+}
+
 export interface AirtableBase {
   id: string;
   name?: string;
 }
 
 export interface AirtableTable {
+  id: string;
+  name?: string;
+  baseId?: string;
+  records?: AirtableRecordPermission[];
+}
+
+export interface AirtableRecordPermission {
   id: string;
   name?: string;
 }

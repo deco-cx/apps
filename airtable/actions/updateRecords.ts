@@ -51,11 +51,21 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<{ records: AirtableRecord[] } | Response> => {
-  const { baseId, tableId, records, typecast, performUpsert } = props;
-
   if (!ctx.client) {
     return new Response("OAuth authentication is required", { status: 401 });
   }
+
+  const validationResult = await ctx.invoke["airtable"].loaders.permissioning
+    .validatePermissions({
+      mode: "filter",
+      props: { ...props, tableIdOrName: props.tableId },
+    }) as any;
+
+  if (validationResult.error) {
+    return new Response(validationResult.error, { status: 403 });
+  }
+
+  const { baseId, tableId, records, typecast, performUpsert } = props;
 
   const body: UpdateRecordsBody = {
     records,

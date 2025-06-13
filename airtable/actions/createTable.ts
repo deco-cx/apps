@@ -100,11 +100,23 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<Table | Response> => {
-  const { baseId, name, description, fields } = props;
-
   if (!ctx.client) {
     return new Response("OAuth authentication is required", { status: 401 });
   }
+
+  const validationResult = await ctx.invoke["airtable"].loaders.permissioning
+    .validatePermissions({
+      mode: "check",
+      baseId: props.baseId,
+    }) as any;
+
+  if (validationResult.error || !validationResult.hasPermission) {
+    return new Response(validationResult.message || "Access denied", {
+      status: 403,
+    });
+  }
+
+  const { baseId, name, description, fields } = props;
 
   if (!name || name.trim() === "") {
     throw new Error("Table name is required");

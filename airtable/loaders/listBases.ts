@@ -1,6 +1,5 @@
 import type { AppContext } from "../mod.ts";
 import type { ListBasesResponse } from "../utils/types.ts";
-import { filterResponseByPermission } from "../utils/permission-checker.ts";
 
 interface Props {
   /**
@@ -35,7 +34,18 @@ const loader = async (
   }
 
   const data = await response.json();
-  return filterResponseByPermission(data, ctx.permission) as ListBasesResponse;
+
+  const validationResult = await ctx.invoke["airtable"].loaders.permissioning
+    .validatePermissions({
+      mode: "filter",
+      response: data,
+    }) as any;
+
+  if (validationResult.error) {
+    return new Response(validationResult.error, { status: 403 });
+  }
+
+  return (validationResult.filteredResponse || data) as ListBasesResponse;
 };
 
 export default loader;

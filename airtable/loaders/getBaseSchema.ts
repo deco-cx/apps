@@ -1,9 +1,5 @@
 import type { AppContext } from "../mod.ts";
 import type { BaseSchemaResponse } from "../utils/types.ts";
-import {
-  filterProps,
-  filterResponseByPermission,
-} from "../utils/permission-checker.ts";
 
 interface Props extends Record<string, unknown> {
   /**
@@ -33,12 +29,18 @@ const loader = async (
     return new Response("OAuth authentication is required", { status: 401 });
   }
 
-  const filteredProps = filterProps(ctx, props);
-  if (filteredProps instanceof Response) {
-    return filteredProps;
+  const propsValidationResult = await ctx.invoke["airtable"].loaders
+    .permissioning.validatePermissions({
+      mode: "filter",
+      props: props,
+    }) as any;
+
+  if (propsValidationResult.error) {
+    return new Response(propsValidationResult.error, { status: 403 });
   }
 
-  const { baseId, offset } = filteredProps as Props;
+  const { baseId, offset } =
+    (propsValidationResult.filteredProps || props) as Props;
 
   const params: { baseId: string; offset?: string } = { baseId };
   if (offset) {
@@ -54,7 +56,19 @@ const loader = async (
   }
 
   const data = await response.json();
-  return filterResponseByPermission(data, ctx.permission) as BaseSchemaResponse;
+
+  const responseValidationResult = await ctx.invoke["airtable"].loaders
+    .permissioning.validatePermissions({
+      mode: "filter",
+      response: data,
+    }) as any;
+
+  if (responseValidationResult.error) {
+    return new Response(responseValidationResult.error, { status: 403 });
+  }
+
+  return (responseValidationResult.filteredResponse ||
+    data) as BaseSchemaResponse;
 };
 
 export default loader;

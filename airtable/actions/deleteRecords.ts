@@ -28,11 +28,24 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<{ records: Array<{ id: string; deleted: boolean }> } | Response> => {
-  const { baseId, tableId, recordIds } = props;
-
   if (!ctx.client) {
     return new Response("OAuth authentication is required", { status: 401 });
   }
+
+  const validationResult = await ctx.invoke["airtable"].loaders.permissioning
+    .validatePermissions({
+      mode: "check",
+      baseId: props.baseId,
+      tableIdOrName: props.tableId,
+    }) as any;
+
+  if (validationResult.error || !validationResult.hasPermission) {
+    return new Response(validationResult.message || "Access denied", {
+      status: 403,
+    });
+  }
+
+  const { baseId, tableId, recordIds } = props;
 
   // Validar record IDs
   const invalidIds = recordIds.filter((id) => !isValidRecordId(id));
