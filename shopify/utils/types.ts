@@ -1,10 +1,10 @@
 import {
-  CountryCode,
   CurrencyCode,
   OrderCancelReason,
   OrderFinancialStatus,
   OrderFulfillmentStatus,
 } from "./enums.ts";
+import { LanguageCode, CountryCode } from "./storefront/storefront.graphql.gen.ts";
 
 type Attribute = {
   key: string;
@@ -188,4 +188,9 @@ export interface UnitPriceMeasurement {
 export interface Metafield {
   namespace: string;
   key: string;
+}
+
+export interface LanguageContextArgs {
+  languageCode: LanguageCode;
+  countryCode: CountryCode;
 }
