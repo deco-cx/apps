@@ -3,21 +3,30 @@ import {
   AllowedTablesBasesResponse,
   BaseSchemaResponse,
   BaseWithTables,
+  FilteredOperationResult,
   ListBasesResponse,
   ListRecordsResponse,
+  OperationItem,
   PermissionCheck,
   PermissionResult,
   ValidationErrorResult,
   ValidationFilterResult,
-  ValidationResult,
 } from "../../utils/types.ts";
 
+type ExtendedValidationResult =
+  | PermissionCheck
+  | ValidationFilterResult
+  | ValidationErrorResult
+  | FilteredOperationResult
+  | { error: string };
+
 interface ValidatePermissionsProps {
-  mode: "check" | "filter";
+  mode: "check" | "filter" | "filter-operations";
   baseId?: string;
   tableIdOrName?: string;
   props?: Record<string, unknown>;
   response?: ListBasesResponse | ListRecordsResponse | BaseSchemaResponse;
+  operations?: OperationItem[];
 }
 
 /**
@@ -29,7 +38,7 @@ const loader = async (
   props: ValidatePermissionsProps,
   _req: Request,
   ctx: AppContext,
-): Promise<ValidationResult> => {
+): Promise<ExtendedValidationResult> => {
   const allowedTablesBases: AllowedTablesBasesResponse = await ctx
     .invoke["airtable"].loaders.permissioning.listAllowedTablesBases();
 
@@ -44,6 +53,14 @@ const loader = async (
         filteredProps: props.props,
         filteredResponse: props.response,
       } as ValidationFilterResult;
+    } else if (props.mode === "filter-operations") {
+      return {
+        allowedOperations: props.operations || [],
+        deniedOperations: [],
+        totalRequested: props.operations?.length || 0,
+        totalAllowed: props.operations?.length || 0,
+        totalDenied: 0,
+      } as FilteredOperationResult;
     }
   }
 
@@ -58,6 +75,14 @@ const loader = async (
         filteredProps: props.props,
         filteredResponse: props.response,
       } as ValidationFilterResult;
+    } else if (props.mode === "filter-operations") {
+      return {
+        allowedOperations: props.operations || [],
+        deniedOperations: [],
+        totalRequested: props.operations?.length || 0,
+        totalAllowed: props.operations?.length || 0,
+        totalDenied: 0,
+      } as FilteredOperationResult;
     }
   }
 
@@ -66,6 +91,13 @@ const loader = async (
       allowedTablesBases.permission || {},
       props.baseId,
       props.tableIdOrName,
+    );
+  }
+
+  if (props.mode === "filter-operations") {
+    return filterOperations(
+      props.operations || [],
+      allowedTablesBases.permission || {},
     );
   }
 
@@ -103,7 +135,9 @@ const loader = async (
     } as ValidationFilterResult;
   }
 
-  return { error: "Invalid mode. Use 'check' or 'filter'" };
+  return {
+    error: "Invalid mode. Use 'check', 'filter', or 'filter-operations'",
+  };
 };
 
 function validateSpecificPermission(
@@ -212,6 +246,49 @@ function filterResponseByPermission(
   }
 
   return response;
+}
+
+function filterOperations(
+  operations: OperationItem[],
+  permission: Record<string, PermissionResult>,
+): FilteredOperationResult {
+  const allowedOperations: OperationItem[] = [];
+  const deniedOperations: OperationItem[] = [];
+
+  for (const operation of operations) {
+    let hasPermission = false;
+
+    const basePermission = permission[operation.baseId];
+    if (basePermission) {
+      if (!operation.tableId && !operation.tableIdOrName) {
+        hasPermission = true;
+      } else {
+        const tableIdentifier = operation.tableId || operation.tableIdOrName;
+        if (tableIdentifier) {
+          if (basePermission.type === "base") {
+            const baseWithTables = basePermission as BaseWithTables;
+            hasPermission = !!baseWithTables.tables[tableIdentifier];
+          } else {
+            hasPermission = permission[tableIdentifier] !== undefined;
+          }
+        }
+      }
+    }
+
+    if (hasPermission) {
+      allowedOperations.push(operation);
+    } else {
+      deniedOperations.push(operation);
+    }
+  }
+
+  return {
+    allowedOperations,
+    deniedOperations,
+    totalRequested: operations.length,
+    totalAllowed: allowedOperations.length,
+    totalDenied: deniedOperations.length,
+  };
 }
 
 export default loader;

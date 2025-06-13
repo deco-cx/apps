@@ -147,19 +147,19 @@ const action = async (
     throw new Error(`Error creating table: ${errorText}`);
   }
 
-  const config = await ctx.getConfiguration();
-  await ctx.configure({
-    ...config,
-    permission: {
-      ...config.permission,
-      tables: [
-        ...(config.permission?.tables ?? []),
-        { id: (await response.json()).id },
-      ],
-    },
+  const table = await response.json();
+
+  await ctx.invoke["airtable"].actions.permissioning.addNewPermitions({
+    tables: [
+      {
+        id: table.id,
+        name: table.name,
+        baseId: baseId,
+      },
+    ],
   });
 
-  return response.json();
+  return table;
 };
 
 export default action;

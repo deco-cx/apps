@@ -177,6 +177,7 @@ export type ValidationResult =
   | PermissionCheck
   | ValidationFilterResult
   | ValidationErrorResult
+  | FilteredOperationResult
   | { error: string };
 
 export interface BaseWithTables {
@@ -204,4 +205,26 @@ export interface AllowedTablesBasesResponse {
   allCurrentAndFutureTableBases?: boolean;
   description?: string;
   permission?: Record<string, PermissionResult>;
+}
+
+export interface OperationItem {
+  baseId: string;
+  tableId?: string;
+  tableIdOrName?: string;
+  [key: string]: unknown;
+}
+
+export interface FilteredOperationResult {
+  allowedOperations: OperationItem[];
+  deniedOperations: OperationItem[];
+  totalRequested: number;
+  totalAllowed: number;
+  totalDenied: number;
+}
+
+export interface PartialOperationResult<T = unknown> {
+  success: boolean;
+  results: T[];
+  filtered: FilteredOperationResult;
+  message: string;
 }

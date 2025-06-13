@@ -2,7 +2,7 @@ import { HttpError } from "../../../utils/http.ts";
 import { AppContext } from "../../mod.ts";
 import { Permission } from "../../utils/types.ts";
 
-interface AddPermissionsRequest {
+export interface AddPermissionsRequest {
   bases?: Array<{
     id: string;
     name: string;
@@ -14,17 +14,24 @@ interface AddPermissionsRequest {
   }>;
 }
 
+export interface AddPermissionsResponse {
+  success: boolean;
+  permission: Permission;
+  message?: string;
+}
+
 /**
  * @internal
  * @title Add New Permissions
  * @description Adds new bases and tables permissions to the current user context.
  */
-const action = async (
-  req: Request,
+const action = (
+  props: AddPermissionsRequest,
+  _req: Request,
   ctx: AppContext,
-): Promise<{ success: boolean; permission: Permission; message?: string }> => {
+): AddPermissionsResponse => {
   try {
-    const body: AddPermissionsRequest = await req.json();
+    const body: AddPermissionsRequest = props;
 
     if (!body.bases?.length && !body.tables?.length) {
       return {

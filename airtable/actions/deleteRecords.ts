@@ -1,14 +1,15 @@
 import type { AppContext } from "../mod.ts";
-import { isValidRecordId } from "../utils/helpers.ts";
 
 interface Props {
   /**
    * @title Base ID
+   * @description The base containing the table with records to delete
    */
   baseId: string;
 
   /**
    * @title Table ID
+   * @description The table containing the records to delete
    */
   tableId: string;
 
@@ -27,7 +28,7 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<{ records: Array<{ id: string; deleted: boolean }> } | Response> => {
+): Promise<{ records: { id: string; deleted: boolean }[] } | Response> => {
   if (!ctx.client) {
     return new Response("OAuth authentication is required", { status: 401 });
   }
@@ -47,19 +48,22 @@ const action = async (
 
   const { baseId, tableId, recordIds } = props;
 
-  const invalidIds = recordIds.filter((id) => !isValidRecordId(id));
-  if (invalidIds.length > 0) {
-    throw new Error(
-      `Invalid record IDs (must start with 'rec'): ${invalidIds.join(", ")}`,
-    );
-  }
-
-  if (recordIds.length === 0) {
-    throw new Error("At least one record ID is required");
+  if (!recordIds || recordIds.length === 0) {
+    return new Response("At least one record ID is required", { status: 400 });
   }
 
   if (recordIds.length > 10) {
-    throw new Error("Maximum 10 records can be deleted at once");
+    return new Response("Maximum 10 records can be deleted at once", {
+      status: 400,
+    });
+  }
+
+  const invalidIds = recordIds.filter((id) => !id.startsWith("rec"));
+  if (invalidIds.length > 0) {
+    return new Response(
+      `Invalid record IDs (must start with 'rec'): ${invalidIds.join(", ")}`,
+      { status: 400 },
+    );
   }
 
   const response = await ctx.client["DELETE /v0/:baseId/:tableId"](
