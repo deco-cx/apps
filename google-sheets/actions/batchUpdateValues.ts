@@ -49,6 +49,7 @@ export interface Props {
  * @name BATCH_UPDATE_SPREADSHEET_VALUES
  * @title Batch Update Spreadsheet Values
  * @description Updates values in a Google Sheets spreadsheet in a simple and intuitive way. Just specify the sheet name, starting cell and data, and the system will automatically calculate the required range.
+ * @internal true
  */
 const action = async (
   props: Props,
@@ -90,7 +91,8 @@ const action = async (
     const { body } = mapSimpleBatchUpdatePropsToApi(simpleProps);
 
     const response = await ctx.client
-      ["POST /v4/spreadsheets/:spreadsheetId/values%3AbatchUpdate"]({
+      ["POST /v4/spreadsheets/:spreadsheetId:batchUpdate"]({
+        // @ts-expect-error Google thought putting : on the endpoint path was cool. Our client handles it, but the types are not inferred.
         spreadsheetId: props.spreadsheet_id,
       }, {
         body,
