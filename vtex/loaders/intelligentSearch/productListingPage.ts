@@ -39,6 +39,7 @@ import type {
 } from "../../utils/types.ts";
 import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
+import { SpanStatusCode } from "npm:@opentelemetry/api@1.9.0";
 
 /** this type is more friendly user to fuzzy type that is 0, 1 or auto. */
 export type LabelledFuzzy = "automatic" | "disabled" | "enabled";
@@ -290,168 +291,223 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
-  const { vcsDeprecated } = ctx;
-  const { url: baseUrl } = req;
-  const url = new URL(props.pageHref || baseUrl);
-  const segment = getSegmentFromBag(ctx);
-  const currentPageoffset = props.pageOffset ?? 1;
-  const { selectedFacets: baseSelectedFacets, page, ...args } = searchArgsOf(
-    props,
-    url,
-    ctx,
-  );
-  let pathToUse = url.href.replace(url.origin, "");
+  const start = performance.now();
+  const span = ctx.monitoring?.tracer.startSpan("intelligent-search-metrics");
+  try {
+    const { vcsDeprecated } = ctx;
+    const { url: baseUrl } = req;
+    const url = new URL(props.pageHref || baseUrl);
+    const segment = getSegmentFromBag(ctx);
+    const currentPageoffset = props.pageOffset ?? 1;
+    const { selectedFacets: baseSelectedFacets, page, ...args } = searchArgsOf(
+      props,
+      url,
+      ctx,
+    );
+    let pathToUse = url.href.replace(url.origin, "");
 
-  if (pathToUse === "/" || pathToUse === "/*") {
-    const result = await PLPDefaultPath({ level: 1 }, req, ctx);
-    pathToUse = result?.possiblePaths[0] ?? pathToUse;
-  }
+    if (pathToUse === "/" || pathToUse === "/*") {
+      const result = await PLPDefaultPath({ level: 1 }, req, ctx);
+      pathToUse = result?.possiblePaths[0] ?? pathToUse;
+    }
 
-  const allPageTypes = await pageTypesFromUrl(pathToUse, ctx);
-  const pageTypes = getValidTypesFromPageTypes(allPageTypes);
+    const pageTypesStart = performance.now();
+    const allPageTypes = await pageTypesFromUrl(pathToUse, ctx);
+    const pageTypes = getValidTypesFromPageTypes(allPageTypes);
+    const pageTypesEnd = performance.now();
+    span?.setAttribute(
+      "page-types-time",
+      (pageTypesEnd - pageTypesStart).toString(),
+    );
 
-  const selectedFacets = baseSelectedFacets.length === 0
-    ? filtersFromPathname(pageTypes)
-    : baseSelectedFacets;
-  const selected = withDefaultFacets(selectedFacets, ctx);
-  const fselected = props.priceFacets
-    ? selected
-    : selected.filter((f) => f.key !== "price");
-  const isInSeachFormat = Boolean(selected.length) || Boolean(args.query);
-  const pathQuery = queryFromPathname(isInSeachFormat, pageTypes, url.pathname);
-  const searchArgs = { ...args, query: args.query || pathQuery };
-  if (!isInSeachFormat && !pathQuery) {
-    return null;
-  }
+    const selectedFacets = baseSelectedFacets.length === 0
+      ? filtersFromPathname(pageTypes)
+      : baseSelectedFacets;
+    const selected = withDefaultFacets(selectedFacets, ctx);
+    const fselected = props.priceFacets
+      ? selected
+      : selected.filter((f) => f.key !== "price");
+    const isInSeachFormat = Boolean(selected.length) || Boolean(args.query);
+    const pathQuery = queryFromPathname(
+      isInSeachFormat,
+      pageTypes,
+      url.pathname,
+    );
+    const searchArgs = { ...args, query: args.query || pathQuery };
+    if (!isInSeachFormat && !pathQuery) {
+      return null;
+    }
 
-  const locale = segment?.payload?.cultureInfo ??
-    ctx.defaultSegment?.cultureInfo ?? "pt-BR";
+    const locale = segment?.payload?.cultureInfo ??
+      ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
-  const params = withDefaultParams({ ...searchArgs, page, locale });
+    const params = withDefaultParams({ ...searchArgs, page, locale });
+    span?.setAttribute("simulationBehavior", searchArgs.simulationBehavior);
 
-  // search products on VTEX. Feel free to change any of these parameters
-  const [productsResult, facetsResult] = await Promise.all([
-    vcsDeprecated
-      ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+    const productsStart = performance.now();
+    // search products on VTEX. Feel free to change any of these parameters
+    const [productsResult, facetsResult] = await Promise.all([
+      vcsDeprecated
+        ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+          ...params,
+          facets: toPath(selected),
+        }, {
+          ...STALE,
+          headers: segment ? withSegmentCookie(segment) : undefined,
+        }).then((res) => {
+          span?.setAttribute(
+            "fetch-products-time",
+            (performance.now() - productsStart).toString(),
+          );
+          span?.setAttribute("fetch-products-status", res.status.toString());
+          return res.json();
+        }),
+      vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
         ...params,
-        facets: toPath(selected),
+        facets: toPath(fselected),
       }, {
         ...STALE,
         headers: segment ? withSegmentCookie(segment) : undefined,
-      }).then((res) => res.json()),
-    vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
-      ...params,
-      facets: toPath(fselected),
-    }, { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined })
-      .then((res) => res.json()),
-  ]);
-
-  const currentPageTypes = !props.useCollectionName
-    ? pageTypes
-    : pageTypes.map((pageType) => {
-      if (pageType.id !== pageTypes.at(-1)?.id) return pageType;
-
-      const name = productsResult?.products?.[0]?.productClusters?.find(
-        (collection) => collection.id === pageType.name,
-      )?.name ?? pageType.name;
-
-      return {
-        ...pageType,
-        name,
-      };
-    });
-
-  // It is a feature from Intelligent Search on VTEX panel
-  // redirect to a specific page based on configured rules
-  if (productsResult.redirect) {
-    redirect(
-      new URL(productsResult.redirect, url.origin)
-        .href,
+      })
+        .then((res) => {
+          span?.setAttribute(
+            "fetch-facets-time",
+            (performance.now() - productsStart).toString(),
+          );
+          span?.setAttribute("fetch-facets-status", res.status.toString());
+          return res.json();
+        }),
+    ]);
+    const productsEnd = performance.now();
+    span?.setAttribute(
+      "products-total-time",
+      (productsEnd - productsStart).toString(),
     );
-  }
-  /** Intelligent search API analytics. Fire and forget 🔫 */
-  const fullTextTerm = params["query"];
-  if (fullTextTerm) {
-    sendEvent({ type: "session.ping", url: url.href }, req, ctx)
-      .then(() =>
-        sendEvent(
-          {
-            type: "search.query",
-            text: fullTextTerm,
-            misspelled: productsResult.correction?.misspelled ?? false,
-            match: productsResult.recordsFiltered,
-            operator: productsResult.operator,
-            locale: segment?.payload?.cultureInfo ?? "pt-BR",
-            url: url.href,
-          },
-          req,
-          ctx,
+
+    const currentPageTypes = !props.useCollectionName
+      ? pageTypes
+      : pageTypes.map((pageType) => {
+        if (pageType.id !== pageTypes.at(-1)?.id) return pageType;
+
+        const name = productsResult?.products?.[0]?.productClusters?.find(
+          (collection) => collection.id === pageType.name,
+        )?.name ?? pageType.name;
+
+        return {
+          ...pageType,
+          name,
+        };
+      });
+
+    // It is a feature from Intelligent Search on VTEX panel
+    // redirect to a specific page based on configured rules
+    if (productsResult.redirect) {
+      redirect(
+        new URL(productsResult.redirect, url.origin)
+          .href,
+      );
+    }
+    /** Intelligent search API analytics. Fire and forget 🔫 */
+    const fullTextTerm = params["query"];
+    if (fullTextTerm) {
+      sendEvent({ type: "session.ping", url: url.href }, req, ctx)
+        .then(() =>
+          sendEvent(
+            {
+              type: "search.query",
+              text: fullTextTerm,
+              misspelled: productsResult.correction?.misspelled ?? false,
+              match: productsResult.recordsFiltered,
+              operator: productsResult.operator,
+              locale: segment?.payload?.cultureInfo ?? "pt-BR",
+              url: url.href,
+            },
+            req,
+            ctx,
+          )
         )
-      )
-      .catch(console.error);
+        .catch(console.error);
+    }
+    const { products: vtexProducts, pagination, recordsFiltered } =
+      productsResult;
+    const facets = selectPriceFacet(facetsResult.facets, selectedFacets);
+    // Transform VTEX product format into schema.org's compatible format
+    // If a property is missing from the final `products` array you can add
+    // it in here
+    const similarStart = performance.now();
+    const products = await Promise.all(
+      vtexProducts
+        .map((p) =>
+          toProduct(p, p.items.find(getFirstItemAvailable) || p.items[0], 0, {
+            baseUrl: baseUrl,
+            priceCurrency: segment?.payload?.currencyCode ?? "BRL",
+            includeOriginalAttributes: props.advancedConfigs
+              ?.includeOriginalAttributes,
+          })
+        )
+        .map((product) =>
+          props.similars ? withIsSimilarTo(req, ctx, product) : product
+        ),
+    );
+    const similarEnd = performance.now();
+    span?.setAttribute(
+      "similar-products-time",
+      (similarEnd - similarStart).toString(),
+    );
+    const paramsToPersist = new URLSearchParams();
+    searchArgs.query && paramsToPersist.set("q", searchArgs.query);
+    searchArgs.sort && paramsToPersist.set("sort", searchArgs.sort);
+    const filters = facets
+      .filter((f) => !f.hidden)
+      .map(toFilter(selectedFacets, paramsToPersist));
+    const itemListElement = pageTypesToBreadcrumbList(pageTypes, baseUrl);
+    const hasNextPage = Boolean(pagination.next.proxyUrl);
+    const hasPreviousPage = page > 0;
+    const nextPage = new URLSearchParams(url.searchParams);
+    const previousPage = new URLSearchParams(url.searchParams);
+    if (hasNextPage) {
+      nextPage.set("page", (page + currentPageoffset + 1).toString());
+    }
+    if (hasPreviousPage) {
+      previousPage.set("page", (page + currentPageoffset - 1).toString());
+    }
+    const currentPage = page + currentPageoffset;
+    const end = performance.now();
+    span?.setAttribute("total-time", (end - start).toString());
+    span?.setStatus({ code: SpanStatusCode.OK });
+    return {
+      "@type": "ProductListingPage",
+      breadcrumb: {
+        "@type": "BreadcrumbList",
+        itemListElement,
+        numberOfItems: itemListElement.length,
+      },
+      filters,
+      products,
+      pageInfo: {
+        nextPage: hasNextPage ? `?${nextPage}` : undefined,
+        previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
+        currentPage,
+        records: recordsFiltered,
+        recordPerPage: pagination.perPage,
+        pageTypes: allPageTypes.map(parsePageType),
+      },
+      sortOptions,
+      seo: safeJsonSerialize(pageTypesToSeo(
+        currentPageTypes,
+        baseUrl,
+        hasPreviousPage ? currentPage : undefined,
+      )),
+    };
+  } catch (error) {
+    span?.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: (error as Error).message,
+    });
+    throw error;
+  } finally {
+    span?.end();
   }
-  const { products: vtexProducts, pagination, recordsFiltered } =
-    productsResult;
-  const facets = selectPriceFacet(facetsResult.facets, selectedFacets);
-  // Transform VTEX product format into schema.org's compatible format
-  // If a property is missing from the final `products` array you can add
-  // it in here
-  const products = await Promise.all(
-    vtexProducts
-      .map((p) =>
-        toProduct(p, p.items.find(getFirstItemAvailable) || p.items[0], 0, {
-          baseUrl: baseUrl,
-          priceCurrency: segment?.payload?.currencyCode ?? "BRL",
-          includeOriginalAttributes: props.advancedConfigs
-            ?.includeOriginalAttributes,
-        })
-      )
-      .map((product) =>
-        props.similars ? withIsSimilarTo(req, ctx, product) : product
-      ),
-  );
-  const paramsToPersist = new URLSearchParams();
-  searchArgs.query && paramsToPersist.set("q", searchArgs.query);
-  searchArgs.sort && paramsToPersist.set("sort", searchArgs.sort);
-  const filters = facets
-    .filter((f) => !f.hidden)
-    .map(toFilter(selectedFacets, paramsToPersist));
-  const itemListElement = pageTypesToBreadcrumbList(pageTypes, baseUrl);
-  const hasNextPage = Boolean(pagination.next.proxyUrl);
-  const hasPreviousPage = page > 0;
-  const nextPage = new URLSearchParams(url.searchParams);
-  const previousPage = new URLSearchParams(url.searchParams);
-  if (hasNextPage) {
-    nextPage.set("page", (page + currentPageoffset + 1).toString());
-  }
-  if (hasPreviousPage) {
-    previousPage.set("page", (page + currentPageoffset - 1).toString());
-  }
-  const currentPage = page + currentPageoffset;
-  return {
-    "@type": "ProductListingPage",
-    breadcrumb: {
-      "@type": "BreadcrumbList",
-      itemListElement,
-      numberOfItems: itemListElement.length,
-    },
-    filters,
-    products,
-    pageInfo: {
-      nextPage: hasNextPage ? `?${nextPage}` : undefined,
-      previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
-      currentPage,
-      records: recordsFiltered,
-      recordPerPage: pagination.perPage,
-      pageTypes: allPageTypes.map(parsePageType),
-    },
-    sortOptions,
-    seo: safeJsonSerialize(pageTypesToSeo(
-      currentPageTypes,
-      baseUrl,
-      hasPreviousPage ? currentPage : undefined,
-    )),
-  };
 };
 export const cache = "stale-while-revalidate";
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
