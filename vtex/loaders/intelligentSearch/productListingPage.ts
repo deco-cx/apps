@@ -297,6 +297,7 @@ const loader = async (
     const { vcsDeprecated } = ctx;
     const { url: baseUrl } = req;
     const url = new URL(props.pageHref || baseUrl);
+    span?.setAttribute("url", url.href);
     const segment = getSegmentFromBag(ctx);
     const currentPageoffset = props.pageOffset ?? 1;
     const { selectedFacets: baseSelectedFacets, page, ...args } = searchArgsOf(
@@ -343,6 +344,7 @@ const loader = async (
 
     const params = withDefaultParams({ ...searchArgs, page, locale });
     span?.setAttribute("simulationBehavior", searchArgs.simulationBehavior);
+    span?.setAttribute("isSearch", isInSeachFormat ? "true" : "false");
 
     const productsStart = performance.now();
     // search products on VTEX. Feel free to change any of these parameters
