@@ -1,9 +1,9 @@
 import type { AppContext } from "../mod.ts";
-import type { BaseSchemaResponse } from "../utils/types.ts";
-import {
-  filterProps,
-  filterResponseByPermission,
-} from "../utils/permission-checker.ts";
+import type {
+  BaseSchemaResponse,
+  ValidationFilterResult,
+  ValidationResult,
+} from "../utils/types.ts";
 
 interface Props extends Record<string, unknown> {
   /**
@@ -20,6 +20,7 @@ interface Props extends Record<string, unknown> {
 }
 
 /**
+ * @name Get_Base_Schema
  * @title Get Airtable Base Schema
  * @description Fetches the schema (tables, fields, etc.) for a specific Airtable base using OAuth.
  */
@@ -32,12 +33,19 @@ const loader = async (
     return new Response("OAuth authentication is required", { status: 401 });
   }
 
-  const filteredProps = filterProps(ctx, props);
-  if (filteredProps instanceof Response) {
-    return filteredProps;
+  const propsValidationResult: ValidationResult = await ctx.invoke["airtable"]
+    .loaders.permissioning.validatePermissions({
+      mode: "filter",
+      props: props,
+    });
+
+  if ("error" in propsValidationResult && propsValidationResult.error) {
+    return new Response(propsValidationResult.error, { status: 403 });
   }
 
-  const { baseId, offset } = filteredProps as Props;
+  const propsFilterResult = propsValidationResult as ValidationFilterResult;
+  const { baseId, offset } =
+    (propsFilterResult.filteredProps || props) as Props;
 
   const params: { baseId: string; offset?: string } = { baseId };
   if (offset) {
@@ -53,7 +61,20 @@ const loader = async (
   }
 
   const data = await response.json();
-  return filterResponseByPermission(data, ctx.permission) as BaseSchemaResponse;
+
+  const responseValidationResult: ValidationResult = await ctx
+    .invoke["airtable"].loaders.permissioning.validatePermissions({
+      mode: "filter",
+      response: data,
+    });
+
+  if ("error" in responseValidationResult && responseValidationResult.error) {
+    return new Response(responseValidationResult.error, { status: 403 });
+  }
+
+  const responseFilterResult =
+    responseValidationResult as ValidationFilterResult;
+  return (responseFilterResult.filteredResponse || data) as BaseSchemaResponse;
 };
 
 export default loader;

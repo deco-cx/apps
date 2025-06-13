@@ -104,6 +104,32 @@ export interface UpdateFieldBody {
   description?: string;
 }
 
+export interface Permission {
+  /**
+   * @title All Bases
+   * @description Whether AI can access all bases
+   */
+  allCurrentAndFutureTableBases?: boolean;
+
+  /**
+   * @title Bases
+   * @description Array of selected base IDs that AI can access
+   */
+  bases?: AirtableBase[];
+
+  /**
+   * @title Tables
+   * @description Array of selected table IDs that AI can access
+   */
+  tables?: AirtableTable[];
+}
+
+export interface PermissionParams {
+  bases: AirtableBase[];
+  tables: AirtableTable[];
+  timestamp: string;
+}
+
 export interface AirtableBase {
   id: string;
   name?: string;
@@ -112,10 +138,93 @@ export interface AirtableBase {
 export interface AirtableTable {
   id: string;
   name?: string;
+  baseId?: string;
+  records?: AirtableRecordPermission[];
+}
+
+export interface AirtableRecordPermission {
+  id: string;
+  name?: string;
 }
 
 export interface WhoamiResponse {
   id: string;
   email?: string;
   scopes?: string[];
+}
+
+export interface PermissionCheck {
+  hasPermission: boolean;
+  message?: string;
+}
+
+export interface ValidationFilterResult {
+  filteredProps?: Record<string, unknown>;
+  filteredResponse?:
+    | ListBasesResponse
+    | ListRecordsResponse
+    | BaseSchemaResponse;
+  error?: string;
+}
+
+export interface ValidationErrorResult {
+  error: string;
+  filteredProps: null;
+  filteredResponse: null;
+}
+
+export type ValidationResult =
+  | PermissionCheck
+  | ValidationFilterResult
+  | ValidationErrorResult
+  | FilteredOperationResult
+  | { error: string };
+
+export interface BaseWithTables {
+  id: string;
+  name: string;
+  type: "base";
+  tables: Record<string, AirtableTable & { type: "table" }>;
+}
+
+export interface TablePermission {
+  id: string;
+  name: string;
+  type: "table";
+}
+
+export interface LegacyTablePermission {
+  id: string;
+  name: string;
+  type: "table";
+}
+
+export type PermissionResult = BaseWithTables | LegacyTablePermission;
+
+export interface AllowedTablesBasesResponse {
+  allCurrentAndFutureTableBases?: boolean;
+  description?: string;
+  permission?: Record<string, PermissionResult>;
+}
+
+export interface OperationItem {
+  baseId: string;
+  tableId?: string;
+  tableIdOrName?: string;
+  [key: string]: unknown;
+}
+
+export interface FilteredOperationResult {
+  allowedOperations: OperationItem[];
+  deniedOperations: OperationItem[];
+  totalRequested: number;
+  totalAllowed: number;
+  totalDenied: number;
+}
+
+export interface PartialOperationResult<T = unknown> {
+  success: boolean;
+  results: T[];
+  filtered: FilteredOperationResult;
+  message: string;
 }

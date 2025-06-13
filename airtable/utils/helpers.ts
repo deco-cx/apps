@@ -1,4 +1,8 @@
-import type { FieldSet, ListRecordsOptions } from "./types.ts";
+import type {
+  FieldSet,
+  ListRecordsOptions,
+  PermissionParams,
+} from "./types.ts";
 
 /**
  * Utility functions for Airtable operations
@@ -146,3 +150,8 @@ export function mapTableFields(
     return mappedField;
   });
 }
+
+export const decodePermission = (permission: string): PermissionParams => {
+  const permissionData = JSON.parse(atob(permission));
+  return permissionData as PermissionParams;
+};

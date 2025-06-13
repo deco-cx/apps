@@ -1,6 +1,9 @@
 import type { AppContext } from "../mod.ts";
-import type { ListRecordsResponse } from "../utils/types.ts";
-import { filterProps } from "../utils/permission-checker.ts";
+import type {
+  ListRecordsResponse,
+  ValidationFilterResult,
+  ValidationResult,
+} from "../utils/types.ts";
 
 interface Props extends Record<string, unknown> {
   /**
@@ -10,6 +13,8 @@ interface Props extends Record<string, unknown> {
   baseId: string;
 
   /**
+   * @title Table ID
+   * @description The ID of the table within the base.
    * @title Table ID
    * @description The ID of the table within the base.
    */
@@ -54,14 +59,16 @@ interface Props extends Record<string, unknown> {
     direction: "asc" | "desc";
   }>;
 
-  /**
-   * @title Fields
-   * @description Array of field names to include in the response.
-   */
-  fields?: string[];
+  // TODO: Add fields to the response
+  // /**
+  //  * @title Fields
+  //  * @description Array of field names to include in the response.
+  //  */
+  // fields?: string[];
 }
 
 /**
+ * @name List_Table_Records
  * @title List Airtable Records
  * @description Fetches records from a specific table using OAuth with optional filtering and sorting.
  */
@@ -74,13 +81,21 @@ const loader = async (
     return new Response("OAuth authentication is required", { status: 401 });
   }
 
-  const filteredProps = filterProps(ctx, props);
-  if (filteredProps instanceof Response) {
-    return filteredProps;
+  const propsValidationResult: ValidationResult = await ctx.invoke["airtable"]
+    .loaders.permissioning.validatePermissions({
+      mode: "filter",
+      props: { ...props, tableIdOrName: props.tableId },
+    });
+
+  if ("error" in propsValidationResult && propsValidationResult.error) {
+    return new Response(propsValidationResult.error, { status: 403 });
   }
 
+  const filterResult = propsValidationResult as ValidationFilterResult;
+  const validatedProps = (filterResult.filteredProps || props) as Props;
+
   const response = await ctx.client["GET /v0/:baseId/:tableId"](
-    filteredProps as Props,
+    validatedProps,
   );
 
   if (!response.ok) {
