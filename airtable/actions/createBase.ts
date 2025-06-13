@@ -31,13 +31,33 @@ interface TableConfig {
      * @description Type of the field
      * @default "singleLineText"
      */
-    type: "singleLineText" | "email" | "url" | "multilineText" | "number" | 
-          "percent" | "currency" | "singleSelect" | "multipleSelects" | 
-          "singleCollaborator" | "multipleCollaborators" | "multipleRecordLinks" | 
-          "date" | "dateTime" | "phoneNumber" | "multipleAttachments" | 
-          "checkbox" | "formula" | "createdTime" | "rollup" | "count" | 
-          "lookup" | "createdBy" | "lastModifiedTime" | "lastModifiedBy" | 
-          "button";
+    type:
+      | "singleLineText"
+      | "email"
+      | "url"
+      | "multilineText"
+      | "number"
+      | "percent"
+      | "currency"
+      | "singleSelect"
+      | "multipleSelects"
+      | "singleCollaborator"
+      | "multipleCollaborators"
+      | "multipleRecordLinks"
+      | "date"
+      | "dateTime"
+      | "phoneNumber"
+      | "multipleAttachments"
+      | "checkbox"
+      | "formula"
+      | "createdTime"
+      | "rollup"
+      | "count"
+      | "lookup"
+      | "createdBy"
+      | "lastModifiedTime"
+      | "lastModifiedBy"
+      | "button";
 
     /**
      * @title Field Description
@@ -60,20 +80,20 @@ interface TableConfig {
          * @description Name of the choice
          */
         name: string;
-        
+
         /**
          * @title Choice Color
          * @description Optional color for the choice
          */
         color?: string;
       }>;
-      
+
       /**
        * @title Color
        * @description Optional color for the field
        */
       color?: string;
-      
+
       /**
        * @title Icon
        * @description Optional icon for the field
@@ -141,21 +161,21 @@ const action = async (
   const body = {
     name: name.trim(),
     workspaceId: workspaceId.trim(),
-    tables: tables.map(table => ({
+    tables: tables.map((table) => ({
       name: table.name,
       ...(table.description && { description: table.description }),
-      fields: table.fields.map(field => ({
+      fields: table.fields.map((field) => ({
         name: field.name,
         type: field.type,
         ...(field.description && { description: field.description }),
-        ...(field.options && { options: field.options })
-      }))
-    }))
+        ...(field.options && { options: field.options }),
+      })),
+    })),
   };
 
   const response = await ctx.client["POST /v0/meta/bases"](
     {},
-    { body }
+    { body },
   );
 
   if (!response.ok) {
@@ -168,11 +188,13 @@ const action = async (
     ...config,
     permission: {
       ...config.permission,
-      bases: [...(config.permission?.bases ?? []), { id: (await response.json()).id }],
+      bases: [...(config.permission?.bases ?? []), {
+        id: (await response.json()).id,
+      }],
     },
   });
 
   return response.json();
 };
 
-export default action; 
+export default action;

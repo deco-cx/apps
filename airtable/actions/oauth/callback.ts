@@ -1,5 +1,7 @@
 import type { AppContext } from "../../mod.ts";
 import { OAUTH_URL_TOKEN } from "../../utils/constants.ts";
+import { decodePermission } from "../../utils/permission-checker.ts";
+import { AirtableBase } from "../../utils/types.ts";
 import { fetchBasesAndTables } from "../../utils/ui-templates/airtable-client.ts";
 import { generateSelectionPage } from "../../utils/ui-templates/page-generator.ts";
 
@@ -96,6 +98,7 @@ function decodeState(state: string): State & StateProvider {
 }
 
 /**
+ * @internal true
  * @title OAuth Callback
  * @description Exchanges the authorization code for access tokens with PKCE support
  */
@@ -112,48 +115,52 @@ export default async function callback(
   req: Request,
   ctx: AppContext,
 ): Promise<Response | Record<string, unknown>> {
-  const { isSaveBase, skip } = queryParams;
+  const { savePermission, continue: continueQueryParam } = queryParams;
 
-  if (isSaveBase) {
-    const { selectedBases, selectedTables } = queryParams;
+  if (savePermission) {
+    const { permissions } = queryParams;
+    const { bases, tables } = decodePermission(permissions);
+
     const stateData = decodeState(state);
+    const currentCtx = await ctx.getConfiguration();
 
     const account = await ctx.invoke.airtable.loaders.whoami({
-      accessToken: ctx.tokens?.access_token,
+      accessToken: currentCtx.tokens?.access_token || ctx.tokens?.access_token,
     })
       .then((user) => user.email)
       .catch((error) => {
-        console.error("Erro ao obter informações do usuário:", error);
+        console.error("Error getting user:", error);
         return undefined;
       }) || undefined;
 
-    if (skip === "true") {
+    const accountName = account ||
+      bases.map((base: AirtableBase) => base.name).join(", ");
+
+    if (continueQueryParam === "true") {
+      await ctx.configure({
+        ...currentCtx,
+        permission: {
+          allCurrentAndFutureTableBases: true,
+        },
+      });
+
       return {
         installId: stateData.installId,
-        account: account ?? selectedBases + "," + selectedTables,
+        account: accountName,
       };
     }
 
-    const basesArray = selectedBases
-      ? selectedBases.split(",").map((id) => ({ id }))
-      : [];
-
-    const tablesArray = selectedTables
-      ? selectedTables.split(",").map((id) => ({ id }))
-      : [];
-
-    const currentCtx = await ctx.getConfiguration();
     await ctx.configure({
       ...currentCtx,
       permission: {
-        bases: basesArray,
-        tables: tablesArray,
+        bases,
+        tables,
       },
     });
 
     return {
       installId: stateData.installId,
-      account,
+      account: accountName,
     };
   }
 
@@ -212,7 +219,7 @@ export default async function callback(
     const newURL = req.url;
     const data = await fetchBasesAndTables(tokenData);
 
-    const selectionHtml = await generateSelectionPage({
+    const selectionHtml = generateSelectionPage({
       bases: data.bases,
       tables: data.tables,
       callbackUrl: newURL,

@@ -44,6 +44,9 @@ export const OAUTH_SCOPES = [
   "data.records:write",
   "schema.bases:read",
   "schema.bases:write",
+  "user.email:read",
+  "data.recordComments:read",
+  "data.recordComments:write"
 ];
 
 export const OAUTH_URL = "https://airtable.com/oauth2/v1";
