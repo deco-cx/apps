@@ -121,9 +121,8 @@ export default async function callback(
 ): Promise<Response | Record<string, unknown>> {
   const { savePermission, continue: continueQueryParam } = queryParams;
 
-  if (savePermission) {
+  if (savePermission || continueQueryParam === "true") {
     const { permissions } = queryParams;
-    const { bases, tables } = decodePermission(permissions);
 
     const stateData = decodeState(state);
     const currentCtx = await ctx.getConfiguration();
@@ -137,8 +136,7 @@ export default async function callback(
         return undefined;
       }) || undefined;
 
-    const accountName = account ||
-      bases.map((base: AirtableBase) => base.name).join(", ");
+    let accountName = account
 
     if (continueQueryParam === "true") {
       await ctx.configure({
@@ -154,6 +152,8 @@ export default async function callback(
       };
     }
 
+    const { bases, tables } = decodePermission(permissions);
+
     await ctx.configure({
       ...currentCtx,
       permission: {
@@ -161,6 +161,9 @@ export default async function callback(
         tables,
       },
     });
+
+    accountName = account ||
+      bases.map((base: AirtableBase) => base.name).join(", ");
 
     return {
       installId: stateData.installId,

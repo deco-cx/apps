@@ -31,6 +31,7 @@ interface ValidatePermissionsProps {
 
 /**
  * @name VALIDATE_PERMISSIONS
+ * @internal
  * @title Validate User Permissions
  * @description Validates if user has permission to access bases/tables or filters data based on permissions.
  */
