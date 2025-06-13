@@ -1289,6 +1289,12 @@ export type CartWalletPaymentMethodInput = {
   shopPayWalletContent?: InputMaybe<ShopPayWalletContentInput>;
 };
 
+/** A filter used to view a subset of products in a collection matching a specific category value. */
+export type CategoryFilter = {
+  /** The id of the category to filter on. */
+  id: Scalars['String']['input'];
+};
+
 /** A container for all the information required to checkout items and pay. */
 export type Checkout = Node & {
   /** The gift cards used on the checkout. */
@@ -6213,6 +6219,8 @@ export type ProductEdge = {
 export type ProductFilter = {
   /** Filter on if the product is available for sale. */
   available?: InputMaybe<Scalars['Boolean']['input']>;
+  /** A product category to filter on. */
+  category?: InputMaybe<CategoryFilter>;
   /** A range of prices to filter with-in. */
   price?: InputMaybe<PriceRangeFilter>;
   /** A product metafield to filter on. */
@@ -6223,6 +6231,8 @@ export type ProductFilter = {
   productVendor?: InputMaybe<Scalars['String']['input']>;
   /** A product tag to filter on. */
   tag?: InputMaybe<Scalars['String']['input']>;
+  /** A standard product attribute metafield to filter on. */
+  taxonomyMetafield?: InputMaybe<TaxonomyMetafieldFilter>;
   /** A variant metafield to filter on. */
   variantMetafield?: InputMaybe<MetafieldFilter>;
   /** A variant option to filter on. */
@@ -7463,6 +7473,16 @@ export type SubmitThrottled = {
    *
    */
   pollAfter: Scalars['DateTime']['output'];
+};
+
+/** A filter used to view a subset of products in a collection matching a specific taxonomy metafield value. */
+export type TaxonomyMetafieldFilter = {
+  /** The key of the metafield to filter on. */
+  key: Scalars['String']['input'];
+  /** The namespace of the metafield to filter on. */
+  namespace: Scalars['String']['input'];
+  /** The value of the metafield. */
+  value: Scalars['String']['input'];
 };
 
 /**
