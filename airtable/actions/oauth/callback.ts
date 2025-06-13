@@ -59,7 +59,7 @@ export interface Props {
    * @title Query Params
    * @description The query parameters from the request
    */
-  queryParams: Record<string, string>;
+  queryParams: Record<string, string | boolean | undefined>;
 }
 
 function extractCodeVerifier(state: string): string | null {
@@ -121,7 +121,7 @@ export default async function callback(
 ): Promise<Response | Record<string, unknown>> {
   const { savePermission, continue: continueQueryParam } = queryParams;
 
-  if (savePermission || continueQueryParam === "true") {
+  if (!!savePermission || !!continueQueryParam) {
     const { permissions } = queryParams;
 
     const stateData = decodeState(state);
@@ -152,23 +152,25 @@ export default async function callback(
       };
     }
 
-    const { bases, tables } = decodePermission(permissions);
+    if (permissions && typeof permissions === "string") {
+      const { bases, tables } = decodePermission(permissions);
 
-    await ctx.configure({
-      ...currentCtx,
-      permission: {
-        bases,
-        tables,
-      },
-    });
+      await ctx.configure({
+        ...currentCtx,
+        permission: {
+          bases,
+          tables,
+        },
+      });
 
-    accountName = account ||
-      bases.map((base: AirtableBase) => base.name).join(", ");
+      accountName = account ||
+        bases.map((base: AirtableBase) => base.name).join(", ");
 
-    return {
-      installId: stateData.installId,
-      account: accountName,
-    };
+      return {
+        installId: stateData.installId,
+        account: accountName,
+      };
+    }
   }
 
   try {
