@@ -24,6 +24,7 @@ export function generateSelectionPage(
 
   try {
     htmlTemplate = `
+<!-- ignore -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -118,7 +119,13 @@ export function generateSelectionPage(
         flex: 1;
         text-align: left;
         margin: 0 16px;
-        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
       }
 
       .header-title.light-mode {
@@ -143,11 +150,44 @@ export function generateSelectionPage(
         z-index: 10;
       }
 
+      #theme-toggle {
+        color: #f5f5f4;
+      }
+
+      #theme-toggle:hover {
+        opacity: 0.8;
+      }
+
+      .light-mode #theme-toggle {
+        color: #1a1a1a;
+      }
+
+      /* Theme icon styling */
+      #theme-icon-path {
+        transition: fill 0.2s ease;
+      }
+
+      /* Dark mode: half-circle is white */
+      #theme-icon-path {
+        fill: #f5f5f4;
+      }
+
+      /* Light mode: half-circle is black */
+      .light-mode #theme-icon-path {
+        fill: #1a1a1a;
+      }
+
       .selection-subtitle {
         color: #a8a29e;
         font-size: 14px;
         text-align: left;
-        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
       }
 
       .selection-subtitle.light-mode {
@@ -180,7 +220,13 @@ export function generateSelectionPage(
         background: #292524;
         color: #f5f5f4;
         transition: border-color 0.2s;
-        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
       }
 
       .search-box.light-mode {
@@ -331,7 +377,13 @@ export function generateSelectionPage(
         flex: 1;
         font-size: 14px;
         color: #f5f5f4;
-        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
       }
 
       .base-label.light-mode {
@@ -464,7 +516,13 @@ export function generateSelectionPage(
         flex: 1;
         font-size: 14px;
         color: #f5f5f4;
-        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
       }
 
       .table-label.light-mode {
@@ -477,7 +535,13 @@ export function generateSelectionPage(
         padding: 24px 16px;
         color: #737373;
         font-size: 14px;
-        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
       }
 
       .no-results.light-mode {
@@ -508,7 +572,13 @@ export function generateSelectionPage(
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
       }
 
       .btn-primary {
@@ -640,8 +710,6 @@ export function generateSelectionPage(
       #select-all-header.light-mode span:last-child {
         color: #999 !important;
       }
-
-
     </style>
   </head>
   <body>
@@ -681,10 +749,31 @@ export function generateSelectionPage(
               </g>
             </svg>
             <span class="header-title">Airtable</span>
-            <button id="theme-toggle" style="margin-left:auto; background:transparent; border:none; cursor:pointer;" title="Toggle theme" onclick="toggleTheme()">
-              <svg id="theme-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" opacity="0.6"/>
-                <path id="theme-icon-path" d="M10 2a8 8 0 1 0 8 8" stroke="currentColor" stroke-width="2" opacity="0.6"/>
+            <button
+              id="theme-toggle"
+              style="margin-left: auto; background: transparent; border: none; cursor: pointer"
+              title="Toggle theme"
+              onclick="toggleTheme()"
+            >
+              <svg
+                id="theme-icon"
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+              >
+                <circle
+                  cx="10"
+                  cy="10"
+                  r="8"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                />
+                <path
+                  id="theme-icon-path"
+                  d="M10 2a8 8 0 0 1 0 16z"
+                />
               </svg>
             </button>
           </div>
@@ -721,20 +810,25 @@ export function generateSelectionPage(
             </div>
           </div>
 
-          <div
-            id="select-all-header"
-          >
-          </div>
+          <div id="select-all-header"></div>
 
           <div class="selection-list" id="selection-list"></div>
         </div>
 
         <div class="button-section">
-          <button class="btn btn-secondary" id="restrict-btn" onclick="confirmSelection()">
+          <button
+            class="btn btn-secondary"
+            id="restrict-btn"
+            onclick="confirmSelection()"
+          >
             Restrict to selected
           </button>
-          <button class="btn btn-primary" id="continue-btn" onclick="skipSelection()">
-           Continue
+          <button
+            class="btn btn-primary"
+            id="continue-btn"
+            onclick="skipSelection()"
+          >
+            Continue
           </button>
         </div>
       </div>
@@ -764,10 +858,10 @@ export function generateSelectionPage(
       let filteredBases = [...bases];
       let filteredTables = [...tables];
 
-      document.addEventListener("DOMContentLoaded", function () {
+              document.addEventListener("DOMContentLoaded", function () {
         preselectPartial();
         renderSelectionList();
-        const theme = localStorage.getItem('theme') || 'dark';
+        const theme = localStorage.getItem("theme") || "light";
         applyTheme(theme);
       });
 
@@ -848,7 +942,7 @@ export function generateSelectionPage(
         const headerContainer = document.getElementById(
           "select-all-header",
         );
-        const theme = localStorage.getItem('theme') || 'dark';
+        const theme = localStorage.getItem("theme") || "light";
 
         if (filteredBases.length === 0) {
           container.innerHTML =
@@ -907,7 +1001,28 @@ export function generateSelectionPage(
           }
         }
 
-        const selectAllChecked = selectedBases.size === bases.length
+        // Verificar se realmente TUDO está selecionado
+        let allBasesFullySelected = true;
+
+        // Verificar se todas as bases estão selecionadas
+        if (selectedBases.size !== bases.length) {
+          allBasesFullySelected = false;
+        } else {
+          // Verificar se todas as tabelas de todas as bases estão selecionadas
+          for (const base of bases) {
+            const baseTableIds = baseToTablesMap.get(base.id) ||
+              new Set();
+            for (const tableId of baseTableIds) {
+              if (!selectedTables.has(tableId)) {
+                allBasesFullySelected = false;
+                break;
+              }
+            }
+            if (!allBasesFullySelected) break;
+          }
+        }
+
+        const selectAllChecked = allBasesFullySelected
           ? "checked"
           : "unchecked";
         const totalBases = selectedBases.size;
@@ -915,7 +1030,9 @@ export function generateSelectionPage(
 
         const headerHTML = \`
           <div style="display: flex; align-items: center; gap: 8px;" onclick="toggleSelectAll()">
-            <div class="base-checkbox \${theme === 'light' ? 'light-mode' : ''} \${selectAllChecked}" style="cursor: pointer;">
+            <div class="base-checkbox \${
+          theme === "light" ? "light-mode" : ""
+        } \${selectAllChecked}" style="cursor: pointer;">
               <svg class="check-icon" viewBox="0 0 16 12">
                 <path d="M1 6l4 4 8-8" />
               </svg>
@@ -926,12 +1043,12 @@ export function generateSelectionPage(
         \`;
 
         headerContainer.innerHTML = headerHTML;
-        if (theme === 'light') {
-          headerContainer.classList.add('light-mode');
-          container.classList.add('light-mode');
+        if (theme === "light") {
+          headerContainer.classList.add("light-mode");
+          container.classList.add("light-mode");
         } else {
-          headerContainer.classList.remove('light-mode');
-          container.classList.remove('light-mode');
+          headerContainer.classList.remove("light-mode");
+          container.classList.remove("light-mode");
         }
         container.innerHTML = basesToShow.map(createBaseItemHTML).join(
           "",
@@ -959,22 +1076,32 @@ export function generateSelectionPage(
           createTableItemHTML(table)
         ).join("");
 
-        const theme = localStorage.getItem('theme') || 'dark';
+        const theme = localStorage.getItem("theme") || "light";
         return \`
           <div class="base-item \${shouldBeExpanded ? "expanded" : ""}">
-            <div class="base-header\${theme === 'light' ? ' light-mode' : ''}" onclick="toggleBaseExpansion('\${base.id}')">
-              <div class="base-checkbox \${theme === 'light' ? 'light-mode' : ''} \${isSelected ? "checked" : "unchecked"}" onclick="event.stopPropagation(); toggleBaseSelection('\${base.id}')">
+            <div class="base-header\${
+          theme === "light" ? " light-mode" : ""
+        }" onclick="toggleBaseExpansion('\${base.id}')">
+              <div class="base-checkbox \${
+          theme === "light" ? "light-mode" : ""
+        } \${
+          isSelected ? "checked" : "unchecked"
+        }" onclick="event.stopPropagation(); toggleBaseSelection('\${base.id}')">
                 <svg class="check-icon" viewBox="0 0 16 12">
                   <path d="M1 6l4 4 8-8" />
                 </svg>
               </div>
-              <span class="base-label\${theme === 'light' ? ' light-mode' : ''}">\${base.name || base.id}</span>
-              <svg class="expand-icon\${theme === 'light' ? ' light-mode' : ''}" viewBox="0 0 16 16">
+              <span class="base-label\${
+          theme === "light" ? " light-mode" : ""
+        }">\${base.name || base.id}</span>
+              <svg class="expand-icon\${
+          theme === "light" ? " light-mode" : ""
+        }" viewBox="0 0 16 16">
                 <path d="M6 12l6-6-6-6" />
               </svg>
             </div>
             <div class="tables-container">
-              \${tablesHTML}
+             \${tablesHTML}
             </div>
           </div>
         \`;
@@ -1017,15 +1144,21 @@ export function generateSelectionPage(
           highlightClass = "base-match";
         }
 
-        const theme = localStorage.getItem('theme') || 'dark';
+        const theme = localStorage.getItem("theme") || "light";
         return \`
-          <div class="table-item \${highlightClass}\${theme === 'light' ? ' light-mode' : ''}" onclick="toggleTableSelection('\${table.id}')">
-            <div class="table-checkbox \${theme === 'light' ? 'light-mode' : ''} \${isSelected ? "checked" : "unchecked"}">
+          <div class="table-item \${highlightClass}\${
+          theme === "light" ? " light-mode" : ""
+        }" onclick="toggleTableSelection('\${table.id}')">
+            <div class="table-checkbox \${
+          theme === "light" ? "light-mode" : ""
+        } \${isSelected ? "checked" : "unchecked"}">
               <svg class="check-icon" viewBox="0 0 16 12">
                 <path d="M1 6l4 4 8-8" />
               </svg>
             </div>
-            <span class="table-label\${theme === 'light' ? ' light-mode' : ''}">\${table.name || table.id}</span>
+            <span class="table-label\${
+          theme === "light" ? " light-mode" : ""
+        }">\${table.name || table.id}</span>
           </div>
         \`;
       }
@@ -1109,9 +1242,25 @@ export function generateSelectionPage(
       }
 
       function toggleSelectAll() {
-        const allSelected = selectedBases.size === bases.length;
+        let allBasesFullySelected = true;
 
-        if (allSelected) {
+        if (selectedBases.size !== bases.length) {
+          allBasesFullySelected = false;
+        } else {
+          for (const base of bases) {
+            const baseTableIds = baseToTablesMap.get(base.id) ||
+              new Set();
+            for (const tableId of baseTableIds) {
+              if (!selectedTables.has(tableId)) {
+                allBasesFullySelected = false;
+                break;
+              }
+            }
+            if (!allBasesFullySelected) break;
+          }
+        }
+
+        if (allBasesFullySelected) {
           selectedBases.clear();
           selectedTables.clear();
         } else {
@@ -1122,7 +1271,7 @@ export function generateSelectionPage(
         renderSelectionList();
       }
 
-     function skipSelection() {
+      function skipSelection() {
         const urlParams = new URLSearchParams();
         urlParams.set("continue", "true");
         window.location.href = callbackUrl + "&" + urlParams.toString();
@@ -1136,30 +1285,36 @@ export function generateSelectionPage(
           return;
         }
 
-        const selectedBasesData = Array.from(selectedBases).map(baseId => {
-          const base = bases.find(b => b.id === baseId);
-          return {
-            id: baseId,
-            name: base ? base.name : baseId
-          };
-        });
+        const selectedBasesData = Array.from(selectedBases).map(
+          (baseId) => {
+            const base = bases.find((b) => b.id === baseId);
+            return {
+              id: baseId,
+              name: base ? base.name : baseId,
+            };
+          },
+        );
 
-        const selectedTablesData = Array.from(selectedTables).map(tableId => {
-          const table = tables.find(t => t.id === tableId);
-          return {
-            id: tableId,
-            name: table ? table.name : tableId,
-            baseId: table ? table.baseId : null
-          };
-        });
+        const selectedTablesData = Array.from(selectedTables).map(
+          (tableId) => {
+            const table = tables.find((t) => t.id === tableId);
+            return {
+              id: tableId,
+              name: table ? table.name : tableId,
+              baseId: table ? table.baseId : null,
+            };
+          },
+        );
 
         const permissionsData = {
           bases: selectedBasesData,
           tables: selectedTablesData,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         };
 
-        const permissionsEncoded = btoa(JSON.stringify(permissionsData));
+        const permissionsEncoded = btoa(
+          JSON.stringify(permissionsData),
+        );
 
         const urlParams = new URLSearchParams();
         urlParams.set("savePermission", "true");
@@ -1171,62 +1326,69 @@ export function generateSelectionPage(
 
       function applyTheme(theme) {
         const body = document.body;
-        const container = document.getElementById('main-container');
-        const header = document.getElementById('selection-header');
-        const content = document.querySelector('.selection-content');
-        const buttonSection = document.querySelector('.button-section');
-          const searchBox = document.getElementById('search-input');
-  const selectionList = document.getElementById('selection-list');
-  const selectAllHeader = document.getElementById('select-all-header');
-  const headerTitle = document.querySelector('.header-title');
-  const subtitle = document.querySelector('.selection-subtitle');
-  const restrictBtn = document.getElementById('restrict-btn');
-  const continueBtn = document.getElementById('continue-btn');
-  const themeIcon = document.getElementById('theme-icon');
-  const themeIconPath = document.getElementById('theme-icon-path');
+        const container = document.getElementById("main-container");
+        const header = document.getElementById("selection-header");
+        const content = document.querySelector(".selection-content");
+        const buttonSection = document.querySelector(".button-section");
+        const searchBox = document.getElementById("search-input");
+        const selectionList = document.getElementById("selection-list");
+        const selectAllHeader = document.getElementById(
+          "select-all-header",
+        );
+        const headerTitle = document.querySelector(".header-title");
+        const subtitle = document.querySelector(".selection-subtitle");
+        const restrictBtn = document.getElementById("restrict-btn");
+        const continueBtn = document.getElementById("continue-btn");
+        const themeIcon = document.getElementById("theme-icon");
+        const themeIconPath = document.getElementById(
+          "theme-icon-path",
+        );
 
-        if (theme === 'light') {
-          body.classList.add('light-mode');
-          container.classList.add('light-mode');
-          header.classList.add('light-mode');
-          content.classList.add('light-mode');
-          buttonSection.classList.add('light-mode');
-              if (searchBox) searchBox.classList.add('light-mode');
-    if (selectionList) selectionList.classList.add('light-mode');
-    if (selectAllHeader) selectAllHeader.classList.add('light-mode');
-    if (headerTitle) headerTitle.classList.add('light-mode');
-    if (subtitle) subtitle.classList.add('light-mode');
-    if (restrictBtn) restrictBtn.classList.add('light-mode');
-    if (continueBtn) continueBtn.classList.add('light-mode');
-    themeIconPath.setAttribute('d', 'M10 2a8 8 0 1 0 8 8');
+        if (theme === "light") {
+          body.classList.add("light-mode");
+          container.classList.add("light-mode");
+          header.classList.add("light-mode");
+          content.classList.add("light-mode");
+          buttonSection.classList.add("light-mode");
+          if (searchBox) searchBox.classList.add("light-mode");
+          if (selectionList) selectionList.classList.add("light-mode");
+          if (selectAllHeader) {
+            selectAllHeader.classList.add("light-mode");
+          }
+          if (headerTitle) headerTitle.classList.add("light-mode");
+          if (subtitle) subtitle.classList.add("light-mode");
+          if (restrictBtn) restrictBtn.classList.add("light-mode");
+          if (continueBtn) continueBtn.classList.add("light-mode");
         } else {
-          body.classList.remove('light-mode');
-          container.classList.remove('light-mode');
-          header.classList.remove('light-mode');
-          content.classList.remove('light-mode');
-          buttonSection.classList.remove('light-mode');
-              if (searchBox) searchBox.classList.remove('light-mode');
-    if (selectionList) selectionList.classList.remove('light-mode');
-    if (selectAllHeader) selectAllHeader.classList.remove('light-mode');
-    if (headerTitle) headerTitle.classList.remove('light-mode');
-    if (subtitle) subtitle.classList.remove('light-mode');
-    if (restrictBtn) restrictBtn.classList.remove('light-mode');
-    if (continueBtn) continueBtn.classList.remove('light-mode');
-    themeIconPath.setAttribute('d', 'M10 2v16M2 10h16');
+          body.classList.remove("light-mode");
+          container.classList.remove("light-mode");
+          header.classList.remove("light-mode");
+          content.classList.remove("light-mode");
+          buttonSection.classList.remove("light-mode");
+          if (searchBox) searchBox.classList.remove("light-mode");
+          if (selectionList) {
+            selectionList.classList.remove("light-mode");
+          }
+          if (selectAllHeader) {
+            selectAllHeader.classList.remove("light-mode");
+          }
+          if (headerTitle) headerTitle.classList.remove("light-mode");
+          if (subtitle) subtitle.classList.remove("light-mode");
+          if (restrictBtn) restrictBtn.classList.remove("light-mode");
+          if (continueBtn) continueBtn.classList.remove("light-mode");
         }
       }
 
       function toggleTheme() {
-        const current = localStorage.getItem('theme') || 'dark';
-        const next = current === 'dark' ? 'light' : 'dark';
-        localStorage.setItem('theme', next);
+        const current = localStorage.getItem("theme") || "light";
+        const next = current === "dark" ? "light" : "dark";
+        localStorage.setItem("theme", next);
         applyTheme(next);
         renderSelectionList();
       }
     </script>
   </body>
 </html>
-
 `;
   } catch (error) {
     console.error("Falha ao ler o template HTML:", error);

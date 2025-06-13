@@ -101,6 +101,25 @@ function decodeState(state: string): State & StateProvider {
   }
 }
 
+function hasExistingPermissions(permission: unknown): boolean {
+  if (!permission || typeof permission !== "object" || permission === null) {
+    return false;
+  }
+  return Object.keys(permission as Record<string, unknown>).length > 0;
+}
+
+function createPermissionExistsError(
+  installId: string,
+  accountName: string | undefined,
+) {
+  return {
+    installId,
+    account: accountName,
+    error:
+      "Permissions already configured. Cannot overwrite existing permissions.",
+  };
+}
+
 /**
  * @internal true
  * @title OAuth Callback
@@ -139,6 +158,10 @@ export default async function callback(
     let accountName = account;
 
     if (continueQueryParam === "true") {
+      if (hasExistingPermissions(currentCtx.permission)) {
+        return createPermissionExistsError(stateData.installId, accountName);
+      }
+
       await ctx.configure({
         ...currentCtx,
         permission: {
@@ -153,6 +176,10 @@ export default async function callback(
     }
 
     if (permissions && typeof permissions === "string") {
+      if (hasExistingPermissions(currentCtx.permission)) {
+        return createPermissionExistsError(stateData.installId, accountName);
+      }
+
       const { bases, tables } = decodePermission(permissions);
 
       await ctx.configure({
