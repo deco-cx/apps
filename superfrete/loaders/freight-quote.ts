@@ -2,7 +2,6 @@ import type { AppContext } from "../mod.ts";
 import type {
   FreightQuoteRequest,
   FreightQuoteResponse,
-  FreightService,
   Package,
   Product,
 } from "../client.ts";
@@ -150,8 +149,9 @@ const loader = async (
   const result = await response.json();
 
   // It's bad, but leave it like that for now.
-  return result.map((service: FreightService) => {
-    if (service.error === '444') {
+  // @ts-ignore -
+  return result.map((service) => {
+    if (service.error === "444") {
       delete service.error;
       service.disponible = false;
     } else if (service.error === undefined) {
