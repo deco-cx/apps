@@ -150,19 +150,3 @@ export default async function action(
     );
   }
 }
-
-/**
- * Função auxiliar para criar respostas de erro
- */
-function createErrorResponse(
-  code: number,
-  message: string,
-  details?: unknown,
-): UpdateVideoError {
-  return {
-    message,
-    error: true,
-    code,
-    details,
-  };
-}

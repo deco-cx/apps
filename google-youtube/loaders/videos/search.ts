@@ -1,5 +1,5 @@
 import { AppContext } from "../../mod.ts";
-import { VideoQuery, YoutubeVideoResponse } from "../../utils/types.ts";
+import { YoutubeVideoResponse } from "../../utils/types.ts";
 import {
   COMMON_ERROR_MESSAGES,
   DEFAULT_MAX_RESULTS,
@@ -178,6 +178,8 @@ const loader = async (
     }
 
     const videoIds = searchData.items
+      // Using any here because the response structure can vary
+      // deno-lint-ignore no-explicit-any
       .map((item: any) => {
         if (typeof item.id === "object" && "videoId" in item.id) {
           return item.id.videoId;
@@ -208,6 +210,8 @@ const loader = async (
 
     const detailsData = await detailsResponse.json();
 
+    // Using any because the video structure is complex and we're adding custom properties
+    // deno-lint-ignore no-explicit-any
     let videos = detailsData.items.map((video: any) => {
       const durationInSeconds = calculateDurationInSeconds(
         video.contentDetails?.duration || "PT0S",
@@ -222,16 +226,22 @@ const loader = async (
     });
 
     if (onlyShorts) {
+      // Using any because we added custom properties to the video objects
+      // deno-lint-ignore no-explicit-any
       videos = videos.filter((video: any) => video.isShort);
       if (videos.length > maxResults) {
         videos = videos.slice(0, maxResults);
       }
     } else if (excludeShorts) {
+      // Using any because we added custom properties to the video objects
+      // deno-lint-ignore no-explicit-any
       videos = videos.filter((video: any) => !video.isShort);
     }
 
     if (maxDuration) {
+      // Using any because we added custom properties to the video objects
       videos = videos.filter(
+        // deno-lint-ignore no-explicit-any
         (video: any) => video.durationInSeconds <= maxDuration,
       );
     }

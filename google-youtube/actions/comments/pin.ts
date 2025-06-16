@@ -56,7 +56,20 @@ export default async function action(
 
     const commentData = await getResponse.json();
 
-    if (!commentData.items || commentData.items.length === 0) {
+    interface CommentResponse {
+      items: Array<{
+        id: string;
+        snippet: {
+          textOriginal: string;
+          videoId: string;
+          [key: string]: unknown;
+        };
+      }>;
+    }
+
+    const typedCommentData = commentData as CommentResponse;
+
+    if (!typedCommentData.items || typedCommentData.items.length === 0) {
       ctx.errorHandler.toHttpError(
         new Error("Comment not found"),
         "Comment not found",
@@ -87,7 +100,7 @@ export default async function action(
       };
     }
 
-    const commentSnippet = commentData.items[0].snippet;
+    const commentSnippet = typedCommentData.items[0].snippet;
 
     const highlightResponse = await ctx.client["PUT /comments"](
       {

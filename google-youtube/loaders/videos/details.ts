@@ -107,23 +107,20 @@ const loader = async (
     };
 
     if (includeCaptions) {
-      try {
-        const captionsResponse = await ctx.client["GET /captions"](
-          {
-            part: YOUTUBE_PARTS.SNIPPET,
-            videoId,
-          },
-          {
-            headers: ctx.tokens?.access_token
-              ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
-              : {},
-          },
-        );
+      const captionsResponse = await ctx.client["GET /captions"](
+        {
+          part: YOUTUBE_PARTS.SNIPPET,
+          videoId,
+        },
+        {
+          headers: ctx.tokens?.access_token
+            ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
+            : {},
+        },
+      );
 
-        if (captionsResponse.ok) {
-          result.captions = await captionsResponse.json();
-        }
-      } catch (_error) {
+      if (captionsResponse.ok) {
+        result.captions = await captionsResponse.json();
       }
     }
 

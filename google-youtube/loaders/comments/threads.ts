@@ -79,7 +79,16 @@ const loader = async (
     if (!response.ok) {
       const errorData = await response.json().catch(() => response.text());
 
-      if (errorData?.error?.errors?.[0]?.reason === "commentsDisabled") {
+      interface YouTubeError {
+        error?: {
+          errors?: Array<{
+            reason?: string;
+          }>;
+        };
+      }
+
+      const typedErrorData = errorData as YouTubeError;
+      if (typedErrorData?.error?.errors?.[0]?.reason === "commentsDisabled") {
         return {
           kind: "youtube#commentThreadListResponse",
           etag: "",

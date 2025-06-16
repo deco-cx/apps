@@ -51,7 +51,15 @@ const loader = async (
   } = props;
 
   try {
-    const params: Record<string, any> = {
+    interface LiveStreamParams {
+      part: string;
+      maxResults: number;
+      id?: string;
+      mine?: boolean;
+      pageToken?: string;
+    }
+
+    const params: LiveStreamParams = {
       part:
         `${YOUTUBE_PARTS.ID},${YOUTUBE_PARTS.SNIPPET},cdn,${YOUTUBE_PARTS.STATUS},${YOUTUBE_PARTS.CONTENT_DETAILS}`,
       maxResults,

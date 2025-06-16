@@ -86,12 +86,29 @@ export default async function action(
 
     const commentData = await response.json();
 
-    if (pinComment && commentData && commentData.id) {
+    interface CommentThreadResponse {
+      id: string;
+      snippet: {
+        topLevelComment: {
+          id: string;
+          snippet: {
+            textOriginal: string;
+            isPublic?: boolean;
+            moderationStatus?: string;
+          };
+        };
+      };
+    }
+
+    if (
+      pinComment && commentData && (commentData as CommentThreadResponse).id
+    ) {
       try {
         const pinResponse = await ctx.client
           ["POST /comments/setModerationStatus"](
             {
-              id: commentData.snippet.topLevelComment.id,
+              id: (commentData as CommentThreadResponse).snippet.topLevelComment
+                .id,
               moderationStatus: "published",
               banAuthor: "false",
             },
@@ -121,9 +138,11 @@ export default async function action(
               Authorization: `Bearer ${ctx.tokens?.access_token}`,
             },
             body: {
-              id: commentData.snippet.topLevelComment.id,
+              id: (commentData as CommentThreadResponse).snippet.topLevelComment
+                .id,
               snippet: {
-                ...commentData.snippet.topLevelComment.snippet,
+                ...(commentData as CommentThreadResponse).snippet
+                  .topLevelComment.snippet,
                 isPublic: true,
                 moderationStatus: "published",
                 textOriginal: text,
@@ -148,7 +167,7 @@ export default async function action(
           comment: commentData,
           pinned: true,
         };
-      } catch (pinError) {
+      } catch (_pinError) {
         return {
           success: true,
           message:

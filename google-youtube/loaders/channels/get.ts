@@ -1,6 +1,6 @@
 import { AppContext } from "../../mod.ts";
 import { YoutubeChannelResponse } from "../../utils/types.ts";
-import { COMMON_ERROR_MESSAGES, YOUTUBE_PARTS } from "../../utils/constant.ts";
+import { YOUTUBE_PARTS } from "../../utils/constant.ts";
 
 export interface Props {
   /**

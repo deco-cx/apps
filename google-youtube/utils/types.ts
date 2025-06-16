@@ -57,6 +57,7 @@ interface Snippet {
     standard?: Thumbnail;
   };
   channelTitle: string;
+  tags?: string[];
   categoryId: string;
   liveBroadcastContent: string;
   localized: {
@@ -64,6 +65,9 @@ interface Snippet {
     description: string;
   };
   defaultAudioLanguage?: string;
+  defaultLanguage?: string;
+  country?: string;
+  topicCategories?: string[];
 }
 
 interface Status {
@@ -165,7 +169,67 @@ export interface YoutubeChannelResponse {
         watchHistory?: string;
       };
     };
+    brandingSettings?: {
+      channel?: {
+        title?: string;
+        description?: string;
+        keywords?: string;
+        defaultLanguage?: string;
+        country?: string;
+        unsubscribedTrailer?: string;
+      };
+      image?: {
+        bannerExternalUrl?: string;
+      };
+      hints?: Array<{
+        property?: string;
+        value?: string;
+      }>;
+      defaults?: {
+        defaultLanguage?: string;
+        defaultPrivacy?: string;
+        privacyStatus?: string;
+        license?: string;
+        embeddable?: boolean;
+        publicStatsViewable?: boolean;
+        autoLevels?: boolean;
+        commentingStatus?: string;
+        categoryId?: string;
+        tags?: string[];
+        enableAutoShare?: boolean;
+      };
+    };
   }>;
+  brandingSettings?: {
+    channel?: {
+      title?: string;
+      description?: string;
+      keywords?: string;
+      defaultLanguage?: string;
+      country?: string;
+      unsubscribedTrailer?: string;
+    };
+    image?: {
+      bannerExternalUrl?: string;
+    };
+    hints?: Array<{
+      property?: string;
+      value?: string;
+    }>;
+    defaults?: {
+      defaultLanguage?: string;
+      defaultPrivacy?: string;
+      privacyStatus?: string;
+      license?: string;
+      embeddable?: boolean;
+      publicStatsViewable?: boolean;
+      autoLevels?: boolean;
+      commentingStatus?: string;
+      categoryId?: string;
+      tags?: string[];
+      enableAutoShare?: boolean;
+    };
+  };
 }
 
 export interface YoutubeVideoResponse {
@@ -430,7 +494,7 @@ export interface LiveBroadcastListResponse {
     resultsPerPage: number;
   };
   items: LiveBroadcast[];
-  infoMessage?: string; // Mensagem informativa adicional
+  infoMessage?: string;
 }
 
 export interface LiveStreamSnippet {

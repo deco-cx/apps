@@ -68,7 +68,7 @@ const loader = async (
 ): Promise<LiveBroadcastListResponse> => {
   const {
     broadcastId,
-    mine = true,
+    mine: _mine = true,
     channelId,
     broadcastStatus = "active",
     maxResults = DEFAULT_MAX_RESULTS,
@@ -78,7 +78,18 @@ const loader = async (
   } = props;
 
   try {
-    const params: Record<string, any> = {
+    interface LiveBroadcastParams {
+      part: string;
+      maxResults: number;
+      id?: string;
+      channelId?: string;
+      broadcastStatus?: "all" | "active" | "completed" | "upcoming";
+      mine?: boolean;
+      pageToken?: string;
+      orderBy?: "startTime" | "viewCount";
+    }
+
+    const params: LiveBroadcastParams = {
       part: includeVideoDetails
         ? `${YOUTUBE_PARTS.ID},${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`
         : `${YOUTUBE_PARTS.ID},${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.STATUS}`,

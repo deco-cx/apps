@@ -110,7 +110,8 @@ export interface Client {
   "POST /thumbnails/set": {
     response: UpdateThumbnailResponse;
     searchParams: { videoId: string; uploadType: string };
-    headers: Headers;
+    headers: Headers & { "Content-Type": string };
+    body: string | Blob;
   };
   "GET /videoCategories": {
     response: YoutubeCategoryListResponse;

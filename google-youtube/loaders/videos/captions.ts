@@ -277,7 +277,7 @@ function parseVttCaption(text: string): ParsedCaption[] {
       continue;
     }
 
-    let timeLine = lines[i];
+    const timeLine = lines[i];
     if (timeLine.includes("-->")) {
       const timecodes = timeLine.split(" --> ");
       const startTime = timecodes[0].trim();
