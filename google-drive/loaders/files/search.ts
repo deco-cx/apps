@@ -30,10 +30,10 @@ export default async function searchFiles(
   } = props;
 
   if (!query) {
-    console.error(ERROR_INVALID_PARAMETERS);
-    return {
-      files: [],
-    };
+    ctx.errorHandler.toHttpError(
+      ERROR_INVALID_PARAMETERS,
+      ERROR_INVALID_PARAMETERS,
+    );
   }
 
   try {
@@ -44,7 +44,6 @@ export default async function searchFiles(
       [FIELDS]: fields,
     };
 
-    // Remove undefined values
     Object.keys(params).forEach((key) => {
       if (params[key] === undefined) {
         delete params[key];
@@ -54,10 +53,6 @@ export default async function searchFiles(
     const response = await ctx.client["GET /files"](params);
     return await response.json();
   } catch (error) {
-    console.error(ERROR_FAILED_TO_LIST_FILES, error);
-
-    return {
-      files: [],
-    };
+    ctx.errorHandler.toHttpError(error, ERROR_FAILED_TO_LIST_FILES);
   }
 }

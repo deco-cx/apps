@@ -43,7 +43,6 @@ export default async function listDocuments(
   } = props;
 
   try {
-    // Combine the document MIME type with any additional query
     const query = q
       ? `mimeType='${DOCUMENT_MIME_TYPE}' and (${q})`
       : `mimeType='${DOCUMENT_MIME_TYPE}'`;
@@ -59,7 +58,6 @@ export default async function listDocuments(
       [CORPORA]: corpora,
     };
 
-    // Remove undefined values
     Object.keys(params).forEach((key) => {
       if (params[key] === undefined) {
         delete params[key];
@@ -69,10 +67,6 @@ export default async function listDocuments(
     const response = await ctx.client["GET /files"](params);
     return await response.json();
   } catch (error) {
-    console.error(ERROR_FAILED_TO_LIST_FILES, error);
-
-    return {
-      files: [],
-    };
+    ctx.errorHandler.toHttpError(error, ERROR_FAILED_TO_LIST_FILES);
   }
 }

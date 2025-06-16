@@ -28,8 +28,7 @@ export default async function updateFile(
   } = props;
 
   if (!fileId) {
-    console.error(ERROR_MISSING_FILE_ID);
-    return {};
+    ctx.errorHandler.toHttpError(ERROR_MISSING_FILE_ID, ERROR_MISSING_FILE_ID);
   }
 
   try {
@@ -52,8 +51,6 @@ export default async function updateFile(
 
     return await response.json();
   } catch (error) {
-    console.error(ERROR_FAILED_TO_UPDATE_FILE, error);
-
-    return {};
+    ctx.errorHandler.toHttpError(error, ERROR_FAILED_TO_UPDATE_FILE);
   }
 }

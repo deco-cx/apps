@@ -4,6 +4,16 @@ import type { FnContext } from "@deco/deco";
 import { McpContext } from "../mcp/context.ts";
 import {
   API_URL,
+  ERROR_FAILED_TO_CREATE_FILE,
+  ERROR_FAILED_TO_DELETE_FILE,
+  ERROR_FAILED_TO_GET_FILE,
+  ERROR_FAILED_TO_LIST_FILES,
+  ERROR_FAILED_TO_UPDATE_FILE,
+  ERROR_FILE_NOT_FOUND,
+  ERROR_INVALID_PARAMETERS,
+  ERROR_MISSING_FILE_ID,
+  ERROR_MISSING_FILE_NAME,
+  ERROR_MISSING_MIME_TYPE,
   OAUTH_URL,
   OAUTH_URL_AUTH,
   SCOPES,
@@ -16,6 +26,10 @@ import {
   OAuthProvider,
   OAuthTokens,
 } from "../mcp/oauth.ts";
+import {
+  createErrorHandler,
+  ErrorHandler,
+} from "../mcp/utils/errorHandling.ts";
 
 export const GoogleProvider: OAuthProvider = {
   name: "Google",
@@ -34,6 +48,7 @@ export interface Props {
 
 export interface State extends Props {
   client: OAuthClients<Client, AuthClient>;
+  errorHandler: ErrorHandler;
 }
 
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
@@ -82,10 +97,27 @@ export default function App(
     },
   });
 
+  const errorHandler = createErrorHandler({
+    errorMessages: {
+      ERROR_FAILED_TO_LIST_FILES,
+      ERROR_FAILED_TO_GET_FILE,
+      ERROR_FAILED_TO_CREATE_FILE,
+      ERROR_FAILED_TO_UPDATE_FILE,
+      ERROR_FAILED_TO_DELETE_FILE,
+      ERROR_FILE_NOT_FOUND,
+      ERROR_INVALID_PARAMETERS,
+      ERROR_MISSING_FILE_ID,
+      ERROR_MISSING_FILE_NAME,
+      ERROR_MISSING_MIME_TYPE,
+    },
+    defaultErrorMessage: "Google Drive operation failed",
+  });
+
   const state: State = {
     ...props,
     tokens,
     client,
+    errorHandler,
   };
 
   return {

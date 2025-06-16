@@ -19,19 +19,15 @@ export default async function deleteFile(
   const { fileId } = props;
 
   if (!fileId) {
-    console.error(ERROR_MISSING_FILE_ID);
-    return false;
+    ctx.errorHandler.toHttpError(ERROR_MISSING_FILE_ID, ERROR_MISSING_FILE_ID);
   }
 
   try {
     await ctx.client["DELETE /files/:fileId"]({
       fileId,
     });
-
     return true;
   } catch (error) {
-    console.error(ERROR_FAILED_TO_DELETE_FILE, error);
-
-    return false;
+    ctx.errorHandler.toHttpError(error, ERROR_FAILED_TO_DELETE_FILE);
   }
 }

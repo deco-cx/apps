@@ -20,8 +20,7 @@ export default async function copyFile(
   const { fileId, name, parents } = props;
 
   if (!fileId) {
-    console.error(ERROR_MISSING_FILE_ID);
-    return {};
+    ctx.errorHandler.toHttpError(ERROR_MISSING_FILE_ID, ERROR_MISSING_FILE_ID);
   }
 
   try {
@@ -37,11 +36,8 @@ export default async function copyFile(
         },
       },
     );
-
     return await response.json();
   } catch (error) {
-    console.error(ERROR_FAILED_TO_CREATE_FILE, error);
-
-    return {};
+    ctx.errorHandler.toHttpError(error, ERROR_FAILED_TO_CREATE_FILE);
   }
 }

@@ -21,8 +21,10 @@ export default async function createPresentation(
   const { name, description, parents, properties, appProperties } = props;
 
   if (!name) {
-    console.error(ERROR_MISSING_FILE_NAME);
-    return {};
+    ctx.errorHandler.toHttpError(
+      ERROR_MISSING_FILE_NAME,
+      ERROR_MISSING_FILE_NAME,
+    );
   }
 
   try {
@@ -41,11 +43,8 @@ export default async function createPresentation(
         },
       },
     );
-
     return await response.json();
   } catch (error) {
-    console.error(ERROR_FAILED_TO_CREATE_FILE, error);
-
-    return {};
+    ctx.errorHandler.toHttpError(error, ERROR_FAILED_TO_CREATE_FILE);
   }
 }

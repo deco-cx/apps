@@ -43,7 +43,6 @@ export default async function listPresentations(
   } = props;
 
   try {
-    // Combine the presentation MIME type with any additional query
     const query = q
       ? `mimeType='${PRESENTATION_MIME_TYPE}' and (${q})`
       : `mimeType='${PRESENTATION_MIME_TYPE}'`;
@@ -59,7 +58,6 @@ export default async function listPresentations(
       [CORPORA]: corpora,
     };
 
-    // Remove undefined values
     Object.keys(params).forEach((key) => {
       if (params[key] === undefined) {
         delete params[key];
@@ -69,10 +67,6 @@ export default async function listPresentations(
     const response = await ctx.client["GET /files"](params);
     return await response.json();
   } catch (error) {
-    console.error(ERROR_FAILED_TO_LIST_FILES, error);
-
-    return {
-      files: [],
-    };
+    ctx.errorHandler.toHttpError(error, ERROR_FAILED_TO_LIST_FILES);
   }
 }

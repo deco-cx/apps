@@ -21,8 +21,7 @@ export default async function getFile(
   const { fileId, fields = DEFAULT_FIELDS } = props;
 
   if (!fileId) {
-    console.error(ERROR_MISSING_FILE_ID);
-    return {};
+    ctx.errorHandler.toHttpError(ERROR_MISSING_FILE_ID, ERROR_MISSING_FILE_ID);
   }
 
   try {
@@ -30,11 +29,8 @@ export default async function getFile(
       fileId,
       [FIELDS]: fields,
     });
-
     return await response.json();
   } catch (error) {
-    console.error(ERROR_FAILED_TO_GET_FILE, error);
-
-    return {};
+    ctx.errorHandler.toHttpError(error, ERROR_FAILED_TO_GET_FILE);
   }
 }

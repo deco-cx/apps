@@ -48,7 +48,6 @@ export default async function listFiles(
       [CORPORA]: corpora,
     };
 
-    // Remove undefined values
     Object.keys(params).forEach((key) => {
       if (params[key] === undefined) {
         delete params[key];
@@ -58,10 +57,6 @@ export default async function listFiles(
     const response = await ctx.client["GET /files"](params);
     return await response.json();
   } catch (error) {
-    console.error(ERROR_FAILED_TO_LIST_FILES, error);
-
-    return {
-      files: [],
-    };
+    ctx.errorHandler.toHttpError(error, ERROR_FAILED_TO_LIST_FILES);
   }
 }
