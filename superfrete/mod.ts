@@ -34,7 +34,7 @@ export interface State extends Omit<Props, "token"> {
   api: ReturnType<typeof createHttpClient<SuperFreteClient>>;
   token: string;
 }
-
+ 
 /**
  * @name SuperFrete
  * @description Integration with SuperFrete API for shipping quotes and management
