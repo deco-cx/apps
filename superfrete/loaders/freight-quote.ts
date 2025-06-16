@@ -2,6 +2,7 @@ import type { AppContext } from "../mod.ts";
 import type {
   FreightQuoteRequest,
   FreightQuoteResponse,
+  FreightService,
   Package,
   Product,
 } from "../client.ts";
@@ -60,6 +61,12 @@ interface Props {
   package?: Package;
 
   /**
+   * @title Quantity of Products
+   * @description Quantity of products (when already known). If not provided, use individual products
+   */
+  quantity?: number;
+
+  /**
    * @title Individual Products
    * @description List of individual products (API will calculate ideal box)
    */
@@ -85,6 +92,7 @@ const loader = async (
     insuranceValue = 0,
     useInsuranceValue = false,
     package: packageDimensions,
+    quantity,
     products,
   } = props;
 
@@ -114,6 +122,13 @@ const loader = async (
   // Adiciona package ou products conforme disponível
   if (packageDimensions) {
     requestData.package = packageDimensions;
+    requestData.products = [{
+      quantity,
+      weight: packageDimensions.weight,
+      height: packageDimensions.height,
+      width: packageDimensions.width,
+      length: packageDimensions.length,
+    }];
   } else if (products) {
     requestData.products = products;
   }
@@ -133,7 +148,18 @@ const loader = async (
   }
 
   const result = await response.json();
-  return result;
+
+  // It's bad, but leave it like that for now.
+  return result.map((service: FreightService) => {
+    if (service.error === '444') {
+      delete service.error;
+      service.disponible = false;
+    } else if (service.error === undefined) {
+      service.disponible = true;
+    }
+
+    return service;
+  });
 };
 
 export default loader;
