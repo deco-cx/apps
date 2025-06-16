@@ -19,15 +19,20 @@ YouTube app to follow the clean pattern established in google-sheets.
 - Extract constants and text to `constants.ts` and call variables to facilitate
   bulk changes
 - Always follow the example code pattern from getValues.ts
-- **IMPORTANT: Always use ctx.client instead of fetch** - client has refresh token and other important features built in
+- **IMPORTANT: Always use ctx.client instead of fetch** - client has refresh
+  token and other important features built in
 - When using ctx.client, always use two parameters:
-  1. The first parameter is a JSON with all query params and any URL template variables (e.g., for videos/:videoId, use videoId: value)
-  2. The second parameter is a JSON with the body and headers, e.g., { body: { ... }, headers: { ... } }
-  3. If the endpoint only needs a body, always pass the first parameter as an empty object: ctx.client["METHOD /endpoint"]({}, { body: { ... } })
+  1. The first parameter is a JSON with all query params and any URL template
+     variables (e.g., for videos/:videoId, use videoId: value)
+  2. The second parameter is a JSON with the body and headers, e.g., { body: {
+     ... }, headers: { ... } }
+  3. If the endpoint only needs a body, always pass the first parameter as an
+     empty object: ctx.client["METHOD /endpoint"]({}, { body: { ... } })
   4. Always check the client.ts file for the correct typing and required fields
 - If a route using client is showing errors, add the missing type to client.ts
 - Use tryCatch only around the necessary code blocks, not the entire function
-- Move complex type definitions to types.ts if they're reusable or already exist there
+- Move complex type definitions to types.ts if they're reusable or already exist
+  there
 
 ### Code Example to Follow
 
@@ -188,8 +193,10 @@ Common strings that appear multiple times and should be moved to `constants.ts`:
 
 ## Next Steps
 
-1. ~~**FIX ALL LOADERS: Replace fetch with client** - This is critical~~ ✅ **COMPLETED**
-2. **START REFACTORING ACTIONS: Replace fetch with client** - Begin with actions/videos/delete.ts
+1. ~~**FIX ALL LOADERS: Replace fetch with client** - This is critical~~ ✅
+   **COMPLETED**
+2. **START REFACTORING ACTIONS: Replace fetch with client** - Begin with
+   actions/videos/delete.ts
 3. Follow the pattern established in getValues.ts
 4. Extract repeated strings to constants
 5. Test each file after refactoring
@@ -202,4 +209,5 @@ Common strings that appear multiple times and should be moved to `constants.ts`:
 - Use proper error handling with ctx.errorHandler
 - Remove all cache-related code
 - Ensure all props are properly documented
-- **ALWAYS use ctx.client instead of fetch** - client handles token refresh and other important features
+- **ALWAYS use ctx.client instead of fetch** - client handles token refresh and
+  other important features

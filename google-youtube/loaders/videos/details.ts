@@ -3,10 +3,7 @@ import {
   YouTubeCaptionListResponse,
   YoutubeVideoResponse,
 } from "../../utils/types.ts";
-import {
-  COMMON_ERROR_MESSAGES,
-  YOUTUBE_PARTS,
-} from "../../utils/constant.ts";
+import { COMMON_ERROR_MESSAGES, YOUTUBE_PARTS } from "../../utils/constant.ts";
 
 export interface Props {
   /**
@@ -86,7 +83,7 @@ const loader = async (
         headers: ctx.tokens?.access_token
           ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
           : {},
-      }
+      },
     );
 
     if (!videoResponse.ok) {
@@ -120,7 +117,7 @@ const loader = async (
             headers: ctx.tokens?.access_token
               ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
               : {},
-          }
+          },
         );
 
         if (captionsResponse.ok) {

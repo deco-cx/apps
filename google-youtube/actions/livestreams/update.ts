@@ -107,14 +107,15 @@ export default async function action(
   try {
     const getResponse = await ctx.client["GET /liveBroadcasts"](
       {
-        part: `id,${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`,
+        part:
+          `id,${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`,
         id: broadcastId,
       },
       {
         headers: {
           Authorization: `Bearer ${ctx.tokens?.access_token}`,
         },
-      }
+      },
     );
 
     if (!getResponse.ok) {
@@ -167,7 +168,8 @@ export default async function action(
 
     const updateResponse = await ctx.client["PUT /liveBroadcasts"](
       {
-        part: `id,${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`,
+        part:
+          `id,${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`,
       },
       {
         headers: {
@@ -175,7 +177,7 @@ export default async function action(
           Authorization: `Bearer ${ctx.tokens?.access_token}`,
         },
         body: payload,
-      }
+      },
     );
 
     if (!updateResponse.ok) {

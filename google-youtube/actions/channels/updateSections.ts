@@ -108,7 +108,7 @@ export default async function action(
         headers: ctx.tokens?.access_token
           ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
           : {},
-      }
+      },
     );
 
     if (!getResponse.ok) {
@@ -175,7 +175,7 @@ export default async function action(
             Authorization: `Bearer ${ctx.tokens?.access_token}`,
           },
           body: sectionBody as Record<string, unknown>,
-        }
+        },
       );
 
       if (!addResponse.ok) {
@@ -195,7 +195,7 @@ export default async function action(
             headers: {
               Authorization: `Bearer ${ctx.tokens?.access_token}`,
             },
-          }
+          },
         );
 
         if (deleteResponse.ok) {

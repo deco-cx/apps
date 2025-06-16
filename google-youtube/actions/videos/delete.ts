@@ -59,7 +59,7 @@ export default async function action(
         id: videoId,
         onBehalfOfContentOwner,
       },
-      {}
+      {},
     );
 
     if (!response.ok) {

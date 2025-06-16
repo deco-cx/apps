@@ -74,7 +74,7 @@ export default async function action(
             },
           },
         },
-      }
+      },
     );
 
     if (!response.ok) {
@@ -88,19 +88,20 @@ export default async function action(
 
     if (pinComment && commentData && commentData.id) {
       try {
-        const pinResponse = await ctx.client["POST /comments/setModerationStatus"](
-          {
-            id: commentData.snippet.topLevelComment.id,
-            moderationStatus: "published",
-            banAuthor: "false",
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${ctx.tokens?.access_token}`,
-              "Content-Length": "0",
+        const pinResponse = await ctx.client
+          ["POST /comments/setModerationStatus"](
+            {
+              id: commentData.snippet.topLevelComment.id,
+              moderationStatus: "published",
+              banAuthor: "false",
             },
-          }
-        );
+            {
+              headers: {
+                Authorization: `Bearer ${ctx.tokens?.access_token}`,
+                "Content-Length": "0",
+              },
+            },
+          );
 
         if (pinResponse.status !== 204) {
           return {
@@ -128,7 +129,7 @@ export default async function action(
                 textOriginal: text,
               },
             },
-          }
+          },
         );
 
         if (!highlightResponse.ok) {

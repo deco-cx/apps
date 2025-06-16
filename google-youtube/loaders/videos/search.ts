@@ -139,9 +139,7 @@ const loader = async (
       {
         part: YOUTUBE_PARTS.SNIPPET,
         q,
-        maxResults: onlyShorts
-          ? Math.max(maxResults * 2, 50)
-          : maxResults,
+        maxResults: onlyShorts ? Math.max(maxResults * 2, 50) : maxResults,
         order,
         type: "video",
         pageToken,
@@ -158,7 +156,7 @@ const loader = async (
         headers: ctx.tokens?.access_token
           ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
           : {},
-      }
+      },
     );
 
     if (!searchResponse.ok) {
@@ -190,14 +188,15 @@ const loader = async (
 
     const detailsResponse = await ctx.client["GET /videos"](
       {
-        part: `${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.STATISTICS},${YOUTUBE_PARTS.STATUS},${YOUTUBE_PARTS.CONTENT_DETAILS}`,
+        part:
+          `${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.STATISTICS},${YOUTUBE_PARTS.STATUS},${YOUTUBE_PARTS.CONTENT_DETAILS}`,
         id: videoIds,
       },
       {
         headers: ctx.tokens?.access_token
           ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
           : {},
-      }
+      },
     );
 
     if (!detailsResponse.ok) {

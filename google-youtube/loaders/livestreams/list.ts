@@ -118,7 +118,7 @@ const loader = async (
         headers: ctx.tokens?.access_token
           ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
           : {},
-      }
+      },
     );
 
     if (!response.ok) {

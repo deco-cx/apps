@@ -91,7 +91,7 @@ const loader = async (
         headers: ctx.tokens?.access_token
           ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
           : {},
-      }
+      },
     );
 
     if (!captionsListResponse.ok) {
@@ -167,7 +167,7 @@ async function loadCaption(
         headers: ctx.tokens?.access_token
           ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
           : {},
-      }
+      },
     );
 
     if (!captionResponse.ok) {

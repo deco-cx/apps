@@ -73,13 +73,18 @@ const loader = async (
         headers: ctx.tokens?.access_token
           ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
           : {},
-      }
+      },
     );
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => response.text()) as YouTubeErrorResponse | string;
+      const errorData = await response.json().catch(() => response.text()) as
+        | YouTubeErrorResponse
+        | string;
 
-      if (typeof errorData === 'object' && errorData?.error?.errors?.[0]?.reason === "commentsDisabled") {
+      if (
+        typeof errorData === "object" &&
+        errorData?.error?.errors?.[0]?.reason === "commentsDisabled"
+      ) {
         return {
           kind: "youtube#commentThreadListResponse",
           etag: "",

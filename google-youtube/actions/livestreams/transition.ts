@@ -52,7 +52,9 @@ export default async function action(
 
   if (!["testing", "live", "complete"].includes(transitionType)) {
     ctx.errorHandler.toHttpError(
-      new Error("Invalid transition type. Use 'testing', 'live', or 'complete'"),
+      new Error(
+        "Invalid transition type. Use 'testing', 'live', or 'complete'",
+      ),
       "Invalid transition type. Use 'testing', 'live', or 'complete'",
     );
   }
@@ -62,18 +64,20 @@ export default async function action(
       {
         id: broadcastId,
         broadcastStatus: transitionType,
-        part: `id,${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`,
+        part:
+          `id,${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`,
       },
       {
         headers: {
           Authorization: `Bearer ${ctx.tokens?.access_token}`,
           "Content-Length": "0",
         },
-      }
+      },
     );
 
     if (!response.ok) {
-      let errorMessage = `Failed to change status to ${transitionType}: ${response.statusText}`;
+      let errorMessage =
+        `Failed to change status to ${transitionType}: ${response.statusText}`;
 
       if (transitionType === "testing" && response.status === 400) {
         errorMessage =

@@ -148,7 +148,8 @@ export default async function action(
 
     const response = await ctx.client["POST /liveBroadcasts"](
       {
-        part: `id,${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`,
+        part:
+          `id,${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`,
       },
       {
         headers: {
@@ -156,7 +157,7 @@ export default async function action(
           Authorization: `Bearer ${ctx.tokens?.access_token}`,
         },
         body: payload,
-      }
+      },
     );
 
     if (!response.ok) {

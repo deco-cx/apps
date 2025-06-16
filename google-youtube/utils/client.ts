@@ -1,19 +1,19 @@
 import {
+  LiveBroadcast,
+  LiveBroadcastListResponse,
+  LiveStream,
+  LiveStreamListResponse,
   Query,
   UpdateThumbnailResponse,
   VideoQuery,
   YouTubeCaptionListResponse,
   YoutubeCategoryListResponse,
   YoutubeChannelResponse,
+  YouTubeCommentThreadListResponse,
   YoutubePlaylistItemsResponse,
   youtubeTokenResponse,
   YoutubeVideoListResponse,
   YoutubeVideoResponse,
-  YouTubeCommentThreadListResponse,
-  LiveBroadcastListResponse,
-  LiveStreamListResponse,
-  LiveBroadcast,
-  LiveStream,
 } from "./types.ts";
 
 type Headers = {
@@ -179,7 +179,7 @@ export interface Client {
   };
   "POST /comments/setModerationStatus": {
     response: void;
-    searchParams: { 
+    searchParams: {
       id: string;
       moderationStatus: string;
       banAuthor: string;
@@ -194,7 +194,7 @@ export interface Client {
   };
   "GET /comments": {
     response: unknown;
-    searchParams: { 
+    searchParams: {
       part: string;
       id: string;
     };
@@ -202,7 +202,7 @@ export interface Client {
   };
   "POST /comments/rate": {
     response: void;
-    searchParams: { 
+    searchParams: {
       id: string;
       rating: "like" | "dislike" | "none";
     };
@@ -216,7 +216,7 @@ export interface Client {
   };
   "POST /liveBroadcasts/bind": {
     response: LiveBroadcast;
-    searchParams: { 
+    searchParams: {
       id: string;
       streamId: string;
       part: string;
@@ -250,7 +250,7 @@ export interface Client {
   };
   "POST /liveBroadcasts/transition": {
     response: LiveBroadcast;
-    searchParams: { 
+    searchParams: {
       id: string;
       broadcastStatus: "testing" | "live" | "complete";
       part: string;
@@ -270,12 +270,12 @@ export interface Client {
   };
   "POST /upload/youtube/v3/liveBroadcasts/thumbnails": {
     response: { items: Array<Record<string, unknown>> };
-    searchParams: { 
+    searchParams: {
       uploadType: string;
       broadcastId: string;
     };
     body: Uint8Array;
-    headers: Headers & { 
+    headers: Headers & {
       "Content-Type": string;
       "Content-Length": string;
     };

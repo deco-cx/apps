@@ -61,7 +61,7 @@ export default async function action(
             textOriginal: text,
           },
         },
-      }
+      },
     );
 
     if (!response.ok) {

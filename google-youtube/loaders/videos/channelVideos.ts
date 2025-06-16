@@ -1,9 +1,6 @@
 import { AppContext } from "../../mod.ts";
 import { YoutubeVideoListResponse } from "../../utils/types.ts";
-import {
-  DEFAULT_MAX_RESULTS,
-  YOUTUBE_PARTS,
-} from "../../utils/constant.ts";
+import { DEFAULT_MAX_RESULTS, YOUTUBE_PARTS } from "../../utils/constant.ts";
 
 export interface Props {
   /**
@@ -68,7 +65,7 @@ const loader = async (
         headers: ctx.tokens?.access_token
           ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
           : {},
-      }
+      },
     );
 
     if (!channelResponse.ok) {
@@ -112,7 +109,7 @@ const loader = async (
         headers: ctx.tokens?.access_token
           ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
           : {},
-      }
+      },
     );
 
     if (!playlistResponse.ok) {

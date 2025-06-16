@@ -44,7 +44,7 @@ export default async function action(
         headers: ctx.tokens?.access_token
           ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
           : {},
-      }
+      },
     );
 
     if (!getResponse.ok) {
@@ -63,19 +63,20 @@ export default async function action(
       );
     }
 
-    const moderationResponse = await ctx.client["POST /comments/setModerationStatus"](
-      {
-        id: commentId,
-        moderationStatus: "published",
-        banAuthor: "false",
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${ctx.tokens?.access_token}`,
-          "Content-Length": "0",
+    const moderationResponse = await ctx.client
+      ["POST /comments/setModerationStatus"](
+        {
+          id: commentId,
+          moderationStatus: "published",
+          banAuthor: "false",
         },
-      }
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${ctx.tokens?.access_token}`,
+            "Content-Length": "0",
+          },
+        },
+      );
 
     if (moderationResponse.status !== 204) {
       return {
@@ -105,7 +106,7 @@ export default async function action(
             moderationStatus: "published",
           },
         },
-      }
+      },
     );
 
     if (!highlightResponse.ok) {

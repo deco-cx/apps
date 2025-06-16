@@ -57,14 +57,15 @@ export default async function action(
       {
         id: broadcastId,
         streamId: streamId,
-        part: `id,${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`,
+        part:
+          `id,${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`,
       },
       {
         headers: {
           Authorization: `Bearer ${ctx.tokens?.access_token}`,
           "Content-Length": "0",
         },
-      }
+      },
     );
 
     if (!response.ok) {

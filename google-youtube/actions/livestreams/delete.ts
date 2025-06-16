@@ -44,7 +44,7 @@ export default async function action(
         headers: {
           Authorization: `Bearer ${ctx.tokens?.access_token}`,
         },
-      }
+      },
     );
 
     if (response.status === 204) {

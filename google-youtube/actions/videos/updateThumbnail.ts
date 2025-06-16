@@ -88,9 +88,9 @@ export default async function action(
     }
 
     const updateResponse = await ctx.client["POST /thumbnails/set"](
-      { 
-        videoId, 
-        uploadType: "media" 
+      {
+        videoId,
+        uploadType: "media",
       },
       {
         headers: {
@@ -98,7 +98,7 @@ export default async function action(
           Authorization: `Bearer ${ctx.tokens?.access_token}`,
         },
         body: imageBase64 ? imageBase64 : imageBlob!,
-      }
+      },
     );
 
     if (!updateResponse.ok) {

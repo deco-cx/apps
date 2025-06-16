@@ -89,20 +89,21 @@ export default async function action(
       );
     }
 
-    const uploadResponse = await ctx.client["POST /upload/youtube/v3/liveBroadcasts/thumbnails"](
-      {
-        uploadType: "media",
-        broadcastId: broadcastId,
-      },
-      {
-        headers: {
-          "Content-Type": mimeType,
-          "Content-Length": imageData.length.toString(),
-          Authorization: `Bearer ${ctx.tokens?.access_token}`,
+    const uploadResponse = await ctx.client
+      ["POST /upload/youtube/v3/liveBroadcasts/thumbnails"](
+        {
+          uploadType: "media",
+          broadcastId: broadcastId,
         },
-        body: imageData,
-      }
-    );
+        {
+          headers: {
+            "Content-Type": mimeType,
+            "Content-Length": imageData.length.toString(),
+            Authorization: `Bearer ${ctx.tokens?.access_token}`,
+          },
+          body: imageData,
+        },
+      );
 
     if (!uploadResponse.ok) {
       ctx.errorHandler.toHttpError(

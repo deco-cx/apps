@@ -86,7 +86,7 @@ export default async function action(
         headers: ctx.tokens?.access_token
           ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
           : {},
-      }
+      },
     );
 
     if (!getResponse.ok) {
@@ -116,8 +116,8 @@ export default async function action(
     };
 
     const updateResponse = await ctx.client["PUT /videos"](
-      { 
-        part: YOUTUBE_PARTS.SNIPPET 
+      {
+        part: YOUTUBE_PARTS.SNIPPET,
       },
       {
         headers: {
@@ -125,7 +125,7 @@ export default async function action(
           Authorization: `Bearer ${ctx.tokens?.access_token}`,
         },
         body: requestBody,
-      }
+      },
     );
 
     if (!updateResponse.ok) {
