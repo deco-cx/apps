@@ -1,19 +1,22 @@
 import type { AppContext } from "../../mod.ts";
 import { LiveBroadcast } from "../../utils/types.ts";
+import { YOUTUBE_PARTS } from "../../utils/constant.ts";
 
 export type BroadcastTransitionType =
-  | "testing" // Coloca a transmissão em modo de teste
-  | "live" // Inicia a transmissão ao vivo para todos
-  | "complete"; // Finaliza a transmissão
+  | "testing" // Puts the broadcast in test mode
+  | "live" // Starts the broadcast live for everyone
+  | "complete"; // Ends the broadcast
 
-export interface TransitionBroadcastParams {
+export interface Props {
   /**
-   * @description ID da transmissão ao vivo
+   * @title Broadcast ID
+   * @description ID of the live broadcast
    */
   broadcastId: string;
 
   /**
-   * @description Tipo de transição a ser aplicada
+   * @title Transition Type
+   * @description Type of transition to apply
    */
   transitionType: BroadcastTransitionType;
 }
@@ -26,11 +29,12 @@ export interface TransitionBroadcastResult {
 }
 
 /**
- * @title Alterar Status da Transmissão
- * @description Altera o status de uma transmissão ao vivo (iniciar teste, ir ao vivo, finalizar)
+ * @name TRANSITION_BROADCAST
+ * @title Change Broadcast Status
+ * @description Changes the status of a live broadcast (start test, go live, end)
  */
 export default async function action(
-  props: TransitionBroadcastParams,
+  props: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<TransitionBroadcastResult> {
@@ -40,77 +44,63 @@ export default async function action(
   } = props;
 
   if (!broadcastId) {
-    return {
-      success: false,
-      message: "ID da transmissão é obrigatório",
-    };
+    ctx.errorHandler.toHttpError(
+      new Error("Broadcast ID is required"),
+      "Broadcast ID is required",
+    );
   }
 
-  // Validar o tipo de transição
   if (!["testing", "live", "complete"].includes(transitionType)) {
-    return {
-      success: false,
-      message:
-        "Tipo de transição inválido. Use 'testing', 'live' ou 'complete'",
-    };
+    ctx.errorHandler.toHttpError(
+      new Error("Invalid transition type. Use 'testing', 'live', or 'complete'"),
+      "Invalid transition type. Use 'testing', 'live', or 'complete'",
+    );
   }
 
   try {
-    // Construir a URL para a transição
-    const url = new URL(
-      "https://youtube.googleapis.com/youtube/v3/liveBroadcasts/transition",
+    const response = await ctx.client["POST /liveBroadcasts/transition"](
+      {
+        id: broadcastId,
+        broadcastStatus: transitionType,
+        part: `id,${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${ctx.tokens?.access_token}`,
+          "Content-Length": "0",
+        },
+      }
     );
 
-    // Adicionar parâmetros obrigatórios
-    url.searchParams.append("id", broadcastId);
-    url.searchParams.append("broadcastStatus", transitionType);
-    url.searchParams.append("part", "id,snippet,contentDetails,status");
-
-    // Fazer a requisição para alterar o status
-    const response = await fetch(url.toString(), {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${ctx.access_token}`,
-        "Content-Length": "0", // Requisição sem corpo
-      },
-    });
-
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error(`Erro ao transicionar para ${transitionType}:`, errorData);
-
-      // Mensagens de erro específicas para cada tipo de transição
-      let errorMessage =
-        `Erro ao alterar status para ${transitionType}: ${response.status} ${response.statusText}`;
+      let errorMessage = `Failed to change status to ${transitionType}: ${response.statusText}`;
 
       if (transitionType === "testing" && response.status === 400) {
         errorMessage =
-          "Erro ao iniciar teste: verifique se a transmissão está no estado 'ready' e se foi vinculada a um stream.";
+          "Failed to start test: verify that the broadcast is in 'ready' state and linked to a stream.";
       } else if (transitionType === "live" && response.status === 400) {
         errorMessage =
-          "Erro ao ir ao vivo: verifique se a transmissão está no estado 'testing' e se o streaming está ativo.";
+          "Failed to go live: verify that the broadcast is in 'testing' state and that streaming is active.";
       } else if (transitionType === "complete" && response.status === 400) {
         errorMessage =
-          "Erro ao finalizar: verifique se a transmissão está no estado 'live' ou 'testing'.";
+          "Failed to end: verify that the broadcast is in 'live' or 'testing' state.";
       }
 
-      return {
-        success: false,
-        message: errorMessage,
-        error: errorData,
-      };
+      ctx.errorHandler.toHttpError(
+        response,
+        errorMessage,
+      );
     }
 
     const broadcast = await response.json();
 
-    // Mensagens de sucesso específicas para cada tipo de transição
     let successMessage = "";
     if (transitionType === "testing") {
-      successMessage = "Transmissão colocada em modo de teste com sucesso";
+      successMessage = "Broadcast successfully put in test mode";
     } else if (transitionType === "live") {
-      successMessage = "Transmissão iniciada ao vivo com sucesso";
+      successMessage = "Broadcast successfully started live";
     } else if (transitionType === "complete") {
-      successMessage = "Transmissão finalizada com sucesso";
+      successMessage = "Broadcast successfully ended";
     }
 
     return {
@@ -118,14 +108,10 @@ export default async function action(
       message: successMessage,
       broadcast,
     };
-  } catch (error: unknown) {
-    let message = "Erro desconhecido";
-    if (error instanceof Error) {
-      message = error.message;
-    }
-    return {
-      success: false,
-      message,
-    };
+  } catch (error) {
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to transition broadcast",
+    );
   }
 }

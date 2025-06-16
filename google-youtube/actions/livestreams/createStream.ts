@@ -1,34 +1,41 @@
 import type { AppContext } from "../../mod.ts";
 import { LiveStream } from "../../utils/types.ts";
+import { YOUTUBE_PARTS } from "../../utils/constant.ts";
 
-export interface CreateLiveStreamParams {
+export interface Props {
   /**
-   * @description Título do stream
+   * @title Title
+   * @description Title of the stream
    */
   title: string;
 
   /**
-   * @description Descrição do stream
+   * @title Description
+   * @description Description of the stream
    */
   description?: string;
 
   /**
-   * @description Tipo de ingestão, RTMP é o padrão mais comum
+   * @title Ingestion Type
+   * @description Type of ingestion, RTMP is the most common standard
    */
   ingestionType?: "rtmp" | "dash" | "webrtc";
 
   /**
-   * @description Resolução, como "1080p", "720p", etc.
+   * @title Resolution
+   * @description Resolution, such as "1080p", "720p", etc.
    */
   resolution?: string;
 
   /**
-   * @description Taxa de quadros, como "30fps", "60fps"
+   * @title Frame Rate
+   * @description Frame rate, such as "30fps", "60fps"
    */
   frameRate?: string;
 
   /**
-   * @description Indica se o stream pode ser reutilizado para várias transmissões
+   * @title Is Reusable
+   * @description Indicates if the stream can be reused for multiple broadcasts
    */
   isReusable?: boolean;
 }
@@ -41,11 +48,12 @@ export interface CreateLiveStreamResult {
 }
 
 /**
- * @title Criar Stream de Vídeo
- * @description Cria um novo stream de vídeo para usar em transmissões ao vivo
+ * @name CREATE_LIVE_STREAM
+ * @title Create Video Stream
+ * @description Creates a new video stream to use in live broadcasts
  */
 export default async function action(
-  props: CreateLiveStreamParams,
+  props: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<CreateLiveStreamResult> {
@@ -59,14 +67,13 @@ export default async function action(
   } = props;
 
   if (!title) {
-    return {
-      success: false,
-      message: "Título do stream é obrigatório",
-    };
+    ctx.errorHandler.toHttpError(
+      new Error("Stream title is required"),
+      "Stream title is required",
+    );
   }
 
   try {
-    // Preparar payload para criar o stream
     const payload = {
       snippet: {
         title,
@@ -82,44 +89,37 @@ export default async function action(
       },
     };
 
-    // Criar o stream
-    const url =
-      "https://youtube.googleapis.com/youtube/v3/liveStreams?part=id,snippet,cdn,contentDetails,status";
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${ctx.access_token}`,
-        "Content-Type": "application/json",
+    const response = await ctx.client["POST /liveStreams"](
+      {
+        part: `id,${YOUTUBE_PARTS.SNIPPET},cdn,${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`,
       },
-      body: JSON.stringify(payload),
-    });
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${ctx.tokens?.access_token}`,
+        },
+        body: payload,
+      }
+    );
 
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error("Erro ao criar stream:", errorData);
-      return {
-        success: false,
-        message:
-          `Erro ao criar stream: ${response.status} ${response.statusText}`,
-        error: errorData,
-      };
+      ctx.errorHandler.toHttpError(
+        response,
+        `Failed to create stream: ${response.statusText}`,
+      );
     }
 
     const stream = await response.json();
 
     return {
       success: true,
-      message: "Stream criado com sucesso",
+      message: "Stream created successfully",
       stream,
     };
-  } catch (error: unknown) {
-    let message = "Erro desconhecido";
-    if (error instanceof Error) {
-      message = error.message;
-    }
-    return {
-      success: false,
-      message: `Erro ao criar stream: ${message}`,
-    };
+  } catch (error) {
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to create stream",
+    );
   }
 }

@@ -1,8 +1,9 @@
 import type { AppContext } from "../../mod.ts";
 
-export interface DeleteLiveBroadcastParams {
+export interface Props {
   /**
-   * @description ID da transmissão ao vivo a ser excluída
+   * @title Broadcast ID
+   * @description ID of the live broadcast to be deleted
    */
   broadcastId: string;
 }
@@ -14,11 +15,12 @@ export interface DeleteLiveBroadcastResult {
 }
 
 /**
- * @title Excluir Transmissão ao Vivo
- * @description Remove uma transmissão ao vivo do YouTube
+ * @name DELETE_LIVE_BROADCAST
+ * @title Delete Live Broadcast
+ * @description Removes a live broadcast from YouTube
  */
 export default async function action(
-  props: DeleteLiveBroadcastParams,
+  props: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<DeleteLiveBroadcastResult> {
@@ -27,55 +29,46 @@ export default async function action(
   } = props;
 
   if (!broadcastId) {
-    return {
-      success: false,
-      message: "ID da transmissão é obrigatório",
-    };
+    ctx.errorHandler.toHttpError(
+      new Error("Broadcast ID is required"),
+      "Broadcast ID is required",
+    );
   }
 
   try {
-    // Construir a URL para exclusão
-    const url = new URL(
-      "https://youtube.googleapis.com/youtube/v3/liveBroadcasts",
+    const response = await ctx.client["DELETE /liveBroadcasts"](
+      {
+        id: broadcastId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${ctx.tokens?.access_token}`,
+        },
+      }
     );
 
-    // Adicionar parâmetro de ID
-    url.searchParams.append("id", broadcastId);
-
-    // Fazer a requisição para excluir a transmissão
-    const response = await fetch(url.toString(), {
-      method: "DELETE",
-      headers: {
-        "Authorization": `Bearer ${ctx.access_token}`,
-      },
-    });
-
-    // A API retorna 204 No Content quando a exclusão é bem-sucedida
     if (response.status === 204) {
       return {
         success: true,
-        message: "Transmissão excluída com sucesso",
+        message: "Broadcast deleted successfully",
       };
     }
 
-    // Se a resposta não for 204, temos um erro
-    const errorData = await response.text();
-    console.error("Erro ao excluir transmissão:", errorData);
+    if (!response.ok) {
+      ctx.errorHandler.toHttpError(
+        response,
+        `Failed to delete broadcast: ${response.statusText}`,
+      );
+    }
 
     return {
-      success: false,
-      message:
-        `Erro ao excluir transmissão: ${response.status} ${response.statusText}`,
-      error: errorData,
+      success: true,
+      message: "Broadcast deleted successfully",
     };
-  } catch (error: unknown) {
-    let message = "Erro desconhecido";
-    if (error instanceof Error) {
-      message = error.message;
-    }
-    return {
-      success: false,
-      message,
-    };
+  } catch (error) {
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to delete broadcast",
+    );
   }
 }

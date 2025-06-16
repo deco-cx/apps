@@ -156,11 +156,11 @@ export default loader;
 
 - [x] `actions/livestreams/bind.ts` ✅ **COMPLETED**
 - [x] `actions/livestreams/create.ts` ✅ **COMPLETED**
-- [ ] `actions/livestreams/createStream.ts`
-- [ ] `actions/livestreams/delete.ts`
-- [ ] `actions/livestreams/transition.ts`
-- [ ] `actions/livestreams/update.ts`
-- [ ] `actions/livestreams/updateThumbnail.ts`
+- [x] `actions/livestreams/createStream.ts` ✅ **COMPLETED**
+- [x] `actions/livestreams/delete.ts` ✅ **COMPLETED**
+- [x] `actions/livestreams/transition.ts` ✅ **COMPLETED**
+- [x] `actions/livestreams/update.ts` ✅ **COMPLETED**
+- [x] `actions/livestreams/updateThumbnail.ts` ✅ **COMPLETED**
 
 #### OAuth
 

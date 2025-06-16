@@ -13,6 +13,7 @@ import {
   LiveBroadcastListResponse,
   LiveStreamListResponse,
   LiveBroadcast,
+  LiveStream,
 } from "./types.ts";
 
 type Headers = {
@@ -231,6 +232,53 @@ export interface Client {
       contentDetails: Record<string, unknown>;
     };
     headers: Headers & { "Content-Type": string };
+  };
+  "POST /liveStreams": {
+    response: LiveStream;
+    searchParams: { part: string };
+    body: {
+      snippet: Record<string, unknown>;
+      cdn: Record<string, unknown>;
+      contentDetails: Record<string, unknown>;
+    };
+    headers: Headers & { "Content-Type": string };
+  };
+  "DELETE /liveBroadcasts": {
+    response: void;
+    searchParams: { id: string };
+    headers: Headers;
+  };
+  "POST /liveBroadcasts/transition": {
+    response: LiveBroadcast;
+    searchParams: { 
+      id: string;
+      broadcastStatus: "testing" | "live" | "complete";
+      part: string;
+    };
+    headers: Headers & { "Content-Length": string };
+  };
+  "PUT /liveBroadcasts": {
+    response: LiveBroadcast;
+    searchParams: { part: string };
+    body: {
+      id: string;
+      snippet?: Record<string, unknown>;
+      status?: Record<string, unknown>;
+      contentDetails?: Record<string, unknown>;
+    };
+    headers: Headers & { "Content-Type": string };
+  };
+  "POST /upload/youtube/v3/liveBroadcasts/thumbnails": {
+    response: { items: Array<Record<string, unknown>> };
+    searchParams: { 
+      uploadType: string;
+      broadcastId: string;
+    };
+    body: Uint8Array;
+    headers: Headers & { 
+      "Content-Type": string;
+      "Content-Length": string;
+    };
   };
 }
 

@@ -1,23 +1,28 @@
+import type { AppContext } from "../../mod.ts";
 import { LiveBroadcast } from "../../utils/types.ts";
 
-export interface UpdateLiveBroadcastThumbnailParams {
+export interface Props {
   /**
-   * @description ID da transmissão ao vivo
+   * @title Broadcast ID
+   * @description ID of the live broadcast
    */
   broadcastId: string;
 
   /**
-   * @description URL da imagem ou base64 da imagem para a miniatura
+   * @title Thumbnail URL
+   * @description URL of the image or base64 of the image for the thumbnail
    */
   thumbnailUrl?: string;
 
   /**
-   * @description Dados binários da imagem (se não usar URL)
+   * @title Thumbnail Data
+   * @description Binary data of the image (if not using URL)
    */
   thumbnailData?: Uint8Array;
 
   /**
-   * @description Tipo MIME da imagem (e.g., 'image/jpeg', 'image/png')
+   * @title MIME Type
+   * @description MIME type of the image (e.g., 'image/jpeg', 'image/png')
    */
   mimeType?: string;
 }
@@ -31,12 +36,14 @@ export interface UpdateLiveBroadcastThumbnailResult {
 }
 
 /**
- * @title Atualizar Miniatura da Transmissão
- * @description Atualiza a miniatura de uma transmissão ao vivo no YouTube
+ * @name UPDATE_LIVE_BROADCAST_THUMBNAIL
+ * @title Update Broadcast Thumbnail
+ * @description Updates the thumbnail of a live broadcast on YouTube
  */
 export default async function action(
-  props: UpdateLiveBroadcastThumbnailParams,
+  props: Props,
   _req: Request,
+  ctx: AppContext,
 ): Promise<UpdateLiveBroadcastThumbnailResult> {
   const {
     broadcastId,
@@ -46,31 +53,29 @@ export default async function action(
   } = props;
 
   if (!broadcastId) {
-    return {
-      success: false,
-      message: "ID da transmissão é obrigatório",
-    };
+    ctx.errorHandler.toHttpError(
+      new Error("Broadcast ID is required"),
+      "Broadcast ID is required",
+    );
   }
 
   if (!thumbnailUrl && !thumbnailData) {
-    return {
-      success: false,
-      message: "É necessário fornecer URL ou dados da imagem",
-    };
+    ctx.errorHandler.toHttpError(
+      new Error("You must provide either a URL or image data"),
+      "You must provide either a URL or image data",
+    );
   }
 
   try {
     let imageData: Uint8Array;
 
-    // Obter os dados da imagem, seja de URL ou diretamente
     if (thumbnailUrl) {
       const imageResponse = await fetch(thumbnailUrl);
       if (!imageResponse.ok) {
-        return {
-          success: false,
-          message:
-            `Erro ao baixar imagem da URL: ${imageResponse.status} ${imageResponse.statusText}`,
-        };
+        ctx.errorHandler.toHttpError(
+          imageResponse,
+          `Failed to download image from URL: ${imageResponse.statusText}`,
+        );
       }
 
       const buffer = await imageResponse.arrayBuffer();
@@ -78,55 +83,45 @@ export default async function action(
     } else if (thumbnailData) {
       imageData = thumbnailData;
     } else {
-      return {
-        success: false,
-        message: "Dados da imagem não disponíveis",
-      };
+      ctx.errorHandler.toHttpError(
+        new Error("Image data not available"),
+        "Image data not available",
+      );
     }
 
-    // Construir a URL para upload da miniatura
-    const url = new URL(
-      `https://youtube.googleapis.com/upload/youtube/v3/liveBroadcasts/thumbnails`,
-    );
-    url.searchParams.append("uploadType", "media");
-    url.searchParams.append("broadcastId", broadcastId);
-
-    // Enviar a imagem
-    const uploadResponse = await fetch(url.toString(), {
-      method: "POST",
-      headers: {
-        "Content-Type": mimeType,
-        "Content-Length": imageData.length.toString(),
+    const uploadResponse = await ctx.client["POST /upload/youtube/v3/liveBroadcasts/thumbnails"](
+      {
+        uploadType: "media",
+        broadcastId: broadcastId,
       },
-      body: imageData,
-    });
+      {
+        headers: {
+          "Content-Type": mimeType,
+          "Content-Length": imageData.length.toString(),
+          Authorization: `Bearer ${ctx.tokens?.access_token}`,
+        },
+        body: imageData,
+      }
+    );
 
     if (!uploadResponse.ok) {
-      const errorData = await uploadResponse.text();
-      console.error("Erro ao enviar miniatura:", errorData);
-      return {
-        success: false,
-        message:
-          `Erro ao enviar miniatura: ${uploadResponse.status} ${uploadResponse.statusText}`,
-        error: errorData,
-      };
+      ctx.errorHandler.toHttpError(
+        uploadResponse,
+        `Failed to upload thumbnail: ${uploadResponse.statusText}`,
+      );
     }
 
     const responseData = await uploadResponse.json();
 
     return {
       success: true,
-      message: "Miniatura atualizada com sucesso",
+      message: "Thumbnail updated successfully",
       thumbnails: responseData.items?.[0] || responseData,
     };
-  } catch (error: unknown) {
-    let message = "Erro desconhecido";
-    if (error instanceof Error) {
-      message = error.message;
-    }
-    return {
-      success: false,
-      message,
-    };
+  } catch (error) {
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to update thumbnail",
+    );
   }
 }
