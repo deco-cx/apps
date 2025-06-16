@@ -1,5 +1,13 @@
 import type { AppContext } from "../../mod.ts";
 import { OAUTH_URL_TOKEN } from "../../utils/constants.ts";
+import { AirtableBase, PermissionParams } from "../../utils/types.ts";
+import { fetchBasesAndTables } from "../../utils/ui-templates/airtable-client.ts";
+import { generateSelectionPage } from "../../utils/ui-templates/page-generator.ts";
+
+function decodePermission(permission: string): PermissionParams {
+  const permissionData = JSON.parse(atob(permission));
+  return permissionData as PermissionParams;
+}
 
 interface OAuthTokenResponse {
   access_token: string;
@@ -46,27 +54,74 @@ export interface Props {
    * @description The same redirect URI used in the authorization request
    */
   redirectUri: string;
+
+  /**
+   * @title Query Params
+   * @description The query parameters from the request
+   */
+  queryParams: Record<string, string | boolean | undefined>;
 }
 
-// Function to extract code_verifier from state
 function extractCodeVerifier(state: string): string | null {
   try {
-    console.log("Attempting to parse state:", state);
     const stateData = JSON.parse(atob(state));
-    console.log("Parsed state data:", stateData);
     const codeVerifier = stateData.code_verifier || null;
-    console.log(
-      "Extracted code_verifier:",
-      codeVerifier ? "found" : "not found",
-    );
     return codeVerifier;
-  } catch (error) {
-    console.error("Failed to parse state parameter:", error);
+  } catch (_error) {
     return null;
   }
 }
 
+interface StateProvider {
+  original_state?: string;
+  code_verifier?: string;
+}
+
+interface State {
+  appName: string;
+  installId: string;
+  invokeApp: string;
+  returnUrl?: string | null;
+  redirectUri?: string | null;
+}
+
+function decodeState(state: string): State & StateProvider {
+  try {
+    const decoded = atob(decodeURIComponent(state));
+    const parsed = JSON.parse(decoded) as State & StateProvider;
+
+    if (parsed.original_state) {
+      return decodeState(parsed.original_state);
+    }
+
+    return parsed;
+  } catch (error) {
+    console.error("Erro ao decodificar state:", error);
+    return {} as State & StateProvider;
+  }
+}
+
+function hasExistingPermissions(permission: unknown): boolean {
+  if (!permission || typeof permission !== "object" || permission === null) {
+    return false;
+  }
+  return Object.keys(permission as Record<string, unknown>).length > 0;
+}
+
+function createPermissionExistsError(
+  installId: string,
+  accountName: string | undefined,
+) {
+  return {
+    installId,
+    account: accountName,
+    error:
+      "Permissions already configured. Cannot overwrite existing permissions.",
+  };
+}
+
 /**
+ * @internal true
  * @title OAuth Callback
  * @description Exchanges the authorization code for access tokens with PKCE support
  */
@@ -78,12 +133,74 @@ export default async function callback(
     clientId,
     clientSecret,
     redirectUri,
+    queryParams,
   }: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
-): Promise<{ installId: string; error?: string; account?: string }> {
+): Promise<Response | Record<string, unknown>> {
+  const { savePermission, continue: continueQueryParam } = queryParams;
+
+  if (!!savePermission || !!continueQueryParam) {
+    const { permissions } = queryParams;
+
+    const stateData = decodeState(state);
+    const currentCtx = await ctx.getConfiguration();
+
+    const account = await ctx.invoke.airtable.loaders.whoami({
+      accessToken: currentCtx.tokens?.access_token || ctx.tokens?.access_token,
+    })
+      .then((user) => user.email)
+      .catch((error) => {
+        console.error("Error getting user:", error);
+        return undefined;
+      }) || undefined;
+
+    let accountName = account;
+
+    if (continueQueryParam === "true") {
+      if (hasExistingPermissions(currentCtx.permission)) {
+        return createPermissionExistsError(stateData.installId, accountName);
+      }
+
+      await ctx.configure({
+        ...currentCtx,
+        permission: {
+          allCurrentAndFutureTableBases: true,
+        },
+      });
+
+      return {
+        installId: stateData.installId,
+        account: accountName,
+      };
+    }
+
+    if (permissions && typeof permissions === "string") {
+      if (hasExistingPermissions(currentCtx.permission)) {
+        return createPermissionExistsError(stateData.installId, accountName);
+      }
+      const { bases, tables } = decodePermission(permissions);
+
+      await ctx.configure({
+        ...currentCtx,
+        permission: {
+          bases,
+          tables,
+        },
+      });
+
+      accountName = account ||
+        bases.map((base: AirtableBase) => base.name).join(", ");
+
+      return {
+        installId: stateData.installId,
+        account: accountName,
+      };
+    }
+  }
+
   try {
-    const uri = redirectUri || new URL("/oauth/callback", _req.url).href;
+    const uri = redirectUri || new URL("/oauth/callback", req.url).href;
 
     const codeVerifier = extractCodeVerifier(state);
     if (!codeVerifier) {
@@ -113,12 +230,6 @@ export default async function callback(
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Token exchange failed:", {
-        tokenRequestBody,
-        status: response.status,
-        statusText: response.statusText,
-        body: errorText,
-      });
       throw new Error(`Token exchange failed: ${response.status} ${errorText}`);
     }
 
@@ -140,15 +251,25 @@ export default async function callback(
       clientId: clientId,
     });
 
-    const account = await ctx.invoke.airtable.loaders.whoami({
-      accessToken: tokenData.access_token,
-    })
-      .then((user) => user.email)
-      .catch(console.error) || undefined;
+    const newURL = req.url;
+    const data = await fetchBasesAndTables(tokenData);
 
-    return { installId, account };
+    const selectionHtml = generateSelectionPage({
+      bases: data.bases,
+      tables: data.tables,
+      callbackUrl: newURL,
+    });
+
+    return new Response(selectionHtml, {
+      headers: {
+        "Content-Type": "text/html",
+        "Content-Security-Policy":
+          "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+      },
+    });
   } catch (error) {
-    console.error("OAuth callback error:", error);
     return {
       installId,
       error: error instanceof Error ? error.message : "Unknown error",

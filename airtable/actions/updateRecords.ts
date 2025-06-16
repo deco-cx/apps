@@ -13,13 +13,15 @@ interface RecordToUpdate {
 interface Props {
   /**
    * @title Base ID
+   * @description The base containing the table with records to update
    */
   baseId: string;
 
   /**
-   * @title Table ID or Name
+   * @title Table ID
+   * @description The table containing the records to update
    */
-  tableIdOrName: string;
+  tableId: string;
 
   /**
    * @title Records to Update
@@ -51,10 +53,42 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<{ records: AirtableRecord[] } | Response> => {
-  const { baseId, tableIdOrName, records, typecast, performUpsert } = props;
-
   if (!ctx.client) {
     return new Response("OAuth authentication is required", { status: 401 });
+  }
+
+  const validationResult = await ctx.invoke["airtable"].loaders.permissioning
+    .validatePermissions({
+      mode: "check",
+      baseId: props.baseId,
+      tableIdOrName: props.tableId,
+    });
+
+  if ("hasPermission" in validationResult && !validationResult.hasPermission) {
+    return new Response(validationResult.message || "Access denied", {
+      status: 403,
+    });
+  }
+
+  const { baseId, tableId, records, typecast, performUpsert } = props;
+
+  if (!records || records.length === 0) {
+    return new Response("At least one record is required", { status: 400 });
+  }
+
+  if (records.length > 10) {
+    return new Response("Maximum 10 records can be updated at once", {
+      status: 400,
+    });
+  }
+
+  const invalidRecords = records.filter((record) =>
+    !record.id || !record.fields
+  );
+  if (invalidRecords.length > 0) {
+    return new Response("All records must have 'id' and 'fields' properties", {
+      status: 400,
+    });
   }
 
   const body: UpdateRecordsBody = {
@@ -67,13 +101,14 @@ const action = async (
     body.performUpsert = performUpsert;
   }
 
-  const response = await ctx.client["PATCH /v0/:baseId/:tableIdOrName"](
-    { baseId, tableIdOrName },
+  const response = await ctx.client["PATCH /v0/:baseId/:tableId"](
+    { baseId, tableId },
     { body },
   );
 
   if (!response.ok) {
-    throw new Error(`Error updating records: ${response.statusText}`);
+    const errorText = await response.text();
+    throw new Error(`Error updating records: ${errorText}`);
   }
 
   return response.json();

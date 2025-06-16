@@ -1,7 +1,5 @@
 import {
   BatchUpdateSpreadsheetRequest,
-  BatchUpdateValuesRequest,
-  BatchUpdateValuesResponse,
   DeveloperMetadata,
   FilterView,
   ProtectedRange,
@@ -67,10 +65,6 @@ export interface GoogleSheetsClient {
       responseValueRenderOption?: string;
       responseDateTimeRenderOption?: string;
     };
-  };
-  "POST /v4/spreadsheets/:spreadsheetId/values:batchUpdate": {
-    response: BatchUpdateValuesResponse;
-    body: BatchUpdateValuesRequest;
   };
   "POST /v4/spreadsheets/:spreadsheetId:batchUpdate": {
     response: Spreadsheet;

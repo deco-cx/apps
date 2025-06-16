@@ -91,6 +91,7 @@ interface Props {
 }
 
 /**
+ * @name Create_New_Table
  * @title Create Airtable Table
  * @description Creates a new table within a specified base using OAuth (Metadata API).
  */
@@ -99,11 +100,23 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<Table | Response> => {
-  const { baseId, name, description, fields } = props;
-
   if (!ctx.client) {
     return new Response("OAuth authentication is required", { status: 401 });
   }
+
+  const validationResult = await ctx.invoke["airtable"].loaders.permissioning
+    .validatePermissions({
+      mode: "check",
+      baseId: props.baseId,
+    });
+
+  if ("hasPermission" in validationResult && !validationResult.hasPermission) {
+    return new Response(validationResult.message || "Access denied", {
+      status: 403,
+    });
+  }
+
+  const { baseId, name, description, fields } = props;
 
   if (!name || name.trim() === "") {
     throw new Error("Table name is required");
@@ -134,7 +147,19 @@ const action = async (
     throw new Error(`Error creating table: ${errorText}`);
   }
 
-  return response.json();
+  const table = await response.json();
+
+  await ctx.invoke["airtable"].actions.permissioning.addNewPermitions({
+    tables: [
+      {
+        id: table.id,
+        name: table.name,
+        baseId: baseId,
+      },
+    ],
+  });
+
+  return table;
 };
 
 export default action;
