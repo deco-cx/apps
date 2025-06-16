@@ -46,7 +46,7 @@ export interface State extends Props {
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
- * @title YouTube
+ * @title Google YouTube
  * @description Integração com YouTube usando OAuth 2.0 com refresh automático de tokens
  * @category Social
  * @logo https://cdn.pixabay.com/photo/2021/09/11/18/21/youtube-6616310_1280.png
