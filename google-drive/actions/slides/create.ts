@@ -1,0 +1,51 @@
+import type { AppContext } from "../../mod.ts";
+import {
+  ERROR_FAILED_TO_CREATE_FILE,
+  ERROR_MISSING_FILE_NAME,
+  FIELDS,
+  PRESENTATION_MIME_TYPE,
+} from "../../utils/constant.ts";
+import { CreateFileParams, DriveFile } from "../../utils/types.ts";
+
+export interface Props extends Omit<CreateFileParams, "mimeType"> {}
+
+/**
+ * @title Create Presentation
+ * @description Creates a new Google Slides presentation
+ */
+export default async function createPresentation(
+  props: Props,
+  _req: Request,
+  ctx: AppContext,
+): Promise<DriveFile> {
+  const { name, description, parents, properties, appProperties } = props;
+
+  if (!name) {
+    console.error(ERROR_MISSING_FILE_NAME);
+    return {};
+  }
+
+  try {
+    const response = await ctx.client["POST /files"](
+      {
+        [FIELDS]: "id,name,mimeType,webViewLink",
+      },
+      {
+        body: {
+          name,
+          mimeType: PRESENTATION_MIME_TYPE,
+          description,
+          parents,
+          properties,
+          appProperties,
+        },
+      },
+    );
+
+    return await response.json();
+  } catch (error) {
+    console.error(ERROR_FAILED_TO_CREATE_FILE, error);
+
+    return {};
+  }
+}
