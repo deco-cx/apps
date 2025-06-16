@@ -10,8 +10,8 @@ import {
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { CartResponse } from "./types/basketJSON.ts";
 import {
-  Product as LinxProductGroupGridProductsJSON,
   MediaGroup,
+  Product as LinxProductGroupGridProductsJSON,
 } from "./types/gridProductsJSON.ts";
 import { NavigationInfo as ProductNavigation } from "./types/shared.ts";
 import {
@@ -464,7 +464,7 @@ export const toAuction = (
   return ({
     ...auction,
     ProductImage: new URL(auction.ProductImage, cdn).href,
-    MediaGroups: product.MediaGroups
+    MediaGroups: product.MediaGroups,
   });
 };
 
