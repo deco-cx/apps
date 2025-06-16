@@ -148,8 +148,7 @@ const loader = async (
 
   const result = await response.json();
 
-  // It's bad, but leave it like that for now.
-  // @ts-ignore -
+  // @ts-ignore - It's bad, but leave it like that for now.
   return result.map((service) => {
     if (service.error === "444") {
       delete service.error;
