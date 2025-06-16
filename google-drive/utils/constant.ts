@@ -16,6 +16,7 @@ export const PAGE_TOKEN = "pageToken";
 export const Q = "q";
 export const ORDER_BY = "orderBy";
 export const INCLUDE_ITEMS_FROM_ALL_DRIVES = "includeItemsFromAllDrives";
+export const SUPPORTS_ALL_DRIVES = "supportsAllDrives";
 export const SPACES = "spaces";
 export const CORPORA = "corpora";
 
@@ -37,6 +38,7 @@ export const WEB_VIEW_LINK = "webViewLink";
 export const WEB_CONTENT_LINK = "webContentLink";
 export const SIZE = "size";
 export const FILE_EXTENSION = "fileExtension";
+export const COMMON_FIELDS = [ID, NAME, MIME_TYPE, WEB_VIEW_LINK].join(",");
 
 // MIME Types
 export const FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
@@ -47,8 +49,10 @@ export const PRESENTATION_MIME_TYPE =
 
 // Default values
 export const DEFAULT_PAGE_SIZE = 100;
-export const DEFAULT_FIELDS =
-  "nextPageToken, files(id, name, mimeType, createdTime, modifiedTime, webViewLink)";
+export const DEFAULT_FIELDS = [
+  "nextPageToken",
+  `files(${COMMON_FIELDS})`,
+].join(",");
 
 // Error messages
 export const ERROR_FAILED_TO_LIST_FILES = "Failed to list files";

@@ -1,5 +1,6 @@
 import type { AppContext } from "../../mod.ts";
 import {
+  COMMON_FIELDS,
   ERROR_FAILED_TO_UPDATE_FILE,
   ERROR_MISSING_FILE_ID,
   FIELDS,
@@ -35,7 +36,7 @@ export default async function updateFile(
     const response = await ctx.client["PATCH /files/:fileId"](
       {
         fileId,
-        [FIELDS]: "id,name,mimeType,webViewLink",
+        [FIELDS]: COMMON_FIELDS,
       },
       {
         body: {

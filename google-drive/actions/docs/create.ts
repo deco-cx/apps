@@ -1,5 +1,6 @@
 import type { AppContext } from "../../mod.ts";
 import {
+  COMMON_FIELDS,
   DOCUMENT_MIME_TYPE,
   ERROR_FAILED_TO_CREATE_FILE,
   ERROR_MISSING_FILE_NAME,
@@ -30,7 +31,7 @@ export default async function createDocument(
   try {
     const response = await ctx.client["POST /files"](
       {
-        [FIELDS]: "id,name,mimeType,webViewLink",
+        [FIELDS]: COMMON_FIELDS,
       },
       {
         body: {

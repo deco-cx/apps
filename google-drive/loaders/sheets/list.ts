@@ -6,12 +6,14 @@ import {
   ERROR_FAILED_TO_LIST_FILES,
   FIELDS,
   INCLUDE_ITEMS_FROM_ALL_DRIVES,
+  MIME_TYPE,
   ORDER_BY,
   PAGE_SIZE,
   PAGE_TOKEN,
   Q,
   SPACES,
   SPREADSHEET_MIME_TYPE,
+  SUPPORTS_ALL_DRIVES,
 } from "../../utils/constant.ts";
 import { FileList, ListFilesParams } from "../../utils/types.ts";
 
@@ -44,8 +46,8 @@ export default async function listSpreadsheets(
 
   try {
     const query = q
-      ? `mimeType='${SPREADSHEET_MIME_TYPE}' and (${q})`
-      : `mimeType='${SPREADSHEET_MIME_TYPE}'`;
+      ? `${MIME_TYPE}='${SPREADSHEET_MIME_TYPE}' and (${q})`
+      : `${MIME_TYPE}='${SPREADSHEET_MIME_TYPE}'`;
 
     const params: Record<string, string | number | boolean | undefined> = {
       [PAGE_SIZE]: pageSize,
@@ -54,6 +56,7 @@ export default async function listSpreadsheets(
       [ORDER_BY]: orderBy,
       [FIELDS]: fields,
       [INCLUDE_ITEMS_FROM_ALL_DRIVES]: includeItemsFromAllDrives,
+      [SUPPORTS_ALL_DRIVES]: includeItemsFromAllDrives,
       [SPACES]: spaces,
       [CORPORA]: corpora,
     };

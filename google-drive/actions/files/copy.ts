@@ -1,5 +1,6 @@
 import type { AppContext } from "../../mod.ts";
 import {
+  COMMON_FIELDS,
   ERROR_FAILED_TO_CREATE_FILE,
   ERROR_MISSING_FILE_ID,
   FIELDS,
@@ -27,7 +28,7 @@ export default async function copyFile(
     const response = await ctx.client["POST /files/:fileId/copy"](
       {
         fileId,
-        [FIELDS]: "id,name,mimeType,webViewLink",
+        [FIELDS]: COMMON_FIELDS,
       },
       {
         body: {

@@ -7,6 +7,7 @@ import {
   ERROR_FAILED_TO_LIST_FILES,
   FIELDS,
   INCLUDE_ITEMS_FROM_ALL_DRIVES,
+  MIME_TYPE,
   ORDER_BY,
   PAGE_SIZE,
   PAGE_TOKEN,
@@ -44,8 +45,8 @@ export default async function listDocuments(
 
   try {
     const query = q
-      ? `mimeType='${DOCUMENT_MIME_TYPE}' and (${q})`
-      : `mimeType='${DOCUMENT_MIME_TYPE}'`;
+      ? `${MIME_TYPE}='${DOCUMENT_MIME_TYPE}' and (${q})`
+      : `${MIME_TYPE}='${DOCUMENT_MIME_TYPE}'`;
 
     const params: Record<string, string | number | boolean | undefined> = {
       [PAGE_SIZE]: pageSize,
