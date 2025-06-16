@@ -1,59 +1,71 @@
-export interface UpdateChannelOptions {
+import { AppContext } from "../../mod.ts";
+import { COMMON_ERROR_MESSAGES, YOUTUBE_PARTS } from "../../utils/constant.ts";
+
+export interface Props {
   /**
-   * @description ID do canal a ser atualizado
+   * @title Channel ID
+   * @description ID of the channel to be updated
    */
   channelId: string;
 
   /**
-   * @description Título do canal (opcional)
+   * @title Title
+   * @description Channel title
    */
   title?: string;
 
   /**
-   * @description Descrição do canal (opcional)
+   * @title Description
+   * @description Channel description
    */
   description?: string;
 
   /**
-   * @description ID do vídeo para definir como trailer do canal (opcional)
+   * @title Unsubscribed Trailer
+   * @description Video ID to set as channel trailer
    */
   unsubscribedTrailer?: string;
 
   /**
-   * @description Tags do canal, separadas por vírgula ou array (opcional)
+   * @title Keywords
+   * @description Channel keywords, comma separated or array
    */
   keywords?: string | string[];
 
   /**
-   * @description País de origem do canal (código de duas letras, ex: BR) (opcional)
+   * @title Country
+   * @description Channel country (two-letter code, e.g. US)
    */
   country?: string;
 
   /**
-   * @description Idioma padrão do canal (código, ex: pt-BR) (opcional)
+   * @title Default Language
+   * @description Channel default language (code, e.g. en-US)
    */
   defaultLanguage?: string;
 
   /**
-   * @description Tópicos relacionados ao canal (IDs de tópicos do Freebase/Wiki) (opcional)
+   * @title Topic Categories
+   * @description Channel topic categories (Freebase/Wiki topic IDs)
    */
   topicCategories?: string[];
 }
 
-interface UpdateChannelResult {
+export interface UpdateChannelResult {
   success: boolean;
   message: string;
   channel?: unknown;
 }
 
 /**
+ * @name UPDATE_CHANNEL
  * @title Configure YouTube Channel
  * @description Updates various channel information such as description, trailer and other settings
  */
 export default async function action(
-  props: UpdateChannelOptions,
+  props: Props,
   _req: Request,
-  _ctx: unknown,
+  ctx: AppContext,
 ): Promise<UpdateChannelResult> {
   const {
     channelId,
@@ -67,33 +79,41 @@ export default async function action(
   } = props;
 
   if (!channelId) {
-    console.error("ID do canal não fornecido");
-    return { success: false, message: "ID do canal é obrigatório" };
+    ctx.errorHandler.toHttpError(
+      new Error(COMMON_ERROR_MESSAGES.MISSING_CHANNEL_ID),
+      COMMON_ERROR_MESSAGES.MISSING_CHANNEL_ID,
+    );
   }
 
   try {
-    // Primeiro, obter os dados atuais do canal para não perder informações
-    const getResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/channels?part=snippet,brandingSettings&id=${channelId}`,
+    const getResponse = await ctx.client["GET /channels"](
+      {
+        part: `${YOUTUBE_PARTS.SNIPPET},brandingSettings`,
+        id: channelId,
+      },
+      {
+        headers: ctx.tokens?.access_token
+          ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
+          : {},
+      }
     );
 
     if (!getResponse.ok) {
-      const errorText = await getResponse.text();
-      console.error("Erro ao obter dados do canal:", errorText);
-      return {
-        success: false,
-        message:
-          `Erro ao obter dados do canal: ${getResponse.status} ${getResponse.statusText}`,
-      };
+      ctx.errorHandler.toHttpError(
+        getResponse,
+        `Failed to get channel data: ${getResponse.statusText}`,
+      );
     }
 
     const channelData = await getResponse.json();
 
     if (!channelData.items || channelData.items.length === 0) {
-      return { success: false, message: "Canal não encontrado" };
+      ctx.errorHandler.toHttpError(
+        new Error("Channel not found"),
+        `Channel not found: ${channelId}`,
+      );
     }
 
-    // Obter os dados atuais para fazer atualizações parciais
     const currentChannel = channelData.items[0];
     const snippet = { ...currentChannel.snippet };
     const brandingSettings = {
@@ -101,7 +121,6 @@ export default async function action(
       channel: { ...currentChannel.brandingSettings?.channel || {} },
     };
 
-    // Atualizar campos no snippet
     let snippetUpdated = false;
     if (title !== undefined) {
       snippet.title = title;
@@ -121,8 +140,6 @@ export default async function action(
         : keywords.split(",").map((k) => k.trim());
 
       snippet.tags = keywordsArray;
-
-      // As palavras-chave no brandingSettings são uma string separada por espaço
       brandingSettings.channel.keywords = keywordsArray.join(" ");
       snippetUpdated = true;
     }
@@ -143,123 +160,109 @@ export default async function action(
       snippetUpdated = true;
     }
 
-    // Atualizar campos no brandingSettings
     let brandingUpdated = false;
     if (unsubscribedTrailer !== undefined) {
       brandingSettings.channel.unsubscribedTrailer = unsubscribedTrailer;
       brandingUpdated = true;
     }
 
-    // Também consideramos atualizações de branding se os campos compartilhados foram alterados
     brandingUpdated = brandingUpdated ||
       title !== undefined ||
       description !== undefined ||
       keywords !== undefined ||
       country !== undefined;
 
-    // Resultados das atualizações
     let snippetUpdateSuccess = true;
     let brandingUpdateSuccess = true;
 
-    // 1. Atualizar o snippet, se necessário
     if (snippetUpdated) {
       const snippetRequestBody = {
         id: channelId,
         snippet,
       };
 
-      const snippetResponse = await fetch(
-        `https://www.googleapis.com/youtube/v3/channels?part=snippet`,
+      const snippetResponse = await ctx.client["PUT /channels"](
+        { part: YOUTUBE_PARTS.SNIPPET },
         {
-          method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${ctx.tokens?.access_token}`,
           },
-          body: JSON.stringify(snippetRequestBody),
-        },
+          body: snippetRequestBody,
+        }
       );
 
       if (!snippetResponse.ok) {
-        const errorText = await snippetResponse.text();
-        console.error("Erro ao atualizar snippet do canal:", errorText);
         snippetUpdateSuccess = false;
-      } else {
-        console.log("Snippet do canal atualizado com sucesso");
       }
     }
 
-    // 2. Atualizar os brandingSettings, se necessário
     if (brandingUpdated) {
       const brandingRequestBody = {
         id: channelId,
         brandingSettings,
       };
 
-      const brandingResponse = await fetch(
-        `https://www.googleapis.com/youtube/v3/channels?part=brandingSettings`,
+      const brandingResponse = await ctx.client["PUT /channels"](
+        { part: "brandingSettings" },
         {
-          method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${ctx.tokens?.access_token}`,
           },
-          body: JSON.stringify(brandingRequestBody),
-        },
+          body: brandingRequestBody,
+        }
       );
 
       if (!brandingResponse.ok) {
-        const errorText = await brandingResponse.text();
-        console.error(
-          "Erro ao atualizar brandingSettings do canal:",
-          errorText,
-        );
         brandingUpdateSuccess = false;
-      } else {
-        console.log("BrandingSettings do canal atualizados com sucesso");
       }
     }
 
-    // 3. Buscar os dados atualizados do canal
-    const updatedDataResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/channels?part=snippet,brandingSettings&id=${channelId}`,
+    const updatedDataResponse = await ctx.client["GET /channels"](
+      {
+        part: `${YOUTUBE_PARTS.SNIPPET},brandingSettings`,
+        id: channelId,
+      },
+      {
+        headers: ctx.tokens?.access_token
+          ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
+          : {},
+      }
     );
 
     const updatedChannelData = await updatedDataResponse.json();
 
-    // Verificar o resultado das operações
     if (!snippetUpdateSuccess && !brandingUpdateSuccess) {
       return {
         success: false,
-        message: "Falha ao atualizar as informações do canal",
+        message: "Failed to update channel information",
       };
     } else if (!snippetUpdateSuccess) {
       return {
         success: false,
         message:
-          "Falha ao atualizar informações básicas do canal, mas configurações de marca podem ter sido atualizadas",
+          "Failed to update basic channel information, but branding settings may have been updated",
         channel: updatedChannelData.items?.[0],
       };
     } else if (!brandingUpdateSuccess) {
       return {
         success: false,
         message:
-          "Falha ao atualizar configurações de marca do canal, mas informações básicas foram atualizadas",
+          "Failed to update channel branding settings, but basic information was updated",
         channel: updatedChannelData.items?.[0],
       };
     }
 
     return {
       success: true,
-      message: "Canal atualizado com sucesso",
+      message: "Channel updated successfully",
       channel: updatedChannelData.items?.[0],
     };
-  } catch (error: unknown) {
-    let message = "Erro desconhecido";
-    if (error instanceof Error) {
-      message = error.message;
-    }
-    return {
-      success: false,
-      message: `Erro ao processar a solicitação: ${message}`,
-    };
+  } catch (error) {
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to process channel update request",
+    );
   }
 }

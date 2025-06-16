@@ -1,21 +1,23 @@
-import type { AppContext } from "../../mod.ts";
-import type {
+import { AppContext } from "../../mod.ts";
+import {
   YouTubeCaptionListResponse,
   YoutubeVideoResponse,
 } from "../../utils/types.ts";
-import { STALE } from "../../../utils/fetch.ts";
+import {
+  COMMON_ERROR_MESSAGES,
+  YOUTUBE_PARTS,
+} from "../../utils/constant.ts";
 
-/**
- * Opções para buscar detalhes de um vídeo
- */
-export interface VideoDetailsOptions {
+export interface Props {
   /**
-   * @description ID do vídeo para buscar detalhes
+   * @title Video ID
+   * @description ID of the video to fetch details for
    */
   videoId: string;
 
   /**
-   * @description Partes adicionais a serem incluídas na resposta
+   * @title Parts
+   * @description Additional parts to include in the response
    */
   parts?: Array<
     | "snippet"
@@ -28,19 +30,16 @@ export interface VideoDetailsOptions {
   >;
 
   /**
-   * @description Incluir vídeos privados
+   * @title Include Private
+   * @description Include private videos in the response
    */
   includePrivate?: boolean;
 
   /**
-   * @description Incluir legendas disponíveis
+   * @title Include Captions
+   * @description Include available captions in the response
    */
   includeCaptions?: boolean;
-
-  /**
-   * @description Ignorar cache para esta solicitação
-   */
-  skipCache?: boolean;
 }
 
 export interface VideoDetailsResult {
@@ -48,67 +47,62 @@ export interface VideoDetailsResult {
   captions?: YouTubeCaptionListResponse;
 }
 
-export interface VideoDetailsError {
-  message: string;
-  error: boolean;
-  code?: number;
-  details?: unknown;
-}
-
-export type VideoDetailsResponse = VideoDetailsResult | VideoDetailsError;
-
 /**
- * @title YouTube Video Details
- * @description Obtém informações detalhadas sobre um vídeo específico pelo ID
+ * @name GET_VIDEO_DETAILS
+ * @title Get Video Details
+ * @description Retrieves detailed information about a specific video by ID
  */
-export default async function loader(
-  props: VideoDetailsOptions,
+const loader = async (
+  props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<VideoDetailsResponse> {
-  const client = ctx.client;
-
+): Promise<VideoDetailsResult> => {
   const {
     videoId,
-    parts = ["snippet", "statistics", "status"],
+    parts = [
+      YOUTUBE_PARTS.SNIPPET,
+      YOUTUBE_PARTS.STATISTICS,
+      YOUTUBE_PARTS.STATUS,
+    ],
     includeCaptions = true,
   } = props;
 
   if (!videoId) {
-    return createErrorResponse(400, "ID do vídeo é obrigatório");
+    ctx.errorHandler.toHttpError(
+      new Error(COMMON_ERROR_MESSAGES.MISSING_VIDEO_ID),
+      COMMON_ERROR_MESSAGES.MISSING_VIDEO_ID,
+    );
   }
 
   try {
     const partString = parts.join(",");
 
-    const videoResponse = await client["GET /videos"]({
-      part: partString,
-      id: videoId,
-    }, {
-      ...STALE,
-    });
-
-    if (videoResponse.status === 401) {
-      ctx.response.headers.set("X-Token-Expired", "true");
-      ctx.response.headers.set("Cache-Control", "no-store");
-      return createErrorResponse(
-        401,
-        "Token de autenticação expirado ou inválido",
-      );
-    }
+    const videoResponse = await ctx.client["GET /videos"](
+      {
+        part: partString,
+        id: videoId,
+      },
+      {
+        headers: ctx.tokens?.access_token
+          ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
+          : {},
+      }
+    );
 
     if (!videoResponse.ok) {
-      return createErrorResponse(
-        videoResponse.status,
-        `Erro ao buscar detalhes do vídeo: ${videoResponse.status}`,
-        await videoResponse.text(),
+      ctx.errorHandler.toHttpError(
+        videoResponse,
+        `Failed to fetch video details: ${videoResponse.statusText}`,
       );
     }
 
     const videoData = await videoResponse.json();
 
     if (!videoData.items || videoData.items.length === 0) {
-      return createErrorResponse(404, `Vídeo não encontrado: ${videoId}`);
+      ctx.errorHandler.toHttpError(
+        new Error("Video not found"),
+        `Video not found: ${videoId}`,
+      );
     }
 
     const result: VideoDetailsResult = {
@@ -117,61 +111,32 @@ export default async function loader(
 
     if (includeCaptions) {
       try {
-        const captionsResponse = await client["GET /captions"]({
-          part: "snippet",
-          videoId,
-        }, {
-          ...STALE,
-        });
+        const captionsResponse = await ctx.client["GET /captions"](
+          {
+            part: YOUTUBE_PARTS.SNIPPET,
+            videoId,
+          },
+          {
+            headers: ctx.tokens?.access_token
+              ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
+              : {},
+          }
+        );
 
         if (captionsResponse.ok) {
           result.captions = await captionsResponse.json();
         }
       } catch (_error) {
-        // Ignora erros de legenda - não são críticos para o resultado
       }
     }
 
     return result;
   } catch (error) {
-    return createErrorResponse(
-      500,
-      "Erro ao processar detalhes do vídeo",
-      error instanceof Error ? error.message : String(error),
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to process video details",
     );
   }
-}
-
-function createErrorResponse(
-  code: number,
-  message: string,
-  details?: unknown,
-): VideoDetailsError {
-  return {
-    message,
-    error: true,
-    code,
-    details,
-  };
-}
-
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (props: VideoDetailsOptions, req: Request) => {
-  const tokenExpired = req.headers.get("X-Token-Expired") === "true";
-
-  if (!props.videoId || props.skipCache || tokenExpired) {
-    return null;
-  }
-
-  const params = new URLSearchParams([
-    ["videoId", props.videoId],
-    ["parts", (props.parts || ["snippet", "statistics", "status"]).join(",")],
-    ["includeCaptions", (props.includeCaptions ?? true).toString()],
-    ["includePrivate", (props.includePrivate ?? false).toString()],
-  ]);
-
-  params.sort();
-
-  return `youtube-video-details-${params.toString()}`;
 };
+
+export default loader;

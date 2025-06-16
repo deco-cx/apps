@@ -1,155 +1,107 @@
-import type { AppContext } from "../../mod.ts";
+import { AppContext } from "../../mod.ts";
 import { YouTubeCommentThreadListResponse } from "../../utils/types.ts";
-import { STALE } from "../../../utils/fetch.ts";
+import {
+  COMMON_ERROR_MESSAGES,
+  DEFAULT_MAX_RESULTS,
+  YOUTUBE_PARTS,
+} from "../../utils/constant.ts";
 
-export interface ThreadListParams {
+export interface Props {
   /**
-   * @description ID do vídeo para buscar threads de comentários
+   * @title Video ID
+   * @description ID of the video to load comment threads from
    */
   videoId: string;
 
   /**
-   * @description Número máximo de resultados
+   * @title Max Results
+   * @description Maximum number of results to return
    */
   maxResults?: number;
 
   /**
-   * @description Token de paginação
+   * @title Page Token
+   * @description Token for pagination
    */
   pageToken?: string;
 
   /**
-   * @description Ordenação dos comentários (tempo ou relevância)
+   * @title Order
+   * @description Order of comments (by time or relevance)
    */
   order?: "time" | "relevance";
-
-  /**
-   * @description Ignorar cache para esta solicitação
-   */
-  skipCache?: boolean;
 }
 
 export interface ThreadListResponse extends YouTubeCommentThreadListResponse {
-  error?: {
-    code: number;
-    message: string;
-    details?: unknown;
-  };
+  commentsDisabled?: boolean;
 }
 
 /**
- * @title Carregar Threads de Comentários
- * @description Carrega as threads de comentários de um vídeo do YouTube
+ * @name GET_COMMENT_THREADS
+ * @title Get Comment Threads
+ * @description Loads comment threads from a specific YouTube video
  */
-export default async function loader(
-  props: ThreadListParams,
+const loader = async (
+  props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<ThreadListResponse | null> {
+): Promise<ThreadListResponse> => {
   const {
     videoId,
-    maxResults = 20,
+    maxResults = DEFAULT_MAX_RESULTS,
     pageToken,
     order = "time",
-    skipCache: _skipCache = false,
   } = props;
 
   if (!videoId) {
-    return createErrorResponse(
-      400,
-      "ID do vídeo é obrigatório para carregar threads de comentários",
+    ctx.errorHandler.toHttpError(
+      new Error(COMMON_ERROR_MESSAGES.MISSING_VIDEO_ID),
+      COMMON_ERROR_MESSAGES.MISSING_VIDEO_ID,
     );
   }
 
   try {
-    const url = new URL(
-      "https://youtube.googleapis.com/youtube/v3/commentThreads",
-    );
-    url.searchParams.set("part", "snippet,replies");
-    url.searchParams.set("videoId", videoId);
-    url.searchParams.set("maxResults", maxResults.toString());
-    url.searchParams.set("order", order);
-    if (pageToken) url.searchParams.set("pageToken", pageToken);
-
-    const response = await fetch(url.toString(), {
-      headers: {
-        Authorization: `Bearer ${ctx.access_token}`,
+    const response = await ctx.client["GET /commentThreads"](
+      {
+        part: `${YOUTUBE_PARTS.SNIPPET},replies`,
+        videoId,
+        maxResults,
+        order,
+        pageToken,
       },
-      ...STALE,
-    });
+      {
+        headers: ctx.tokens?.access_token
+          ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
+          : {},
+      }
+    );
 
     if (!response.ok) {
-      // Verifica se o erro é porque os comentários estão desativados
       const errorData = await response.json().catch(() => response.text());
+
       if (errorData?.error?.errors?.[0]?.reason === "commentsDisabled") {
         return {
           kind: "youtube#commentThreadListResponse",
           etag: "",
           items: [],
-          // Adiciona uma propriedade para indicar que os comentários estão desativados
           commentsDisabled: true,
-        } as ThreadListResponse;
+        };
       }
 
-      // Outros erros
-      return createErrorResponse(
-        response.status,
-        `Erro ao carregar threads de comentários: ${response.status} ${response.statusText}`,
-        errorData,
+      ctx.errorHandler.toHttpError(
+        response,
+        `Failed to load comment threads: ${response.statusText}`,
       );
     }
 
-    return await response.json();
+    const data = await response.json();
+    return data;
   } catch (error) {
-    return createErrorResponse(
-      500,
-      `Erro ao carregar threads de comentários para o vídeo ${videoId}`,
-      error instanceof Error ? error.message : String(error),
+    ctx.errorHandler.toHttpError(
+      error,
+      `Failed to load comment threads for video ${videoId}`,
     );
   }
-}
-
-// Função auxiliar para criar respostas de erro
-function createErrorResponse(
-  code: number,
-  message: string,
-  details?: unknown,
-): ThreadListResponse {
-  return {
-    kind: "youtube#commentThreadListResponse",
-    etag: "",
-    items: [],
-    error: {
-      code,
-      message,
-      details,
-    },
-  };
-}
-
-// Define a estratégia de cache como stale-while-revalidate
-export const cache = "stale-while-revalidate";
-
-// Define a chave de cache com base nos parâmetros da requisição
-export const cacheKey = (
-  props: ThreadListParams,
-  _req: Request,
-  _ctx: AppContext,
-) => {
-  // Não usar cache se não houver token ou se skipCache for verdadeiro
-  if (props.skipCache) {
-    return null;
-  }
-
-  const params = new URLSearchParams([
-    ["videoId", props.videoId],
-    ["maxResults", (props.maxResults || 20).toString()],
-    ["pageToken", props.pageToken || ""],
-    ["order", props.order || "time"],
-  ]);
-
-  // Ordenamos os parâmetros para garantir consistência na chave de cache
-  params.sort();
-
-  return `youtube-comment-threads-${params.toString()}`;
 };
+
+export default loader;

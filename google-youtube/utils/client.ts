@@ -9,6 +9,10 @@ import {
   youtubeTokenResponse,
   YoutubeVideoListResponse,
   YoutubeVideoResponse,
+  YouTubeCommentThreadListResponse,
+  LiveBroadcastListResponse,
+  LiveStreamListResponse,
+  LiveBroadcast,
 } from "./types.ts";
 
 type Headers = {
@@ -35,9 +39,7 @@ export interface Client {
   "GET /videos": {
     response: YoutubeVideoListResponse;
     searchParams: { part: string; id: string };
-    headers: {
-      Authorization: string;
-    };
+    headers: Headers;
   };
   "GET /playlistItems": {
     response: YoutubePlaylistItemsResponse;
@@ -68,6 +70,42 @@ export interface Client {
     };
     headers: Headers;
   };
+  "GET /commentThreads": {
+    response: YouTubeCommentThreadListResponse;
+    searchParams: {
+      part: string;
+      videoId: string;
+      maxResults?: number;
+      order?: "time" | "relevance";
+      pageToken?: string;
+    };
+    headers: Headers;
+  };
+  "GET /liveBroadcasts": {
+    response: LiveBroadcastListResponse;
+    searchParams: {
+      part: string;
+      id?: string;
+      mine?: boolean;
+      channelId?: string;
+      broadcastStatus?: "all" | "active" | "completed" | "upcoming";
+      maxResults?: number;
+      pageToken?: string;
+      orderBy?: "startTime" | "viewCount";
+    };
+    headers: Headers;
+  };
+  "GET /liveStreams": {
+    response: LiveStreamListResponse;
+    searchParams: {
+      part: string;
+      id?: string;
+      mine?: boolean;
+      maxResults?: number;
+      pageToken?: string;
+    };
+    headers: Headers;
+  };
   "POST /thumbnails/set": {
     response: UpdateThumbnailResponse;
     searchParams: { videoId: string; uploadType: string };
@@ -88,6 +126,16 @@ export interface Client {
     };
     headers: Headers & { "Content-Type": string };
   };
+  "PUT /channels": {
+    response: YoutubeChannelResponse;
+    searchParams: { part: string };
+    body: {
+      id: string;
+      snippet?: Record<string, unknown>;
+      brandingSettings?: Record<string, unknown>;
+    };
+    headers: Headers & { "Content-Type": string };
+  };
   "POST /upload/thumbnails/set": {
     response: UpdateThumbnailResponse;
     searchParams: { videoId: string; uploadType: string };
@@ -101,6 +149,88 @@ export interface Client {
       onBehalfOfContentOwner?: string;
     };
     headers: Headers;
+  };
+  "GET /channelSections": {
+    response: unknown;
+    searchParams: {
+      part: string;
+      mine?: boolean;
+      id?: string;
+    };
+    headers: Headers;
+  };
+  "POST /channelSections": {
+    response: unknown;
+    searchParams: { part: string };
+    body: Record<string, unknown>;
+    headers: Headers & { "Content-Type": string };
+  };
+  "DELETE /channelSections": {
+    response: void;
+    searchParams: { id: string };
+    headers: Headers;
+  };
+  "POST /commentThreads": {
+    response: unknown;
+    searchParams: { part: string };
+    body: Record<string, unknown>;
+    headers: Headers & { "Content-Type": string };
+  };
+  "POST /comments/setModerationStatus": {
+    response: void;
+    searchParams: { 
+      id: string;
+      moderationStatus: string;
+      banAuthor: string;
+    };
+    headers: Headers & { "Content-Length": string };
+  };
+  "PUT /comments": {
+    response: unknown;
+    searchParams: { part: string };
+    body: Record<string, unknown>;
+    headers: Headers & { "Content-Type": string };
+  };
+  "GET /comments": {
+    response: unknown;
+    searchParams: { 
+      part: string;
+      id: string;
+    };
+    headers: Headers;
+  };
+  "POST /comments/rate": {
+    response: void;
+    searchParams: { 
+      id: string;
+      rating: "like" | "dislike" | "none";
+    };
+    headers: Headers & { "Content-Length": string };
+  };
+  "POST /comments": {
+    response: unknown;
+    searchParams: { part: string };
+    body: Record<string, unknown>;
+    headers: Headers & { "Content-Type": string };
+  };
+  "POST /liveBroadcasts/bind": {
+    response: LiveBroadcast;
+    searchParams: { 
+      id: string;
+      streamId: string;
+      part: string;
+    };
+    headers: Headers & { "Content-Length": string };
+  };
+  "POST /liveBroadcasts": {
+    response: LiveBroadcast;
+    searchParams: { part: string };
+    body: {
+      snippet: Record<string, unknown>;
+      status: Record<string, unknown>;
+      contentDetails: Record<string, unknown>;
+    };
+    headers: Headers & { "Content-Type": string };
   };
 }
 

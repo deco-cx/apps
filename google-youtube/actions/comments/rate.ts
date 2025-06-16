@@ -1,86 +1,88 @@
 import type { AppContext } from "../../mod.ts";
 
-export interface LikeCommentProps {
+export interface Props {
+  /**
+   * @title Comment ID
+   * @description ID of the comment to rate
+   */
   commentId: string;
+  
+  /**
+   * @title Rating
+   * @description Rating to apply to the comment
+   */
   rating: "like" | "dislike" | "none";
 }
 
+export interface RateCommentResult {
+  success: boolean;
+  message: string;
+  details?: string;
+  apiStatus?: number;
+}
+
 /**
- * @title Like YouTube Comment
+ * @name RATE_COMMENT
+ * @title Rate YouTube Comment
  * @description Sets the rating (like/dislike) on a YouTube comment
  */
-const action = async (
-  props: LikeCommentProps,
+export default async function action(
+  props: Props,
   _req: Request,
   ctx: AppContext,
-) => {
+): Promise<RateCommentResult> {
   const { commentId, rating } = props;
 
   if (!commentId) {
-    return { success: false, message: "ID do comentário é obrigatório" };
+    ctx.errorHandler.toHttpError(
+      new Error("Comment ID is required"),
+      "Comment ID is required",
+    );
   }
 
   if (!rating) {
-    return { success: false, message: "Avaliação (rating) é obrigatória" };
+    ctx.errorHandler.toHttpError(
+      new Error("Rating is required"),
+      "Rating is required",
+    );
   }
 
   try {
-    // O endereço correto conforme a documentação da API
-    const url = new URL(
-      "https://youtube.googleapis.com/youtube/v3/comments/rate",
-    );
-    url.searchParams.append("id", commentId);
-    url.searchParams.append("rating", rating);
-
-    console.log(`Enviando requisição para: ${url.toString()}`);
-
-    const response = await fetch(url.toString(), {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${ctx.access_token}`,
-        "Content-Length": "0", // importante: requisição sem corpo
+    const response = await ctx.client["POST /comments/rate"](
+      {
+        id: commentId,
+        rating,
       },
-    });
+      {
+        headers: {
+          Authorization: `Bearer ${ctx.tokens?.access_token}`,
+          "Content-Length": "0",
+        },
+      }
+    );
 
-    // A API de rate não retorna um corpo na resposta quando bem-sucedida
-    // Ela retorna 204 No Content quando funciona
     if (response.status === 204) {
-      console.log("Like aplicado com sucesso");
       return {
         success: true,
-        message: `Comentário avaliado com sucesso: ${rating}`,
+        message: `Comment rated successfully: ${rating}`,
       };
     }
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(
-        `Erro ao avaliar comentário: ${response.status} ${response.statusText}`,
-        errorText,
+      ctx.errorHandler.toHttpError(
+        response,
+        `Failed to rate comment: ${response.statusText}`,
       );
-      return {
-        success: false,
-        message:
-          `Erro ao avaliar comentário: ${response.status} ${response.statusText}`,
-        details: errorText || "API retornou erro sem detalhes",
-        apiStatus: response.status,
-      };
     }
 
     return {
       success: true,
-      message: `Comentário avaliado com sucesso: ${rating}`,
+      message: `Comment rated successfully: ${rating}`,
     };
-  } catch (error: unknown) {
-    let message = "Erro desconhecido";
-    if (error instanceof Error) {
-      message = error.message;
-    }
-    return {
-      success: false,
-      message: `Erro ao avaliar comentário: ${message}`,
-    };
+  } catch (error) {
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to rate comment",
+    );
   }
-};
-
-export default action;
+}

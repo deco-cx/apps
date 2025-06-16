@@ -1,23 +1,23 @@
-import { CLIENT_ID, SCOPES } from "../../utils/constant.ts";
+import { OAUTH_URL_AUTH, SCOPES } from "../../utils/constant.ts";
 
-interface Props {
-  state: string;
+export interface Props {
+  clientId: string;
   redirectUri: string;
+  state: string;
 }
 
 export default function start(props: Props) {
   const authParams = new URLSearchParams({
-    client_id: CLIENT_ID,
+    client_id: props.clientId,
     redirect_uri: props.redirectUri,
     response_type: "code",
-    scope: SCOPES,
+    scope: SCOPES.join(" "),
     access_type: "offline",
     prompt: "consent",
     state: props.state,
   });
 
-  const authorizationUrl =
-    `https://accounts.google.com/o/oauth2/v2/auth?${authParams.toString()}`;
+  const authorizationUrl = `${OAUTH_URL_AUTH}?${authParams.toString()}`;
 
   return Response.redirect(authorizationUrl);
 }

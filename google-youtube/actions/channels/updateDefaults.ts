@@ -1,71 +1,83 @@
+import { AppContext } from "../../mod.ts";
 import type { PrivacyStatus } from "../../utils/types.ts";
 
-export interface ChannelDefaultOptions {
+export interface Props {
   /**
-   * @description Status de privacidade padrão para novos vídeos
+   * @title Privacy Status
+   * @description Default privacy status for new videos
    */
   privacyStatus?: PrivacyStatus;
 
   /**
-   * @description Licença padrão para novos vídeos (youtube, creativeCommon)
+   * @title License
+   * @description Default license for new videos
    */
   license?: "youtube" | "creativeCommon";
 
   /**
-   * @description Se novos vídeos podem ser incorporados em outros sites
+   * @title Embeddable
+   * @description Whether new videos can be embedded on other sites
    */
   embeddable?: boolean;
 
   /**
-   * @description Se as estatísticas do vídeo são visíveis publicamente
+   * @title Public Stats Viewable
+   * @description Whether video statistics are publicly viewable
    */
   publicStatsViewable?: boolean;
 
   /**
-   * @description Se novos vídeos devem ser automaticamente publicados para a timeline do Google+
+   * @title Auto Levels
+   * @description Whether new videos should be automatically published to Google+ timeline
    */
   autoLevels?: boolean;
 
   /**
-   * @description Se os comentários são permitidos por padrão em novos vídeos
+   * @title Default Comment Setting
+   * @description Whether comments are allowed by default on new videos
    */
   defaultCommentSetting?: "enabled" | "disabled" | "moderatedWithLinkedAccount";
 
   /**
-   * @description Categoria padrão para novos vídeos (ID da categoria)
+   * @title Category ID
+   * @description Default category for new videos
    */
   categoryId?: string;
 
   /**
-   * @description Tags padrão para novos vídeos
+   * @title Tags
+   * @description Default tags for new videos
    */
   tags?: string[];
 
   /**
-   * @description Idioma padrão para novos vídeos
+   * @title Default Language
+   * @description Default language for new videos
    */
   defaultLanguage?: string;
 
   /**
-   * @description Se a publicação automática na feed social está ativada
+   * @title Enable Auto Share
+   * @description Whether automatic publishing to social feed is enabled
    */
   enableAutoShare?: boolean;
 }
 
-interface UpdateChannelDefaultsResult {
+export interface UpdateChannelDefaultsResult {
   success: boolean;
   message: string;
   defaults?: unknown;
 }
 
 /**
- * @title Configurar Padrões do Canal
- * @description Atualiza as configurações padrão para novos vídeos enviados ao canal
+ * @name UPDATE_CHANNEL_DEFAULTS
+ * @title Configure Channel Defaults
+ * @description Updates default settings for new videos uploaded to the channel
  */
 export default async function action(
-  props: ChannelDefaultOptions,
+  props: Props,
   _req: Request,
-  _ctx: unknown,
+  ctx: AppContext,
 ): Promise<UpdateChannelDefaultsResult> {
   const {
     privacyStatus,
@@ -81,37 +93,41 @@ export default async function action(
   } = props;
 
   try {
-    // Primeiro, obter os dados atuais do canal para não perder configurações
-    const getResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/channels?part=brandingSettings&mine=true`,
+    const getResponse = await ctx.client["GET /channels"](
+      {
+        part: "brandingSettings",
+        mine: true,
+      },
+      {
+        headers: ctx.tokens?.access_token
+          ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
+          : {},
+      }
     );
 
     if (!getResponse.ok) {
-      const errorText = await getResponse.text();
-      console.error("Erro ao obter dados do canal:", errorText);
-      return {
-        success: false,
-        message:
-          `Erro ao obter dados do canal: ${getResponse.status} ${getResponse.statusText}`,
-      };
+      ctx.errorHandler.toHttpError(
+        getResponse,
+        `Failed to get channel data: ${getResponse.statusText}`,
+      );
     }
 
     const channelData = await getResponse.json();
 
     if (!channelData.items || channelData.items.length === 0) {
-      return { success: false, message: "Canal não encontrado" };
+      ctx.errorHandler.toHttpError(
+        new Error("Channel not found"),
+        "Channel not found",
+      );
     }
 
-    // Obter o ID do canal e as configurações atuais
     const channelId = channelData.items[0].id;
     const currentChannel = channelData.items[0];
 
-    // Criar uma cópia completa das configurações de branding
     const brandingSettings = {
       ...currentChannel.brandingSettings || {},
     };
 
-    // Certifique-se de que as seções existem
     if (!brandingSettings.channel) {
       brandingSettings.channel = {};
     }
@@ -120,7 +136,6 @@ export default async function action(
       brandingSettings.defaults = {};
     }
 
-    // Atualizar apenas os campos fornecidos
     if (privacyStatus !== undefined) {
       brandingSettings.defaults.privacyStatus = privacyStatus;
     }
@@ -161,50 +176,40 @@ export default async function action(
       brandingSettings.defaults.enableAutoShare = enableAutoShare;
     }
 
-    // Montar o corpo da requisição - importante: usar APENAS brandingSettings
     const requestBody = {
       id: channelId,
       brandingSettings,
     };
 
-    // Enviar a requisição de atualização
-    const updateResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/channels?part=brandingSettings`,
+    const updateResponse = await ctx.client["PUT /channels"](
+      { part: "brandingSettings" },
       {
-        method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${ctx.tokens?.access_token}`,
         },
-        body: JSON.stringify(requestBody),
-      },
+        body: requestBody,
+      }
     );
 
     if (!updateResponse.ok) {
-      const errorText = await updateResponse.text();
-      console.error("Erro ao atualizar padrões do canal:", errorText);
-      return {
-        success: false,
-        message:
-          `Erro ao atualizar padrões: ${updateResponse.status} ${updateResponse.statusText}`,
-      };
+      ctx.errorHandler.toHttpError(
+        updateResponse,
+        `Failed to update channel defaults: ${updateResponse.statusText}`,
+      );
     }
 
     const updatedChannelData = await updateResponse.json();
-    console.log("Padrões do canal atualizados com sucesso");
 
     return {
       success: true,
-      message: "Padrões do canal atualizados com sucesso",
+      message: "Channel defaults updated successfully",
       defaults: updatedChannelData.brandingSettings?.defaults,
     };
-  } catch (error: unknown) {
-    let message = "Erro desconhecido";
-    if (error instanceof Error) {
-      message = error.message;
-    }
-    return {
-      success: false,
-      message: `Erro ao processar a solicitação: ${message}`,
-    };
+  } catch (error) {
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to process channel defaults update",
+    );
   }
 }

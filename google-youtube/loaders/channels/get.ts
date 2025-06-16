@@ -1,148 +1,70 @@
 import { AppContext } from "../../mod.ts";
-import type { YoutubeChannelResponse } from "../../utils/types.ts";
-import { STALE } from "../../../utils/fetch.ts";
+import { YoutubeChannelResponse } from "../../utils/types.ts";
+import { COMMON_ERROR_MESSAGES, YOUTUBE_PARTS } from "../../utils/constant.ts";
 
-/**
- * Opções para buscar canais do YouTube
- */
-export interface ChannelOptions {
+export interface Props {
   /**
-   * @description Buscar canal do usuário autenticado
+   * @title Get My Channel
+   * @description Fetch the authenticated user's channel information
    */
   mine?: boolean;
 
   /**
-   * @description Partes adicionais a serem incluídas na resposta
+   * @title Part
+   * @description Additional parts to include in the response (snippet, contentDetails, statistics, status)
    */
   part?: string;
 
   /**
-   * @description ID do canal específico a ser buscado
+   * @title Channel ID
+   * @description Specific channel ID to fetch
    */
   id?: string;
-
-  /**
-   * @description Ignorar cache para esta solicitação
-   */
-  skipCache?: boolean;
 }
-
-export interface ChannelResult {
-  channels: YoutubeChannelResponse;
-}
-
-export interface ChannelError {
-  message: string;
-  error: boolean;
-  code?: number;
-  details?: unknown;
-}
-
-export type ChannelResponse = ChannelResult | ChannelError;
 
 /**
- * @title Fetch YouTube Channels
+ * @name GET_YOUTUBE_CHANNELS
+ * @title Get YouTube Channels
  * @description Retrieves information about YouTube channels for the authenticated user or by specific ID
  */
-export default async function loader(
-  props: ChannelOptions,
+const loader = async (
+  props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<ChannelResponse> {
-  const client = ctx.client;
+): Promise<YoutubeChannelResponse> => {
+  const { client } = ctx;
 
-  const { part = "snippet", id, mine = true } = props;
+  const {
+    part = YOUTUBE_PARTS.SNIPPET,
+    id,
+    mine = true,
+  } = props;
 
-  // Validar parâmetros
   if (!id && !mine) {
-    return createErrorResponse(
-      400,
-      "É necessário fornecer um ID de canal ou definir mine=true",
+    ctx.errorHandler.toHttpError(
+      new Error("Channel ID is required or mine must be true"),
+      "Channel ID is required or mine must be true",
     );
   }
 
   try {
-    const response = await client["GET /channels"]({ part, id, mine }, {
-      ...STALE,
-    });
-
-    // Verificar erro de autenticação
-    if (response.status === 401) {
-      // Sinalizar que o token está expirado
-      ctx.response.headers.set("X-Token-Expired", "true");
-      ctx.response.headers.set("Cache-Control", "no-store");
-      return createErrorResponse(
-        401,
-        "Token de autenticação expirado ou inválido",
-      );
-    }
+    const response = await client["GET /channels"]({ part, id, mine });
 
     if (!response.ok) {
-      return createErrorResponse(
-        response.status,
-        `Erro ao buscar dados do canal: ${response.status}`,
-        await response.text(),
+      ctx.errorHandler.toHttpError(
+        response,
+        `Failed to fetch channel data: ${response.statusText}`,
       );
     }
 
     const channelData = await response.json();
-
-    return {
-      channels: channelData,
-    };
+    return channelData;
   } catch (error) {
-    return createErrorResponse(
-      500,
-      "Erro ao processar dados do canal",
-      error instanceof Error ? error.message : String(error),
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to fetch channel information",
     );
   }
-}
-
-function createErrorResponse(
-  code: number,
-  message: string,
-  details?: unknown,
-): ChannelError {
-  return {
-    message,
-    error: true,
-    code,
-    details,
-  };
-}
-
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (
-  props: ChannelOptions,
-  req: Request,
-  ctx: AppContext,
-) => {
-  // Verificar se há flag de token expirado
-  const tokenExpired = req.headers.get("X-Token-Expired") === "true";
-
-  // Não usar cache se não houver token, for canal do usuário autenticado, skipCache for verdadeiro
-  // ou se o token estiver expirado
-  if (
-    !ctx.access_token || (props.mine === true && !props.id) ||
-    props.skipCache ||
-    tokenExpired
-  ) {
-    return null;
-  }
-
-  // Incluir fragmento do token na chave de cache
-  const tokenFragment = ctx.access_token.slice(-8);
-
-  const params = new URLSearchParams([
-    ["id", props.id || ""],
-    ["part", props.part || "snippet"],
-    ["mine", (props.mine || false).toString()],
-    ["tokenId", tokenFragment],
-  ]);
-
-  params.sort();
-
-  return `youtube-channel-${params.toString()}`;
 };
+
+export default loader;

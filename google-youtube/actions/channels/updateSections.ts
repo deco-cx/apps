@@ -1,6 +1,9 @@
+import { AppContext } from "../../mod.ts";
+
 export interface ChannelSection {
   /**
-   * @description Tipo da seção (uploads, singlePlaylist, recentUploads, etc.)
+   * @title Section Type
+   * @description Type of channel section
    */
   type:
     | "allPlaylists"
@@ -18,49 +21,57 @@ export interface ChannelSection {
     | "uploads";
 
   /**
-   * @description Estilo da seção (horizontalRow, verticalList)
+   * @title Section Style
+   * @description Visual style of the section
    */
   style?: "horizontalRow" | "verticalList";
 
   /**
-   * @description Título da seção (opcional)
+   * @title Section Title
+   * @description Title displayed for the section
    */
   title?: string;
 
   /**
-   * @description ID(s) da(s) playlist(s) para a seção (obrigatório para tipo singlePlaylist e multiplePlaylists)
+   * @title Playlists
+   * @description Playlist IDs for the section (required for singlePlaylist and multiplePlaylists types)
    */
   playlists?: string[];
 
   /**
-   * @description ID(s) do(s) canal(is) para a seção (obrigatório para tipo multipleChannels)
+   * @title Channels
+   * @description Channel IDs for the section (required for multipleChannels type)
    */
   channels?: string[];
 
   /**
-   * @description Posição da seção (0 = topo, as seções são exibidas em ordem crescente)
+   * @title Position
+   * @description Position of the section (0 = top, sections are displayed in ascending order)
    */
   position?: number;
 
   /**
-   * @description A seção deve ser visível para usuários não inscritos no canal
+   * @title Show For Not Subscribed
+   * @description Whether the section should be visible to users not subscribed to the channel
    */
   showForNotSubscribed?: boolean;
 }
 
-export interface UpdateChannelSectionsOptions {
+export interface Props {
   /**
-   * @description Seções a serem configuradas para o canal (adicionar ou atualizar)
+   * @title Sections
+   * @description Sections to configure for the channel (add or update)
    */
   sections: ChannelSection[];
 
   /**
-   * @description IDs de seções a serem removidas (opcional)
+   * @title Remove Section IDs
+   * @description IDs of sections to remove
    */
   removeSectionIds?: string[];
 }
 
-interface UpdateChannelSectionsResult {
+export interface UpdateChannelSectionsResult {
   success: boolean;
   message: string;
   addedSections?: unknown[];
@@ -69,60 +80,49 @@ interface UpdateChannelSectionsResult {
 }
 
 /**
- * @title Configurar Seções do Canal
- * @description Adiciona, atualiza ou remove seções do canal (playlists, uploads, likes, etc.)
+ * @name UPDATE_CHANNEL_SECTIONS
+ * @title Configure Channel Sections
+ * @description Add, update or remove channel sections (playlists, uploads, likes, etc.)
  */
 export default async function action(
-  props: UpdateChannelSectionsOptions,
-  req: Request,
+  props: Props,
+  _req: Request,
+  ctx: AppContext,
 ): Promise<UpdateChannelSectionsResult> {
   const { sections, removeSectionIds } = props;
 
   if (!sections || sections.length === 0) {
-    console.error("Nenhuma seção fornecida");
-    return {
-      success: false,
-      message:
-        "É necessário fornecer pelo menos uma seção para adicionar/atualizar",
-    };
-  }
-
-  // Obter o token de acesso
-  const accessToken = req.headers.get("Authorization");
-
-  if (!accessToken) {
-    console.error("Token de acesso não encontrado");
-    return { success: false, message: "Autenticação necessária" };
+    ctx.errorHandler.toHttpError(
+      new Error("No sections provided"),
+      "You must provide at least one section to add/update",
+    );
   }
 
   try {
-    // Primeiro, obter as seções atuais para saber quais adicionar e quais atualizar
-    const getResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/channelSections?part=id,snippet,contentDetails&mine=true`,
+    const getResponse = await ctx.client["GET /channelSections"](
       {
-        headers: {
-          Authorization: accessToken,
-        },
+        part: "id,snippet,contentDetails",
+        mine: true,
       },
+      {
+        headers: ctx.tokens?.access_token
+          ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
+          : {},
+      }
     );
 
     if (!getResponse.ok) {
-      const errorText = await getResponse.text();
-      console.error("Erro ao obter seções do canal:", errorText);
-      return {
-        success: false,
-        message:
-          `Erro ao obter seções do canal: ${getResponse.status} ${getResponse.statusText}`,
-      };
+      ctx.errorHandler.toHttpError(
+        getResponse,
+        `Failed to get channel sections: ${getResponse.statusText}`,
+      );
     }
 
     const addedSections: unknown[] = [];
     const updatedSections: unknown[] = [];
     const removeResults: string[] = [];
 
-    // Processar cada seção fornecida
     for (const section of sections) {
-      // Preparar o objeto de seção para a API
       const sectionBody = {
         snippet: {
           type: section.type,
@@ -131,7 +131,6 @@ export default async function action(
         contentDetails: {},
       };
 
-      // Adicionar propriedades opcionais
       if (section.title) {
         (sectionBody.snippet as Record<string, unknown>).title = section.title;
       }
@@ -141,24 +140,20 @@ export default async function action(
           section.position;
       }
 
-      // Por padrão, mostrar para todos
       const localizable = {
-        defaultLanguage: "pt-BR",
+        defaultLanguage: "en-US",
       };
       (sectionBody as Record<string, unknown>).localizations = {
-        "pt-BR": localizable,
+        "en-US": localizable,
       };
 
-      // Configurar visibilidade da seção
-      (sectionBody.snippet as Record<string, unknown>).targetChannelId = "UC"; // Representa o próprio canal
+      (sectionBody.snippet as Record<string, unknown>).targetChannelId = "UC";
 
-      // Configurar para mostrar para usuários não inscritos (opcional)
       if (section.showForNotSubscribed !== undefined) {
         (sectionBody.snippet as Record<string, unknown>).showForNonSubscribers =
           section.showForNotSubscribed;
       }
 
-      // Adicionar playlists ou canais conforme o tipo da seção
       if (
         (section.type === "singlePlaylist" ||
           section.type === "multiplePlaylists") && section.playlists?.length
@@ -172,61 +167,47 @@ export default async function action(
           section.channels;
       }
 
-      // Enviar a requisição para adicionar ou atualizar a seção
-      // Por simplicidade, sempre adicionamos novas seções
-      const addResponse = await fetch(
-        `https://www.googleapis.com/youtube/v3/channelSections?part=snippet,contentDetails`,
+      const addResponse = await ctx.client["POST /channelSections"](
+        { part: "snippet,contentDetails" },
         {
-          method: "POST",
           headers: {
-            Authorization: accessToken,
             "Content-Type": "application/json",
+            Authorization: `Bearer ${ctx.tokens?.access_token}`,
           },
-          body: JSON.stringify(sectionBody as Record<string, unknown>),
-        },
+          body: sectionBody as Record<string, unknown>,
+        }
       );
 
       if (!addResponse.ok) {
-        console.error(
-          `Erro ao adicionar seção de tipo ${section.type}:`,
-          await addResponse.text(),
-        );
-        continue; // Continuar com as outras seções
+        // Continue with other sections if one fails
+        continue;
       }
 
       const addedSection = await addResponse.json();
       addedSections.push(addedSection);
     }
 
-    // Processar remoções de seções, se solicitado
     if (removeSectionIds && removeSectionIds.length > 0) {
       for (const sectionId of removeSectionIds) {
-        const deleteResponse = await fetch(
-          `https://www.googleapis.com/youtube/v3/channelSections?id=${sectionId}`,
+        const deleteResponse = await ctx.client["DELETE /channelSections"](
+          { id: sectionId },
           {
-            method: "DELETE",
             headers: {
-              Authorization: accessToken,
+              Authorization: `Bearer ${ctx.tokens?.access_token}`,
             },
-          },
+          }
         );
 
         if (deleteResponse.ok) {
           removeResults.push(sectionId);
-        } else {
-          console.error(
-            `Erro ao remover seção ${sectionId}:`,
-            await deleteResponse.text(),
-          );
         }
       }
     }
 
-    // Preparar o resultado da operação
     const result: UpdateChannelSectionsResult = {
       success: true,
       message:
-        `Operação concluída: ${addedSections.length} seções adicionadas, ${removeResults.length} seções removidas`,
+        `Operation completed: ${addedSections.length} sections added, ${removeResults.length} sections removed`,
     };
 
     if (addedSections.length > 0) {
@@ -242,17 +223,10 @@ export default async function action(
     }
 
     return result;
-  } catch (error: unknown) {
-    let message = "Erro desconhecido";
-    if (error instanceof Error) {
-      message = error.message;
-    }
-    console.error(
-      `Erro ao atualizar seção do canal: ${message}`,
+  } catch (error) {
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to update channel sections",
     );
-    return {
-      success: false,
-      message,
-    };
   }
 }

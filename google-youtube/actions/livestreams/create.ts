@@ -3,50 +3,60 @@ import {
   LiveBroadcast,
   LiveBroadcastPrivacyStatus,
 } from "../../utils/types.ts";
+import { YOUTUBE_PARTS } from "../../utils/constant.ts";
 
-export interface CreateLiveBroadcastParams {
+export interface Props {
   /**
-   * @description Título da transmissão ao vivo
+   * @title Title
+   * @description Title of the live broadcast
    */
   title: string;
 
   /**
-   * @description Descrição da transmissão ao vivo
+   * @title Description
+   * @description Description of the live broadcast
    */
   description?: string;
 
   /**
-   * @description Data e hora agendada para início (formato ISO 8601)
+   * @title Scheduled Start Time
+   * @description Scheduled start date and time (ISO 8601 format)
    */
   scheduledStartTime: string;
 
   /**
-   * @description Data e hora agendada para término (formato ISO 8601, opcional)
+   * @title Scheduled End Time
+   * @description Scheduled end date and time (ISO 8601 format)
    */
   scheduledEndTime?: string;
 
   /**
-   * @description Status de privacidade da transmissão
+   * @title Privacy Status
+   * @description Privacy status of the broadcast
    */
   privacyStatus?: LiveBroadcastPrivacyStatus;
 
   /**
-   * @description Habilitar DVR (permite ao espectador voltar no tempo durante a transmissão)
+   * @title Enable DVR
+   * @description Enable DVR (allows viewers to rewind during the broadcast)
    */
   enableDvr?: boolean;
 
   /**
-   * @description Habilitar início automático quando a transmissão estiver pronta
+   * @title Enable Auto Start
+   * @description Enable automatic start when the broadcast is ready
    */
   enableAutoStart?: boolean;
 
   /**
-   * @description Habilitar encerramento automático quando a transmissão terminar
+   * @title Enable Auto Stop
+   * @description Enable automatic stop when the broadcast ends
    */
   enableAutoStop?: boolean;
 
   /**
-   * @description Transmissão é adequada para crianças
+   * @title Made For Kids
+   * @description Broadcast is suitable for children
    */
   madeForKids?: boolean;
 }
@@ -59,11 +69,12 @@ export interface CreateLiveBroadcastResult {
 }
 
 /**
+ * @name CREATE_LIVE_BROADCAST
  * @title Create Live Broadcast
  * @description Creates a new live broadcast on YouTube
  */
 export default async function action(
-  props: CreateLiveBroadcastParams,
+  props: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<CreateLiveBroadcastResult> {
@@ -80,42 +91,40 @@ export default async function action(
   } = props;
 
   if (!title) {
-    return {
-      success: false,
-      message: "Título da transmissão é obrigatório",
-    };
+    ctx.errorHandler.toHttpError(
+      new Error("Title is required"),
+      "Title is required",
+    );
   }
 
   if (!scheduledStartTime) {
-    return {
-      success: false,
-      message: "Data e hora de início são obrigatórias",
-    };
+    ctx.errorHandler.toHttpError(
+      new Error("Scheduled start time is required"),
+      "Scheduled start time is required",
+    );
   }
 
   try {
-    // Verificar se a data agendada é válida (no futuro)
     const startTime = new Date(scheduledStartTime);
     const now = new Date();
 
     if (startTime < now) {
-      return {
-        success: false,
-        message: "A data de início deve ser no futuro",
-      };
+      ctx.errorHandler.toHttpError(
+        new Error("Start time must be in the future"),
+        "Start time must be in the future",
+      );
     }
 
     if (scheduledEndTime) {
       const endTime = new Date(scheduledEndTime);
       if (endTime <= startTime) {
-        return {
-          success: false,
-          message: "A data de término deve ser posterior à data de início",
-        };
+        ctx.errorHandler.toHttpError(
+          new Error("End time must be after start time"),
+          "End time must be after start time",
+        );
       }
     }
 
-    // Preparar payload para criar a transmissão
     const payload = {
       snippet: {
         title,
@@ -137,44 +146,37 @@ export default async function action(
       },
     };
 
-    // Criar a transmissão
-    const url =
-      "https://youtube.googleapis.com/youtube/v3/liveBroadcasts?part=id,snippet,contentDetails,status";
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${ctx.access_token}`,
-        "Content-Type": "application/json",
+    const response = await ctx.client["POST /liveBroadcasts"](
+      {
+        part: `id,${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`,
       },
-      body: JSON.stringify(payload),
-    });
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${ctx.tokens?.access_token}`,
+        },
+        body: payload,
+      }
+    );
 
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error("Erro ao criar transmissão:", errorData);
-      return {
-        success: false,
-        message:
-          `Erro ao criar transmissão: ${response.status} ${response.statusText}`,
-        error: errorData,
-      };
+      ctx.errorHandler.toHttpError(
+        response,
+        `Failed to create broadcast: ${response.statusText}`,
+      );
     }
 
     const broadcast = await response.json();
 
     return {
       success: true,
-      message: "Transmissão criada com sucesso",
+      message: "Broadcast created successfully",
       broadcast,
     };
-  } catch (error: unknown) {
-    let message = "Erro desconhecido";
-    if (error instanceof Error) {
-      message = error.message;
-    }
-    return {
-      success: false,
-      message,
-    };
+  } catch (error) {
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to create broadcast",
+    );
   }
 }

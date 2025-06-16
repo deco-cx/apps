@@ -1,31 +1,37 @@
 import { AppContext } from "../../mod.ts";
+import { COMMON_ERROR_MESSAGES, YOUTUBE_PARTS } from "../../utils/constant.ts";
 
 /**
  * Opções para atualização de vídeo
  */
-export interface UpdateVideoOptions {
+export interface Props {
   /**
-   * @description ID do vídeo a ser atualizado
+   * @title Video ID
+   * @description ID of the video to be updated
    */
   videoId: string;
 
   /**
-   * @description Novo título do vídeo (opcional)
+   * @title Title
+   * @description New title for the video
    */
   title?: string;
 
   /**
-   * @description Nova descrição do vídeo (opcional)
+   * @title Description
+   * @description New description for the video
    */
   description?: string;
 
   /**
-   * @description Novas tags do vídeo (opcional)
+   * @title Tags
+   * @description New tags for the video
    */
   tags?: string[] | undefined;
 
   /**
-   * @description Novo status de privacidade do vídeo (opcional)
+   * @title Privacy Status
+   * @description New privacy status for the video
    */
   privacyStatus?: "public" | "private" | "unlisted";
 }
@@ -45,47 +51,55 @@ export interface UpdateVideoError {
 export type UpdateVideoResponse = UpdateVideoResult | UpdateVideoError;
 
 /**
+ * @name UPDATE_VIDEO
  * @title Update YouTube Video
  * @description Updates video information like title, description, tags and privacy status
  */
 export default async function action(
-  props: UpdateVideoOptions,
+  props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<UpdateVideoResponse> {
-  const client = ctx.client;
-
+): Promise<UpdateVideoResult> {
   if (!props.videoId) {
-    return createErrorResponse(400, "ID do vídeo é obrigatório");
+    ctx.errorHandler.toHttpError(
+      new Error(COMMON_ERROR_MESSAGES.MISSING_VIDEO_ID),
+      COMMON_ERROR_MESSAGES.MISSING_VIDEO_ID,
+    );
   }
 
   try {
-    // Primeiro, obter os dados atuais do vídeo para não perder informações
-    const getResponse = await client["GET /videos"]({
-      part: "snippet,status",
-      id: props.videoId,
-    });
+    const getResponse = await ctx.client["GET /videos"](
+      {
+        part: `${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.STATUS}`,
+        id: props.videoId,
+      },
+      {
+        headers: ctx.tokens?.access_token
+          ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
+          : {},
+      }
+    );
 
     if (!getResponse.ok) {
-      return createErrorResponse(
-        getResponse.status,
-        `Erro ao obter dados do vídeo: ${getResponse.status}`,
-        await getResponse.text(),
+      ctx.errorHandler.toHttpError(
+        getResponse,
+        `Failed to get video data: ${getResponse.statusText}`,
       );
     }
 
     const videoData = await getResponse.json();
 
     if (!videoData.items || videoData.items.length === 0) {
-      return createErrorResponse(404, "Vídeo não encontrado");
+      ctx.errorHandler.toHttpError(
+        new Error("Video not found"),
+        `Video not found: ${props.videoId}`,
+      );
     }
 
-    // Obter o snippet atual para fazer atualizações parciais
     const currentVideo = videoData.items[0];
     const snippet = { ...currentVideo.snippet };
     const status = { ...currentVideo.status };
 
-    // Atualizar apenas os campos fornecidos
     if (props.title !== undefined) snippet.title = props.title;
     if (props.description !== undefined) {
       snippet.description = props.description;
@@ -97,29 +111,29 @@ export default async function action(
       status.privacyStatus = props.privacyStatus;
     }
 
-    // Montar o corpo da requisição
     const requestBody = {
       id: props.videoId,
       snippet,
       status,
     };
 
-    // Enviar a requisição de atualização usando o client
-    const updateResponse = await client["PUT /videos"](
-      { part: "snippet,status" },
+    const updateResponse = await ctx.client["PUT /videos"](
+      { 
+        part: `${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.STATUS}` 
+      },
       {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${ctx.tokens?.access_token}`,
         },
         body: requestBody,
-      },
+      }
     );
 
     if (!updateResponse.ok) {
-      return createErrorResponse(
-        updateResponse.status,
-        `Erro ao atualizar vídeo: ${updateResponse.status}`,
-        await updateResponse.text(),
+      ctx.errorHandler.toHttpError(
+        updateResponse,
+        `Failed to update video: ${updateResponse.statusText}`,
       );
     }
 
@@ -130,10 +144,9 @@ export default async function action(
       video: updatedVideoData,
     };
   } catch (error) {
-    return createErrorResponse(
-      500,
-      "Erro ao processar atualização do vídeo",
-      error instanceof Error ? error.message : String(error),
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to process video update",
     );
   }
 }

@@ -1,44 +1,70 @@
 import type { AppContext } from "../../mod.ts";
+import { COMMON_ERROR_MESSAGES } from "../../utils/constant.ts";
 
-export interface SendCommentProps {
-  videoId: string;
-  text: string;
+export interface Props {
   /**
-   * @description Define se o comentário deve ser pinado no vídeo (requer permissão de proprietário do vídeo)
+   * @title Video ID
+   * @description ID of the video to comment on
+   */
+  videoId: string;
+
+  /**
+   * @title Comment Text
+   * @description Text content of the comment
+   */
+  text: string;
+
+  /**
+   * @title Pin Comment
+   * @description Whether to pin the comment to the video (requires video owner permission)
    */
   pinComment?: boolean;
 }
 
+export interface CommentResult {
+  success: boolean;
+  message: string;
+  comment?: unknown;
+  pinned?: boolean;
+  pinError?: string;
+  highlightError?: string;
+}
+
 /**
+ * @name CREATE_COMMENT
  * @title Send YouTube Comment
  * @description Sends a new comment on a YouTube video with an option to pin the comment
  */
-const action = async (
-  props: SendCommentProps,
+export default async function action(
+  props: Props,
   _req: Request,
   ctx: AppContext,
-) => {
+): Promise<CommentResult> {
   const { videoId, text, pinComment = false } = props;
 
   if (!videoId) {
-    return { success: false, message: "ID do vídeo é obrigatório" };
+    ctx.errorHandler.toHttpError(
+      new Error(COMMON_ERROR_MESSAGES.MISSING_VIDEO_ID),
+      COMMON_ERROR_MESSAGES.MISSING_VIDEO_ID,
+    );
   }
 
   if (!text || text.trim() === "") {
-    return { success: false, message: "Texto do comentário é obrigatório" };
+    ctx.errorHandler.toHttpError(
+      new Error("Comment text is required"),
+      "Comment text is required",
+    );
   }
 
   try {
-    // Enviar o comentário
-    const response = await fetch(
-      "https://youtube.googleapis.com/youtube/v3/commentThreads?part=snippet",
+    const response = await ctx.client["POST /commentThreads"](
+      { part: "snippet" },
       {
-        method: "POST",
         headers: {
-          Authorization: `Bearer ${ctx.access_token}`,
           "Content-Type": "application/json",
+          Authorization: `Bearer ${ctx.tokens?.access_token}`,
         },
-        body: JSON.stringify({
+        body: {
           snippet: {
             videoId,
             topLevelComment: {
@@ -47,82 +73,53 @@ const action = async (
               },
             },
           },
-        }),
-      },
+        },
+      }
     );
 
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error(`Erro ao enviar comentário: ${response.status}`, errorData);
-      return {
-        success: false,
-        message:
-          `Erro ao enviar comentário: ${response.status} ${response.statusText}`,
-        details: errorData,
-      };
+      ctx.errorHandler.toHttpError(
+        response,
+        `Failed to send comment: ${response.statusText}`,
+      );
     }
 
     const commentData = await response.json();
 
-    // Se o usuário deseja pinar o comentário e o envio foi bem-sucedido
     if (pinComment && commentData && commentData.id) {
       try {
-        // Requisição para pinar o comentário
-        const pinUrl = new URL(
-          "https://youtube.googleapis.com/youtube/v3/comments/setModerationStatus",
-        );
-        pinUrl.searchParams.append(
-          "id",
-          commentData.snippet.topLevelComment.id,
-        );
-        pinUrl.searchParams.append("moderationStatus", "published");
-        pinUrl.searchParams.append("banAuthor", "false");
-
-        const pinResponse = await fetch(
-          pinUrl.toString(),
+        const pinResponse = await ctx.client["POST /comments/setModerationStatus"](
           {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${ctx.access_token}`,
-              "Content-Length": "0", // importante: requisição sem corpo
-            },
+            id: commentData.snippet.topLevelComment.id,
+            moderationStatus: "published",
+            banAuthor: "false",
           },
+          {
+            headers: {
+              Authorization: `Bearer ${ctx.tokens?.access_token}`,
+              "Content-Length": "0",
+            },
+          }
         );
 
-        // Verificando resposta 204 No Content (sucesso)
-        if (pinResponse.status === 204) {
-          console.log("Status de moderação definido com sucesso");
-        } else if (!pinResponse.ok) {
-          const pinErrorText = await pinResponse.text();
-          console.warn(
-            "O comentário foi enviado, mas não foi possível piná-lo",
-            pinErrorText,
-          );
+        if (pinResponse.status !== 204) {
           return {
             success: true,
             message:
-              "Comentário enviado com sucesso, mas não foi possível piná-lo (verifique se você é o proprietário do vídeo)",
+              "Comment sent successfully, but could not pin it (check if you are the video owner)",
             comment: commentData,
             pinned: false,
-            pinError: pinErrorText,
           };
         }
 
-        // Requisição específica para marcar como "destacado"
-        const highlightUrl = new URL(
-          "https://youtube.googleapis.com/youtube/v3/comments",
-        );
-        highlightUrl.searchParams.append("part", "snippet");
-
-        const highlightResponse = await fetch(
-          highlightUrl.toString(),
+        const highlightResponse = await ctx.client["PUT /comments"](
+          { part: "snippet" },
           {
-            method: "PUT",
             headers: {
-              Authorization: `Bearer ${ctx.access_token}`,
               "Content-Type": "application/json",
+              Authorization: `Bearer ${ctx.tokens?.access_token}`,
             },
-            body: JSON.stringify({
+            body: {
               id: commentData.snippet.topLevelComment.id,
               snippet: {
                 ...commentData.snippet.topLevelComment.snippet,
@@ -130,61 +127,47 @@ const action = async (
                 moderationStatus: "published",
                 textOriginal: text,
               },
-            }),
-          },
+            },
+          }
         );
 
         if (!highlightResponse.ok) {
-          const highlightErrorText = await highlightResponse.text();
-          console.warn("Problema ao destacar o comentário", highlightErrorText);
           return {
             success: true,
             message:
-              "Comentário enviado com sucesso, mas houve um problema ao destacá-lo",
+              "Comment sent successfully, but there was a problem highlighting it",
             comment: commentData,
             pinned: false,
-            highlightError: highlightErrorText,
           };
         }
 
         return {
           success: true,
-          message: "Comentário enviado e pinado com sucesso",
+          message: "Comment sent and pinned successfully",
           comment: commentData,
           pinned: true,
         };
-      } catch (pinError: unknown) {
-        let pinErrorMessage = "Erro desconhecido";
-        if (pinError instanceof Error) {
-          pinErrorMessage = pinError.message;
-        }
+      } catch (pinError) {
         return {
           success: true,
           message:
-            "Comentário enviado com sucesso, mas ocorreu um erro ao piná-lo",
+            "Comment sent successfully, but an error occurred while pinning it",
           comment: commentData,
           pinned: false,
-          error: pinErrorMessage,
         };
       }
     }
 
     return {
       success: true,
-      message: "Comentário enviado com sucesso",
+      message: "Comment sent successfully",
       comment: commentData,
       pinned: false,
     };
-  } catch (error: unknown) {
-    let message = "Erro desconhecido";
-    if (error instanceof Error) {
-      message = error.message;
-    }
-    return {
-      success: false,
-      message: `Erro ao processar a requisição: ${message}`,
-    };
+  } catch (error) {
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to process comment request",
+    );
   }
-};
-
-export default action;
+}

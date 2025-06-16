@@ -1,4 +1,5 @@
 import { AppContext } from "../../mod.ts";
+import { COMMON_ERROR_MESSAGES, YOUTUBE_PARTS } from "../../utils/constant.ts";
 
 /**
  * Resultado da atualização de categoria de vídeo
@@ -20,104 +21,117 @@ export type UpdateCategoryResponse = UpdateCategoryResult | UpdateCategoryError;
 /**
  * Opções para atualização de categoria de vídeo
  */
-export interface UpdateCategoryOptions {
+export interface Props {
   /**
-   * @description ID do vídeo a ser atualizado
+   * @title Video ID
+   * @description ID of the video to be updated
    */
   videoId: string;
 
   /**
-   * @description ID da categoria do vídeo
-   * Categorias comuns:
-   * 1 - Filmes e animação
-   * 2 - Automóveis
-   * 10 - Música
-   * 15 - Animais
-   * 17 - Esportes
-   * 18 - Curtas-metragens
-   * 19 - Viagens e eventos
-   * 20 - Jogos
-   * 22 - Pessoas e blogs
-   * 23 - Comédia
-   * 24 - Entretenimento
-   * 25 - Notícias e política
-   * 26 - Guias e estilo
-   * 27 - Educação
-   * 28 - Ciência e tecnologia
-   * 29 - Sem fins lucrativos/ativismo
+   * @title Category ID
+   * @description Video category ID
+   * Common categories:
+   * 1 - Film & Animation
+   * 2 - Autos & Vehicles
+   * 10 - Music
+   * 15 - Pets & Animals
+   * 17 - Sports
+   * 18 - Short Movies
+   * 19 - Travel & Events
+   * 20 - Gaming
+   * 22 - People & Blogs
+   * 23 - Comedy
+   * 24 - Entertainment
+   * 25 - News & Politics
+   * 26 - Howto & Style
+   * 27 - Education
+   * 28 - Science & Technology
+   * 29 - Nonprofits & Activism
    */
   categoryId: string;
 }
 
 /**
+ * @name UPDATE_VIDEO_CATEGORY
  * @title Update Video Category
  * @description Updates the category of a YouTube video
  */
 export default async function action(
-  props: UpdateCategoryOptions,
+  props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<UpdateCategoryResponse> {
-  const client = ctx.client;
-
+): Promise<UpdateCategoryResult> {
   if (!props.videoId) {
-    return createErrorResponse(400, "ID do vídeo é obrigatório");
+    ctx.errorHandler.toHttpError(
+      new Error(COMMON_ERROR_MESSAGES.MISSING_VIDEO_ID),
+      COMMON_ERROR_MESSAGES.MISSING_VIDEO_ID,
+    );
   }
 
   if (!props.categoryId) {
-    return createErrorResponse(400, "ID da categoria é obrigatório");
+    ctx.errorHandler.toHttpError(
+      new Error("Category ID is required"),
+      "Category ID is required",
+    );
   }
 
   try {
-    // Primeiro, obter os dados atuais do vídeo para não perder informações
-    const getResponse = await client["GET /videos"]({
-      part: "snippet,status",
-      id: props.videoId,
-    });
+    const getResponse = await ctx.client["GET /videos"](
+      {
+        part: `${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.STATUS}`,
+        id: props.videoId,
+      },
+      {
+        headers: ctx.tokens?.access_token
+          ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
+          : {},
+      }
+    );
 
     if (!getResponse.ok) {
-      return createErrorResponse(
-        getResponse.status,
-        `Erro ao obter dados do vídeo: ${getResponse.status}`,
-        await getResponse.text(),
+      ctx.errorHandler.toHttpError(
+        getResponse,
+        `Failed to get video data: ${getResponse.statusText}`,
       );
     }
 
     const videoData = await getResponse.json();
 
     if (!videoData.items || videoData.items.length === 0) {
-      return createErrorResponse(404, "Vídeo não encontrado");
+      ctx.errorHandler.toHttpError(
+        new Error("Video not found"),
+        `Video not found: ${props.videoId}`,
+      );
     }
 
-    // Obter o snippet atual para fazer atualizações parciais
     const currentVideo = videoData.items[0];
     const snippet = { ...currentVideo.snippet };
 
-    // Atualizar a categoria
     snippet.categoryId = props.categoryId;
 
-    // Montar o corpo da requisição
     const requestBody = {
       id: props.videoId,
       snippet,
     };
 
-    // Enviar a requisição de atualização
-    const updateResponse = await client["PUT /videos"](
-      { part: "snippet" },
+    const updateResponse = await ctx.client["PUT /videos"](
+      { 
+        part: YOUTUBE_PARTS.SNIPPET 
+      },
       {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${ctx.tokens?.access_token}`,
         },
         body: requestBody,
-      },
+      }
     );
 
     if (!updateResponse.ok) {
-      return createErrorResponse(
-        updateResponse.status,
-        `Erro ao atualizar categoria do vídeo: ${updateResponse.status}`,
-        await updateResponse.text(),
+      ctx.errorHandler.toHttpError(
+        updateResponse,
+        `Failed to update video category: ${updateResponse.statusText}`,
       );
     }
 
@@ -128,10 +142,9 @@ export default async function action(
       video: updatedVideoData,
     };
   } catch (error) {
-    return createErrorResponse(
-      500,
-      "Erro ao processar atualização de categoria",
-      error instanceof Error ? error.message : String(error),
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to process category update",
     );
   }
 }

@@ -1,14 +1,17 @@
 import { LiveBroadcast } from "../../utils/types.ts";
 import type { AppContext } from "../../mod.ts";
+import { YOUTUBE_PARTS } from "../../utils/constant.ts";
 
-export interface BindStreamParams {
+export interface Props {
   /**
-   * @description ID da transmissão ao vivo
+   * @title Broadcast ID
+   * @description ID of the live broadcast
    */
   broadcastId: string;
 
   /**
-   * @description ID do stream de vídeo
+   * @title Stream ID
+   * @description ID of the video stream
    */
   streamId: string;
 }
@@ -21,11 +24,12 @@ export interface BindStreamResult {
 }
 
 /**
+ * @name BIND_STREAM_TO_BROADCAST
  * @title Bind Stream to Broadcast
  * @description Links a video stream to a live broadcast
  */
 export default async function action(
-  props: BindStreamParams,
+  props: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<BindStreamResult> {
@@ -35,65 +39,52 @@ export default async function action(
   } = props;
 
   if (!broadcastId) {
-    return {
-      success: false,
-      message: "ID da transmissão é obrigatório",
-    };
+    ctx.errorHandler.toHttpError(
+      new Error("Broadcast ID is required"),
+      "Broadcast ID is required",
+    );
   }
 
   if (!streamId) {
-    return {
-      success: false,
-      message: "ID do stream é obrigatório",
-    };
+    ctx.errorHandler.toHttpError(
+      new Error("Stream ID is required"),
+      "Stream ID is required",
+    );
   }
 
   try {
-    // Construir a URL para vincular o stream à transmissão
-    const url = new URL(
-      "https://youtube.googleapis.com/youtube/v3/liveBroadcasts/bind",
+    const response = await ctx.client["POST /liveBroadcasts/bind"](
+      {
+        id: broadcastId,
+        streamId: streamId,
+        part: `id,${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${ctx.tokens?.access_token}`,
+          "Content-Length": "0",
+        },
+      }
     );
 
-    // Adicionar parâmetros obrigatórios
-    url.searchParams.append("id", broadcastId);
-    url.searchParams.append("streamId", streamId);
-    url.searchParams.append("part", "id,snippet,contentDetails,status");
-
-    // Fazer a requisição para vincular
-    const response = await fetch(url.toString(), {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${ctx.access_token}`,
-        "Content-Length": "0", // Requisição sem corpo
-      },
-    });
-
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error("Erro ao vincular stream:", errorData);
-      return {
-        success: false,
-        message:
-          `Erro ao vincular stream: ${response.status} ${response.statusText}`,
-        error: errorData,
-      };
+      ctx.errorHandler.toHttpError(
+        response,
+        `Failed to bind stream: ${response.statusText}`,
+      );
     }
 
     const broadcast = await response.json();
 
     return {
       success: true,
-      message: "Stream vinculado com sucesso à transmissão",
+      message: "Stream successfully bound to broadcast",
       broadcast,
     };
-  } catch (error: unknown) {
-    let message = "Erro desconhecido";
-    if (error instanceof Error) {
-      message = error.message;
-    }
-    return {
-      success: false,
-      message,
-    };
+  } catch (error) {
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to bind stream to broadcast",
+    );
   }
 }

@@ -1,234 +1,136 @@
 import { AppContext } from "../../mod.ts";
+import {
+  DEFAULT_MAX_RESULTS,
+  YOUTUBE_ERROR_MESSAGES,
+  YOUTUBE_PARTS,
+} from "../../utils/constant.ts";
+import { LiveBroadcastListResponse } from "../../utils/types.ts";
 
-/**
- * Opções para listar transmissões ao vivo
- */
-export interface ListLiveBroadcastsParams {
+export interface Props {
   /**
-   * @description Filtrar por IDs específicos de transmissões
+   * @title Broadcast ID
+   * @description Filter by specific broadcast IDs
    */
   broadcastId?: string;
 
   /**
-   * @description Filtrar transmissões do canal autenticado (true) ou de um canal específico
+   * @title Mine
+   * @description Filter broadcasts from the authenticated channel
    */
   mine?: boolean;
 
   /**
-   * @description ID do canal para buscar transmissões (apenas quando mine=false)
+   * @title Channel ID
+   * @description Channel ID to fetch broadcasts from (only when mine=false)
    */
   channelId?: string;
 
   /**
-   * @description Estado do ciclo de vida das transmissões a serem retornadas
+   * @title Broadcast Status
+   * @description Lifecycle status of broadcasts to return
    */
   broadcastStatus?: "all" | "active" | "completed" | "upcoming";
 
   /**
-   * @description Máximo de resultados a serem retornados
+   * @title Max Results
+   * @description Maximum number of results to return
    */
   maxResults?: number;
 
   /**
-   * @description Token para a próxima página de resultados
+   * @title Page Token
+   * @description Token for the next page of results
    */
   pageToken?: string;
 
   /**
-   * @description Ordenar resultados por data de início (asc ou desc)
+   * @title Order By
+   * @description Sort results by start time or view count
    */
   orderBy?: "startTime" | "viewCount";
 
   /**
-   * @description Incluir detalhes do vídeo na resposta
+   * @title Include Video Details
+   * @description Include video details in the response
    */
   includeVideoDetails?: boolean;
 }
 
-export interface LiveBroadcastListResult {
-  kind: string;
-  etag: string;
-  items: Array<unknown>;
-  pageInfo: {
-    totalResults: number;
-    resultsPerPage: number;
-  };
-  nextPageToken?: string;
-  prevPageToken?: string;
-}
-
-export interface LiveBroadcastListError {
-  message: string;
-  error: boolean;
-  code?: number;
-  details?: unknown;
-}
-
-export type LiveBroadcastListResponse =
-  | LiveBroadcastListResult
-  | LiveBroadcastListError;
-
 /**
+ * @name GET_LIVE_BROADCASTS
  * @title List Live Broadcasts
  * @description Retrieves a list of live broadcasts for the authenticated channel or a specific channel
  */
-export default async function loader(
-  props: ListLiveBroadcastsParams,
+const loader = async (
+  props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<LiveBroadcastListResponse> {
+): Promise<LiveBroadcastListResponse> => {
   const {
     broadcastId,
     mine = true,
     channelId,
     broadcastStatus = "active",
-    maxResults = 25,
+    maxResults = DEFAULT_MAX_RESULTS,
     pageToken,
     orderBy = "startTime",
     includeVideoDetails = false,
   } = props;
 
   try {
-    // Construir a URL manualmente
-    const baseUrl = "https://youtube.googleapis.com/youtube/v3/liveBroadcasts";
-    const url = new URL(baseUrl);
+    const params: Record<string, any> = {
+      part: includeVideoDetails
+        ? `${YOUTUBE_PARTS.ID},${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.CONTENT_DETAILS},${YOUTUBE_PARTS.STATUS}`
+        : `${YOUTUBE_PARTS.ID},${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.STATUS}`,
+      maxResults,
+    };
 
-    // Definir parâmetros comuns
-    url.searchParams.append(
-      "part",
-      includeVideoDetails
-        ? "id,snippet,contentDetails,status"
-        : "id,snippet,status",
-    );
-    url.searchParams.append("maxResults", maxResults.toString());
-
-    // Verificar parâmetros mutuamente exclusivos
     if (broadcastId) {
-      // Quando ID é especificado, apenas use o ID
-      url.searchParams.append("id", broadcastId);
-
-      // Para busca por ID, não use outros filtros
-      if (mine || channelId || broadcastStatus !== "all") {
-        console.warn(
-          "Aviso: Ao buscar por broadcastId específico, outros filtros serão ignorados (mine, channelId, broadcastStatus)",
-        );
-      }
+      params.id = broadcastId;
     } else if (channelId) {
-      // Quando channelId é especificado, broadcastStatus é obrigatório
-      url.searchParams.append("channelId", channelId);
+      params.channelId = channelId;
 
       if (broadcastStatus === "all") {
-        return createErrorResponse(
-          400,
-          "Ao usar channelId, você deve especificar um broadcastStatus diferente de 'all'",
+        ctx.errorHandler.toHttpError(
+          new Error(
+            "When using channelId, you must specify a broadcastStatus other than 'all'",
+          ),
+          "When using channelId, you must specify a broadcastStatus other than 'all'",
         );
       }
 
-      url.searchParams.append("broadcastStatus", broadcastStatus);
-
-      // Aviso sobre parâmetro mine ignorado
-      if (mine) {
-        console.warn(
-          "Aviso: O parâmetro 'mine' será ignorado porque 'channelId' foi especificado",
-        );
-      }
+      params.broadcastStatus = broadcastStatus;
     } else {
-      // Caso padrão: mine=true
-      url.searchParams.append("mine", "true");
-
-      // ATENÇÃO: NÃO adicionar broadcastStatus junto com mine
-      // Isso causa o erro: "Incompatible parameters specified in the request: broadcastStatus, mine"
-
-      if (broadcastStatus !== "all") {
-        console.warn(
-          "Aviso: A API do YouTube não permite usar 'broadcastStatus' junto com 'mine=true'. O parâmetro 'broadcastStatus' será ignorado.",
-        );
-      }
+      params.mine = true;
     }
 
-    // Adicionar parâmetros opcionais
     if (pageToken) {
-      url.searchParams.append("pageToken", pageToken);
+      params.pageToken = pageToken;
     }
 
     if (orderBy) {
-      url.searchParams.append("orderBy", orderBy);
+      params.orderBy = orderBy;
     }
 
-    // Fazer a requisição à API
-    const response = await fetch(
-      url.toString(),
+    const response = await ctx.client["GET /liveBroadcasts"](
+      params,
       {
-        headers: {
-          Authorization: `Bearer ${ctx.access_token}`,
-        },
-      },
+        headers: ctx.tokens?.access_token
+          ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
+          : {},
+      }
     );
 
-    // Verificar se a resposta é ok antes de converter para JSON
     if (!response.ok) {
-      const errorText = await response.text();
-      let errorDetails;
-
-      try {
-        // Tentar extrair mais detalhes do erro se for um JSON
-        errorDetails = JSON.parse(errorText);
-      } catch {
-        errorDetails = errorText;
-      }
-
-      // Códigos de erro mais comuns
-      if (response.status === 401) {
-        return createErrorResponse(
-          401,
-          "Token de autenticação inválido ou expirado. Faça login novamente.",
-          errorDetails,
-        );
-      } else if (response.status === 403) {
-        return createErrorResponse(
-          403,
-          "Acesso negado. Verifique se você tem permissão para listar transmissões.",
-          errorDetails,
-        );
-      } else if (response.status === 404) {
-        return createErrorResponse(
-          404,
-          "Recurso não encontrado. Verifique se os IDs das transmissões estão corretos.",
-          errorDetails,
-        );
-      } else if (response.status === 400) {
-        return createErrorResponse(
-          400,
-          "Solicitação inválida. Verifique os parâmetros enviados.",
-          errorDetails,
-        );
-      } else if (response.status === 429) {
-        return createErrorResponse(
-          429,
-          "Limite de requisições excedido. Aguarde um momento e tente novamente.",
-          errorDetails,
-        );
-      }
-
-      return createErrorResponse(
-        response.status,
-        `Erro ao listar transmissões: ${response.status} ${response.statusText}`,
-        errorDetails,
+      ctx.errorHandler.toHttpError(
+        response,
+        YOUTUBE_ERROR_MESSAGES[response.status.toString()] ||
+          `Failed to list broadcasts: ${response.statusText}`,
       );
     }
 
     const data = await response.json();
 
-    // Verificar erros no formato de resposta da API
-    if (data.error) {
-      return createErrorResponse(
-        data.error.code || 500,
-        `Erro na API do YouTube: ${data.error.message || "erro desconhecido"}`,
-        data.error,
-      );
-    }
-
-    // Verificar se a resposta contém a estrutura esperada
     if (!data.items) {
       return {
         kind: "youtube#liveBroadcastListResponse",
@@ -241,57 +143,13 @@ export default async function loader(
       };
     }
 
-    // Retornar os dados processados
     return data;
   } catch (error) {
-    return createErrorResponse(
-      500,
-      "Erro ao processar listagem de transmissões",
-      error instanceof Error ? error.message : String(error),
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to process broadcast listing",
     );
   }
-}
-
-/**
- * Função auxiliar para criar respostas de erro
- */
-function createErrorResponse(
-  code: number,
-  message: string,
-  details?: unknown,
-): LiveBroadcastListError {
-  return {
-    message,
-    error: true,
-    code,
-    details,
-  };
-}
-
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (props: ListLiveBroadcastsParams, _req: Request) => {
-  // Não usar cache para consultas que exigem dados em tempo real
-  if (!ctx.access_token || props.broadcastStatus === "active") {
-    return null;
-  }
-
-  // Incluir fragmento do token na chave de cache
-  const tokenFragment = ctx.access_token.slice(-8);
-
-  const params = new URLSearchParams([
-    ["broadcastId", props.broadcastId || ""],
-    ["channelId", props.channelId || ""],
-    ["mine", (props.mine === true).toString()],
-    ["broadcastStatus", props.broadcastStatus || "active"],
-    ["maxResults", props.maxResults?.toString() || "25"],
-    ["pageToken", props.pageToken || ""],
-    ["orderBy", props.orderBy || "startTime"],
-    ["includeVideoDetails", (props.includeVideoDetails === true).toString()],
-    ["tokenId", tokenFragment],
-  ]);
-
-  params.sort();
-
-  return `youtube-livestreams-list-${params.toString()}`;
 };
+
+export default loader;

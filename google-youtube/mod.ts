@@ -1,56 +1,104 @@
-import type { AuthClient, Client } from "./utils/client.ts";
+import { createOAuthHttpClient } from "../mcp/utils/httpClient.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import type { FnContext } from "@deco/deco";
-import { createHttpClient } from "../utils/http.ts";
-import { fetchSafe } from "../utils/fetch.ts";
 import { McpContext } from "../mcp/context.ts";
+import {
+  API_URL,
+  OAUTH_URL,
+  OAUTH_URL_AUTH,
+  SCOPES,
+  YOUTUBE_ERROR_MESSAGES,
+} from "./utils/constant.ts";
+import { Client } from "./utils/client.ts";
+import {
+  DEFAULT_OAUTH_HEADERS,
+  OAuthClientOptions,
+  OAuthClients,
+  OAuthProvider,
+  OAuthTokens,
+} from "../mcp/oauth.ts";
+import {
+  createErrorHandler,
+  ErrorHandler,
+} from "../mcp/utils/errorHandling.ts";
+import { GoogleAuthClient } from "../mcp/utils/google/authClient.ts";
+
+export const YoutubeProvider: OAuthProvider = {
+  name: "YouTube",
+  authUrl: OAUTH_URL_AUTH,
+  tokenUrl: OAUTH_URL,
+  scopes: SCOPES,
+  clientId: "",
+  clientSecret: "",
+};
 
 export interface Props {
-  code?: string;
-  access_token?: string;
-  refresh_token?: string;
-  expires_in?: number;
-  scope?: string;
-  token_type?: string;
-  refresh_token_expires_in?: number;
+  tokens?: OAuthTokens;
+  clientSecret?: string;
+  clientId?: string;
 }
 
 export interface State extends Props {
-  client: ReturnType<typeof createHttpClient<Client>>;
-  authClient: ReturnType<typeof createHttpClient<AuthClient>>;
+  client: OAuthClients<Client, GoogleAuthClient>;
+  errorHandler: ErrorHandler;
 }
 
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
- * @title youtube
- * @description Loaders, actions and authentication for the youtube API for Deco.
+ * @title YouTube
+ * @description Integração com YouTube usando OAuth 2.0 com refresh automático de tokens
  * @category Social
  * @logo https://cdn.pixabay.com/photo/2021/09/11/18/21/youtube-6616310_1280.png
  */
-export default function App({ ...props }: Props) {
-  const client = createHttpClient<Client>({
-    base: "https://www.googleapis.com/youtube/v3",
-    headers: new Headers({
-      "Accept": "application/json",
-      "Authorization": `Bearer ${props.access_token}`,
-    }),
-    fetcher: fetchSafe,
+export default function App(
+  props: Props,
+  _req: Request,
+  ctx?: McpContext<Props>,
+) {
+  const { tokens, clientId, clientSecret } = props;
+
+  const youtubeProvider: OAuthProvider = {
+    ...YoutubeProvider,
+    clientId: clientId ?? "",
+    clientSecret: clientSecret ?? "",
+  };
+
+  const options: OAuthClientOptions = {
+    headers: DEFAULT_OAUTH_HEADERS,
+    authClientConfig: {
+      headers: new Headers({
+        "Accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+      }),
+    },
+  };
+
+  const client = createOAuthHttpClient<Client, GoogleAuthClient>({
+    provider: youtubeProvider,
+    apiBaseUrl: API_URL,
+    tokens,
+    options,
+    onTokenRefresh: async (newTokens: OAuthTokens) => {
+      if (ctx) {
+        await ctx.configure({
+          ...ctx,
+          tokens: newTokens,
+        });
+      }
+    },
   });
 
-  const authClient = createHttpClient<AuthClient>({
-    base: "https://oauth2.googleapis.com",
-    headers: new Headers({
-      "Accept": "application/json",
-      "Content-Type": "application/x-www-form-urlencoded",
-    }),
-    fetcher: fetchSafe,
+  const errorHandler = createErrorHandler({
+    errorMessages: YOUTUBE_ERROR_MESSAGES,
+    defaultErrorMessage: "YouTube operation failed",
   });
 
-  const state = {
+  const state: State = {
     ...props,
+    tokens,
     client,
-    authClient,
+    errorHandler,
   };
 
   return {

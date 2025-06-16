@@ -1,45 +1,55 @@
-import type { AppContext } from "../../mod.ts";
+import { AppContext } from "../../mod.ts";
+import {
+  COMMON_ERROR_MESSAGES,
+  DEFAULT_MAX_RESULTS,
+} from "../../utils/constant.ts";
 
-export interface ChannelAnalyticsOptions {
+export interface Props {
   /**
-   * @description ID do canal no formato "channel==CANAL_ID"
+   * @title Channel ID
+   * @description Channel ID in format "channel==CHANNEL_ID"
    */
   channelId: string;
 
   /**
-   * @description Data de início da consulta (formato: YYYY-MM-DD)
+   * @title Start Date
+   * @description Query start date in YYYY-MM-DD format
    */
   startDate: string;
 
   /**
-   * @description Data de término da consulta (formato: YYYY-MM-DD)
+   * @title End Date
+   * @description Query end date in YYYY-MM-DD format
    */
   endDate: string;
 
   /**
-   * @description Métricas a serem buscadas (separadas por vírgula)
-   * Métricas comuns: views, estimatedMinutesWatched, likes, subscribersGained, shares, comments, averageViewDuration
+   * @title Metrics
+   * @description Comma-separated metrics to fetch (views, estimatedMinutesWatched, likes, subscribersGained, shares, comments, averageViewDuration)
    */
   metrics?: string;
 
   /**
-   * @description Dimensões para agrupar os dados (separadas por vírgula)
-   * Dimensões comuns: day, month, video, country, subscribedStatus
+   * @title Dimensions
+   * @description Comma-separated dimensions to group data (day, month, video, country, subscribedStatus)
    */
   dimensions?: string;
 
   /**
-   * @description Campo para ordenação dos resultados (ex: day, -views para ordem decrescente)
+   * @title Sort
+   * @description Field to sort results by (ex: day, -views for descending order)
    */
   sort?: string;
 
   /**
-   * @description Filtros adicionais para a consulta
+   * @title Filters
+   * @description Additional filters for the query
    */
   filters?: string;
 
   /**
-   * @description Número máximo de resultados
+   * @title Max Results
+   * @description Maximum number of results to return
    */
   maxResults?: number;
 }
@@ -55,14 +65,15 @@ interface AnalyticsResponse {
 }
 
 /**
- * @title Analytics do Canal do YouTube
- * @description Busca dados analíticos de um canal do YouTube usando a API YouTube Analytics
+ * @name GET_CHANNEL_ANALYTICS
+ * @title Get Channel Analytics
+ * @description Fetches analytical data for a YouTube channel using the YouTube Analytics API
  */
-export default async function loader(
-  props: ChannelAnalyticsOptions,
+const loader = async (
+  props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<AnalyticsResponse | null> {
+): Promise<AnalyticsResponse> => {
   const {
     channelId,
     startDate,
@@ -71,31 +82,32 @@ export default async function loader(
     dimensions = "day",
     sort = "day",
     filters,
-    maxResults,
+    maxResults = DEFAULT_MAX_RESULTS,
   } = props;
 
   if (!channelId) {
-    console.error("ID do canal é obrigatório");
-    return null;
+    ctx.errorHandler.toHttpError(
+      new Error(COMMON_ERROR_MESSAGES.MISSING_CHANNEL_ID),
+      COMMON_ERROR_MESSAGES.MISSING_CHANNEL_ID,
+    );
   }
 
   if (!startDate || !endDate) {
-    console.error("Datas de início e término são obrigatórias");
-    return null;
+    ctx.errorHandler.toHttpError(
+      new Error("Start date and end date are required"),
+      "Start date and end date are required",
+    );
   }
 
-  // Validar formato das datas (YYYY-MM-DD)
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
   if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
-    console.error("Datas devem estar no formato YYYY-MM-DD");
-    return null;
+    ctx.errorHandler.toHttpError(
+      new Error("Dates must be in YYYY-MM-DD format"),
+      "Dates must be in YYYY-MM-DD format",
+    );
   }
 
   try {
-    // Construir URL da requisição com os parâmetros
-    let url = "https://youtubeanalytics.googleapis.com/v2/reports";
-
-    // Adicionar parâmetros obrigatórios
     const params = new URLSearchParams({
       ids: channelId,
       startDate,
@@ -103,43 +115,42 @@ export default async function loader(
       metrics,
       dimensions,
       sort,
+      maxResults: maxResults.toString(),
     });
 
-    // Adicionar parâmetros opcionais se fornecidos
-    if (filters) params.append("filters", filters);
-    if (maxResults) params.append("maxResults", maxResults.toString());
-
-    url += `?${params.toString()}`;
-
-    // Fazer a requisição para a API do YouTube Analytics
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${ctx.access_token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error(
-        `Erro ao buscar dados de analytics: ${response.status} ${response.statusText}`,
-        errorData,
-      );
-      return null;
+    if (filters) {
+      params.append("filters", filters);
     }
 
-    // Processar e retornar os dados
+    const response = await fetch(
+      `https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${ctx.tokens?.access_token}`,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      ctx.errorHandler.toHttpError(
+        response,
+        `Failed to fetch channel analytics: ${response.statusText}`,
+      );
+    }
+
     const analyticsData = await response.json();
 
-    // Formatação dos dados para facilitar o uso
-    const formattedResponse = {
+    return {
       kind: analyticsData.kind,
       columnHeaders: analyticsData.columnHeaders,
       rows: analyticsData.rows || [],
     };
-
-    return formattedResponse;
   } catch (error) {
-    console.error("Erro ao buscar dados de analytics:", error);
-    return null;
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to fetch channel analytics data",
+    );
   }
-}
+};
+
+export default loader;

@@ -1,59 +1,60 @@
-import { AppContext } from "../../../youtube/mod.ts";
-import { STALE } from "../../../utils/fetch.ts";
+import { AppContext } from "../../mod.ts";
+import {
+  COMMON_ERROR_MESSAGES,
+  DEFAULT_MAX_RESULTS,
+} from "../../utils/constant.ts";
 
-/**
- * Opções para buscar analytics de vídeos
- */
-export interface VideoAnalyticsOptions {
+export interface Props {
   /**
-   * @description ID do canal no formato "channel==CANAL_ID"
+   * @title Channel ID
+   * @description Channel ID in format "channel==CHANNEL_ID"
    */
   channelId: string;
 
   /**
-   * @description ID do vídeo ou IDs de vídeos separados por vírgula para filtrar (opcional)
+   * @title Video ID
+   * @description Video ID or comma-separated video IDs to filter (optional)
    */
   videoId?: string;
 
   /**
-   * @description Data de início da consulta (formato: YYYY-MM-DD)
+   * @title Start Date
+   * @description Query start date in YYYY-MM-DD format
    */
   startDate: string;
 
   /**
-   * @description Data de término da consulta (formato: YYYY-MM-DD)
+   * @title End Date
+   * @description Query end date in YYYY-MM-DD format
    */
   endDate: string;
 
   /**
-   * @description Métricas a serem buscadas (separadas por vírgula)
-   * Métricas comuns para vídeos: views, estimatedMinutesWatched, averageViewDuration, averageViewPercentage, likes, comments, shares
+   * @title Metrics
+   * @description Comma-separated metrics to fetch (views, estimatedMinutesWatched, averageViewDuration, averageViewPercentage, likes, comments, shares)
    */
   metrics?: string;
 
   /**
-   * @description Dimensões para agrupar os dados (separadas por vírgula)
-   * Para vídeos específicos, use "video" para separar por vídeo
+   * @title Dimensions
+   * @description Comma-separated dimensions to group data (use "video" to separate by video)
    */
   dimensions?: string;
 
   /**
-   * @description Campo para ordenação dos resultados (ex: -views para classificar por mais visualizações)
+   * @title Sort
+   * @description Field to sort results by (ex: -views for most views first)
    */
   sort?: string;
 
   /**
-   * @description Número máximo de resultados
+   * @title Max Results
+   * @description Maximum number of results to return
    */
   maxResults?: number;
-
-  /**
-   * @description Ignorar cache para esta solicitação
-   */
-  skipCache?: boolean;
 }
 
-export interface AnalyticsResult {
+interface AnalyticsResult {
   kind: string;
   columnHeaders: Array<{
     name: string;
@@ -68,24 +69,16 @@ export interface AnalyticsResult {
   }>;
 }
 
-export interface AnalyticsError {
-  message: string;
-  error: boolean;
-  code?: number;
-  details?: unknown;
-}
-
-export type AnalyticsResponse = AnalyticsResult | AnalyticsError;
-
 /**
- * @title Analytics de Vídeos do YouTube
- * @description Busca dados analíticos de vídeos específicos usando a API YouTube Analytics
+ * @name GET_VIDEO_ANALYTICS
+ * @title Get Video Analytics
+ * @description Fetches analytical data for specific videos using the YouTube Analytics API
  */
-export default async function loader(
-  props: VideoAnalyticsOptions,
+const loader = async (
+  props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<AnalyticsResponse> {
+): Promise<AnalyticsResult> => {
   const {
     channelId,
     videoId,
@@ -95,32 +88,32 @@ export default async function loader(
       "views,estimatedMinutesWatched,likes,comments,shares,averageViewDuration",
     dimensions = "video",
     sort = "-views",
-    maxResults,
-    skipCache: _skipCache = false,
+    maxResults = DEFAULT_MAX_RESULTS,
   } = props;
 
   if (!channelId) {
-    return createErrorResponse(400, "ID do canal é obrigatório");
-  }
-
-  if (!startDate || !endDate) {
-    return createErrorResponse(
-      400,
-      "Datas de início e término são obrigatórias",
+    ctx.errorHandler.toHttpError(
+      new Error(COMMON_ERROR_MESSAGES.MISSING_CHANNEL_ID),
+      COMMON_ERROR_MESSAGES.MISSING_CHANNEL_ID,
     );
   }
 
-  // Validar formato das datas (YYYY-MM-DD)
+  if (!startDate || !endDate) {
+    ctx.errorHandler.toHttpError(
+      new Error("Start date and end date are required"),
+      "Start date and end date are required",
+    );
+  }
+
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
   if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
-    return createErrorResponse(400, "Datas devem estar no formato YYYY-MM-DD");
+    ctx.errorHandler.toHttpError(
+      new Error("Dates must be in YYYY-MM-DD format"),
+      "Dates must be in YYYY-MM-DD format",
+    );
   }
 
   try {
-    // Construir URL da requisição com os parâmetros
-    const url = new URL("https://youtubeanalytics.googleapis.com/v2/reports");
-
-    // Adicionar parâmetros obrigatórios
     const params = new URLSearchParams({
       ids: channelId,
       startDate,
@@ -128,54 +121,45 @@ export default async function loader(
       metrics,
       dimensions,
       sort,
+      maxResults: maxResults.toString(),
     });
 
-    // Adicionar filtro de vídeo específico se for fornecido
-    if (videoId) params.append("filters", `video==${videoId}`);
+    if (videoId) {
+      params.append("filters", `video==${videoId}`);
+    }
 
-    // Adicionar limite de resultados se fornecido
-    if (maxResults) params.append("maxResults", maxResults.toString());
-
-    url.search = params.toString();
-
-    // Fazer a requisição para a API do YouTube Analytics
-    const response = await fetch(url.toString(), {
-      headers: {
-        Authorization: `Bearer ${ctx.access_token}`,
+    const response = await fetch(
+      `https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${ctx.tokens?.access_token}`,
+        },
       },
-      ...STALE,
-    });
+    );
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => response.text());
-      return createErrorResponse(
-        response.status,
-        `Erro ao buscar dados de analytics: ${response.status} ${response.statusText}`,
-        errorData,
+      ctx.errorHandler.toHttpError(
+        response,
+        `Failed to fetch video analytics: ${response.statusText}`,
       );
     }
 
-    // Processar e retornar os dados
     const analyticsData = await response.json();
 
-    // Formatação dos dados para facilitar o uso
     const result: AnalyticsResult = {
       kind: analyticsData.kind,
       columnHeaders: analyticsData.columnHeaders || [],
       rows: analyticsData.rows || [],
     };
 
-    // Estrutura os dados de uma forma mais fácil de usar quando a dimensão é "video"
     if (dimensions.includes("video") && result.rows.length > 0) {
       const videoData = [];
       const headerIndexMap: Record<string, number> = {};
 
-      // Mapear índices das colunas
       result.columnHeaders.forEach((header, index) => {
         headerIndexMap[header.name] = index;
       });
 
-      // Criar objetos estruturados para cada vídeo
       for (const row of result.rows) {
         const videoObject: {
           videoId: string;
@@ -185,7 +169,6 @@ export default async function loader(
           metrics: {},
         };
 
-        // Adicionar cada métrica ao objeto do vídeo
         for (const header of result.columnHeaders) {
           if (header.name !== "video") {
             videoObject.metrics[header.name] =
@@ -201,57 +184,11 @@ export default async function loader(
 
     return result;
   } catch (error) {
-    return createErrorResponse(
-      500,
-      "Erro ao buscar dados de analytics para vídeos",
-      error instanceof Error ? error.message : String(error),
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to fetch video analytics data",
     );
   }
-}
-
-// Função auxiliar para criar respostas de erro
-function createErrorResponse(
-  code: number,
-  message: string,
-  details?: unknown,
-): AnalyticsError {
-  return {
-    message,
-    error: true,
-    code,
-    details,
-  };
-}
-
-// Define a estratégia de cache como stale-while-revalidate
-export const cache = "stale-while-revalidate";
-
-// Define a chave de cache com base nos parâmetros da requisição
-export const cacheKey = (
-  props: VideoAnalyticsOptions,
-  _req: Request,
-  _ctx: AppContext,
-) => {
-  if (props.skipCache) {
-    return null;
-  }
-
-  const params = new URLSearchParams([
-    ["channelId", props.channelId],
-    ["videoId", props.videoId || ""],
-    ["startDate", props.startDate],
-    ["endDate", props.endDate],
-    [
-      "metrics",
-      props.metrics ||
-      "views,estimatedMinutesWatched,likes,comments,shares,averageViewDuration",
-    ],
-    ["dimensions", props.dimensions || "video"],
-    ["sort", props.sort || "-views"],
-    ["maxResults", props.maxResults?.toString() || ""],
-  ]);
-
-  params.sort();
-
-  return `youtube-video-analytics-${params.toString()}`;
 };
+
+export default loader;

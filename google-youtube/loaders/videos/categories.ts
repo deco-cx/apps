@@ -1,52 +1,44 @@
 import { AppContext } from "../../mod.ts";
-import { STALE } from "../../../utils/fetch.ts";
 import { YoutubeCategoryListResponse } from "../../utils/types.ts";
+import { YOUTUBE_PARTS } from "../../utils/constant.ts";
 
-export interface VideoCategoriesOptions {
+export interface Props {
   /**
-   * @description Código de região (padrão: BR)
+   * @title Region Code
+   * @description Country code to fetch video categories for
    */
   regionCode?: string;
-
-  /**
-   * @description Ignorar cache para esta solicitação
-   */
-  skipCache?: boolean;
 }
 
 /**
+ * @name GET_VIDEO_CATEGORIES
  * @title List Video Categories
- * @description Obtém a lista de categorias de vídeos disponíveis no YouTube para uma região específica
+ * @description Retrieves the list of video categories available on YouTube for a specific region
  */
-export default async function loader(
-  props: VideoCategoriesOptions,
+const loader = async (
+  props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<YoutubeCategoryListResponse | null> {
+): Promise<YoutubeCategoryListResponse> => {
   const { regionCode = "BR" } = props;
-  const client = ctx.client;
 
   try {
-    const response = await client["GET /videoCategories"]({
-      part: "snippet",
-      regionCode,
-    }, {
-      ...STALE,
-    });
+    const response = await ctx.client["GET /videoCategories"](
+      {
+        part: YOUTUBE_PARTS.SNIPPET,
+        regionCode,
+      },
+      {
+        headers: ctx.tokens?.access_token
+          ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
+          : {},
+      }
+    );
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => response.text());
-
-      if (response.status === 401) {
-        ctx.response.headers.set("X-Token-Expired", "true");
-
-        ctx.response.headers.set("Cache-Control", "no-store");
-      }
-
-      return createErrorResponse(
-        response.status,
-        `Erro ao buscar categorias de vídeos: ${response.status} ${response.statusText}`,
-        errorData,
+      ctx.errorHandler.toHttpError(
+        response,
+        `Failed to fetch video categories: ${response.statusText}`,
       );
     }
 
@@ -60,45 +52,11 @@ export default async function loader(
 
     return categoriesData;
   } catch (error) {
-    return createErrorResponse(
-      500,
-      "Erro ao buscar categorias de vídeos",
-      error instanceof Error ? error.message : String(error),
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to fetch video categories",
     );
   }
-}
-
-function createErrorResponse(
-  code: number,
-  message: string,
-  details?: unknown,
-): YoutubeCategoryListResponse {
-  return {
-    kind: "youtube#videoCategoryListResponse",
-    etag: "",
-    items: [],
-    error: {
-      code,
-      message,
-      details,
-    },
-  };
-}
-
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (props: VideoCategoriesOptions, req: Request) => {
-  const tokenExpired = req.headers.get("X-Token-Expired") === "true";
-
-  if (props.skipCache || tokenExpired) {
-    return null;
-  }
-
-  const params = new URLSearchParams([
-    ["regionCode", props.regionCode || "BR"],
-  ]);
-
-  params.sort();
-
-  return `youtube-video-categories-${params.toString()}`;
 };
+
+export default loader;

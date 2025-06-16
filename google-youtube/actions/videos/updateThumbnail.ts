@@ -1,22 +1,27 @@
 import type { UpdateThumbnailResponse } from "../../utils/types.ts";
 import { AppContext } from "../../mod.ts";
+import { COMMON_ERROR_MESSAGES } from "../../utils/constant.ts";
 
 /**
- * Opções para atualização de thumbnail de vídeo
+ * @title Video ID
+ * @description ID of the YouTube video
  */
-export interface UpdateThumbnailOptions {
+export interface Props {
   /**
-   * @description ID do vídeo do YouTube
+   * @title Video ID
+   * @description ID of the YouTube video
    */
   videoId: string;
 
   /**
-   * @description URL da imagem ou dados base64 da imagem para o thumbnail
+   * @title Image Data
+   * @description URL of the image or base64 image data for the thumbnail
    */
   imageData?: string;
 
   /**
-   * @description Dados base64 da imagem para o thumbnail
+   * @title Image Base64
+   * @description Base64 encoded image data for the thumbnail
    */
   imageBase64?: string;
 }
@@ -36,32 +41,35 @@ export interface ThumbnailUpdateError {
 export type ThumbnailResponse = ThumbnailUpdateResult | ThumbnailUpdateError;
 
 /**
+ * @name UPDATE_VIDEO_THUMBNAIL
  * @title Update YouTube Video Thumbnail
  * @description Updates the custom thumbnail for a YouTube video
  */
 export default async function action(
-  props: UpdateThumbnailOptions,
+  props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<ThumbnailResponse> {
-  const client = ctx.client;
+): Promise<ThumbnailUpdateResult> {
   const { videoId, imageData, imageBase64 } = props;
 
-  // Validar dados
   if (!videoId) {
-    return createErrorResponse(400, "ID do vídeo é obrigatório");
+    ctx.errorHandler.toHttpError(
+      new Error(COMMON_ERROR_MESSAGES.MISSING_VIDEO_ID),
+      COMMON_ERROR_MESSAGES.MISSING_VIDEO_ID,
+    );
   }
 
   if (!imageData && !imageBase64) {
-    return createErrorResponse(400, "Dados da imagem são obrigatórios");
+    ctx.errorHandler.toHttpError(
+      new Error("Image data is required"),
+      "Image data is required",
+    );
   }
 
   try {
-    // Preparar o arquivo/blob para upload
     let imageBlob: Blob;
 
     if (imageData && typeof imageData === "string") {
-      // Se for uma string base64, converter para Blob
       const base64Data = imageData.split(",")[1] || imageData;
       const byteCharacters = atob(base64Data);
       const byteArrays = [];
@@ -73,25 +81,30 @@ export default async function action(
       const byteArray = new Uint8Array(byteArrays);
       imageBlob = new Blob([byteArray], { type: "image/jpeg" });
     } else if (!imageBase64) {
-      return createErrorResponse(400, "Formato de imagem inválido");
+      ctx.errorHandler.toHttpError(
+        new Error("Invalid image format"),
+        "Invalid image format",
+      );
     }
 
-    // Usar o client para upload do thumbnail
-    const updateResponse = await client["POST /thumbnails/set"](
-      { videoId, uploadType: "media" },
+    const updateResponse = await ctx.client["POST /thumbnails/set"](
+      { 
+        videoId, 
+        uploadType: "media" 
+      },
       {
         headers: {
           "Content-Type": "image/jpeg, image/png, image/webp",
+          Authorization: `Bearer ${ctx.tokens?.access_token}`,
         },
         body: imageBase64 ? imageBase64 : imageBlob!,
-      },
+      }
     );
 
     if (!updateResponse.ok) {
-      return createErrorResponse(
-        updateResponse.status,
-        `Erro ao atualizar thumbnail: ${updateResponse.status}`,
-        await updateResponse.text(),
+      ctx.errorHandler.toHttpError(
+        updateResponse,
+        `Failed to update thumbnail: ${updateResponse.statusText}`,
       );
     }
 
@@ -102,10 +115,9 @@ export default async function action(
       thumbnail: thumbnailData,
     };
   } catch (error) {
-    return createErrorResponse(
-      500,
-      "Erro ao processar atualização do thumbnail",
-      error instanceof Error ? error.message : String(error),
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to process thumbnail update",
     );
   }
 }

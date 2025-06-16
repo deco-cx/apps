@@ -1,158 +1,96 @@
-import type { AppContext } from "../../mod.ts";
-import type { LiveStreamListResponse } from "../../utils/types.ts";
+import { AppContext } from "../../mod.ts";
+import { LiveStreamListResponse } from "../../utils/types.ts";
+import {
+  COMMON_ERROR_MESSAGES,
+  DEFAULT_MAX_RESULTS,
+  YOUTUBE_ERROR_MESSAGES,
+  YOUTUBE_PARTS,
+} from "../../utils/constant.ts";
 
-export interface ListLiveStreamsParams {
+export interface Props {
   /**
-   * @description Filtrar por IDs específicos de streams
+   * @title Stream ID
+   * @description Filter by specific stream IDs
    */
   streamId?: string;
 
   /**
-   * @description Filtrar streams do canal autenticado (true)
+   * @title Mine
+   * @description Filter streams from the authenticated channel
    */
   mine?: boolean;
 
   /**
-   * @description Máximo de resultados a serem retornados
+   * @title Max Results
+   * @description Maximum number of results to return
    */
   maxResults?: number;
 
   /**
-   * @description Token para a próxima página de resultados
+   * @title Page Token
+   * @description Token for the next page of results
    */
   pageToken?: string;
 }
 
-export interface LiveStreamListErrorResponse {
-  error: true;
-  message: string;
-  details?: unknown;
-  code?: number;
-}
-
 /**
- * @title Listar Streams de Vídeo
- * @description Recupera uma lista de recursos de stream de vídeo para o canal autenticado
+ * @name GET_LIVE_STREAMS
+ * @title List Live Streams
+ * @description Retrieves a list of video stream resources for the authenticated channel
  */
-export default async function loader(
-  props: ListLiveStreamsParams,
+const loader = async (
+  props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<LiveStreamListResponse | LiveStreamListErrorResponse> {
+): Promise<LiveStreamListResponse> => {
   const {
     streamId,
     mine = true,
-    maxResults = 25,
+    maxResults = DEFAULT_MAX_RESULTS,
     pageToken,
   } = props;
 
-  //const client = ctx.client;
-
   try {
-    // Construir a URL manualmente
-    const baseUrl = "https://youtube.googleapis.com/youtube/v3/liveStreams";
-    const url = new URL(baseUrl);
+    const params: Record<string, any> = {
+      part:
+        `${YOUTUBE_PARTS.ID},${YOUTUBE_PARTS.SNIPPET},cdn,${YOUTUBE_PARTS.STATUS},${YOUTUBE_PARTS.CONTENT_DETAILS}`,
+      maxResults,
+    };
 
-    // Definir parâmetros comuns
-    url.searchParams.append("part", "id,snippet,cdn,status,contentDetails");
-    url.searchParams.append("maxResults", maxResults.toString());
-
-    // Verificar parâmetros mutuamente exclusivos
     if (streamId) {
-      url.searchParams.append("id", streamId);
+      params.id = streamId;
     } else if (mine) {
-      url.searchParams.append("mine", "true");
+      params.mine = true;
     } else {
-      return {
-        error: true,
-        message:
-          "Parâmetros inválidos: pelo menos um dos parâmetros streamId ou mine deve ser especificado",
-      };
+      ctx.errorHandler.toHttpError(
+        new Error(COMMON_ERROR_MESSAGES.INVALID_PARAMETERS),
+        "Invalid parameters: either streamId or mine must be specified",
+      );
     }
 
-    // Adicionar parâmetros opcionais
     if (pageToken) {
-      url.searchParams.append("pageToken", pageToken);
+      params.pageToken = pageToken;
     }
 
-    // Fazer a requisição à API
-    const response = await fetch(
-      url.toString(),
+    const response = await ctx.client["GET /liveStreams"](
+      params,
       {
-        headers: {
-          Authorization: `Bearer ${ctx.access_token}`,
-        },
-      },
+        headers: ctx.tokens?.access_token
+          ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
+          : {},
+      }
     );
 
-    // Verificar se a resposta é ok antes de converter para JSON
     if (!response.ok) {
-      const errorText = await response.text();
-      let errorDetails;
-
-      try {
-        // Tentar extrair mais detalhes do erro se for um JSON
-        errorDetails = JSON.parse(errorText);
-      } catch {
-        errorDetails = errorText;
-      }
-
-      console.error(
-        `Erro HTTP ${response.status} ao listar streams:`,
-        errorDetails,
+      ctx.errorHandler.toHttpError(
+        response,
+        YOUTUBE_ERROR_MESSAGES[response.status.toString()] ||
+          `Failed to list streams: ${response.statusText}`,
       );
-
-      // Mensagens personalizadas para códigos de erro comuns
-      let mensagem =
-        `Erro ao listar streams: ${response.status} ${response.statusText}`;
-
-      if (response.status === 401) {
-        mensagem =
-          "Token de autenticação inválido ou expirado. Faça login novamente.";
-      } else if (response.status === 403) {
-        mensagem =
-          "Acesso negado. Verifique se você tem permissão para listar streams e o escopo 'youtube.livestream' está autorizado.";
-      } else if (response.status === 404) {
-        mensagem =
-          "Recurso não encontrado. Verifique se os IDs dos streams estão corretos.";
-      } else if (response.status === 400) {
-        mensagem = "Solicitação inválida. Verifique os parâmetros enviados.";
-      } else if (response.status === 500) {
-        mensagem =
-          "Erro interno do servidor YouTube. Tente novamente mais tarde.";
-      } else if (response.status === 429) {
-        mensagem =
-          "Limite de requisições excedido. Aguarde um momento e tente novamente.";
-      }
-
-      return {
-        error: true,
-        message: mensagem,
-        details: errorDetails,
-        code: response.status,
-      };
     }
 
     const data = await response.json();
 
-    // Verificar erros no formato de resposta da API
-    if (data.error) {
-      console.error("Erro na API do YouTube:", data.error);
-
-      let mensagem = "Erro na API do YouTube";
-      if (data.error.message) {
-        mensagem = `Erro na API do YouTube: ${data.error.message}`;
-      }
-
-      return {
-        error: true,
-        message: mensagem,
-        details: data.error,
-        code: data.error.code,
-      };
-    }
-
-    // Verificar se a resposta contém a estrutura esperada
     if (!data.items) {
       return {
         kind: "youtube#liveStreamListResponse",
@@ -165,7 +103,6 @@ export default async function loader(
       };
     }
 
-    // Verificar se não encontrou resultados
     if (data.items.length === 0) {
       return {
         kind: "youtube#liveStreamListResponse",
@@ -176,19 +113,17 @@ export default async function loader(
           resultsPerPage: 0,
         },
         infoMessage:
-          "Nenhum stream de vídeo encontrado. Para transmissões ao vivo, você precisa primeiro configurar um stream de vídeo no canal.",
+          "No video streams found. For live broadcasts, you need to first set up a video stream on the channel.",
       };
     }
 
     return data;
-  } catch (error: unknown) {
-    let message = "Erro desconhecido";
-    if (error instanceof Error) {
-      message = error.message;
-    }
-    return {
-      error: true,
-      message,
-    };
+  } catch (error) {
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to process stream listing",
+    );
   }
-}
+};
+
+export default loader;

@@ -1,39 +1,82 @@
-import type { AppContext } from "../../mod.ts";
-import type { YoutubeVideoListResponse } from "../../utils/types.ts";
+import { AppContext } from "../../mod.ts";
+import { YoutubeVideoListResponse } from "../../utils/types.ts";
+import {
+  DEFAULT_MAX_RESULTS,
+  YOUTUBE_PARTS,
+} from "../../utils/constant.ts";
 
-export interface ChannelVideosOptions {
+export interface Props {
   /**
-   * @description Número máximo de resultados por página
+   * @title Max Results
+   * @description Maximum number of results per page
    */
   maxResults?: number;
 
   /**
-   * @description Token para buscar a próxima página
+   * @title Page Token
+   * @description Token to fetch the next page of results
    */
   pageToken?: string;
 }
 
+interface PlaylistItem {
+  etag: string;
+  snippet: {
+    publishedAt: string;
+    channelId: string;
+    title: string;
+    description: string;
+    thumbnails: {
+      default: { url: string; width: number; height: number };
+      medium?: { url: string; width: number; height: number };
+      high?: { url: string; width: number; height: number };
+      standard?: { url: string; width: number; height: number };
+      maxres?: { url: string; width: number; height: number };
+    };
+    channelTitle: string;
+    resourceId: {
+      videoId: string;
+    };
+  };
+  status?: {
+    privacyStatus?: string;
+  };
+}
+
 /**
- * @title Listar Vídeos do Canal
- * @description Busca todos os vídeos do canal do usuário autenticado, incluindo vídeos privados
+ * @name GET_CHANNEL_VIDEOS
+ * @title List Channel Videos
+ * @description Fetches all videos from the authenticated user's channel, including private videos
  */
-export default async function loader(
-  props: ChannelVideosOptions,
+const loader = async (
+  props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<YoutubeVideoListResponse | null> {
-  const { client } = ctx;
-
+): Promise<YoutubeVideoListResponse> => {
   const {
-    maxResults = 50,
+    maxResults = DEFAULT_MAX_RESULTS,
     pageToken,
   } = props;
 
   try {
-    const channelResponse = await client["GET /channels"]({
-      part: "contentDetails",
-      mine: true,
-    });
+    const channelResponse = await ctx.client["GET /channels"](
+      {
+        part: YOUTUBE_PARTS.CONTENT_DETAILS,
+        mine: true,
+      },
+      {
+        headers: ctx.tokens?.access_token
+          ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
+          : {},
+      }
+    );
+
+    if (!channelResponse.ok) {
+      ctx.errorHandler.toHttpError(
+        channelResponse,
+        `Failed to fetch channel data: ${channelResponse.statusText}`,
+      );
+    }
 
     const channelData = await channelResponse.json();
 
@@ -58,12 +101,26 @@ export default async function loader(
       };
     }
 
-    const playlistResponse = await client["GET /playlistItems"]({
-      part: "snippet,status",
-      playlistId: uploadsPlaylistId,
-      maxResults,
-      pageToken,
-    });
+    const playlistResponse = await ctx.client["GET /playlistItems"](
+      {
+        part: `${YOUTUBE_PARTS.SNIPPET},${YOUTUBE_PARTS.STATUS}`,
+        playlistId: uploadsPlaylistId,
+        maxResults: maxResults,
+        pageToken: pageToken,
+      },
+      {
+        headers: ctx.tokens?.access_token
+          ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
+          : {},
+      }
+    );
+
+    if (!playlistResponse.ok) {
+      ctx.errorHandler.toHttpError(
+        playlistResponse,
+        `Failed to fetch playlist items: ${playlistResponse.statusText}`,
+      );
+    }
 
     const playlistData = await playlistResponse.json();
 
@@ -78,7 +135,7 @@ export default async function loader(
 
     return {
       kind: "youtube#videoListResponse",
-      items: playlistData.items.map((item) => {
+      items: playlistData.items.map((item: PlaylistItem) => {
         const thumbnails = {
           default: item.snippet.thumbnails.default,
           medium: item.snippet.thumbnails.medium ||
@@ -126,12 +183,12 @@ export default async function loader(
       etag: "",
       nextPageToken: playlistData.nextPageToken,
     };
-  } catch (_error) {
-    return {
-      kind: "youtube#videoListResponse",
-      items: [],
-      pageInfo: { totalResults: 0, resultsPerPage: 0 },
-      etag: "",
-    };
+  } catch (error) {
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to fetch channel videos",
+    );
   }
-}
+};
+
+export default loader;

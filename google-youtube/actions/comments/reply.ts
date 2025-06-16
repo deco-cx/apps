@@ -1,77 +1,86 @@
 import type { AppContext } from "../../mod.ts";
 
-export interface ResponderCommentProps {
+export interface Props {
+  /**
+   * @title Parent Comment ID
+   * @description ID of the parent comment to reply to
+   */
   parentId: string;
+
+  /**
+   * @title Reply Text
+   * @description Text content of the reply
+   */
   text: string;
 }
 
+export interface ReplyCommentResult {
+  success: boolean;
+  message: string;
+  comment?: unknown;
+  details?: string;
+}
+
 /**
- * @title Responder Comentário
- * @description Responde a um comentário existente no YouTube
+ * @name REPLY_COMMENT
+ * @title Reply to Comment
+ * @description Replies to an existing YouTube comment
  */
-const action = async (
-  props: ResponderCommentProps,
+export default async function action(
+  props: Props,
   _req: Request,
   ctx: AppContext,
-) => {
+): Promise<ReplyCommentResult> {
   const { parentId, text } = props;
 
   if (!parentId) {
-    return { success: false, message: "ID do comentário pai é obrigatório" };
+    ctx.errorHandler.toHttpError(
+      new Error("Parent comment ID is required"),
+      "Parent comment ID is required",
+    );
   }
 
   if (!text || text.trim() === "") {
-    return { success: false, message: "Texto da resposta é obrigatório" };
+    ctx.errorHandler.toHttpError(
+      new Error("Reply text is required"),
+      "Reply text is required",
+    );
   }
 
   try {
-    const response = await fetch(
-      "https://youtube.googleapis.com/youtube/v3/comments?part=snippet",
+    const response = await ctx.client["POST /comments"](
+      { part: "snippet" },
       {
-        method: "POST",
         headers: {
-          Authorization: `Bearer ${ctx.access_token}`,
           "Content-Type": "application/json",
+          Authorization: `Bearer ${ctx.tokens?.access_token}`,
         },
-        body: JSON.stringify({
+        body: {
           snippet: {
             parentId,
             textOriginal: text,
           },
-        }),
-      },
+        },
+      }
     );
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(
-        `Erro ao responder comentário: ${response.status} ${response.statusText}`,
-        errorText,
+      ctx.errorHandler.toHttpError(
+        response,
+        `Failed to reply to comment: ${response.statusText}`,
       );
-      return {
-        success: false,
-        message:
-          `Erro ao responder comentário: ${response.status} ${response.statusText}`,
-        details: errorText,
-      };
     }
 
     const data = await response.json();
     return {
       success: true,
-      message: "Resposta enviada com sucesso",
+      message: "Reply sent successfully",
       comment: data,
     };
-  } catch (error: unknown) {
-    let message = "Erro desconhecido";
-    if (error instanceof Error) {
-      message = error.message;
-    }
-    return {
-      success: false,
-      message: `Erro ao responder comentário: ${message}`,
-    };
+  } catch (error) {
+    ctx.errorHandler.toHttpError(
+      error,
+      "Failed to reply to comment",
+    );
   }
-};
-
-export default action;
+}
