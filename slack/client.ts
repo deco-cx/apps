@@ -116,7 +116,7 @@ export class SlackClient {
   ) {
     this.botHeaders = {
       Authorization: `Bearer ${botToken}`,
-      "Content-Type": "application/json",
+      "Content-Type": "application/json; charset=utf-8",
     };
     this.oauthClient = oauthClient;
   }
