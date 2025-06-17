@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("google-docs"),
     app("google-drive"),
     app("google-youtube"),
     app("barte"),
