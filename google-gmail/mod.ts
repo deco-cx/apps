@@ -4,6 +4,7 @@ import type { FnContext } from "@deco/deco";
 import { McpContext } from "../mcp/context.ts";
 import {
   API_URL,
+  GMAIL_ERROR_MESSAGES,
   OAUTH_URL,
   OAUTH_URL_AUTH,
   SCOPES,
@@ -16,6 +17,10 @@ import {
   OAuthProvider,
   OAuthTokens,
 } from "../mcp/oauth.ts";
+import {
+  createErrorHandler,
+  ErrorHandler,
+} from "../mcp/utils/errorHandling.ts";
 import {
   createGoogleOAuthUserInfoClient,
   GoogleUserInfoClient,
@@ -40,6 +45,7 @@ export interface Props {
 export interface State extends Props {
   client: OAuthClients<Client, GoogleAuthClient>;
   userInfoClient: GoogleUserInfoClient;
+  errorHandler: ErrorHandler;
 }
 
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
@@ -102,11 +108,17 @@ export default function App(
     },
   });
 
+  const errorHandler = createErrorHandler({
+    errorMessages: GMAIL_ERROR_MESSAGES,
+    defaultErrorMessage: "Operation of Gmail failed",
+  });
+
   const state: State = {
     ...props,
     tokens,
     client,
     userInfoClient,
+    errorHandler,
   };
 
   return {
