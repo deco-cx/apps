@@ -28,12 +28,13 @@ import * as $$$4 from "./loaders/comments/threads.ts";
 import * as $$$5 from "./loaders/livestreams/list.ts";
 import * as $$$6 from "./loaders/livestreams/streams.ts";
 import * as $$$7 from "./loaders/oauth/start.ts";
-import * as $$$8 from "./loaders/videos/captions.ts";
-import * as $$$9 from "./loaders/videos/categories.ts";
-import * as $$$10 from "./loaders/videos/channelVideos.ts";
-import * as $$$11 from "./loaders/videos/details.ts";
-import * as $$$12 from "./loaders/videos/list.ts";
-import * as $$$13 from "./loaders/videos/search.ts";
+import * as $$$8 from "./loaders/oauth/whoami.ts";
+import * as $$$9 from "./loaders/videos/captions.ts";
+import * as $$$10 from "./loaders/videos/categories.ts";
+import * as $$$11 from "./loaders/videos/channelVideos.ts";
+import * as $$$12 from "./loaders/videos/details.ts";
+import * as $$$13 from "./loaders/videos/list.ts";
+import * as $$$14 from "./loaders/videos/search.ts";
 
 const manifest = {
   "loaders": {
@@ -45,12 +46,13 @@ const manifest = {
     "google-youtube/loaders/livestreams/list.ts": $$$5,
     "google-youtube/loaders/livestreams/streams.ts": $$$6,
     "google-youtube/loaders/oauth/start.ts": $$$7,
-    "google-youtube/loaders/videos/captions.ts": $$$8,
-    "google-youtube/loaders/videos/categories.ts": $$$9,
-    "google-youtube/loaders/videos/channelVideos.ts": $$$10,
-    "google-youtube/loaders/videos/details.ts": $$$11,
-    "google-youtube/loaders/videos/list.ts": $$$12,
-    "google-youtube/loaders/videos/search.ts": $$$13,
+    "google-youtube/loaders/oauth/whoami.ts": $$$8,
+    "google-youtube/loaders/videos/captions.ts": $$$9,
+    "google-youtube/loaders/videos/categories.ts": $$$10,
+    "google-youtube/loaders/videos/channelVideos.ts": $$$11,
+    "google-youtube/loaders/videos/details.ts": $$$12,
+    "google-youtube/loaders/videos/list.ts": $$$13,
+    "google-youtube/loaders/videos/search.ts": $$$14,
   },
   "actions": {
     "google-youtube/actions/channels/update.ts": $$$$$$$$$0,

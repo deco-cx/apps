@@ -22,6 +22,10 @@ import {
   ErrorHandler,
 } from "../mcp/utils/errorHandling.ts";
 import { GoogleAuthClient } from "../mcp/utils/google/authClient.ts";
+import {
+  createGoogleOAuthUserInfoClient,
+  GoogleUserInfoClient,
+} from "../mcp/utils/google/userInfo.ts";
 
 export const YoutubeProvider: OAuthProvider = {
   name: "YouTube",
@@ -40,6 +44,7 @@ export interface Props {
 
 export interface State extends Props {
   client: OAuthClients<Client, GoogleAuthClient>;
+  userInfoClient: GoogleUserInfoClient;
   errorHandler: ErrorHandler;
 }
 
@@ -89,6 +94,20 @@ export default function App(
     },
   });
 
+  const userInfoClient = createGoogleOAuthUserInfoClient({
+    provider: youtubeProvider,
+    tokens,
+    options,
+    onTokenRefresh: async (newTokens: OAuthTokens) => {
+      if (ctx) {
+        await ctx.configure({
+          ...ctx,
+          tokens: newTokens,
+        });
+      }
+    },
+  });
+
   const errorHandler = createErrorHandler({
     errorMessages: YOUTUBE_ERROR_MESSAGES,
     defaultErrorMessage: "YouTube operation failed",
@@ -98,6 +117,7 @@ export default function App(
     ...props,
     tokens,
     client,
+    userInfoClient,
     errorHandler,
   };
 

@@ -25,7 +25,7 @@ export default async function callback(
   { code, installId, clientId, clientSecret, redirectUri }: Props,
   req: Request,
   ctx: AppContext,
-): Promise<{ installId: string }> {
+): Promise<{ installId: string; account?: string }> {
   const { client } = ctx;
 
   const finalRedirectUri = redirectUri ||
@@ -64,5 +64,11 @@ export default async function callback(
     clientId: clientId,
   });
 
-  return { installId };
+  const account = await ctx.invoke["google-drive"].loaders.oauth.whoami({
+    accessToken: tokenData.access_token,
+  })
+    .then((user: { email: string }) => user.email)
+    .catch(console.error) || undefined;
+
+  return { installId, account };
 }
