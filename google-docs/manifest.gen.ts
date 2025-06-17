@@ -14,7 +14,8 @@ import * as $$$1 from "./loaders/getDocumentMetadata.ts";
 import * as $$$2 from "./loaders/listDocuments.ts";
 import * as $$$3 from "./loaders/listSharedDocuments.ts";
 import * as $$$4 from "./loaders/oauth/start.ts";
-import * as $$$5 from "./loaders/searchDocuments.ts";
+import * as $$$5 from "./loaders/oauth/whoami.ts";
+import * as $$$6 from "./loaders/searchDocuments.ts";
 
 const manifest = {
   "loaders": {
@@ -23,7 +24,8 @@ const manifest = {
     "google-docs/loaders/listDocuments.ts": $$$2,
     "google-docs/loaders/listSharedDocuments.ts": $$$3,
     "google-docs/loaders/oauth/start.ts": $$$4,
-    "google-docs/loaders/searchDocuments.ts": $$$5,
+    "google-docs/loaders/oauth/whoami.ts": $$$5,
+    "google-docs/loaders/searchDocuments.ts": $$$6,
   },
   "actions": {
     "google-docs/actions/appendToDocument.ts": $$$$$$$$$0,

@@ -21,6 +21,10 @@ import {
   createErrorHandler,
   ErrorHandler,
 } from "../mcp/utils/errorHandling.ts";
+import {
+  createGoogleOAuthUserInfoClient,
+  GoogleUserInfoClient,
+} from "../mcp/utils/google/userInfo.ts";
 
 export const GoogleProvider: OAuthProvider = {
   name: "Google",
@@ -39,6 +43,7 @@ export interface Props {
 
 export interface State extends Props {
   client: OAuthClients<Client, AuthClient>;
+  userInfoClient: GoogleUserInfoClient;
   errorHandler: ErrorHandler;
 }
 
@@ -88,6 +93,20 @@ export default function App(
     },
   });
 
+  const userInfoClient = createGoogleOAuthUserInfoClient({
+    provider: googleProvider,
+    tokens,
+    options,
+    onTokenRefresh: async (newTokens: OAuthTokens) => {
+      if (ctx) {
+        await ctx.configure({
+          ...ctx,
+          tokens: newTokens,
+        });
+      }
+    },
+  });
+
   const errorHandler = createErrorHandler({
     errorMessages: ERROR_MESSAGES,
     defaultErrorMessage: "Google Docs operation failed",
@@ -97,6 +116,7 @@ export default function App(
     ...props,
     tokens,
     client,
+    userInfoClient,
     errorHandler,
   };
 
