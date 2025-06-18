@@ -11,9 +11,11 @@ import {
   HasMetafieldsMetafieldsArgs,
   ProductRecommendationsQuery,
   ProductRecommendationsQueryVariables,
+  LanguageCode,
+  CountryCode
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toProduct } from "../utils/transform.ts";
-import { Metafield } from "../utils/types.ts";
+import { LanguageContextArgs, Metafield } from "../utils/types.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -27,6 +29,18 @@ export interface Props {
    * @description search for metafields
    */
   metafields?: Metafield[];
+  /**
+   * @title Language Code
+   * @description Language code for the storefront API
+   * @example "EN" for English, "FR" for French, etc.
+   */
+  languageCode?: LanguageCode;
+  /**
+   * @title Country Code
+   * @description Country code for the storefront API
+   * @example "US" for United States, "FR" for France, etc.
+   */
+  countryCode?: CountryCode;
 }
 
 /**
@@ -39,7 +53,7 @@ const loader = async (
   ctx: AppContext,
 ): Promise<Product[] | null> => {
   const { storefront } = ctx;
-  const { slug, count } = props;
+  const { slug, count, languageCode = "PT", countryCode = "BR" } = props;
 
   const splitted = slug?.split("-");
   const maybeSkuId = Number(splitted[splitted.length - 1]);
@@ -48,9 +62,9 @@ const loader = async (
 
   const query = await storefront.query<
     GetProductQuery,
-    GetProductQueryVariables & HasMetafieldsMetafieldsArgs
+    GetProductQueryVariables & HasMetafieldsMetafieldsArgs & LanguageContextArgs
   >({
-    variables: { handle, identifiers: metafields },
+    variables: { handle, identifiers: metafields, languageCode, countryCode },
     ...GetProduct,
   });
 
@@ -60,11 +74,13 @@ const loader = async (
 
   const data = await storefront.query<
     ProductRecommendationsQuery,
-    ProductRecommendationsQueryVariables & HasMetafieldsMetafieldsArgs
+    ProductRecommendationsQueryVariables & HasMetafieldsMetafieldsArgs & LanguageContextArgs
   >({
     variables: {
       productId: query.product.id,
       identifiers: metafields,
+      languageCode,
+      countryCode
     },
     ...ProductRecommendations,
   });
