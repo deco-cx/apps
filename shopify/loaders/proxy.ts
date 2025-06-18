@@ -29,17 +29,13 @@ const buildProxyRoutes = (
   {
     ctx,
     ctx: { storeName, publicUrl },
-    extraPaths,
+    extraPathsToProxy: extraPaths = [],
     includeSiteMap,
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
+    excludePathsFromShopifySiteMap,
     replaces,
-  }: {
-    extraPaths: string[];
-    includeSiteMap?: string[];
-    generateDecoSiteMap?: boolean;
-    excludePathsFromDecoSiteMap: string[];
-    replaces: TextReplace[];
+  }: Props & {
     ctx: AppContext;
   },
 ) => {
@@ -95,6 +91,7 @@ const buildProxyRoutes = (
         handler: {
           value: {
             include,
+            exclude: excludePathsFromShopifySiteMap,
             __resolveType: "shopify/handlers/sitemap.ts",
           },
         },
@@ -130,6 +127,10 @@ export interface Props {
    * @title Exclude paths from /deco-sitemap.xml
    */
   excludePathsFromDecoSiteMap?: string[];
+  /**
+   * @title Exclude paths from /shopify-sitemap.xml
+   */
+  excludePathsFromShopifySiteMap?: string[];
   replaces?: TextReplace[];
 }
 
@@ -142,6 +143,7 @@ function loader(
     includeSiteMap = [],
     generateDecoSiteMap = true,
     excludePathsFromDecoSiteMap = [],
+    excludePathsFromShopifySiteMap = [],
     replaces = [],
   }: Props,
   _req: Request,
@@ -150,8 +152,9 @@ function loader(
   return buildProxyRoutes({
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
+    excludePathsFromShopifySiteMap,
     includeSiteMap,
-    extraPaths: extraPathsToProxy,
+    extraPathsToProxy,
     replaces,
     ctx,
   });
