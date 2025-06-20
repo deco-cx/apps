@@ -32,6 +32,22 @@ export interface Props {
    * @description Sort by.
    */
   sort_by?: "relevance" | "descending_date" | "ascending_date";
+  /**
+   * @description The size of the excerpt of the gazette.
+   */
+  excerpt_size?: number;
+  /**
+   * @description The number of excerpts to return.
+   */
+  number_of_excerpts?: number;
+  /**
+   * @description The pre-tags for the excerpt.
+   */
+  pre_tags?: string;
+  /**
+   * @description The post-tags for the excerpt.
+   */
+  post_tags?: string;
 }
 
 /**
@@ -43,6 +59,8 @@ const loader = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<{ total_gazettes: number; gazettes: Gazette[] }> => {
+  console.log("Searching gazettes with props:", props);
+
   const response = await ctx.api["GET /gazettes"]({
     querystring: props.q,
     territory_ids: props.territory_ids,
@@ -51,9 +69,15 @@ const loader = async (
     size: props.size,
     offset: props.offset,
     sort_by: props.sort_by,
+    excerpt_size: props.excerpt_size,
+    number_of_excerpts: props.number_of_excerpts,
+    pre_tags: props.pre_tags,
+    post_tags: props.post_tags,
   });
 
   const data = await response.json();
+
+  console.log("Received data:", data);
 
   return data;
 };

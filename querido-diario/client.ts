@@ -44,6 +44,10 @@ export interface QueridoDiarioClient {
       published_since?: string;
       published_until?: string;
       querystring?: string;
+      excerpt_size?: number;
+      number_of_excerpts?: number;
+      pre_tags?: string;
+      post_tags?: string;
       offset?: number;
       size?: number;
       sort_by?: "relevance" | "descending_date" | "ascending_date";
