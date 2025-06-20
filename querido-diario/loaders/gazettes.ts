@@ -11,15 +11,15 @@ export interface Props {
    */
   territory_ids?: string[];
   /**
-   * @description Filter by start date.
+   * @description Filter by start date (YYYY-MM-DD).
    * @format date
    */
-  since?: string;
+  published_since?: string;
   /**
-   * @description Filter by end date.
+   * @description Filter by end date (YYYY-MM-DD).
    * @format date
    */
-  until?: string;
+  published_until?: string;
   /**
    * @description Number of results to return.
    */
@@ -62,17 +62,8 @@ const loader = async (
   console.log("Searching gazettes with props:", props);
 
   const response = await ctx.api["GET /gazettes"]({
+    ...props,
     querystring: props.q,
-    territory_ids: props.territory_ids,
-    published_since: props.since,
-    published_until: props.until,
-    size: props.size,
-    offset: props.offset,
-    sort_by: props.sort_by,
-    excerpt_size: props.excerpt_size,
-    number_of_excerpts: props.number_of_excerpts,
-    pre_tags: props.pre_tags,
-    post_tags: props.post_tags,
   });
 
   const data = await response.json();
