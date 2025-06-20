@@ -41,8 +41,8 @@ export interface QueridoDiarioClient {
     };
     searchParams: {
       territory_ids?: string[];
-      since?: string;
-      until?: string;
+      published_since?: string;
+      published_until?: string;
       querystring?: string;
       offset?: number;
       size?: number;

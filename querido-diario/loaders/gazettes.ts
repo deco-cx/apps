@@ -46,8 +46,8 @@ const loader = async (
   const response = await ctx.api["GET /gazettes"]({
     querystring: props.q,
     territory_ids: props.territory_ids,
-    since: props.since,
-    until: props.until,
+    published_since: props.since,
+    published_until: props.until,
     size: props.size,
     offset: props.offset,
     sort_by: props.sort_by,
