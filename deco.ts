@@ -81,6 +81,7 @@ const config = {
     app("crux"),
     app("decohub"),
     app("htmx"),
+    app("querido-diario"),
     app("sap"),
     app("tiptap-cloud"),
     app("browser-use"),
