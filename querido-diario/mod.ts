@@ -14,7 +14,7 @@ export interface State {
  * @title Querido Diário
  * @description Search for official government gazettes in Brazil.
  * @category Government
- * @logo https://avatars.githubusercontent.com/u/62223996?s=200&v=4
+ * @logo https://ok.org.br/wp-content/uploads/2019/12/queridodiario-siteokbr.png
  */
 export default function App(): App<Manifest, State> {
   const api = createHttpClient<QueridoDiarioClient>({
