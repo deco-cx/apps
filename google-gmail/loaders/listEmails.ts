@@ -79,10 +79,10 @@ const loader = async (
       });
 
     if (!listResponse.ok) {
-      const errorData = await listResponse.text();
-      return {
-        error: `Gmail API error: ${listResponse.status} - ${errorData}`,
-      };
+      ctx.errorHandler.toHttpError(
+        listResponse,
+        `Error to list emails: ${listResponse.statusText}`,
+      );
     }
 
     const listData = await listResponse.json();
@@ -107,6 +107,9 @@ const loader = async (
               });
 
             if (!detailResponse.ok) {
+              console.warn(
+                `Error to load email details ${message.id}: ${detailResponse.statusText}`,
+              );
               return {
                 id: message.id,
                 threadId: message.threadId,
@@ -142,11 +145,7 @@ const loader = async (
       resultSizeEstimate: listData.resultSizeEstimate,
     };
   } catch (error) {
-    return {
-      error: `Erro interno: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    };
+    ctx.errorHandler.toHttpError(error, "Error to list emails");
   }
 };
 

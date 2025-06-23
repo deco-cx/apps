@@ -15,9 +15,9 @@ export interface Props {
 }
 
 /**
- * @title OpenAI
- * @name OpenAI
- * @description OpenAI API integration for text and image generation
+ * @title OpenAI Imagen
+ * @name OpenAI Imagen
+ * @description The latest and most powerful OpenAI Image generation model.
  * @category AI
  * @logo https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/OpenAI_Logo.svg/1024px-OpenAI_Logo.svg.png
  */

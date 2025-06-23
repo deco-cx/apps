@@ -56,7 +56,6 @@ export default function App(props: Props): App<Manifest, State> {
   });
 
   const getToken = async () => {
-    console.log("getToken", { stringUsername, stringPassword });
     const response = await api["POST /v1/authentication"]({}, {
       body: {
         Username: stringUsername,

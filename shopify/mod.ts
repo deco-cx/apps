@@ -70,7 +70,7 @@ export default function App(props: Props): App<Manifest, State> {
 
   const storefront = createGraphqlClient({
     fetcher: fetchSafe,
-    endpoint: `https://${storeName}.myshopify.com/api/2023-07/graphql.json`,
+    endpoint: `https://${storeName}.myshopify.com/api/2025-04/graphql.json`,
     headers: new Headers({
       "Content-Type": "application/json",
       "X-Shopify-Storefront-Access-Token": storefrontAccessToken,
@@ -80,7 +80,7 @@ export default function App(props: Props): App<Manifest, State> {
   const admin = createGraphqlClient({
     fetcher: fetchSafe,
     endpoint:
-      `https://${storeName}.myshopify.com/admin/api/2023-07/graphql.json`,
+      `https://${storeName}.myshopify.com/admin/api/2025-04/graphql.json`,
     headers: new Headers({
       "Content-Type": "application/json",
       "X-Shopify-Access-Token": stringAdminAccessToken,

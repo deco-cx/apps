@@ -65,19 +65,16 @@ export interface ListRecordsOptions {
   returnFieldsByFieldId?: boolean;
 }
 
-// Specific type for the response of listing records
 export interface ListRecordsResponse {
   records: AirtableRecord[];
   offset?: string;
 }
 
-// For creating a single record
 export interface CreateRecordBody {
   fields: FieldSet;
   typecast?: boolean;
 }
 
-// For updating records
 export interface UpdateRecordsBody {
   records: Array<{ id: string; fields: FieldSet }>;
   typecast?: boolean;
@@ -90,33 +87,144 @@ export interface UpdateRecordsBody {
 export interface CreateTableBody {
   name: string;
   description?: string;
-  fields: Field[]; // The service method uses Field[] which implies id might not be there for new fields.
-  // However, Airtable API expects field definitions.
-  // Let's assume Field might have id undefined for new ones.
-  primaryFieldId?: string; // Or fieldIdToPrimaryFieldId depending on API version/docs.
-  // The service used `fields: Field[]` without primary field explicit in params.
-  // It's usually part of the fields definitions or a separate param.
+  fields: Field[];
+  primaryFieldId?: string;
 }
 
-// For updating a table
 export interface UpdateTableBody {
   name?: string;
   description?: string;
   primaryFieldId?: string;
 }
 
-// For creating a field (Omit 'id' as it's generated)
 export type CreateFieldBody = Omit<Field, "id">;
 
-// For updating a field
 export interface UpdateFieldBody {
   name?: string;
   description?: string;
-  // type?: string; // Type changes are complex and might not be supported or have caveats
-  // options?: unknown;
 }
 
-// Secret type from NewAppPrompt
-export interface Secret {
-  get: () => string;
+export interface Permission {
+  /**
+   * @title All Bases
+   * @description Whether AI can access all bases
+   */
+  allCurrentAndFutureTableBases?: boolean;
+
+  /**
+   * @title Bases
+   * @description Array of selected base IDs that AI can access
+   */
+  bases?: AirtableBase[];
+
+  /**
+   * @title Tables
+   * @description Array of selected table IDs that AI can access
+   */
+  tables?: AirtableTable[];
+}
+
+export interface PermissionParams {
+  bases: AirtableBase[];
+  tables: AirtableTable[];
+  timestamp: string;
+}
+
+export interface AirtableBase {
+  id: string;
+  name?: string;
+}
+
+export interface AirtableTable {
+  id: string;
+  name?: string;
+  baseId?: string;
+  records?: AirtableRecordPermission[];
+}
+
+export interface AirtableRecordPermission {
+  id: string;
+  name?: string;
+}
+
+export interface WhoamiResponse {
+  id: string;
+  email?: string;
+  scopes?: string[];
+}
+
+export interface PermissionCheck {
+  hasPermission: boolean;
+  message?: string;
+}
+
+export interface ValidationFilterResult {
+  filteredProps?: Record<string, unknown>;
+  filteredResponse?:
+    | ListBasesResponse
+    | ListRecordsResponse
+    | BaseSchemaResponse;
+  error?: string;
+}
+
+export interface ValidationErrorResult {
+  error: string;
+  filteredProps: null;
+  filteredResponse: null;
+}
+
+export type ValidationResult =
+  | PermissionCheck
+  | ValidationFilterResult
+  | ValidationErrorResult
+  | FilteredOperationResult
+  | { error: string };
+
+export interface BaseWithTables {
+  id: string;
+  name: string;
+  type: "base";
+  tables: Record<string, AirtableTable & { type: "table" }>;
+}
+
+export interface TablePermission {
+  id: string;
+  name: string;
+  type: "table";
+}
+
+export interface LegacyTablePermission {
+  id: string;
+  name: string;
+  type: "table";
+}
+
+export type PermissionResult = BaseWithTables | LegacyTablePermission;
+
+export interface AllowedTablesBasesResponse {
+  allCurrentAndFutureTableBases?: boolean;
+  description?: string;
+  permission?: Record<string, PermissionResult>;
+}
+
+export interface OperationItem {
+  baseId: string;
+  tableId?: string;
+  tableIdOrName?: string;
+  [key: string]: unknown;
+}
+
+export interface FilteredOperationResult {
+  allowedOperations: OperationItem[];
+  deniedOperations: OperationItem[];
+  totalRequested: number;
+  totalAllowed: number;
+  totalDenied: number;
+}
+
+export interface PartialOperationResult<T = unknown> {
+  success: boolean;
+  results: T[];
+  filtered: FilteredOperationResult;
+  message: string;
 }
