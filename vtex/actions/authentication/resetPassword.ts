@@ -1,7 +1,8 @@
 import { AppContext } from "../../mod.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
 import { AuthResponse } from "../../utils/types.ts";
-import completeLogin from "../../utils/completeLogin.ts";
+import setLoginCookies from "../../utils/login/setLoginCookies.ts";
+import { getSetCookies } from "std/http/cookie.ts";
 
 export interface Props {
   email: string;
@@ -64,7 +65,8 @@ export default async function action(
   }
 
   const data: AuthResponse = await response.json();
-  await completeLogin(data, ctx);
+  const setCookies = getSetCookies(response.headers);
+  await setLoginCookies(data, ctx, setCookies);
 
   return data;
 }

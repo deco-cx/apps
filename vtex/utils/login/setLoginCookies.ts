@@ -1,13 +1,14 @@
-import { setCookie } from "std/http/cookie.ts";
-import { AuthResponse } from "./types.ts";
-import { AppContext } from "../mod.ts";
+import { Cookie, setCookie } from "std/http/cookie.ts";
+import { AuthResponse } from "../types.ts";
+import { AppContext } from "../../mod.ts";
+
+const VID_RT_COOKIE_NAME = "vid_rt";
 
 export default async function completeLogin(
     data: AuthResponse,
     ctx: AppContext,
+    setCookies?: Cookie[],
 ) {
-    //const cookies = getSetCookies(headers);
-
     if (data.authStatus === "Success") {
         const VTEXID_EXPIRES = data.expiresIn;
 
@@ -31,6 +32,25 @@ export default async function completeLogin(
                 path: "/",
                 secure: true,
             });
+        }
+
+        // Set vid_rt cookie from setCookies array if available and setRefreshToken is true
+        if (setCookies && ctx.setRefreshToken) {
+            const vidRtCookie = setCookies.find((cookie) =>
+                cookie.name === VID_RT_COOKIE_NAME
+            );
+
+            if (vidRtCookie) {
+                setCookie(ctx.response.headers, {
+                    name: VID_RT_COOKIE_NAME,
+                    value: vidRtCookie.value,
+                    httpOnly: true,
+                    expires: new Date(vidRtCookie.expires ?? 0),
+                    path: "/",
+                    secure: true,
+                    sameSite: "Strict",
+                });
+            }
         }
     }
 
