@@ -10,6 +10,7 @@ export interface Props {
 }
 
 /**
+ * @name GET_ACTOR
  * @title Get Actor
  * @description Get details of a specific actor
  */

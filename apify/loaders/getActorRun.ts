@@ -16,6 +16,7 @@ export interface Props {
 }
 
 /**
+ * @name GET_ACTOR_RUN
  * @title Get Actor Run
  * @description Get details of a specific actor run
  */

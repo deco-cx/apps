@@ -35,6 +35,7 @@ export interface Props {
 
 /**
  * @title List Actor Runs
+ * @name LIST_ACTOR_RUNS
  * @description List runs of a specific actor
  */
 export default async function listActorRuns(

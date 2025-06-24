@@ -28,6 +28,7 @@ export interface Props {
 }
 
 /**
+ * @name LIST_ACTORS
  * @title List Actors
  * @description List actors from Apify platform
  */
