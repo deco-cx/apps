@@ -1,44 +1,40 @@
+import { Actor, ActorRun, ActorRunsResponse, ActorsResponse } from "./types.ts";
+
 // Apify API client interface - simplified for Deco compatibility
 export interface ApifyClient {
   // Run Actor - POST /v2/acts/:actorId/runs
   "POST /v2/acts/:actorId/runs": {
-    response: any;
+    response: ActorRun;
   };
-  // Get list of runs - GET /v2/acts/:actorId/runs  
+  // Get list of runs - GET /v2/acts/:actorId/runs
   "GET /v2/acts/:actorId/runs": {
-    response: any;
+    searchParams: {
+      limit?: number;
+      offset?: number;
+      status?: string;
+      desc?: boolean;
+    };
+    response: ActorRunsResponse;
   };
   // Get run - GET /v2/acts/:actorId/runs/:runId
   "GET /v2/acts/:actorId/runs/:runId": {
-    response: any;
+    response: ActorRun;
   };
-  // Get Actor - GET /v2/acts/:actorId  
+  // Get Actor - GET /v2/acts/:actorId
   "GET /v2/acts/:actorId": {
-    response: any;
+    response: Actor;
   };
   // Get list of Actors - GET /v2/acts
   "GET /v2/acts": {
-    response: any;
+    response: ActorsResponse;
   };
-}
-// Common Apify types
-export interface ActorRun {
-  id: string;
-  actId: string;
-  status: string;
-  startedAt: string;
-  finishedAt?: string;
-  output?: {
-    items?: Array<Record<string, unknown>>;
+  "POST /v2/acts/:actorId/run-sync-get-dataset-items": {
+    searchParams: {
+      timeout?: number;
+      memory?: number;
+      build?: string;
+    };
+    body: unknown;
+    response: Array<Record<string, unknown>>;
   };
-}
-
-export interface Actor {
-  id: string;
-  name: string;
-  username: string;
-  description?: string;
-  isPublic: boolean;
-  createdAt: string;
-  modifiedAt: string;
 }

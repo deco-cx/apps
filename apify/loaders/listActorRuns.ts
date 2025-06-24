@@ -51,12 +51,15 @@ export default async function listActorRuns(
 
     const response = await ctx.api["GET /v2/acts/:actorId/runs"]({
       actorId,
+      limit,
+      offset,
+      status,
+      desc,
     });
 
-    const result = await response.json();
-    return result;
+    return response.json();
   } catch (error) {
     console.error("Error listing actor runs:", error);
     return ctx.errorHandler.toHttpError(error, "Error listing actor runs");
   }
-} 
+}

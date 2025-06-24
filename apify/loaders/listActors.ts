@@ -39,12 +39,16 @@ export default async function listActors(
   try {
     const { limit = 10, offset = 0, my = false, desc = true } = props;
 
-    const response = await ctx.api["GET /v2/acts"]({});
+    const response = await ctx.api["GET /v2/acts"]({
+      limit,
+      offset,
+      my,
+      desc,
+    });
 
-    const result = await response.json();
-    return result;
+    return response.json();
   } catch (error) {
     console.error("Error listing actors:", error);
     return ctx.errorHandler.toHttpError(error, "Error listing actors");
   }
-} 
+}

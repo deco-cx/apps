@@ -18,8 +18,7 @@ export const APIFY_ERROR_MESSAGES = {
   "DEADLINE_EXCEEDED": "A operação expirou. Tente novamente.",
   "UNAVAILABLE":
     "Serviço do Apify temporariamente indisponível. Tente novamente mais tarde.",
-  "INVALID_VALUE":
-    "Um ou mais valores na sua requisição são inválidos.",
+  "INVALID_VALUE": "Um ou mais valores na sua requisição são inválidos.",
   "ACTOR_NOT_FOUND": "Actor não encontrado ou inacessível.",
   "RUN_NOT_FOUND": "Execução não encontrada.",
   "INVALID_TOKEN": "Token de API inválido ou expirado.",

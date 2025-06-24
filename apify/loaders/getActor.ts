@@ -17,7 +17,7 @@ export default async function getActor(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<{ data: Actor } | { error: string }> {
+): Promise<Actor | { error: string }> {
   try {
     const { actorId } = props;
 
@@ -29,10 +29,9 @@ export default async function getActor(
       actorId,
     });
 
-    const result = await response.json();
-    return result;
+    return response.json();
   } catch (error) {
     console.error("Error getting actor:", error);
     return ctx.errorHandler.toHttpError(error, "Error getting actor");
   }
-} 
+}

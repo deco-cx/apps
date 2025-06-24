@@ -9,11 +9,9 @@ export interface Props {
 
   /**
    * @title Input
-   * @description Input data for the actor run (JSON object). If you don't know what object to pass, use an empty object: {}
+   * @description Input data for the actor run (Stringified JSON object). If you don't know what object to pass, use an empty object: {}
    */
-  input: {
-    "profileUrls": string[];
-  };
+  input: string;
 
   /**
    * @title Timeout (seconds)
@@ -42,41 +40,23 @@ export default async function runActor(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<any[] | { error: string }> {
+): Promise<Array<Record<string, unknown>> | { error: string }> {
   try {
-    const { actorId, input, timeout, memory, build } = props;
+    const { actorId, input: inputString, timeout, memory, build } = props;
 
     if (!actorId) {
       return { error: "Actor ID is required" };
     }
 
-    console.log("Props received:", JSON.stringify(props, null, 2));
-    console.log("Input value:", input);
-    console.log("Input type:", typeof input);
-
-    // Construir a URL com parâmetros de query usando o endpoint síncrono
-    let url = `https://api.apify.com/v2/acts/${actorId}/run-sync-get-dataset-items`;
-    const params = new URLSearchParams();
-    if (timeout) params.append('timeout', timeout.toString());
-    if (memory) params.append('memory', memory.toString());
-    if (build) params.append('build', build);
-    
-    if (params.toString()) {
-      url += `?${params.toString()}`;
-    }
-
-    // Preparar o body - agora o input é obrigatório
-    console.log("Body to send:", JSON.stringify(input, null, 2));
-
-    // Fazer a requisição POST diretamente com fetch
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${ctx.token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(input),
-    });
+    const response = await ctx.api
+      ["POST /v2/acts/:actorId/run-sync-get-dataset-items"]({
+        actorId,
+        timeout,
+        memory,
+        build,
+      }, {
+        body: JSON.parse(inputString),
+      });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -90,4 +70,4 @@ export default async function runActor(
     console.error("Error running actor:", error);
     return ctx.errorHandler.toHttpError(error, "Error running actor");
   }
-} 
+}

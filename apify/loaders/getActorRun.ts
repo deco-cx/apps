@@ -36,10 +36,9 @@ export default async function getActorRun(
       runId,
     });
 
-    const result = await response.json();
-    return result.data;
+    return response.json();
   } catch (error) {
     console.error("Error getting actor run:", error);
     return ctx.errorHandler.toHttpError(error, "Error getting actor run");
   }
-} 
+}
