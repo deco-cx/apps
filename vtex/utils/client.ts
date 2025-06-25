@@ -36,6 +36,16 @@ export interface VTEXCommerceStable {
     };
     response: StartAuthentication;
   };
+  "POST /api/vtexid/refreshtoken/webstore": {
+    response: {
+      status: string;
+      userId: string;
+      refreshAfter: string;
+    };
+    body: {
+      fingerprint?: string;
+    };
+  };
   "POST /api/vtexid/pub/authentication/classic/validate": {
     body: URLSearchParams;
     response: AuthResponse;
