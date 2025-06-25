@@ -2,17 +2,7 @@ import { AppContext } from "../mod.ts";
 import { Buffer } from "node:buffer";
 import { uploadImage } from "./generateImage.ts";
 
-/**
- * @title Edit Image
- * @description Modifies existing images or creates new composite images based on text prompts and reference images.
- * This action provides three main capabilities:
- * 1. Edit parts of an image using a mask (inpainting)
- * 2. Create a new image using multiple reference images
- * 3. Apply simple edits to a single image
- *
- * The behavior varies based on which parameters you provide (image only, image + mask, or multiple reference images).
- * Different models have different capabilities and limitations for image editing.
- */
+
 export interface Props {
   /**
    * @description The presigned URL to upload the edited image to. The image will be
@@ -140,6 +130,18 @@ export interface Props {
   background?: "opaque" | "transparent" | "auto";
 }
 
+/**
+ * @tool true
+ * @title Edit Image
+ * @description Modifies existing images or creates new composite images based on text prompts and reference images.
+ * This action provides three main capabilities:
+ * 1. Edit parts of an image using a mask (inpainting)
+ * 2. Create a new image using multiple reference images
+ * 3. Apply simple edits to a single image
+ *
+ * The behavior varies based on which parameters you provide (image only, image + mask, or multiple reference images).
+ * Different models have different capabilities and limitations for image editing.
+ */
 export default function editImageAction(
   props: Props,
   _req: Request,

@@ -2,12 +2,6 @@ import { AppContext } from "../mod.ts";
 import { Buffer } from "node:buffer";
 import OpenAI from "npm:openai";
 
-/**
- * @title Generate Image
- * @description Creates high-quality images from text prompts using OpenAI's image generation models.
- * This action allows you to generate images by providing a descriptive prompt and customizing
- * various parameters to control the output.
- */
 export interface Props {
   /**
    * @description The presigned URLs to upload the generated images to. The images will be
@@ -125,6 +119,14 @@ export interface Props {
   moderation?: "auto" | "low";
 }
 
+/**
+ * @tool
+ * @title _ws_Generate Image
+ * @name _ws_Generate Image
+ * @description Creates high-quality images from text prompts using OpenAI's image generation models.
+ * This action allows you to generate images by providing a descriptive prompt and customizing
+ * various parameters to control the output.
+ */
 export default function generateImageAction(
   props: Props,
   _req: Request,
@@ -133,7 +135,6 @@ export default function generateImageAction(
   const {
     presignedUrls,
   } = props;
-
   const openAI = ctx.openAI;
 
   // If presigned URLs are provided, return preview URL

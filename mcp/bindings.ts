@@ -92,6 +92,7 @@ export const processStream = async <
   if (!stream.body) {
     throw new Error("Stream body is null");
   }
+
   await processDataStream({
     stream: stream.body,
     ...rest,

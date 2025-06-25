@@ -1,3 +1,5 @@
+import { McpServer } from "@deco/mcp";
+
 export interface Storage {
   getItem<T = unknown>(key: string): Promise<T | null>;
   setItem<T = unknown>(key: string, value: T): Promise<void>;
@@ -9,4 +11,5 @@ export interface McpContext<Props> {
   appStorage: Storage;
   configure: (props: Props) => Promise<void>;
   getConfiguration: (installId?: string) => Promise<Props> | Props;
+  mcpServer: McpServer;
 }
