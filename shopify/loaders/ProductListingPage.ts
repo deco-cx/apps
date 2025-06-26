@@ -121,6 +121,7 @@ const loader = async (
     | undefined = undefined;
   let shopifyFilters = undefined;
   let records = undefined;
+  let collectionId = undefined;
   let collectionTitle = undefined;
   let collectionDescription = undefined;
 
@@ -188,6 +189,7 @@ const loader = async (
     hasPreviousPage = Boolean(
       data?.collection?.products.pageInfo.hasPreviousPage ?? false,
     );
+    collectionId = data.collection?.id;
     collectionTitle = data.collection?.title;
     collectionDescription = data.collection?.description;
   }
@@ -222,6 +224,7 @@ const loader = async (
     // TODO: Update breadcrumb when accept more than one path
     breadcrumb: {
       "@type": "BreadcrumbList",
+      "@id": collectionId,
       itemListElement: [{
         "@type": "ListItem" as const,
         name: isSearch ? query : url.pathname.split("/").filter(Boolean).pop(),

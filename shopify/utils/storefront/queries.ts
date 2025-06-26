@@ -390,6 +390,7 @@ export const ProductsByCollection = {
       $countryCode: CountryCode
     ) @inContext(language: $languageCode, country: $countryCode) {
       collection(handle: $handle) {
+        id
         handle
         description
         title
