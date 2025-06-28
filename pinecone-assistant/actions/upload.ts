@@ -80,7 +80,6 @@ const action = async (
     });
 
   const result = await response.json();
-  console.log({ result });
 
   if (result.error_message) {
     return {
