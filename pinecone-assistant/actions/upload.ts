@@ -1,5 +1,5 @@
 import { AppContext } from "../mod.ts";
-
+import { FileUploadResponse } from "../utils/types.ts";
 export interface Props {
   /**
    * @description The URL of the file to upload
@@ -19,23 +19,30 @@ export interface Props {
   /**
    * @description The optional metadata to attach to the file
    */
-  metadata?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface Result {
+  success: boolean;
+  file: FileUploadResponse | null;
+  message?: string;
 }
 
 /**
- * @title Upload File
- * @name Upload File
+ * @title UPLOAD_FILE
+ * @name UPLOAD_FILE
  * @description Uploads a file to the assistant
  */
 const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-) => {
+): Promise<Result> => {
   if (!props.fileUrl && !props.fileContent) {
     return {
       success: false,
-      error: "No file URL or content provided",
+      file: null,
+      message: "No file URL or content provided",
     };
   }
 
@@ -57,7 +64,8 @@ const action = async (
   if (!fileBuffer) {
     return {
       success: false,
-      error:
+      file: null,
+      message:
         "Could not create a file buffer from the provided file URL or content",
     };
   }
@@ -74,24 +82,29 @@ const action = async (
   const response = await ctx.client
     ["POST /assistant/files/:assistant_name"]({
       assistant_name: ctx.assistant,
-      metadata: props.metadata,
+      metadata: props.metadata ? JSON.stringify(props.metadata) : undefined,
     }, {
       body: formData,
     });
 
-  const result = await response.json();
+  const data = await response.json();
 
-  if (result.error_message) {
+  if (data.error_message) {
     return {
       success: false,
-      error: result.error_message,
+      file: null,
+      message: data.error_message,
     };
   }
 
-  return {
+  const result: Result = {
     success: true,
-    file: result,
+    file: data,
+    message:
+      "File uploaded successfully. It may take a few minutes to be available.",
   };
+
+  return result;
 };
 
 export default action;
