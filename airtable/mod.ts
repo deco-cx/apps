@@ -50,7 +50,7 @@ export interface Props {
    * @title Permission
    * @description Permission to access the Airtable API and selected bases and tables
    */
-  permission?: Permission;
+  permission: Permission;
 }
 
 export interface State extends Props {
@@ -68,7 +68,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 export default function App(
   props: Props,
   _req: Request,
-  ctx?: McpContext<Props>,
+  ctx: AppContext,
 ) {
   const { tokens, clientId, clientSecret } = props;
 

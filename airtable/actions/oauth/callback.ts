@@ -145,7 +145,6 @@ export default async function callback(
 
     const stateData = decodeState(state);
     const currentCtx = await ctx.getConfiguration();
-
     const account = await ctx.invoke.airtable.loaders.whoami({
       accessToken: currentCtx.tokens?.access_token || ctx.tokens?.access_token,
     })
@@ -157,7 +156,7 @@ export default async function callback(
 
     let accountName = account;
 
-    if (continueQueryParam === "true") {
+    if (continueQueryParam) {
       if (hasExistingPermissions(currentCtx.permission)) {
         return createPermissionExistsError(stateData.installId, accountName);
       }
