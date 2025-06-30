@@ -174,6 +174,10 @@ fragment Cart on Cart {
   id
   checkoutUrl
   totalQuantity
+  buyerIdentity {
+    countryCode
+    email
+  }
   lines(first: 100) {
     nodes {
       id
@@ -580,6 +584,26 @@ export const UpdateItems = {
     }
   `,
 };
+
+export const CartBuyerIdentityUpdate = {
+  fragments: [Cart],
+  query: gql`
+    mutation CartBuyerIdentityUpdate(
+      $cartId: ID!,
+      $buyerIdentity: CartBuyerIdentityInput!
+    ) {
+      cartBuyerIdentityUpdate(cartId: $cartId, buyerIdentity: $buyerIdentity) {
+        cart {
+          ...Cart
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `,
+}
 
 export const SignInWithEmailAndPassword = {
   query: gql`
