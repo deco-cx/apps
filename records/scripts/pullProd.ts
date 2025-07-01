@@ -4,10 +4,6 @@ import { getLocalDbFilename, getLocalSQLClientConfig } from "../utils.ts";
 import { brightGreen, brightYellow } from "std/fmt/colors.ts";
 import { getDbCredentials } from "./checkDbCredential.ts";
 
-const PRAGMA = "PRAGMA foreign_keys=OFF";
-const BEGIN_TRANSACTION = "BEGIN TRANSACTION";
-const COMMIT = "COMMIT";
-
 async function checkDumpInsertedTables(
   sqlClient: ReturnType<typeof createSQLClient>,
 ) {
@@ -21,20 +17,6 @@ async function checkDumpInsertedTables(
   } else {
     return "Failed to dump database";
   }
-}
-
-function extractStatements(sql: string) {
-  // Split the SQL string by semicolons to get individual statements
-  let statements = sql.split(";");
-
-  // Trim whitespace and filter out empty statements
-  statements = statements.map((stmt) => stmt.trim()).filter((stmt) =>
-    stmt.length > 0
-  );
-
-  return statements.filter((stmt) =>
-    !(stmt === BEGIN_TRANSACTION || stmt === COMMIT || stmt === PRAGMA)
-  );
 }
 
 async function run() {
@@ -89,11 +71,10 @@ async function run() {
     getLocalSQLClientConfig(),
   );
 
-  const sliced = extractStatements(dumpQuery);
+  await sqlClient.executeMultiple(dumpQuery);
 
-  await sqlClient.batch(sliced, "write");
-
-  await checkDumpInsertedTables(sqlClient);
+  const result = await checkDumpInsertedTables(sqlClient);
+  console.log(result);
 
   return "sqlite.db updated sucessfully!";
 }

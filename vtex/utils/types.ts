@@ -363,20 +363,22 @@ export interface ShippingData {
 }
 
 export interface Address {
-  addressType: string;
-  receiverName: null;
+  addressType?: string;
+  receiverName: string | null;
   addressId: string;
-  isDisposable: boolean;
-  postalCode: string;
-  city: string;
-  state: string;
-  country: string;
-  street: string;
-  number: null | string;
-  neighborhood: string;
-  complement: null | string;
-  reference: null;
-  geoCoordinates: number[];
+  isDisposable?: boolean;
+  postalCode?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  street?: string;
+  number?: string;
+  neighborhood?: string;
+  addressName?: string;
+  complement: string | null;
+  reference?: string;
+  geoCoordinates?: number[];
+  name?: string;
 }
 
 export interface LogisticsInfo {
@@ -1274,6 +1276,71 @@ export interface ProductInventoryData {
   balance?: ProductBalance[];
 }
 
+interface OrderPlacedSeller {
+  id: string;
+  name: string;
+  logo: string;
+}
+
+export interface OrderPlaced {
+  sellers: OrderPlacedSeller[];
+  orderId: string;
+  orderGroup: string;
+  state: string;
+  isCheckedIn: boolean;
+  sellerOrderId: string;
+  storeId: string | null;
+  checkedInPickupPointId: string | null;
+  value: number;
+  items: OrderFormItem[];
+  totals: Total[];
+  clientProfileData: ClientProfileData;
+  ratesAndBenefitsData: RatesAndBenefitsData;
+  shippingData: ShippingData;
+  paymentData: PaymentData;
+  clientPreferencesData: ClientPreferencesData;
+  commercialConditionData: null;
+  giftRegistryData: null;
+  marketingData: MarketingData | null;
+  storePreferencesData: StorePreferencesData;
+  openTextField: null;
+  invoiceData: null;
+  itemMetadata: ItemMetadata;
+  taxData: null;
+  customData: null;
+  hooksData: null;
+  changeData: null;
+  subscriptionData: null;
+  merchantContextData: null;
+  purchaseAgentData: null;
+  salesChannel: string;
+  followUpEmail: string;
+  creationDate: string;
+  lastChange: string;
+  timeZoneCreationDate: string;
+  timeZoneLastChange: string;
+  isCompleted: boolean;
+  hostName: string;
+  merchantName: string | null;
+  userType: string;
+  roundingError: number;
+  allowEdition: boolean;
+  allowCancellation: boolean;
+  isUserDataVisible: boolean;
+  cancellationData: CancelattionData;
+  orderFormCreationDate: string;
+  marketplaceRequestedCancellationWindow: null;
+}
+
+interface CancelattionData {
+  requestedByUser: true;
+  reason: string;
+  cancellationDate: string;
+  cancellationRequestId: string;
+  requestedBy: null;
+  cancellationSource: null;
+}
+
 export interface Order {
   ShippingEstimatedDate?: Date;
   ShippingEstimatedDateMax: string;
@@ -1526,3 +1593,283 @@ export interface AdvancedLoaderConfig {
 }
 
 export type Maybe<T> = T | null | undefined;
+
+export interface AddressInput {
+  name?: string;
+  addressName: string;
+  addressType?: string;
+  city?: string;
+  complement?: string;
+  country?: string;
+  geoCoordinates?: number[];
+  neighborhood?: string;
+  number?: string;
+  postalCode?: string;
+  receiverName?: string;
+  reference?: string;
+  state?: string;
+  street?: string;
+}
+
+export interface SavedAddress {
+  id: string;
+  cacheId: string;
+}
+
+export type SimulationBehavior = "default" | "skip" | "only1P";
+
+export enum DeviceType {
+  Mobile = "MOBILE",
+  Tablet = "TABLET",
+  Desktop = "DESKTOP",
+}
+
+export interface LoginSession {
+  id: string;
+  cacheId: string;
+  deviceType: DeviceType;
+  city?: Maybe<string>;
+  lastAccess: string;
+  browser?: Maybe<string>;
+  os?: Maybe<string>;
+  ip?: Maybe<string>;
+  fullAddress?: Maybe<string>;
+  firstAccess: string;
+}
+
+export interface LoginSessionsInfo {
+  currentLoginSessionId?: Maybe<string>;
+  loginSessions?: Maybe<LoginSession[]>;
+}
+
+export interface Session {
+  id: string;
+  namespaces?: {
+    profile: SessionProfile;
+    impersonate: SessionImpersonate;
+    authentication: Record<string, string>;
+    public: SessionPublic;
+  };
+}
+
+export interface SessionProfile {
+  id?: { value: string };
+  email?: { value: string };
+  firstName?: { value: string };
+  lastName?: { value: string };
+  phone?: { value: string };
+  isAuthenticated?: { value: string };
+  priceTables?: { value: string };
+}
+
+export interface SessionImpersonate {
+  storeUserEmail?: { value: string };
+  storeUserId?: { value: string };
+}
+
+export interface SessionPublic {
+  orderFormId?: { value: string };
+  utm_source?: { value: string };
+  utm_medium?: { value: string };
+  utm_campaign?: { value: string };
+  utm_term?: { value: string };
+  utm_content?: { value: string };
+  utmi_cp?: { value: string };
+  utmi_pc?: { value: string };
+  utmi_p?: { value: string };
+}
+
+export interface ProfileCustomField {
+  key?: Maybe<string>;
+  value?: Maybe<string>;
+}
+
+export interface PaymentProfile {
+  cacheId?: Maybe<string>;
+  id?: Maybe<string>;
+  paymentSystem?: Maybe<string>;
+  paymentSystemName?: Maybe<string>;
+  cardNumber?: Maybe<string>;
+  address?: Maybe<Address>;
+  isExpired?: Maybe<boolean>;
+  expirationDate?: Maybe<string>;
+  accountStatus?: Maybe<string>;
+}
+
+export interface Profile {
+  cacheId?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
+  profilePicture?: Maybe<string>;
+  email?: Maybe<string>;
+  document?: Maybe<string>;
+  userId?: Maybe<string>;
+  birthDate?: Maybe<string>;
+  gender?: Maybe<string>;
+  homePhone?: Maybe<string>;
+  businessPhone?: Maybe<string>;
+  addresses?: Maybe<Address[]>;
+  isCorporate?: Maybe<boolean>;
+  corporateName?: Maybe<string>;
+  corporateDocument?: Maybe<string>;
+  stateRegistration?: Maybe<string>;
+  payments?: Maybe<PaymentProfile[]>;
+  customFields?: Maybe<ProfileCustomField[]>;
+  passwordLastUpdate?: Maybe<string>;
+  pii?: Maybe<boolean>;
+}
+
+export interface ProfileInput {
+  email: string;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
+  document?: Maybe<string>;
+  phone?: Maybe<string>;
+  birthDate?: Maybe<string>;
+  gender?: Maybe<string>;
+  homePhone?: Maybe<string>;
+  businessPhone?: Maybe<string>;
+  tradeName?: Maybe<string>;
+  corporateName?: Maybe<string>;
+  corporateDocument?: Maybe<string>;
+  stateRegistration?: Maybe<string>;
+  isCorporate?: Maybe<boolean>;
+}
+
+export interface AuthResponse {
+  authStatus: string | "WrongCredentials" | "BlockedUser" | "Success";
+  promptMFA: boolean;
+  clientToken: string | null;
+  authCookie: {
+    Name: string;
+    Value: string;
+  } | null;
+  accountAuthCookie: {
+    Name: string;
+    Value: string;
+  } | null;
+  expiresIn: number;
+  userId: string | null;
+  phoneNumber: string | null;
+  scope: string | null;
+}
+
+export interface AuthProvider {
+  providerName: string;
+  className: string;
+  expectedContext: unknown[];
+}
+
+export interface StartAuthentication {
+  authenticationToken: string | null;
+  oauthProviders: AuthProvider[];
+  showClassicAuthentication: boolean;
+  showAccessKeyAuthentication: boolean;
+  showPasskeyAuthentication: boolean;
+  authCookie: string | null;
+  isAuthenticated: boolean;
+  selectedProvider: string | null;
+  samlProviders: unknown[];
+}
+
+export interface CanceledOrder {
+  date?: string;
+  orderId?: string;
+  receipt?: string | null;
+}
+
+export interface ReceiptData {
+  ReceiptCollection: Receipt[];
+}
+
+export interface Receipt {
+  ReceiptType: string;
+  Date: string;
+  ReceiptToken: string;
+  Source: string;
+  InvoiceNumber: string | null;
+  TransactionId: string;
+  MerchantName: string;
+  SellerOrderId: string | null;
+  ValueAsInt: number | null;
+}
+
+export interface CancellationData {
+  requestedByUser: boolean;
+  reason: string;
+  cancellationDate: string;
+  cancellationRequestId: string;
+  requestedBy: string | null;
+  cancellationSource: string | null;
+}
+
+export interface OrderFormOrder {
+  sellers: Seller[];
+  receiptData?: ReceiptData;
+  sequence?: string;
+  marketPlaceOrderId?: string;
+  origin?: number;
+  items: OrderFormItem[];
+  giftRegistryData?: unknown;
+  contextData?: unknown;
+  marketPlaceOrderGroup?: string | null;
+  marketplaceServicesEndpoint?: string | null;
+  orderFormId?: string;
+  affiliateId?: string;
+  status?: string;
+  callCenterOperator?: string;
+  userProfileId?: string;
+  creationVersion?: string;
+  creationEnvironment?: string;
+  lastChangeVersion?: string;
+  workflowInstanceId?: string;
+  workflowInstanceGroupId?: string | null;
+  marketplacePaymentValue?: number | null;
+  marketplacePaymentReferenceValue?: number | null;
+  marketplace?: string | null;
+  orderId: string;
+  orderGroup: string;
+  state: string;
+  isCheckedIn: boolean;
+  sellerOrderId: string;
+  storeId?: string | null;
+  checkedInPickupPointId?: string | null;
+  value: number;
+  totals: Total[];
+  clientProfileData: ClientProfileData;
+  ratesAndBenefitsData: RatesAndBenefitsData;
+  shippingData: ShippingData;
+  paymentData: PaymentData;
+  clientPreferencesData: ClientPreferencesData;
+  commercialConditionData?: unknown;
+  marketingData?: MarketingData | null;
+  storePreferencesData: StorePreferencesData;
+  openTextField?: unknown;
+  invoiceData?: unknown;
+  itemMetadata: ItemMetadata;
+  taxData?: unknown;
+  customData?: unknown;
+  hooksData?: unknown;
+  changeData?: unknown;
+  subscriptionData?: unknown;
+  merchantContextData?: unknown;
+  purchaseAgentData?: unknown;
+  salesChannel: string;
+  followUpEmail?: string;
+  creationDate: string;
+  lastChange: string;
+  timeZoneCreationDate: string;
+  timeZoneLastChange: string;
+  isCompleted: boolean;
+  hostName: string;
+  merchantName?: string | null;
+  userType?: string;
+  roundingError?: number;
+  allowEdition?: boolean;
+  allowCancellation?: boolean;
+  isUserDataVisible?: boolean;
+  allowChangeSeller?: boolean;
+  cancellationData?: CancellationData;
+  orderFormCreationDate?: string;
+  marketplaceRequestedCancellationWindow?: unknown;
+}
