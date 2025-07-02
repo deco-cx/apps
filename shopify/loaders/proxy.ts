@@ -60,7 +60,7 @@ const buildProxyRoutes = (
       pathTemplate,
       handler: {
         value: {
-          __resolveType: "website/handlers/proxy.ts",
+          __resolveType: pathTemplate.includes("sitemap") ? "shopify/handlers/sitemap.ts" : "website/handlers/proxy.ts",
           url: urlToProxy,
           host: hostToUse,
           customHeaders: withDigestCookie(ctx),
