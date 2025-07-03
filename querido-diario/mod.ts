@@ -1,4 +1,4 @@
-import type { App, FnContext } from "deco/mod.ts";
+import type { App, FnContext } from "@deco/deco";
 import { createHttpClient } from "../utils/http.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
