@@ -4,19 +4,17 @@
 
 import * as $$$$$$$$$0 from "./actions/oauth/callback.ts";
 import * as $$$$$$$$$1 from "./actions/sendEmail.ts";
-import * as $$$0 from "./loaders/emails.ts";
-import * as $$$1 from "./loaders/getEmail.ts";
-import * as $$$2 from "./loaders/getEmails.ts";
-import * as $$$3 from "./loaders/oauth/start.ts";
-import * as $$$4 from "./loaders/whoami.ts";
+import * as $$$0 from "./loaders/getEmail.ts";
+import * as $$$1 from "./loaders/listEmails.ts";
+import * as $$$2 from "./loaders/oauth/start.ts";
+import * as $$$3 from "./loaders/oauth/whoami.ts";
 
 const manifest = {
   "loaders": {
-    "google-gmail/loaders/emails.ts": $$$0,
-    "google-gmail/loaders/getEmail.ts": $$$1,
-    "google-gmail/loaders/getEmails.ts": $$$2,
-    "google-gmail/loaders/oauth/start.ts": $$$3,
-    "google-gmail/loaders/whoami.ts": $$$4,
+    "google-gmail/loaders/getEmail.ts": $$$0,
+    "google-gmail/loaders/listEmails.ts": $$$1,
+    "google-gmail/loaders/oauth/start.ts": $$$2,
+    "google-gmail/loaders/oauth/whoami.ts": $$$3,
   },
   "actions": {
     "google-gmail/actions/oauth/callback.ts": $$$$$$$$$0,

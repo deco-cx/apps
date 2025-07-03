@@ -16,8 +16,9 @@ interface Props extends CreateFieldBody {
 }
 
 /**
+ * @name Create_New_Field
  * @title Create Airtable Field
- * @description Creates a new field in a specified table using OAuth (Metadata API).
+ * @description Creates multiple records. See Field types for supported field types, the recording format for field options, and other specifications for specific field types. Supported field types have a recording format displayed.
  * @see https://airtable.com/developers/web/api/create-field
  */
 const action = async (
@@ -25,11 +26,24 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<Field | Response> => {
-  const { baseId, tableId, name, type, description, options } = props;
-
   if (!ctx.client) {
     return new Response("OAuth authentication is required", { status: 401 });
   }
+
+  const validationResult = await ctx.invoke["airtable"].loaders.permissioning
+    .validatePermissions({
+      mode: "check",
+      baseId: props.baseId,
+      tableIdOrName: props.tableId,
+    });
+
+  if ("hasPermission" in validationResult && !validationResult.hasPermission) {
+    return new Response(validationResult.message || "Access denied", {
+      status: 403,
+    });
+  }
+
+  const { baseId, tableId, name, type, description, options } = props;
 
   const body: CreateFieldBody = {
     name,

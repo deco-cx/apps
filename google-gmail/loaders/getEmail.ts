@@ -58,10 +58,10 @@ const loader = async (
       });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      return {
-        error: `Gmail API error: ${response.status} - ${errorData}`,
-      };
+      ctx.errorHandler.toHttpError(
+        response,
+        `Error to get email: ${response.statusText}`,
+      );
     }
 
     const emailData = await response.json();

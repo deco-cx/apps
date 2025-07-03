@@ -4,11 +4,12 @@ import type { FnContext } from "@deco/deco";
 import { McpContext } from "../mcp/context.ts";
 import {
   API_URL,
+  GMAIL_ERROR_MESSAGES,
   OAUTH_URL,
   OAUTH_URL_AUTH,
   SCOPES,
 } from "./utils/constant.ts";
-import { AuthClient, Client } from "./utils/client.ts";
+import { Client } from "./utils/client.ts";
 import {
   DEFAULT_OAUTH_HEADERS,
   OAuthClientOptions,
@@ -16,6 +17,15 @@ import {
   OAuthProvider,
   OAuthTokens,
 } from "../mcp/oauth.ts";
+import {
+  createErrorHandler,
+  ErrorHandler,
+} from "../mcp/utils/errorHandling.ts";
+import {
+  createGoogleOAuthUserInfoClient,
+  GoogleUserInfoClient,
+} from "../mcp/utils/google/userInfo.ts";
+import { GoogleAuthClient } from "../mcp/utils/google/authClient.ts";
 
 export const GoogleProvider: OAuthProvider = {
   name: "Google",
@@ -33,7 +43,9 @@ export interface Props {
 }
 
 export interface State extends Props {
-  client: OAuthClients<Client, AuthClient>;
+  client: OAuthClients<Client, GoogleAuthClient>;
+  userInfoClient: GoogleUserInfoClient;
+  errorHandler: ErrorHandler;
 }
 
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
@@ -67,7 +79,7 @@ export default function App(
     },
   };
 
-  const client = createOAuthHttpClient<Client, AuthClient>({
+  const client = createOAuthHttpClient<Client, GoogleAuthClient>({
     provider: googleProvider,
     apiBaseUrl: API_URL,
     tokens,
@@ -82,10 +94,31 @@ export default function App(
     },
   });
 
+  const userInfoClient = createGoogleOAuthUserInfoClient({
+    provider: googleProvider,
+    tokens,
+    options,
+    onTokenRefresh: async (newTokens: OAuthTokens) => {
+      if (ctx) {
+        await ctx.configure({
+          ...ctx,
+          tokens: newTokens,
+        });
+      }
+    },
+  });
+
+  const errorHandler = createErrorHandler({
+    errorMessages: GMAIL_ERROR_MESSAGES,
+    defaultErrorMessage: "Operation of Gmail failed",
+  });
+
   const state: State = {
     ...props,
     tokens,
     client,
+    userInfoClient,
+    errorHandler,
   };
 
   return {

@@ -301,9 +301,11 @@ const toPropertyValue = (
 
 const isSelectedFilter = (filterValue: FilterValue, url: URL) => {
   let isSelected = false;
+  const label = getFilterValue(filterValue);
+
   url.searchParams.forEach((value, key) => {
     if (!key?.startsWith("filter")) return;
-    if (value === filterValue.label) isSelected = true;
+    if (value === label) isSelected = true;
   });
   return isSelected;
 };
@@ -346,12 +348,46 @@ const filtersURL = (filter: FilterShopify, value: FilterValue, _url: URL) => {
   params.delete("page");
   params.delete("startCursor");
   params.delete("endCursor");
-  if (params.has(filter.id, value.label)) {
-    params.delete(filter.id, value.label);
+
+  const label = getFilterValue(value);
+
+  if (params.has(filter.id, label)) {
+    params.delete(filter.id, label);
   } else {
-    params.append(filter.id, value.label);
+    params.append(filter.id, label);
   }
 
   url.search = params.toString();
   return url.toString();
+};
+
+const getFilterValue = (value: FilterValue) => {
+  try {
+    const parsed = JSON.parse(value.input);
+
+    const fieldsToCheck = [
+      ["productMetafield", "value"],
+      ["taxonomyMetafield", "value"],
+      ["productVendor"],
+      ["productType"],
+      ["category", "id"],
+    ];
+
+    for (const path of fieldsToCheck) {
+      let current = parsed;
+      for (const key of path) {
+        if (current && typeof current === "object" && key in current) {
+          current = current[key];
+        } else {
+          current = null;
+          break;
+        }
+      }
+      if (current != null) return current;
+    }
+  } catch (error) {
+    console.error("Error parsing input JSON:", error);
+  }
+
+  return value.label;
 };

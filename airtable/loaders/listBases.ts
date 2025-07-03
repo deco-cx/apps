@@ -1,5 +1,9 @@
 import type { AppContext } from "../mod.ts";
-import type { ListBasesResponse } from "../utils/types.ts";
+import type {
+  ListBasesResponse,
+  ValidationFilterResult,
+  ValidationResult,
+} from "../utils/types.ts";
 
 interface Props {
   /**
@@ -10,6 +14,7 @@ interface Props {
 }
 
 /**
+ * @name List_Bases
  * @title List Airtable Bases
  * @description Fetches a list of bases accessible with OAuth token.
  */
@@ -19,18 +24,33 @@ const loader = async (
   ctx: AppContext,
 ): Promise<ListBasesResponse | Response> => {
   const { offset } = props;
-  console.log(ctx.tokens);
-  console.log("Listing bases");
+
+  if (!ctx.client) {
+    return new Response("OAuth authentication is required", { status: 401 });
+  }
+
   const response = await ctx.client["GET /v0/meta/bases"](
     offset ? { offset: offset } : {},
   );
-  console.log("Bases listed");
 
   if (!response.ok) {
     throw new Error(`Error listing bases: ${response.statusText}`);
   }
 
-  return response.json();
+  const data = await response.json();
+
+  const validationResult: ValidationResult = await ctx.invoke["airtable"]
+    .loaders.permissioning.validatePermissions({
+      mode: "filter",
+      response: data,
+    });
+
+  if ("error" in validationResult && validationResult.error) {
+    return new Response(validationResult.error, { status: 403 });
+  }
+
+  const filterResult = validationResult as ValidationFilterResult;
+  return (filterResult.filteredResponse || data) as ListBasesResponse;
 };
 
 export default loader;

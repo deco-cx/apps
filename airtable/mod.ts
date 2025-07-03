@@ -16,6 +16,7 @@ import {
   OAuthProvider,
   OAuthTokens,
 } from "../mcp/oauth.ts";
+import type { Permission } from "./utils/types.ts";
 
 export const AirtableProvider: OAuthProvider = {
   name: "Airtable",
@@ -44,6 +45,12 @@ export interface Props {
    * @description OAuth client ID for authentication
    */
   clientId?: string;
+
+  /**
+   * @title Permission
+   * @description Permission to access the Airtable API and selected bases and tables
+   */
+  permission: Permission;
 }
 
 export interface State extends Props {
@@ -61,7 +68,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 export default function App(
   props: Props,
   _req: Request,
-  ctx?: McpContext<Props>,
+  ctx: AppContext,
 ) {
   const { tokens, clientId, clientSecret } = props;
 

@@ -11,9 +11,14 @@ const compatibilityApps = [{
 const config = {
   apps: [
     app("google-calendar"),
+    app("apify"),
+    app("google-docs"),
+    app("google-drive"),
+    app("google-youtube"),
     app("barte"),
     app("pinecone-assistant"),
     app("shopify-mcp"),
+    app("superfrete"),
     app("google-gmail"),
     app("github"),
     app("turso-db"),
@@ -78,6 +83,7 @@ const config = {
     app("crux"),
     app("decohub"),
     app("htmx"),
+    app("querido-diario"),
     app("sap"),
     app("tiptap-cloud"),
     app("browser-use"),

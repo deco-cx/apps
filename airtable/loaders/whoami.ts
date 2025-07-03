@@ -1,13 +1,15 @@
 import { unauthorized } from "@deco/deco";
 import type { AppContext } from "../mod.ts";
 import type { WhoamiResponse } from "../utils/types.ts";
+import { OverrideAuthHeaderProps } from "../../mcp/oauth.ts";
+import { OAUTH_CLIENT_OVERRIDE_AUTH_HEADER_NAME } from "../../mcp/utils/httpClient.ts";
 
 /**
  * @title Get Current User
  * @description Fetches the current user's information.
  */
 const loader = async (
-  _props: unknown,
+  props: OverrideAuthHeaderProps,
   _req: Request,
   ctx: AppContext,
 ): Promise<WhoamiResponse> => {
@@ -17,7 +19,13 @@ const loader = async (
     });
   }
 
-  const response = await ctx.client["GET /v0/meta/whoami"]({});
+  const opts: RequestInit = {};
+  if (props.accessToken) {
+    opts.headers = new Headers({
+      [OAUTH_CLIENT_OVERRIDE_AUTH_HEADER_NAME]: `Bearer ${props.accessToken}`,
+    });
+  }
+  const response = await ctx.client["GET /v0/meta/whoami"]({}, opts);
 
   if (!response.ok) {
     throw new Error(`Error getting user: ${response.statusText}`);

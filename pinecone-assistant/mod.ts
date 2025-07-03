@@ -47,7 +47,6 @@ export default function App(
     base: props.host,
     headers: new Headers({
       "Api-Key": apiKey ?? "",
-      "Content-Type": "application/json",
       "X-Pinecone-API-Version": "2025-01-01",
     }),
   });

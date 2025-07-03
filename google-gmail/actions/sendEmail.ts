@@ -104,20 +104,20 @@ const action = async (
 
     if (!to) {
       return {
-        error: "Campo 'to' é obrigatório",
+        error: "field 'to' is required",
       };
     }
 
     if (!subject) {
       return {
-        error: "Campo 'subject' é obrigatório",
+        error: "field 'subject' is required",
       };
     }
 
     if (!bodyText && !bodyHtml) {
       return {
         error:
-          "Pelo menos um dos campos 'bodyText' ou 'bodyHtml' é obrigatório",
+          "at least one of the fields 'bodyText' or 'bodyHtml' is required",
       };
     }
 
@@ -190,10 +190,10 @@ const action = async (
       });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      return {
-        error: `Gmail API error: ${response.status} - ${errorData}`,
-      };
+      ctx.errorHandler.toHttpError(
+        response,
+        `Error to send email: ${response.statusText}`,
+      );
     }
 
     const result = await response.json() as SendEmailResponse;
@@ -204,11 +204,7 @@ const action = async (
       labelIds: result.labelIds || [],
     };
   } catch (error) {
-    return {
-      error: `Erro interno: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    };
+    ctx.errorHandler.toHttpError(error, "Error to send email");
   }
 };
 

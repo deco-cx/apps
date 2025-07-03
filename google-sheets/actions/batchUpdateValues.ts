@@ -1,5 +1,4 @@
 import { AppContext } from "../mod.ts";
-import { GOOGLE_SHEETS_URL } from "../utils/constant.ts";
 import type { SimpleBatchUpdateResponse } from "../utils/types.ts";
 import {
   mapActionPropsToSimpleBatchUpdate,
@@ -91,19 +90,13 @@ const action = async (
 
     const { body } = mapSimpleBatchUpdatePropsToApi(simpleProps);
 
-    const accessToken = ctx.tokens?.access_token;
-
-    const response = await fetch(
-      `${GOOGLE_SHEETS_URL}/v4/spreadsheets/${props.spreadsheet_id}/values:batchUpdate`,
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      },
-    );
+    const response = await ctx.client
+      ["POST /v4/spreadsheets/:spreadsheetId:batchUpdate"]({
+        // @ts-expect-error Google thought putting : on the endpoint path was cool. Our client handles it, but the types are not inferred.
+        spreadsheetId: props.spreadsheet_id,
+      }, {
+        body,
+      });
 
     if (!response.ok) {
       ctx.errorHandler.toHttpError(
