@@ -157,7 +157,7 @@ export const getFiltersByUrl = (url: URL) => {
         category: {
           id: value,
         },
-      })
+      });
     }
   });
   return filters;
