@@ -1,5 +1,8 @@
 export const SCOPES = [
   "https://www.googleapis.com/auth/calendar.readonly",
+  "https://www.googleapis.com/auth/calendar.events",
+  "https://www.googleapis.com/auth/calendar.events.readonly",
+  "https://www.googleapis.com/auth/calendar",
 ];
 
 export const API_URL = "https://www.googleapis.com/calendar/v3";
