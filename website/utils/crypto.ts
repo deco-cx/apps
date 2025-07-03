@@ -153,3 +153,25 @@ export const decryptFromHex = async (encrypted: string) => {
   const decryptedBytes = new Uint8Array(decrypted);
   return { decrypted: textDecode(decryptedBytes) };
 };
+
+if (import.meta.main) {
+  const [arg] = Deno.args;
+  if (!arg) {
+    // Generate and print a new CRYPTO_KEY
+    const savedKey = await generateAESKey();
+    const encoded = btoa(JSON.stringify({
+      key: Array.from(savedKey.key),
+      iv: Array.from(savedKey.iv),
+    }));
+    console.log("Generated CRYPTO_KEY (set as DECO_CRYPTO_KEY):\n", encoded);
+  } else {
+    // Decode and print the key and iv
+    try {
+      const parsed = JSON.parse(atob(arg));
+      console.log("Decoded key:", parsed.key);
+      console.log("Decoded iv:", parsed.iv);
+    } catch (e) {
+      console.error("Failed to decode the provided string:", e);
+    }
+  }
+}
