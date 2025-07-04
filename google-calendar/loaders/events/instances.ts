@@ -31,16 +31,19 @@ export default async function listEventInstances(
   ctx: AppContext,
 ) {
   const { calendarId, eventId, ...searchParams } = props;
-  
-  const response = await ctx.client["GET /calendars/:calendarId/events/:eventId/instances"]({
-    calendarId,
-    eventId,
-    ...searchParams,
-  });
+
+  const response = await ctx.client
+    ["GET /calendars/:calendarId/events/:eventId/instances"]({
+      calendarId,
+      eventId,
+      ...searchParams,
+    });
 
   if (!response.ok) {
-    throw new Error(`Failed to list event instances: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to list event instances: ${response.status} ${response.statusText}`,
+    );
   }
 
   return await response.json();
-} 
+}

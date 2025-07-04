@@ -7,20 +7,26 @@ import * as $$$$$$$$$1 from "./actions/createGist.ts";
 import * as $$$$$$$$$2 from "./actions/createIssue.ts";
 import * as $$$$$$$$$3 from "./actions/oauth/callback.ts";
 import * as $$$0 from "./loaders/getAuthenticatedUser.ts";
-import * as $$$1 from "./loaders/getRepoFileContent.ts";
-import * as $$$2 from "./loaders/listAuthenticatedUserRepos.ts";
-import * as $$$3 from "./loaders/listPublicGists.ts";
-import * as $$$4 from "./loaders/listRepoIssues.ts";
-import * as $$$5 from "./loaders/oauth/start.ts";
+import * as $$$1 from "./loaders/getPullRequest.ts";
+import * as $$$2 from "./loaders/getPullRequestDiff.ts";
+import * as $$$3 from "./loaders/getRepoFileContent.ts";
+import * as $$$4 from "./loaders/listAuthenticatedUserRepos.ts";
+import * as $$$5 from "./loaders/listPublicGists.ts";
+import * as $$$6 from "./loaders/listRepoIssues.ts";
+import * as $$$7 from "./loaders/listRepoIssuesRaw.ts";
+import * as $$$8 from "./loaders/oauth/start.ts";
 
 const manifest = {
   "loaders": {
     "github/loaders/getAuthenticatedUser.ts": $$$0,
-    "github/loaders/getRepoFileContent.ts": $$$1,
-    "github/loaders/listAuthenticatedUserRepos.ts": $$$2,
-    "github/loaders/listPublicGists.ts": $$$3,
-    "github/loaders/listRepoIssues.ts": $$$4,
-    "github/loaders/oauth/start.ts": $$$5,
+    "github/loaders/getPullRequest.ts": $$$1,
+    "github/loaders/getPullRequestDiff.ts": $$$2,
+    "github/loaders/getRepoFileContent.ts": $$$3,
+    "github/loaders/listAuthenticatedUserRepos.ts": $$$4,
+    "github/loaders/listPublicGists.ts": $$$5,
+    "github/loaders/listRepoIssues.ts": $$$6,
+    "github/loaders/listRepoIssuesRaw.ts": $$$7,
+    "github/loaders/oauth/start.ts": $$$8,
   },
   "actions": {
     "github/actions/commentIssue.ts": $$$$$$$$$0,
