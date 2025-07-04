@@ -10,6 +10,8 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("google-calendar"),
+    app("apify"),
     app("google-docs"),
     app("google-drive"),
     app("google-youtube"),

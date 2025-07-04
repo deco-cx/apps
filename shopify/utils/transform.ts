@@ -301,7 +301,7 @@ const toPropertyValue = (
 
 const isSelectedFilter = (filterValue: FilterValue, url: URL) => {
   let isSelected = false;
-  const label = getFilterValue(filterValue)
+  const label = getFilterValue(filterValue);
 
   url.searchParams.forEach((value, key) => {
     if (!key?.startsWith("filter")) return;
@@ -349,7 +349,7 @@ const filtersURL = (filter: FilterShopify, value: FilterValue, _url: URL) => {
   params.delete("startCursor");
   params.delete("endCursor");
 
-  const label = getFilterValue(value)
+  const label = getFilterValue(value);
 
   if (params.has(filter.id, label)) {
     params.delete(filter.id, label);
@@ -366,17 +366,17 @@ const getFilterValue = (value: FilterValue) => {
     const parsed = JSON.parse(value.input);
 
     const fieldsToCheck = [
-      ['productMetafield', 'value'],
-      ['taxonomyMetafield', 'value'],
-      ['productVendor'],
-      ['productType'],
-      ['category', 'id'],
+      ["productMetafield", "value"],
+      ["taxonomyMetafield", "value"],
+      ["productVendor"],
+      ["productType"],
+      ["category", "id"],
     ];
 
     for (const path of fieldsToCheck) {
       let current = parsed;
       for (const key of path) {
-        if (current && typeof current === 'object' && key in current) {
+        if (current && typeof current === "object" && key in current) {
           current = current[key];
         } else {
           current = null;

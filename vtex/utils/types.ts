@@ -1717,6 +1717,7 @@ export interface Profile {
   customFields?: Maybe<ProfileCustomField[]>;
   passwordLastUpdate?: Maybe<string>;
   pii?: Maybe<boolean>;
+  tradeName?: Maybe<string>;
 }
 
 export interface ProfileInput {
