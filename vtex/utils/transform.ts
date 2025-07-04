@@ -1276,6 +1276,7 @@ export const toPostalAddress = (address: Address): PostalAddress => {
     addressCountry: address.country,
     addressLocality: address.city,
     addressRegion: address.state,
+    addressDistrict: address.neighborhood,
     postalCode: address.postalCode,
     streetAddress: address.street,
     name: address.addressName || undefined,
