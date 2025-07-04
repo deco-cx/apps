@@ -1,4 +1,5 @@
 import { AppContext } from "../mod.ts";
+import type { Client } from "../utils/client.ts";
 
 export interface Props {
   owner: string;
@@ -25,9 +26,10 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-) => {
+): Promise<{ data: Client["GET /repos/:owner/:repo/issues"]["response"] }> => {
   const response = await ctx.client["GET /repos/:owner/:repo/issues"](props);
-  return await response.json();
+  const data = await response.json();
+  return { data };
 };
 
 export default loader;
