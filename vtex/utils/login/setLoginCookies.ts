@@ -2,7 +2,7 @@ import { Cookie, setCookie } from "std/http/cookie.ts";
 import { AuthResponse } from "../types.ts";
 import { AppContext } from "../../mod.ts";
 
-const VID_RT_COOKIE_NAME = "vid_rt";
+export const VID_RT_COOKIE_NAME = "vid_rt";
 
 export default async function completeLogin(
     data: AuthResponse,
