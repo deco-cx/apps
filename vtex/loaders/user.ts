@@ -18,6 +18,7 @@ export interface User {
   tradeName?: string;
   businessPhone?: string;
   isCorporate?: boolean;
+  stateRegistration?: string;
   customFields?: { key: string; value: string }[];
 }
 
@@ -34,7 +35,7 @@ async function loader(
   }
 
   const query =
-    `query getUserProfile { profile(customFields: "isNewsletterOptIn") { id userId email firstName lastName profilePicture gender document homePhone birthDate corporateDocument corporateName tradeName businessPhone isCorporate customFields { key value } }}`;
+    `query getUserProfile { profile(customFields: "isNewsletterOptIn") { id userId email firstName lastName profilePicture gender document homePhone birthDate corporateDocument corporateName tradeName businessPhone isCorporate stateRegistration customFields { key value } }}`;
 
   try {
     const { profile: user } = await io.query<{ profile: User }, null>(
@@ -58,6 +59,7 @@ async function loader(
       corporateDocument: user?.corporateDocument,
       businessPhone: user?.businessPhone,
       isCorporate: user?.isCorporate,
+      stateRegistration: user?.stateRegistration,
       customFields: user?.customFields,
     };
   } catch (_) {
