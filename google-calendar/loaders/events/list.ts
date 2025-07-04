@@ -13,15 +13,17 @@ export default async function listEvents(
   ctx: AppContext,
 ) {
   const { calendarId, ...searchParams } = props;
-  
+
   const response = await ctx.client["GET /calendars/:calendarId/events"]({
     calendarId,
     ...searchParams,
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to list events: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to list events: ${response.status} ${response.statusText}`,
+    );
   }
 
   return await response.json();
-} 
+}

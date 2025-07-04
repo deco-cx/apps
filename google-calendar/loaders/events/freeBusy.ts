@@ -35,8 +35,10 @@ export default async function getFreeBusy(
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Failed to get free/busy information: ${response.status} ${response.statusText} - ${errorText}`);
+    throw new Error(
+      `Failed to get free/busy information: ${response.status} ${response.statusText} - ${errorText}`,
+    );
   }
 
   return await response.json();
-} 
+}

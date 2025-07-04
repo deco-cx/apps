@@ -23,16 +23,19 @@ export default async function getEvent(
   ctx: AppContext,
 ) {
   const { calendarId, eventId, ...searchParams } = props;
-  
-  const response = await ctx.client["GET /calendars/:calendarId/events/:eventId"]({
-    calendarId,
-    eventId,
-    ...searchParams,
-  });
+
+  const response = await ctx.client
+    ["GET /calendars/:calendarId/events/:eventId"]({
+      calendarId,
+      eventId,
+      ...searchParams,
+    });
 
   if (!response.ok) {
-    throw new Error(`Failed to get event: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to get event: ${response.status} ${response.statusText}`,
+    );
   }
 
   return await response.json();
-} 
+}

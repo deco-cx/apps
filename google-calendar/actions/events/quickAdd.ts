@@ -19,17 +19,20 @@ export default async function quickAddEvent(
   ctx: AppContext,
 ) {
   const { calendarId, text, sendNotifications = false } = props;
-  
-  const response = await ctx.client["POST /calendars/:calendarId/events/quickAdd"]({
-    calendarId,
-    text,
-    sendNotifications,
-  });
+
+  const response = await ctx.client
+    ["POST /calendars/:calendarId/events/quickAdd"]({
+      calendarId,
+      text,
+      sendNotifications,
+    });
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Failed to quick add event: ${response.status} ${response.statusText} - ${errorText}`);
+    throw new Error(
+      `Failed to quick add event: ${response.status} ${response.statusText} - ${errorText}`,
+    );
   }
 
   return await response.json();
-} 
+}

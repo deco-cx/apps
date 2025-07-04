@@ -1,11 +1,21 @@
 import { AppContext } from "../../mod.ts";
-import { Event, CreateEventParams } from "../../utils/types.ts";
+import { CreateEventParams, Event } from "../../utils/types.ts";
 
-export interface Props extends Omit<CreateEventParams, 'calendarId'> {
+export interface Props extends Omit<CreateEventParams, "calendarId"> {
   /** ID do calendário onde criar o evento */
   calendarId: string;
   /** Dados do evento a ser criado */
-  event: Omit<Event, 'id' | 'etag' | 'created' | 'updated' | 'htmlLink' | 'iCalUID' | 'sequence' | 'kind'>;
+  event: Omit<
+    Event,
+    | "id"
+    | "etag"
+    | "created"
+    | "updated"
+    | "htmlLink"
+    | "iCalUID"
+    | "sequence"
+    | "kind"
+  >;
 }
 
 /**
@@ -18,7 +28,7 @@ export default async function createEvent(
   ctx: AppContext,
 ) {
   const { calendarId, event, ...searchParams } = props;
-  
+
   const response = await ctx.client["POST /calendars/:calendarId/events"]({
     calendarId,
     ...searchParams,
@@ -28,8 +38,10 @@ export default async function createEvent(
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Failed to create event: ${response.status} ${response.statusText} - ${errorText}`);
+    throw new Error(
+      `Failed to create event: ${response.status} ${response.statusText} - ${errorText}`,
+    );
   }
 
   return await response.json();
-} 
+}

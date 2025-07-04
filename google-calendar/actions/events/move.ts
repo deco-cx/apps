@@ -21,18 +21,21 @@ export default async function moveEvent(
   ctx: AppContext,
 ) {
   const { calendarId, eventId, destination, sendNotifications = false } = props;
-  
-  const response = await ctx.client["POST /calendars/:calendarId/events/:eventId/move"]({
-    calendarId,
-    eventId,
-    destination,
-    sendNotifications,
-  });
+
+  const response = await ctx.client
+    ["POST /calendars/:calendarId/events/:eventId/move"]({
+      calendarId,
+      eventId,
+      destination,
+      sendNotifications,
+    });
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Failed to move event: ${response.status} ${response.statusText} - ${errorText}`);
+    throw new Error(
+      `Failed to move event: ${response.status} ${response.statusText} - ${errorText}`,
+    );
   }
 
   return await response.json();
-} 
+}
