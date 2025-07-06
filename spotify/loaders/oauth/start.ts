@@ -38,12 +38,15 @@ export default function start(props: Props) {
 
   const finalClientId = clientId || Deno.env.get("SPOTIFY_CLIENT_ID") || "";
   const finalScopes = scopes || SPOTIFY_SCOPES;
+  const scopeString = Array.isArray(finalScopes)
+    ? finalScopes.join(" ")
+    : finalScopes;
 
   const authParams = new URLSearchParams({
     client_id: finalClientId,
     redirect_uri: redirectUri,
     response_type: "code",
-    scope: finalScopes,
+    scope: scopeString,
     state: state,
   });
 

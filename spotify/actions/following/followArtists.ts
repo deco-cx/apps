@@ -27,10 +27,17 @@ export default async function followArtists(
     throw new Error("Maximum of 50 IDs allowed at once");
   }
 
-  const response = await ctx.client["PUT /me/following"]({
-    type: "artist",
-    ids: ids.join(","),
-  });
+  const response = await ctx.client["PUT /me/following"](
+    {
+      type: "artist",
+      ids: ids.join(","),
+    },
+    {
+      body: {
+        ids: ids,
+      },
+    },
+  );
 
   if (!response.ok) {
     const errorText = await response.text();

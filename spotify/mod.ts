@@ -65,7 +65,6 @@ export default function App(
   ctx?: McpContext<Props>,
 ): App<Manifest, State> {
   const { tokens, clientId, clientSecret } = props;
-  console.log({ tokens, clientId, clientSecret });
 
   const spotifyProvider: OAuthProvider = {
     ...SpotifyProvider,

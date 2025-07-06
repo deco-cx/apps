@@ -27,9 +27,16 @@ export default async function removeTracks(
     throw new Error("Maximum of 50 IDs allowed at once");
   }
 
-  const response = await ctx.client["DELETE /me/tracks"]({
-    ids: ids.join(","),
-  });
+  const response = await ctx.client["DELETE /me/tracks"](
+    {
+      ids: ids.join(","),
+    },
+    {
+      body: {
+        ids: ids,
+      },
+    },
+  );
 
   if (!response.ok) {
     const errorText = await response.text();
