@@ -1,0 +1,35 @@
+name: Spotify
+description: Integrate with Spotify Web API to manage playlists, player, and user data
+category: Music
+logo: ./logo.png
+
+scopes:
+  - user-read-private
+  - user-read-email
+  - playlist-modify-public
+  - playlist-modify-private
+  - user-library-modify
+  - user-read-playback-state
+  - user-modify-playback-state
+  - user-read-currently-playing
+
+endpoints:
+  - name: Get Current User
+    path: /me
+    method: GET
+    
+  - name: Get Available Devices
+    path: /me/player/devices
+    method: GET
+    
+  - name: Add Tracks to Playlist
+    path: /playlists/{playlist_id}/tracks
+    method: POST
+    
+  - name: Save Albums to Library
+    path: /me/albums
+    method: PUT
+    
+  - name: Start/Resume Playback
+    path: /me/player/play
+    method: PUT
