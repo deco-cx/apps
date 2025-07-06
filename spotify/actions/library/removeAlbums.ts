@@ -27,7 +27,7 @@ export default async function removeAlbums(
     throw new Error("Maximum of 50 IDs allowed at once");
   }
 
-  const response = await ctx.api["DELETE /me/albums"]({
+  const response = await ctx.client["DELETE /me/albums"]({
     ids: ids.join(","),
   });
 

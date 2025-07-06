@@ -19,7 +19,7 @@ export default async function previous(
 ): Promise<{ success: boolean }> {
   const { device_id } = props;
 
-  const response = await ctx.api["POST /me/player/previous"]({
+  const response = await ctx.client["POST /me/player/previous"]({
     device_id,
   });
 

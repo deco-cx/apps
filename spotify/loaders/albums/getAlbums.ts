@@ -26,7 +26,7 @@ export default async function getAlbums(
 ): Promise<{ data: SpotifyAlbum[] }> {
   const { ids, market } = props;
 
-  const response = await ctx.api["GET /albums"]({
+  const response = await ctx.client["GET /albums"]({
     ids,
     market,
   });

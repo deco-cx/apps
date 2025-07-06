@@ -91,10 +91,14 @@ export default async function callback(
   await ctx.configure({
     clientId: finalClientId,
     clientSecret: finalClientSecret,
-    accessToken: tokenData.access_token,
-    refreshToken: tokenData.refresh_token,
-    scope: tokenData.scope,
-    tokenType: tokenData.token_type,
+    tokens: {
+      access_token: tokenData.access_token,
+      refresh_token: tokenData.refresh_token,
+      expires_in: tokenData.expires_in,
+      token_type: tokenData.token_type,
+      scope: tokenData.scope,
+      tokenObtainedAt: Date.now(),
+    },
   });
 
   // Get user information to return account

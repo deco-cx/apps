@@ -26,7 +26,7 @@ export default async function getCurrentTrack(
 ): Promise<SpotifyPlaybackState | null> {
   const { market, additional_types } = props;
 
-  const response = await ctx.api["GET /me/player/currently-playing"]({
+  const response = await ctx.client["GET /me/player/currently-playing"]({
     market,
     additional_types,
   });

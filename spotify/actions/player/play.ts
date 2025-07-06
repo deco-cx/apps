@@ -56,29 +56,39 @@ export default async function play(
     position_ms,
   } = props;
 
-  const body: any = {};
+  const bodyData: {
+    context_uri?: string;
+    uris?: string[];
+    offset?: {
+      position?: number;
+      uri?: string;
+    };
+    position_ms?: number;
+  } = {};
 
   if (context_uri) {
-    body.context_uri = context_uri;
+    bodyData.context_uri = context_uri;
   }
 
   if (uris && uris.length > 0) {
-    body.uris = uris;
+    bodyData.uris = uris;
   }
 
   if (offset_position !== undefined || offset_uri) {
-    body.offset = {};
-    if (offset_position !== undefined) body.offset.position = offset_position;
-    if (offset_uri) body.offset.uri = offset_uri;
+    bodyData.offset = {};
+    if (offset_position !== undefined) {
+      bodyData.offset.position = offset_position;
+    }
+    if (offset_uri) bodyData.offset.uri = offset_uri;
   }
 
   if (position_ms !== undefined) {
-    body.position_ms = position_ms;
+    bodyData.position_ms = position_ms;
   }
 
-  const response = await ctx.api["PUT /me/player/play"](
+  const response = await ctx.client["PUT /me/player/play"](
     { device_id },
-    Object.keys(body).length > 0 ? body : undefined,
+    { body: bodyData },
   );
 
   if (!response.ok) {

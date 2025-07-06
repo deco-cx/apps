@@ -20,7 +20,7 @@ export default async function getArtist(
 ): Promise<SpotifyArtist> {
   const { id } = props;
 
-  const response = await ctx.api["GET /artists/:id"]({
+  const response = await ctx.client["GET /artists/:id"]({
     id,
   });
 

@@ -34,7 +34,7 @@ export default async function getSavedAlbums(
 ): Promise<SpotifyPagingObject<{ added_at: string; album: SpotifyAlbum }>> {
   const { limit = 20, offset = 0, market } = props;
 
-  const response = await ctx.api["GET /me/albums"]({
+  const response = await ctx.client["GET /me/albums"]({
     limit,
     offset,
     market,

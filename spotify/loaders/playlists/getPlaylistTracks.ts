@@ -59,7 +59,7 @@ export default async function getPlaylistTracks(
     additional_types,
   } = props;
 
-  const response = await ctx.api["GET /playlists/:playlist_id/tracks"]({
+  const response = await ctx.client["GET /playlists/:playlist_id/tracks"]({
     playlist_id,
     market,
     fields,

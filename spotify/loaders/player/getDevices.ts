@@ -6,11 +6,11 @@ import { SpotifyDevice } from "../../client.ts";
  * @description Get the user's available playback devices
  */
 export default async function getDevices(
-  _props: {},
+  _props: Record<PropertyKey, never>,
   _req: Request,
   ctx: AppContext,
 ): Promise<{ data: SpotifyDevice[] }> {
-  const response = await ctx.api["GET /me/player/devices"]({});
+  const response = await ctx.client["GET /me/player/devices"]({});
 
   if (!response.ok) {
     const errorText = await response.text();

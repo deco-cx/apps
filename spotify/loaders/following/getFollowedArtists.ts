@@ -33,7 +33,7 @@ export default async function getFollowedArtists(
     throw new Error("Limit must be between 1 and 50");
   }
 
-  const response = await ctx.api["GET /me/following"]({
+  const response = await ctx.client["GET /me/following"]({
     type: "artist",
     after,
     limit,

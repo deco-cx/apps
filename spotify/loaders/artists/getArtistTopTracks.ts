@@ -26,7 +26,7 @@ export default async function getArtistTopTracks(
 ): Promise<{ data: SpotifyTrack[] }> {
   const { id, market } = props;
 
-  const response = await ctx.api["GET /artists/:id/top-tracks"]({
+  const response = await ctx.client["GET /artists/:id/top-tracks"]({
     id,
     market,
   });

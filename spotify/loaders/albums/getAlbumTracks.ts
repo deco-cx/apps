@@ -40,7 +40,7 @@ export default async function getAlbumTracks(
 ): Promise<SpotifyPagingObject<SpotifySimplifiedTrack>> {
   const { id, market, limit = 20, offset = 0 } = props;
 
-  const response = await ctx.api["GET /albums/:id/tracks"]({
+  const response = await ctx.client["GET /albums/:id/tracks"]({
     id,
     market,
     limit,

@@ -55,7 +55,7 @@ export default async function getRecentlyPlayed(
     throw new Error("Limit must be between 1 and 50");
   }
 
-  const response = await ctx.api["GET /me/player/recently-played"]({
+  const response = await ctx.client["GET /me/player/recently-played"]({
     limit,
     after,
     before,

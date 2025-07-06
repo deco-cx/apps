@@ -39,7 +39,7 @@ export default async function getTopArtists(
     throw new Error("Limit must be between 1 and 50");
   }
 
-  const response = await ctx.api["GET /me/top/artists"]({
+  const response = await ctx.client["GET /me/top/artists"]({
     time_range,
     limit,
     offset,

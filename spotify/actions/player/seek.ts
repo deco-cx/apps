@@ -29,7 +29,7 @@ export default async function seek(
     throw new Error("Position must be greater than or equal to 0");
   }
 
-  const response = await ctx.api["PUT /me/player/seek"]({
+  const response = await ctx.client["PUT /me/player/seek"]({
     position_ms,
     device_id,
   });

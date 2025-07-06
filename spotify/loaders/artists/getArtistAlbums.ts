@@ -53,7 +53,7 @@ export default async function getArtistAlbums(
     offset = 0,
   } = props;
 
-  const response = await ctx.api["GET /artists/:id/albums"]({
+  const response = await ctx.client["GET /artists/:id/albums"]({
     id,
     include_groups,
     market,

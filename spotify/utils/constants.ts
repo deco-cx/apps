@@ -16,7 +16,9 @@ export const SPOTIFY_SCOPES = [
   "user-follow-read",
   "user-follow-modify",
   "streaming",
-].join(" ");
+];
+
+export const SPOTIFY_SCOPES_STRING = SPOTIFY_SCOPES.join(" ");
 
 export const SPOTIFY_API_BASE_URL = "https://api.spotify.com/v1";
 export const SPOTIFY_OAUTH_AUTHORIZE_URL =

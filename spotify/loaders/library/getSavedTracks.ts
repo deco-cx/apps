@@ -34,7 +34,7 @@ export default async function getSavedTracks(
 ): Promise<SpotifyPagingObject<{ added_at: string; track: SpotifyTrack }>> {
   const { limit = 20, offset = 0, market } = props;
 
-  const response = await ctx.api["GET /me/tracks"]({
+  const response = await ctx.client["GET /me/tracks"]({
     limit,
     offset,
     market,

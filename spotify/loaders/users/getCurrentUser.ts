@@ -6,11 +6,11 @@ import { SpotifyUser } from "../../client.ts";
  * @description Get the complete profile of the current authenticated user
  */
 export default async function getCurrentUser(
-  _props: {},
+  _props: Record<PropertyKey, never>,
   _req: Request,
   ctx: AppContext,
 ): Promise<SpotifyUser> {
-  const response = await ctx.api["GET /me"]({});
+  const response = await ctx.client["GET /me"]({});
 
   if (!response.ok) {
     const errorText = await response.text();

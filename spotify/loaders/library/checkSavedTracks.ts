@@ -27,7 +27,7 @@ export default async function checkSavedTracks(
     throw new Error("Maximum of 50 IDs allowed at once");
   }
 
-  const response = await ctx.api["GET /me/tracks/contains"]({
+  const response = await ctx.client["GET /me/tracks/contains"]({
     ids: ids.join(","),
   });
 

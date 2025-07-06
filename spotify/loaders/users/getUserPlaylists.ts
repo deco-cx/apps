@@ -28,7 +28,7 @@ export default async function getUserPlaylists(
 ): Promise<SpotifyPagingObject<SpotifyPlaylist>> {
   const { limit = 20, offset = 0 } = props;
 
-  const response = await ctx.api["GET /me/playlists"]({
+  const response = await ctx.client["GET /me/playlists"]({
     limit,
     offset,
   });

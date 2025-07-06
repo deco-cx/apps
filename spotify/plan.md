@@ -340,7 +340,7 @@ export default async function whoami(
   _req: Request,
   ctx: AppContext,
 ) {
-  const response = await ctx.api["GET /me"]({});
+  const response = await ctx.client["GET /me"]({});
   return await response.json();
 }
 ```

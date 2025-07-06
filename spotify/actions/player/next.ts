@@ -19,7 +19,7 @@ export default async function next(
 ): Promise<{ success: boolean }> {
   const { device_id } = props;
 
-  const response = await ctx.api["POST /me/player/next"]({
+  const response = await ctx.client["POST /me/player/next"]({
     device_id,
   });
 

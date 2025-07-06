@@ -46,7 +46,7 @@ export default async function removeTracks(
     throw new Error("At least one track must be specified");
   }
 
-  const response = await ctx.api["DELETE /playlists/:playlist_id/tracks"]({
+  const response = await ctx.client["DELETE /playlists/:playlist_id/tracks"]({
     playlist_id,
   }, {
     body: {

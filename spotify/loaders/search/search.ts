@@ -60,7 +60,7 @@ export default async function search(
     include_external,
   } = props;
 
-  const response = await ctx.api["GET /search"]({
+  const response = await ctx.client["GET /search"]({
     q,
     type,
     market,

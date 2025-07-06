@@ -47,7 +47,7 @@ export default async function getFeaturedPlaylists(
     throw new Error("Limit must be between 1 and 50");
   }
 
-  const response = await ctx.api["GET /browse/featured-playlists"]({
+  const response = await ctx.client["GET /browse/featured-playlists"]({
     country,
     limit,
     offset,

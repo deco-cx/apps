@@ -19,7 +19,7 @@ export default async function pause(
 ): Promise<{ success: boolean }> {
   const { device_id } = props;
 
-  const response = await ctx.api["PUT /me/player/pause"]({
+  const response = await ctx.client["PUT /me/player/pause"]({
     device_id,
   });
 

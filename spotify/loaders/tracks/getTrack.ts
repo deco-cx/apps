@@ -26,7 +26,7 @@ export default async function getTrack(
 ): Promise<SpotifyTrack> {
   const { id, market } = props;
 
-  const response = await ctx.api["GET /tracks/:id"]({
+  const response = await ctx.client["GET /tracks/:id"]({
     id,
     market,
   });

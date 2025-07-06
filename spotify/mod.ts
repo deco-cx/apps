@@ -1,52 +1,54 @@
 import type { App, FnContext } from "@deco/deco";
 import { McpContext } from "../mcp/context.ts";
-import { fetchSafe } from "../utils/fetch.ts";
-import { createHttpClient } from "../utils/http.ts";
-import type { Secret } from "../website/loaders/secret.ts";
-import { SPOTIFY_API_BASE_URL } from "./utils/constants.ts";
-import { SpotifyClient } from "./client.ts";
+import { createOAuthHttpClient } from "../mcp/utils/httpClient.ts";
+
+import {
+  SPOTIFY_API_BASE_URL,
+  SPOTIFY_OAUTH_AUTHORIZE_URL,
+  SPOTIFY_OAUTH_TOKEN_URL,
+  SPOTIFY_SCOPES,
+} from "./utils/constants.ts";
+import { AuthClient, SpotifyClient } from "./client.ts";
+import {
+  DEFAULT_OAUTH_HEADERS,
+  OAuthClientOptions,
+  OAuthClients,
+  OAuthProvider,
+  OAuthTokens,
+} from "../mcp/oauth.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+
+export const SpotifyProvider: OAuthProvider = {
+  name: "Spotify",
+  authUrl: SPOTIFY_OAUTH_AUTHORIZE_URL,
+  tokenUrl: SPOTIFY_OAUTH_TOKEN_URL,
+  scopes: SPOTIFY_SCOPES,
+  clientId: "",
+  clientSecret: "",
+};
 
 export interface Props {
   /**
-   * @title Client ID
-   * @description Spotify application client ID. If not provided, will use SPOTIFY_CLIENT_ID from environment.
+   * @title OAuth Tokens
+   * @description OAuth tokens for authenticated requests
+   */
+  tokens?: OAuthTokens;
+
+  /**
+   * @title OAuth Client Secret
+   * @description OAuth client secret for authentication
+   */
+  clientSecret?: string;
+
+  /**
+   * @title OAuth Client ID
+   * @description OAuth client ID for authentication
    */
   clientId?: string;
-
-  /**
-   * @title Client Secret
-   * @description Spotify application client secret. If not provided, will use SPOTIFY_CLIENT_SECRET from environment.
-   */
-  clientSecret?: string | Secret;
-
-  /**
-   * @title Access Token
-   * @description Spotify OAuth2 access token
-   */
-  accessToken?: string | Secret;
-
-  /**
-   * @title Refresh Token
-   * @description Spotify OAuth2 refresh token
-   */
-  refreshToken?: string | Secret;
-
-  /**
-   * @title Scope
-   * @description OAuth2 permission scopes
-   */
-  scope?: string;
-
-  /**
-   * @title Token Type
-   * @description Token type (usually "Bearer")
-   */
-  tokenType?: string;
 }
 
 export interface State extends Props {
-  api: ReturnType<typeof createHttpClient<SpotifyClient>>;
+  client: OAuthClients<SpotifyClient, AuthClient>;
 }
 
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
@@ -57,52 +59,48 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
  * @category Music
  * @logo https://s3-alpha.figma.com/hub/file/2734964093/9f5edc36-eb4d-414a-8447-10514f2bc224-cover.png
  */
-export default function App(props: Props): App<Manifest, State> {
-  const {
-    accessToken,
-    clientId = Deno.env.get("SPOTIFY_CLIENT_ID"),
-    clientSecret = Deno.env.get("SPOTIFY_CLIENT_SECRET"),
-    refreshToken,
-    scope,
-    tokenType = "Bearer",
-  } = props;
+export default function App(
+  props: Props,
+  _req: Request,
+  ctx?: McpContext<Props>,
+): App<Manifest, State> {
+  const { tokens, clientId, clientSecret } = props;
+  console.log({ tokens, clientId, clientSecret });
 
-  // Resolve string or Secret tokens
-  const finalAccessToken = typeof accessToken === "string"
-    ? accessToken
-    : accessToken?.get?.() ?? "";
+  const spotifyProvider: OAuthProvider = {
+    ...SpotifyProvider,
+    clientId: clientId ?? "",
+    clientSecret: clientSecret ?? "",
+  };
 
-  const finalClientSecret = typeof clientSecret === "string"
-    ? clientSecret
-    : clientSecret?.get?.() ?? "";
+  const options: OAuthClientOptions = {
+    headers: DEFAULT_OAUTH_HEADERS,
+    authClientConfig: {
+      headers: new Headers({
+        "Accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+      }),
+    },
+  };
 
-  const finalRefreshToken = typeof refreshToken === "string"
-    ? refreshToken
-    : refreshToken?.get?.() ?? "";
-
-  const api = createHttpClient<SpotifyClient>({
-    base: SPOTIFY_API_BASE_URL,
-    headers: new Headers({
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-      ...(finalAccessToken
-        ? {
-          "Authorization": `${tokenType} ${finalAccessToken}`,
-        }
-        : {}),
-    }),
-    fetcher: fetchSafe,
+  const client = createOAuthHttpClient<SpotifyClient, AuthClient>({
+    provider: spotifyProvider,
+    apiBaseUrl: SPOTIFY_API_BASE_URL,
+    tokens,
+    options,
+    onTokenRefresh: async (newTokens: OAuthTokens) => {
+      if (ctx) {
+        await ctx.configure({
+          ...ctx,
+          tokens: newTokens,
+        });
+      }
+    },
   });
 
   const state: State = {
     ...props,
-    api,
-    clientId: clientId || "",
-    clientSecret: finalClientSecret,
-    accessToken: finalAccessToken,
-    refreshToken: finalRefreshToken,
-    scope,
-    tokenType,
+    client,
   };
 
   return {

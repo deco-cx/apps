@@ -439,7 +439,7 @@ export interface SpotifyClient {
     response: {
       snapshot_id: string;
     };
-    body?: {
+    body: {
       uris?: string[];
       position?: number;
     };
@@ -493,7 +493,7 @@ export interface SpotifyClient {
 
   "PUT /me/albums": {
     response: void;
-    body?: {
+    body: {
       ids: string[];
     };
     searchParams?: {
@@ -503,7 +503,7 @@ export interface SpotifyClient {
 
   "DELETE /me/albums": {
     response: void;
-    body?: {
+    body: {
       ids: string[];
     };
     searchParams?: {
@@ -532,7 +532,7 @@ export interface SpotifyClient {
 
   "PUT /me/tracks": {
     response: void;
-    body?: {
+    body: {
       ids: string[];
     };
     searchParams?: {
@@ -542,7 +542,7 @@ export interface SpotifyClient {
 
   "DELETE /me/tracks": {
     response: void;
-    body?: {
+    body: {
       ids: string[];
     };
     searchParams?: {
@@ -590,7 +590,7 @@ export interface SpotifyClient {
 
   "PUT /me/player/play": {
     response: void;
-    body?: {
+    body: {
       context_uri?: string;
       uris?: string[];
       offset?: {
@@ -723,7 +723,7 @@ export interface SpotifyClient {
 
   "PUT /me/following": {
     response: void;
-    body?: {
+    body: {
       ids: string[];
     };
     searchParams: {
@@ -734,7 +734,7 @@ export interface SpotifyClient {
 
   "DELETE /me/following": {
     response: void;
-    body?: {
+    body: {
       ids: string[];
     };
     searchParams: {
@@ -762,6 +762,25 @@ export interface SpotifyClient {
       limit?: number;
       offset?: number;
       timestamp?: string;
+    };
+  };
+}
+
+// Auth client for OAuth token operations
+export interface AuthClient {
+  "POST /api/token": {
+    response: {
+      access_token: string;
+      token_type: string;
+      scope: string;
+      expires_in: number;
+      refresh_token: string;
+    };
+    body: {
+      grant_type: "authorization_code" | "refresh_token";
+      code?: string;
+      redirect_uri?: string;
+      refresh_token?: string;
     };
   };
 }

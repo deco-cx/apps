@@ -22,9 +22,14 @@ export default async function saveAlbums(
   // Convert comma-separated string to array
   const albumIds = ids.split(",").map((id) => id.trim());
 
-  const response = await ctx.api["PUT /me/albums"]({
-    ids,
-  });
+  const response = await ctx.client["PUT /me/albums"](
+    {},
+    {
+      body: {
+        ids: albumIds,
+      },
+    },
+  );
 
   if (!response.ok) {
     const errorText = await response.text();

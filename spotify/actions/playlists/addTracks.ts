@@ -34,14 +34,14 @@ export default async function addTracks(
   // Convert comma-separated string to array
   const trackUris = uris.split(",").map((uri) => uri.trim());
 
-  const body: any = { uris: trackUris };
-  if (position !== undefined) {
-    body.position = position;
-  }
-
-  const response = await ctx.api["POST /playlists/:playlist_id/tracks"](
+  const response = await ctx.client["POST /playlists/:playlist_id/tracks"](
     { playlist_id },
-    body,
+    {
+      body: {
+        uris: trackUris,
+        ...(position !== undefined && { position }),
+      },
+    },
   );
 
   if (!response.ok) {

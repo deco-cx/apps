@@ -26,7 +26,7 @@ export default async function getPlaybackState(
 ): Promise<SpotifyPlaybackState | null> {
   const { market, additional_types } = props;
 
-  const response = await ctx.api["GET /me/player"]({
+  const response = await ctx.client["GET /me/player"]({
     market,
     additional_types,
   });

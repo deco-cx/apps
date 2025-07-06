@@ -26,7 +26,7 @@ export default async function getAlbum(
 ): Promise<SpotifyAlbum> {
   const { id, market } = props;
 
-  const response = await ctx.api["GET /albums/:id"]({
+  const response = await ctx.client["GET /albums/:id"]({
     id,
     market,
   });

@@ -6,11 +6,13 @@ import { SpotifyUser } from "../../client.ts";
  * @description Get information about the current authenticated user
  */
 export default async function whoami(
-  _props: {},
+  _props: Record<PropertyKey, never>,
   _req: Request,
   ctx: AppContext,
 ): Promise<SpotifyUser> {
-  const response = await ctx.api["GET /me"]({});
+  const response = await ctx.client["GET /me"]({});
+
+  console.log(response);
 
   if (!response.ok) {
     const errorText = await response.text();

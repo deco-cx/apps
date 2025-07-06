@@ -38,7 +38,7 @@ export default async function getPlaylist(
 ): Promise<SpotifyPlaylist> {
   const { playlist_id, market, fields, additional_types } = props;
 
-  const response = await ctx.api["GET /playlists/:playlist_id"]({
+  const response = await ctx.client["GET /playlists/:playlist_id"]({
     playlist_id,
     market,
     fields,
