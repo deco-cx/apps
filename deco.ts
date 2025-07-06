@@ -88,6 +88,7 @@ const config = {
     app("tiptap-cloud"),
     app("browser-use"),
     app("clearsale"),
+    app("spotify"),
     ...compatibilityApps,
   ],
 };
