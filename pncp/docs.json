@@ -1,0 +1,2043 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API PNCP CONSULTA",
+    "description": "API REST de serviços do Portal Nacional de Contratações Públicas (PNCP)",
+    "contact": {
+      "name": "Serviço Federal de Processamento de Dados - Serpro",
+      "url": "https://www.serpro.gov.br",
+      "email": "css.serpro@serpro.gov.br"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    { "url": "/api/consulta" },
+    { "url": "http://localhost:8080/pncp-consulta" }
+  ],
+  "tags": [
+    { "name": "Ata", "description": "Consultas de Atas de Registro de Preços" },
+    { "name": "Contratação", "description": "Consultas de Contratações" },
+    {
+      "name": "Contrato/Empenho",
+      "description": "Consultas de Contratos/Empenhos"
+    },
+    {
+      "name": "Instrumento de Cobrança de Contrato/Empenho",
+      "description": "Consultas de Instrumentos de Cobrança de Contratos/Empenhos"
+    },
+    { "name": "Contratação", "description": "Manutenção de Contratações" },
+    {
+      "name": "Plano de Contratação",
+      "description": "Consultas de Planos de Contratações"
+    }
+  ],
+  "paths": {
+    "/v1/pca/usuario": {
+      "get": {
+        "tags": ["Plano de Contratação"],
+        "summary": "Consultar Itens de PCA por Ano do PCA, IdUsuario e Código de Classificação Superior",
+        "operationId": "consultarItensPorUsuarioAno",
+        "parameters": [
+          {
+            "name": "anoPca",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "idUsuario",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          },
+          {
+            "name": "codigoClassificacaoSuperior",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "cnpj",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "required": true,
+            "schema": { "minimum": 1, "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "tamanhoPagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "maximum": 500,
+              "minimum": 10,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": { "type": "string" }
+                    },
+                    { "$ref": "#/components/schemas/RespostaErroValidacaoDTO" }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaRetornoPlanoContratacaoComItensDoUsuarioDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/pca/atualizacao": {
+      "get": {
+        "tags": ["Plano de Contratação"],
+        "summary": "Consultar PCA por Data de Atualização Global",
+        "operationId": "consultarItensPorUsuarioAno_1",
+        "parameters": [
+          {
+            "name": "dataInicio",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "dataFim",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "cnpj",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "codigoUnidade",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "required": true,
+            "schema": { "minimum": 1, "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "tamanhoPagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "maximum": 500,
+              "minimum": 10,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": { "type": "string" }
+                    },
+                    { "$ref": "#/components/schemas/RespostaErroValidacaoDTO" }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaRetornoPlanoContratacaoComItensDoUsuarioDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/pca/": {
+      "get": {
+        "tags": ["Plano de Contratação"],
+        "summary": "Consultar Itens de PCA por Ano do PCA e Código de Classificação Superior",
+        "operationId": "consultarItensPorAno",
+        "parameters": [
+          {
+            "name": "anoPca",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "codigoClassificacaoSuperior",
+            "in": "query",
+            "required": true,
+            "schema": { "maxLength": 100, "minLength": 0, "type": "string" }
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "required": true,
+            "schema": { "minimum": 1, "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "tamanhoPagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "maximum": 500,
+              "minimum": 10,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": { "type": "string" }
+                    },
+                    { "$ref": "#/components/schemas/RespostaErroValidacaoDTO" }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaRetornoPlanoContratacaoComItensDoUsuarioDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgaos/{cnpj}/compras/{ano}/{sequencial}": {
+      "get": {
+        "tags": ["Contratação"],
+        "summary": "Consultar Contratação",
+        "operationId": "consultarCompra",
+        "parameters": [
+          {
+            "name": "cnpj",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "ano",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "sequencial",
+            "in": "path",
+            "required": true,
+            "schema": { "minimum": 1, "type": "integer", "format": "int32" }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": { "type": "string" }
+                    },
+                    { "$ref": "#/components/schemas/RespostaErroValidacaoDTO" }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/RecuperarCompraDTO" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/instrumentoscobranca/inclusao": {
+      "get": {
+        "tags": ["Instrumento de Cobrança de Contrato/Empenho"],
+        "summary": "Consultar Instrumentos de Cobrança por Data de Inclusão",
+        "operationId": "consultarInstrumentos",
+        "parameters": [
+          {
+            "name": "dataInicial",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "dataFinal",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "tipoInstrumentoCobranca",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64" }
+          },
+          {
+            "name": "cnpjOrgao",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "required": true,
+            "schema": { "minimum": 1, "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "tamanhoPagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 10,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": { "type": "string" }
+                    },
+                    { "$ref": "#/components/schemas/RespostaErroValidacaoDTO" }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaRetornoConsultarInstrumentoCobrancaDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/contratos": {
+      "get": {
+        "tags": ["Contrato/Empenho"],
+        "summary": "Consultar Contratos por Data de Publicação",
+        "operationId": "consultarContratosPorDataPublicacao",
+        "parameters": [
+          {
+            "name": "dataInicial",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "dataFinal",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "cnpjOrgao",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "codigoUnidadeAdministrativa",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "usuarioId",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64" }
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "required": true,
+            "schema": { "minimum": 1, "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "tamanhoPagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "maximum": 500,
+              "minimum": 10,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": { "type": "string" }
+                    },
+                    { "$ref": "#/components/schemas/RespostaErroValidacaoDTO" }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaRetornoRecuperarContratoDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/contratos/atualizacao": {
+      "get": {
+        "tags": ["Contrato/Empenho"],
+        "summary": "Consultar Contratos/Empenhos por Data de Atualização Global",
+        "operationId": "consultarContratosPorDataAtualizacaoGlobal",
+        "parameters": [
+          {
+            "name": "dataInicial",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "dataFinal",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "cnpjOrgao",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "codigoUnidadeAdministrativa",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "usuarioId",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64" }
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "required": true,
+            "schema": { "minimum": 1, "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "tamanhoPagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "maximum": 500,
+              "minimum": 10,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": { "type": "string" }
+                    },
+                    { "$ref": "#/components/schemas/RespostaErroValidacaoDTO" }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaRetornoRecuperarContratoDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/contratacoes/publicacao": {
+      "get": {
+        "tags": ["Contratação"],
+        "summary": "Consultar Contratações por Data de Publicação",
+        "operationId": "consultarContratacaoPorDataDePublicacao",
+        "parameters": [
+          {
+            "name": "dataInicial",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "dataFinal",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "codigoModalidadeContratacao",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          },
+          {
+            "name": "codigoModoDisputa",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "uf",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "codigoMunicipioIbge",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "cnpj",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "codigoUnidadeAdministrativa",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "idUsuario",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64" }
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "required": true,
+            "schema": { "minimum": 1, "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "tamanhoPagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "maximum": 50,
+              "minimum": 10,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": { "type": "string" }
+                    },
+                    { "$ref": "#/components/schemas/RespostaErroValidacaoDTO" }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaRetornoRecuperarCompraPublicacaoDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/contratacoes/proposta": {
+      "get": {
+        "tags": ["Contratação"],
+        "summary": "Consultar Contratações com Recebimento de Propostas Aberto",
+        "operationId": "consultarContratacaoPeriodoRecebimentoPropostas",
+        "parameters": [
+          {
+            "name": "dataFinal",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "codigoModalidadeContratacao",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64" }
+          },
+          {
+            "name": "uf",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "codigoMunicipioIbge",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "cnpj",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "codigoUnidadeAdministrativa",
+            "in": "query",
+            "required": false,
+            "schema": { "maxLength": 30, "minLength": 1, "type": "string" }
+          },
+          {
+            "name": "idUsuario",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64" }
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "required": true,
+            "schema": { "minimum": 1, "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "tamanhoPagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "maximum": 50,
+              "minimum": 10,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": { "type": "string" }
+                    },
+                    { "$ref": "#/components/schemas/RespostaErroValidacaoDTO" }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaRetornoRecuperarCompraPublicacaoDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/contratacoes/atualizacao": {
+      "get": {
+        "tags": ["Contratação"],
+        "summary": "Consultar Contratações por Data de Atualização Global",
+        "operationId": "consultarContratacaoPorDataUltimaAtualizacao",
+        "parameters": [
+          {
+            "name": "dataInicial",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "dataFinal",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "codigoModalidadeContratacao",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          },
+          {
+            "name": "codigoModoDisputa",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "uf",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "codigoMunicipioIbge",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "cnpj",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "codigoUnidadeAdministrativa",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "idUsuario",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64" }
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "required": true,
+            "schema": { "minimum": 1, "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "tamanhoPagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "maximum": 50,
+              "minimum": 10,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": { "type": "string" }
+                    },
+                    { "$ref": "#/components/schemas/RespostaErroValidacaoDTO" }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaRetornoRecuperarCompraPublicacaoDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/atas": {
+      "get": {
+        "tags": ["Ata"],
+        "summary": "Consultar Ata de Registro de Preço por Período de Vigência",
+        "operationId": "consultarAtaRegistroPrecoPeriodo",
+        "parameters": [
+          {
+            "name": "dataInicial",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "dataFinal",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "idUsuario",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64" }
+          },
+          {
+            "name": "cnpj",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "codigoUnidadeAdministrativa",
+            "in": "query",
+            "required": false,
+            "schema": { "maxLength": 30, "minLength": 1, "type": "string" }
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "required": true,
+            "schema": { "minimum": 1, "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "tamanhoPagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "maximum": 500,
+              "minimum": 10,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": { "type": "string" }
+                    },
+                    { "$ref": "#/components/schemas/RespostaErroValidacaoDTO" }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaRetornoAtaRegistroPrecoPeriodoDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/atas/atualizacao": {
+      "get": {
+        "tags": ["Ata"],
+        "summary": "Consultar Atas de Registro de Preço por Data de Atualização Global",
+        "operationId": "consultarAtaRegistroPrecoDataAtualizacao",
+        "parameters": [
+          {
+            "name": "dataInicial",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "dataFinal",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "idUsuario",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64" }
+          },
+          {
+            "name": "cnpj",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "codigoUnidadeAdministrativa",
+            "in": "query",
+            "required": false,
+            "schema": { "maxLength": 30, "minLength": 1, "type": "string" }
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "required": true,
+            "schema": { "minimum": 1, "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "tamanhoPagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "maximum": 500,
+              "minimum": 10,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": { "type": "string" }
+                    },
+                    { "$ref": "#/components/schemas/RespostaErroValidacaoDTO" }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaRetornoAtaRegistroPrecoPeriodoDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RespostaErroValidacaoDTO": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" },
+          "path": { "type": "string" },
+          "timestamp": { "type": "string" },
+          "status": { "type": "string" },
+          "error": { "type": "string" }
+        }
+      },
+      "PaginaRetornoPlanoContratacaoComItensDoUsuarioDTO": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanoContratacaoComItensDoUsuarioDTO"
+            }
+          },
+          "totalRegistros": { "type": "integer", "format": "int64" },
+          "totalPaginas": { "type": "integer", "format": "int64" },
+          "numeroPagina": { "type": "integer", "format": "int64" },
+          "paginasRestantes": { "type": "integer", "format": "int64" },
+          "empty": { "type": "boolean" }
+        }
+      },
+      "PlanoContratacaoComItensDoUsuarioDTO": {
+        "type": "object",
+        "properties": {
+          "itens": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlanoContratacaoItemDTO" }
+          },
+          "codigoUnidade": { "type": "string" },
+          "nomeUnidade": { "type": "string" },
+          "anoPca": { "type": "integer", "format": "int32" },
+          "orgaoEntidadeRazaoSocial": { "type": "string" },
+          "orgaoEntidadeCnpj": { "type": "string" },
+          "idPcaPncp": { "type": "string" },
+          "dataPublicacaoPNCP": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataAtualizacaoGlobalPCA": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          }
+        }
+      },
+      "PlanoContratacaoItemDTO": {
+        "type": "object",
+        "properties": {
+          "descricaoItem": { "type": "string" },
+          "nomeClassificacaoCatalogo": { "type": "string" },
+          "quantidadeEstimada": { "type": "number" },
+          "pdmCodigo": { "type": "string" },
+          "dataInclusao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "numeroItem": { "type": "integer", "format": "int32" },
+          "dataAtualizacao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "valorTotal": { "type": "number" },
+          "pdmDescricao": { "type": "string" },
+          "codigoItem": { "type": "string" },
+          "unidadeRequisitante": { "type": "string" },
+          "grupoContratacaoCodigo": { "type": "string" },
+          "grupoContratacaoNome": { "type": "string" },
+          "classificacaoSuperiorCodigo": { "type": "string" },
+          "classificacaoSuperiorNome": { "type": "string" },
+          "unidadeFornecimento": { "type": "string" },
+          "valorUnitario": { "type": "number" },
+          "valorOrcamentoExercicio": { "type": "number" },
+          "dataDesejada": { "type": "string", "format": "date" },
+          "categoriaItemPcaNome": { "type": "string" },
+          "classificacaoCatalogoId": { "type": "integer", "format": "int64" }
+        }
+      },
+      "ContratacaoFonteOrcamentariaDTO": {
+        "type": "object",
+        "properties": {
+          "codigo": { "type": "integer", "format": "int64" },
+          "nome": { "type": "string" },
+          "descricao": { "type": "string" },
+          "dataInclusao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          }
+        }
+      },
+      "RecuperarAmparoLegalDTO": {
+        "type": "object",
+        "properties": {
+          "descricao": { "type": "string" },
+          "nome": { "type": "string" },
+          "codigo": { "type": "integer", "format": "int64" }
+        }
+      },
+      "RecuperarCompraDTO": {
+        "type": "object",
+        "properties": {
+          "valorTotalEstimado": { "type": "number" },
+          "valorTotalHomologado": { "type": "number" },
+          "indicadorOrcamentoSigiloso": {
+            "type": "string",
+            "writeOnly": true,
+            "enum": [
+              "COMPRA_SEM_SIGILO",
+              "COMPRA_PARCIALMENTE_SIGILOSA",
+              "COMPRA_TOTALMENTE_SIGILOSA"
+            ]
+          },
+          "orcamentoSigilosoCodigo": { "type": "integer", "format": "int32" },
+          "orcamentoSigilosoDescricao": { "type": "string" },
+          "numeroControlePNCP": { "type": "string" },
+          "linkSistemaOrigem": { "type": "string" },
+          "linkProcessoEletronico": { "type": "string" },
+          "anoCompra": { "type": "integer", "format": "int32" },
+          "sequencialCompra": { "type": "integer", "format": "int32" },
+          "numeroCompra": { "type": "string" },
+          "processo": { "type": "string" },
+          "orgaoEntidade": {
+            "$ref": "#/components/schemas/RecuperarOrgaoEntidadeDTO"
+          },
+          "unidadeOrgao": {
+            "$ref": "#/components/schemas/RecuperarUnidadeOrgaoDTO"
+          },
+          "orgaoSubRogado": {
+            "$ref": "#/components/schemas/RecuperarOrgaoEntidadeDTO"
+          },
+          "unidadeSubRogada": {
+            "$ref": "#/components/schemas/RecuperarUnidadeOrgaoDTO"
+          },
+          "modalidadeId": { "type": "integer", "format": "int64" },
+          "modalidadeNome": { "type": "string" },
+          "justificativaPresencial": { "type": "string" },
+          "modoDisputaId": { "type": "integer", "format": "int64" },
+          "modoDisputaNome": { "type": "string" },
+          "tipoInstrumentoConvocatorioCodigo": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tipoInstrumentoConvocatorioNome": { "type": "string" },
+          "amparoLegal": {
+            "$ref": "#/components/schemas/RecuperarAmparoLegalDTO"
+          },
+          "objetoCompra": { "type": "string" },
+          "informacaoComplementar": { "type": "string" },
+          "srp": { "type": "boolean" },
+          "fontesOrcamentarias": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContratacaoFonteOrcamentariaDTO"
+            }
+          },
+          "dataPublicacaoPncp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataAberturaProposta": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataEncerramentoProposta": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "situacaoCompraId": {
+            "type": "string",
+            "enum": ["1", "2", "3", "4"]
+          },
+          "situacaoCompraNome": { "type": "string" },
+          "existeResultado": { "type": "boolean" },
+          "dataInclusao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataAtualizacao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataAtualizacaoGlobal": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "usuarioNome": { "type": "string" }
+        }
+      },
+      "RecuperarOrgaoEntidadeDTO": {
+        "type": "object",
+        "properties": {
+          "cnpj": { "type": "string" },
+          "razaoSocial": { "type": "string" },
+          "poderId": { "type": "string" },
+          "esferaId": { "type": "string" }
+        }
+      },
+      "RecuperarUnidadeOrgaoDTO": {
+        "type": "object",
+        "properties": {
+          "ufNome": { "type": "string" },
+          "codigoIbge": { "type": "string" },
+          "codigoUnidade": { "type": "string" },
+          "nomeUnidade": { "type": "string" },
+          "ufSigla": { "type": "string" },
+          "municipioNome": { "type": "string" }
+        }
+      },
+      "Categoria": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "nome": { "type": "string" }
+        }
+      },
+      "ConsultarInstrumentoCobrancaDTO": {
+        "type": "object",
+        "properties": {
+          "cnpj": { "type": "string" },
+          "ano": { "type": "integer", "format": "int32" },
+          "sequencialContrato": { "type": "integer", "format": "int32" },
+          "sequencialInstrumentoCobranca": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tipoInstrumentoCobranca": {
+            "$ref": "#/components/schemas/TipoInstrumentoCobrancaDTO"
+          },
+          "numeroInstrumentoCobranca": { "type": "string" },
+          "dataEmissaoDocumento": { "type": "string", "format": "date" },
+          "observacao": { "type": "string" },
+          "chaveNFe": { "type": "string" },
+          "fonteNFe": { "type": "integer", "format": "int64" },
+          "dataConsultaNFe": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "statusResponseNFe": { "type": "string" },
+          "jsonResponseNFe": { "type": "string" },
+          "notaFiscalEletronica": {
+            "$ref": "#/components/schemas/NotaFiscalEletronicaConsultaDTO"
+          },
+          "dataInclusao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataAtualizacao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "recuperarContratoDTO": {
+            "$ref": "#/components/schemas/RecuperarContratoDTO"
+          }
+        }
+      },
+      "EventoNotaFiscalConsultaDTO": {
+        "type": "object",
+        "properties": {
+          "dataEvento": { "type": "string" },
+          "tipoEvento": { "type": "string" },
+          "evento": { "type": "string" },
+          "motivoEvento": { "type": "string" }
+        }
+      },
+      "ItemNotaFiscalConsultaDTO": {
+        "type": "object",
+        "properties": {
+          "numeroItem": { "type": "string" },
+          "descricaoProdutoServico": { "type": "string" },
+          "codigoNCM": { "type": "string" },
+          "descricaoNCM": { "type": "string" },
+          "cfop": { "type": "string" },
+          "quantidade": { "type": "string" },
+          "unidade": { "type": "string" },
+          "valorUnitario": { "type": "string" },
+          "valorTotal": { "type": "string" }
+        }
+      },
+      "NotaFiscalEletronicaConsultaDTO": {
+        "type": "object",
+        "properties": {
+          "instrumentoCobrancaId": { "type": "integer", "format": "int64" },
+          "chave": { "type": "string" },
+          "nfTransparenciaID": { "type": "integer", "format": "int64" },
+          "numero": { "type": "integer", "format": "int64" },
+          "serie": { "type": "integer", "format": "int32" },
+          "dataEmissao": { "type": "string" },
+          "niEmitente": { "type": "string" },
+          "nomeEmitente": { "type": "string" },
+          "nomeMunicipioEmitente": { "type": "string" },
+          "codigoOrgaoDestinatario": { "type": "string" },
+          "nomeOrgaoDestinatario": { "type": "string" },
+          "codigoOrgaoSuperiorDestinatario": { "type": "string" },
+          "nomeOrgaoSuperiorDestinatario": { "type": "string" },
+          "valorNotaFiscal": { "type": "string" },
+          "tipoEventoMaisRecente": { "type": "string" },
+          "dataTipoEventoMaisRecente": { "type": "string" },
+          "dataInclusao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataAtualizacao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "itens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemNotaFiscalConsultaDTO"
+            }
+          },
+          "eventos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventoNotaFiscalConsultaDTO"
+            }
+          }
+        }
+      },
+      "PaginaRetornoConsultarInstrumentoCobrancaDTO": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConsultarInstrumentoCobrancaDTO"
+            }
+          },
+          "totalRegistros": { "type": "integer", "format": "int64" },
+          "totalPaginas": { "type": "integer", "format": "int64" },
+          "numeroPagina": { "type": "integer", "format": "int64" },
+          "paginasRestantes": { "type": "integer", "format": "int64" },
+          "empty": { "type": "boolean" }
+        }
+      },
+      "RecuperarContratoDTO": {
+        "type": "object",
+        "properties": {
+          "numeroControlePncpCompra": { "type": "string" },
+          "codigoPaisFornecedor": { "type": "string" },
+          "numeroControlePNCP": { "type": "string" },
+          "receita": { "type": "boolean" },
+          "numeroParcelas": { "type": "integer", "format": "int32" },
+          "numeroRetificacao": { "type": "integer", "format": "int32" },
+          "tipoPessoaSubContratada": {
+            "type": "string",
+            "enum": ["PJ", "PF", "PE"]
+          },
+          "objetoContrato": { "type": "string" },
+          "valorInicial": { "type": "number" },
+          "valorParcela": { "type": "number" },
+          "valorGlobal": { "type": "number" },
+          "valorAcumulado": { "type": "number" },
+          "dataAtualizacaoGlobal": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "identificadorCipi": { "type": "string" },
+          "urlCipi": { "type": "string" },
+          "anoContrato": { "type": "integer", "format": "int32" },
+          "tipoContrato": { "$ref": "#/components/schemas/TipoContrato" },
+          "numeroContratoEmpenho": { "type": "string" },
+          "dataAssinatura": { "type": "string", "format": "date" },
+          "dataVigenciaInicio": { "type": "string", "format": "date" },
+          "dataVigenciaFim": { "type": "string", "format": "date" },
+          "niFornecedor": { "type": "string" },
+          "tipoPessoa": { "type": "string", "enum": ["PJ", "PF", "PE"] },
+          "orgaoEntidade": {
+            "$ref": "#/components/schemas/RecuperarOrgaoEntidadeDTO"
+          },
+          "categoriaProcesso": { "$ref": "#/components/schemas/Categoria" },
+          "dataPublicacaoPncp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataAtualizacao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "sequencialContrato": { "type": "integer", "format": "int32" },
+          "unidadeOrgao": {
+            "$ref": "#/components/schemas/RecuperarUnidadeOrgaoDTO"
+          },
+          "informacaoComplementar": { "type": "string" },
+          "processo": { "type": "string" },
+          "unidadeSubRogada": {
+            "$ref": "#/components/schemas/RecuperarUnidadeOrgaoDTO"
+          },
+          "orgaoSubRogado": {
+            "$ref": "#/components/schemas/RecuperarOrgaoEntidadeDTO"
+          },
+          "nomeRazaoSocialFornecedor": { "type": "string" },
+          "niFornecedorSubContratado": { "type": "string" },
+          "nomeFornecedorSubContratado": { "type": "string" },
+          "usuarioNome": { "type": "string" }
+        }
+      },
+      "TipoContrato": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "nome": { "type": "string" }
+        }
+      },
+      "TipoInstrumentoCobrancaDTO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "nome": { "type": "string" },
+          "descricao": { "type": "string" },
+          "dataInclusao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataAtualizacao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "statusAtivo": { "type": "boolean" }
+        }
+      },
+      "PaginaRetornoRecuperarContratoDTO": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/RecuperarContratoDTO" }
+          },
+          "totalRegistros": { "type": "integer", "format": "int64" },
+          "totalPaginas": { "type": "integer", "format": "int64" },
+          "numeroPagina": { "type": "integer", "format": "int64" },
+          "paginasRestantes": { "type": "integer", "format": "int64" },
+          "empty": { "type": "boolean" }
+        }
+      },
+      "PaginaRetornoRecuperarCompraPublicacaoDTO": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecuperarCompraPublicacaoDTO"
+            }
+          },
+          "totalRegistros": { "type": "integer", "format": "int64" },
+          "totalPaginas": { "type": "integer", "format": "int64" },
+          "numeroPagina": { "type": "integer", "format": "int64" },
+          "paginasRestantes": { "type": "integer", "format": "int64" },
+          "empty": { "type": "boolean" }
+        }
+      },
+      "RecuperarCompraPublicacaoDTO": {
+        "type": "object",
+        "properties": {
+          "numeroControlePNCP": { "type": "string" },
+          "dataAtualizacaoGlobal": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "modalidadeId": { "type": "integer", "format": "int64" },
+          "srp": { "type": "boolean" },
+          "orgaoEntidade": {
+            "$ref": "#/components/schemas/RecuperarOrgaoEntidadeDTO"
+          },
+          "anoCompra": { "type": "integer", "format": "int32" },
+          "sequencialCompra": { "type": "integer", "format": "int32" },
+          "dataInclusao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataPublicacaoPncp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataAtualizacao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "numeroCompra": { "type": "string" },
+          "unidadeOrgao": {
+            "$ref": "#/components/schemas/RecuperarUnidadeOrgaoDTO"
+          },
+          "amparoLegal": {
+            "$ref": "#/components/schemas/RecuperarAmparoLegalDTO"
+          },
+          "dataAberturaProposta": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataEncerramentoProposta": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "informacaoComplementar": { "type": "string" },
+          "processo": { "type": "string" },
+          "objetoCompra": { "type": "string" },
+          "linkSistemaOrigem": { "type": "string" },
+          "justificativaPresencial": { "type": "string" },
+          "unidadeSubRogada": {
+            "$ref": "#/components/schemas/RecuperarUnidadeOrgaoDTO"
+          },
+          "orgaoSubRogado": {
+            "$ref": "#/components/schemas/RecuperarOrgaoEntidadeDTO"
+          },
+          "valorTotalHomologado": { "type": "number" },
+          "modoDisputaId": { "type": "integer", "format": "int64" },
+          "linkProcessoEletronico": { "type": "string" },
+          "valorTotalEstimado": { "type": "number" },
+          "modalidadeNome": { "type": "string" },
+          "modoDisputaNome": { "type": "string" },
+          "tipoInstrumentoConvocatorioCodigo": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tipoInstrumentoConvocatorioNome": { "type": "string" },
+          "fontesOrcamentarias": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContratacaoFonteOrcamentariaDTO"
+            }
+          },
+          "situacaoCompraId": {
+            "type": "string",
+            "enum": ["1", "2", "3", "4"]
+          },
+          "situacaoCompraNome": { "type": "string" },
+          "usuarioNome": { "type": "string" }
+        }
+      },
+      "AtaRegistroPrecoPeriodoDTO": {
+        "type": "object",
+        "properties": {
+          "numeroControlePNCPAta": { "type": "string" },
+          "numeroAtaRegistroPreco": { "type": "string" },
+          "anoAta": { "type": "integer", "format": "int32" },
+          "numeroControlePNCPCompra": { "type": "string" },
+          "cancelado": { "type": "boolean" },
+          "dataCancelamento": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataAssinatura": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "vigenciaInicio": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "vigenciaFim": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataPublicacaoPncp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataInclusao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataAtualizacao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "dataAtualizacaoGlobal": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-16T17:29:58"
+          },
+          "usuario": { "type": "string" },
+          "objetoContratacao": { "type": "string" },
+          "cnpjOrgao": { "type": "string" },
+          "nomeOrgao": { "type": "string" },
+          "cnpjOrgaoSubrogado": { "type": "string" },
+          "nomeOrgaoSubrogado": { "type": "string" },
+          "codigoUnidadeOrgao": { "type": "string" },
+          "nomeUnidadeOrgao": { "type": "string" },
+          "codigoUnidadeOrgaoSubrogado": { "type": "string" },
+          "nomeUnidadeOrgaoSubrogado": { "type": "string" }
+        }
+      },
+      "PaginaRetornoAtaRegistroPrecoPeriodoDTO": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AtaRegistroPrecoPeriodoDTO"
+            }
+          },
+          "totalRegistros": { "type": "integer", "format": "int64" },
+          "totalPaginas": { "type": "integer", "format": "int64" },
+          "numeroPagina": { "type": "integer", "format": "int64" },
+          "paginasRestantes": { "type": "integer", "format": "int64" },
+          "empty": { "type": "boolean" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
