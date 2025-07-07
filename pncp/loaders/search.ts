@@ -61,7 +61,7 @@ interface Props {
  */
 const loader = async (
   props: Props,
-  _req: Request
+  _req: Request,
 ): Promise<SearchResults> => {
   const { pagina = 1, tam_pagina = 10, ...searchParams } = props;
 
