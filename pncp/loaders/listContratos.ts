@@ -54,4 +54,4 @@ const loader = async (
   return response.json();
 };
 
-export default loader; 
+export default loader;

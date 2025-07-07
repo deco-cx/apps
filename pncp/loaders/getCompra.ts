@@ -27,13 +27,14 @@ const loader = async (
 ): Promise<RecuperarCompraDTO> => {
   const { cnpj, ano, sequencial } = props;
 
-  const response = await ctx.api["GET /v1/orgaos/:cnpj/compras/:ano/:sequencial"]({
-    cnpj,
-    ano: ano.toString(),
-    sequencial: sequencial.toString(),
-  });
+  const response = await ctx.api
+    ["GET /v1/orgaos/:cnpj/compras/:ano/:sequencial"]({
+      cnpj,
+      ano: ano.toString(),
+      sequencial: sequencial.toString(),
+    });
 
   return response.json();
 };
 
-export default loader; 
+export default loader;

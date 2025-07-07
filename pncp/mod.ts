@@ -46,4 +46,4 @@ export default function App(props: Props): App<Manifest, State> {
 export interface State {
   api: ReturnType<typeof createHttpClient<PNCPClient>>;
   token: string;
-} 
+}

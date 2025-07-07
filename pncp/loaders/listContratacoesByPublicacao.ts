@@ -11,31 +11,43 @@ interface Props {
    */
   dataFinal: string;
   /**
-   * @description Code of the contracting modality
+   * @description Code of the contracting modality. Common values:
+   * - 1: Concorrência
+   * - 2: Tomada de Preços
+   * - 3: Convite
+   * - 4: Concurso
+   * - 5: Leilão
+   * - 6: Pregão Eletrônico
+   * - 7: Pregão Presencial
+   * - 8: Dispensa
+   * - 9: Inexigibilidade
    */
   codigoModalidadeContratacao: number;
   /**
-   * @description Code of the dispute mode (optional)
+   * @description Code of the dispute mode (optional). Common values:
+   * - 1: Aberto
+   * - 2: Fechado
+   * - 3: Combinado
    */
   codigoModoDisputa?: number;
   /**
-   * @description State abbreviation (optional)
+   * @description State abbreviation (2 letters, e.g., SP, RJ, MG)
    */
   uf?: string;
   /**
-   * @description IBGE municipality code (optional)
+   * @description IBGE municipality code (7 digits)
    */
   codigoMunicipioIbge?: string;
   /**
-   * @description Organization CNPJ (optional)
+   * @description Organization CNPJ (14 digits, numbers only)
    */
   cnpj?: string;
   /**
-   * @description Administrative unit code (optional)
+   * @description Administrative unit code (varies by organization)
    */
   codigoUnidadeAdministrativa?: string;
   /**
-   * @description User ID (optional)
+   * @description User ID for filtering by specific user
    */
   idUsuario?: number;
   /**
@@ -44,7 +56,7 @@ interface Props {
    */
   pagina?: number;
   /**
-   * @description Page size for pagination
+   * @description Page size for pagination (max 50)
    * @default 10
    */
   tamanhoPagina?: number;
@@ -52,7 +64,7 @@ interface Props {
 
 /**
  * @title PNCP - List Procurements by Publication Date
- * @description List procurements filtered by publication date range and other criteria.
+ * @description List procurements filtered by publication date range and other criteria. This endpoint requires authentication and accesses the official PNCP API for detailed procurement data.
  */
 const loader = async (
   props: Props,
@@ -70,4 +82,4 @@ const loader = async (
   return response.json();
 };
 
-export default loader; 
+export default loader;

@@ -6,33 +6,33 @@ interface Props {
    * @description Initial date for filtering validity period (format: yyyyMMdd, e.g., 20240101)
    */
   dataInicial: string;
-  
+
   /**
    * @description Final date for filtering validity period (format: yyyyMMdd, e.g., 20241231)
    */
   dataFinal: string;
-  
+
   /**
    * @description User ID (optional)
    */
   idUsuario?: number;
-  
+
   /**
    * @description Organization CNPJ (optional)
    */
   cnpj?: string;
-  
+
   /**
    * @description Administrative unit code (optional)
    */
   codigoUnidadeAdministrativa?: string;
-  
+
   /**
    * @description Page number for pagination
    * @default 1
    */
   pagina?: number;
-  
+
   /**
    * @description Page size for pagination
    * @default 10
@@ -60,4 +60,4 @@ const loader = async (
   return response.json();
 };
 
-export default loader; 
+export default loader;

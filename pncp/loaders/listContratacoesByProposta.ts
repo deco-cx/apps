@@ -6,47 +6,47 @@ interface Props {
    * @description Final date for filtering proposals (format: yyyyMMdd, e.g., 20241231)
    */
   dataFinal: string;
-  
+
   /**
    * @title Código da Modalidade de Contratação
    * @description Código da modalidade de contratação (opcional)
    */
   codigoModalidadeContratacao?: number;
-  
+
   /**
    * @description State abbreviation (optional)
    */
   uf?: string;
-  
+
   /**
    * @title Código do Município (IBGE)
    * @description Código IBGE do município
    */
   codigoMunicipioIbge?: string;
-  
+
   /**
    * @description Organization CNPJ (optional)
    */
   cnpj?: string;
-  
+
   /**
    * @title Código da Unidade Administrativa
    * @description Código da unidade administrativa (máximo 30 caracteres)
    * @maxLength 30
    */
   codigoUnidadeAdministrativa?: string;
-  
+
   /**
    * @description User ID (optional)
    */
   idUsuario?: number;
-  
+
   /**
    * @description Page number for pagination
    * @default 1
    */
   pagina?: number;
-  
+
   /**
    * @description Page size for pagination
    * @default 10
@@ -74,4 +74,4 @@ const loader = async (
   return response.json();
 };
 
-export default loader; 
+export default loader;

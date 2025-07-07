@@ -117,7 +117,8 @@ export interface PlanoContratacaoComItensDoUsuarioDTO {
   dataAtualizacaoGlobalPCA?: string;
 }
 
-export type PaginaRetornoPlanoContratacaoComItensDoUsuarioDTO = PaginaRetornoBase<PlanoContratacaoComItensDoUsuarioDTO>;
+export type PaginaRetornoPlanoContratacaoComItensDoUsuarioDTO =
+  PaginaRetornoBase<PlanoContratacaoComItensDoUsuarioDTO>;
 
 // Orgão/Entidade Types
 export interface RecuperarOrgaoEntidadeDTO {
@@ -227,7 +228,9 @@ export interface RecuperarCompraPublicacaoDTO {
   usuarioNome?: string;
 }
 
-export type PaginaRetornoRecuperarCompraPublicacaoDTO = PaginaRetornoBase<RecuperarCompraPublicacaoDTO>;
+export type PaginaRetornoRecuperarCompraPublicacaoDTO = PaginaRetornoBase<
+  RecuperarCompraPublicacaoDTO
+>;
 
 // Contrato Types
 export interface Categoria {
@@ -280,7 +283,9 @@ export interface RecuperarContratoDTO {
   usuarioNome?: string;
 }
 
-export type PaginaRetornoRecuperarContratoDTO = PaginaRetornoBase<RecuperarContratoDTO>;
+export type PaginaRetornoRecuperarContratoDTO = PaginaRetornoBase<
+  RecuperarContratoDTO
+>;
 
 // Ata Types
 export interface AtaRegistroPrecoPeriodoDTO {
@@ -309,7 +314,9 @@ export interface AtaRegistroPrecoPeriodoDTO {
   nomeUnidadeOrgaoSubrogado?: string;
 }
 
-export type PaginaRetornoAtaRegistroPrecoPeriodoDTO = PaginaRetornoBase<AtaRegistroPrecoPeriodoDTO>;
+export type PaginaRetornoAtaRegistroPrecoPeriodoDTO = PaginaRetornoBase<
+  AtaRegistroPrecoPeriodoDTO
+>;
 
 // Instrumento de Cobrança Types
 export interface TipoInstrumentoCobrancaDTO {
@@ -383,7 +390,9 @@ export interface ConsultarInstrumentoCobrancaDTO {
   recuperarContratoDTO?: RecuperarContratoDTO;
 }
 
-export type PaginaRetornoConsultarInstrumentoCobrancaDTO = PaginaRetornoBase<ConsultarInstrumentoCobrancaDTO>;
+export type PaginaRetornoConsultarInstrumentoCobrancaDTO = PaginaRetornoBase<
+  ConsultarInstrumentoCobrancaDTO
+>;
 
 // Main Client Interface
 export interface PNCPClient {
@@ -542,4 +551,4 @@ export interface PNCPClient {
       tamanhoPagina?: number;
     };
   };
-} 
+}
