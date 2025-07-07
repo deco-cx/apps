@@ -3,38 +3,32 @@ import { PaginaRetornoAtaRegistroPrecoPeriodoDTO } from "../client.ts";
 
 interface Props {
   /**
-   * @description Initial date for filtering validity period (format: yyyyMMdd, e.g., 20240101)
+   * @description Initial date for filtering validity period (format: yyyyMMdd, e.g., 20240101). Filters price registration records that are valid from this date onwards.
    */
   dataInicial: string;
-
   /**
-   * @description Final date for filtering validity period (format: yyyyMMdd, e.g., 20241231)
+   * @description Final date for filtering validity period (format: yyyyMMdd, e.g., 20241231). Filters price registration records that are valid up to this date.
    */
   dataFinal: string;
-
   /**
-   * @description User ID (optional)
+   * @description User ID for filtering by specific user
    */
   idUsuario?: number;
-
   /**
-   * @description Organization CNPJ (optional)
+   * @description Organization CNPJ (14 digits, numbers only). Example: 01615784000125
    */
   cnpj?: string;
-
   /**
-   * @description Administrative unit code (optional)
+   * @description Administrative unit code (varies by organization). Example: 01
    */
   codigoUnidadeAdministrativa?: string;
-
   /**
    * @description Page number for pagination
    * @default 1
    */
   pagina?: number;
-
   /**
-   * @description Page size for pagination
+   * @description Page size for pagination (max 500)
    * @default 10
    */
   tamanhoPagina?: number;
@@ -42,7 +36,7 @@ interface Props {
 
 /**
  * @title PNCP - List Price Registration Records
- * @description List price registration records (atas) filtered by validity period and other criteria.
+ * @description List price registration records (atas) filtered by validity period and other criteria. Price registration records are agreements that allow multiple purchases from pre-selected suppliers at pre-negotiated prices. Requires valid authentication token.
  */
 const loader = async (
   props: Props,

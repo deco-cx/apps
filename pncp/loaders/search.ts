@@ -26,10 +26,7 @@ interface Props {
    */
   tam_pagina?: number;
   /**
-   * @description Filter by procurement status. Required parameter.
-   * - recebendo_proposta: Currently accepting proposals (~34k results)
-   * - analise: Under analysis (~2.2M results)
-   * - encerrado: Closed/finished (~2.2M results)
+   * @description Filter by procurement status. Required parameter. Values: recebendo_proposta=Currently accepting proposals (~34k results), analise=Under analysis (~2.2M results), encerrado=Closed/finished (~2.2M results)
    */
   status: "recebendo_proposta" | "analise" | "encerrado";
   /**
@@ -64,7 +61,7 @@ interface Props {
  */
 const loader = async (
   props: Props,
-  _req: Request,
+  _req: Request
 ): Promise<SearchResults> => {
   const { pagina = 1, tam_pagina = 10, ...searchParams } = props;
 

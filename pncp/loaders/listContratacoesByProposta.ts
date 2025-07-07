@@ -3,52 +3,40 @@ import { PaginaRetornoRecuperarCompraPublicacaoDTO } from "../client.ts";
 
 interface Props {
   /**
-   * @description Final date for filtering proposals (format: yyyyMMdd, e.g., 20241231)
+   * @description Final date for filtering proposals (format: yyyyMMdd, e.g., 20241231). Only procurements with proposal deadlines up to this date will be included.
    */
   dataFinal: string;
-
   /**
-   * @title Código da Modalidade de Contratação
-   * @description Código da modalidade de contratação (opcional)
+   * @description Code of the contracting modality (optional). Common values: 1=Concorrência, 2=Tomada de Preços, 3=Convite, 4=Concurso, 5=Leilão, 6=Pregão Eletrônico (most common), 7=Pregão Presencial, 8=Dispensa, 9=Inexigibilidade
    */
   codigoModalidadeContratacao?: number;
-
   /**
-   * @description State abbreviation (optional)
+   * @description State abbreviation (2 letters, e.g., SP, RJ, MG, PB)
    */
   uf?: string;
-
   /**
-   * @title Código do Município (IBGE)
-   * @description Código IBGE do município
+   * @description IBGE municipality code (7 digits)
    */
   codigoMunicipioIbge?: string;
-
   /**
-   * @description Organization CNPJ (optional)
+   * @description Organization CNPJ (14 digits, numbers only)
    */
   cnpj?: string;
-
   /**
-   * @title Código da Unidade Administrativa
-   * @description Código da unidade administrativa (máximo 30 caracteres)
-   * @maxLength 30
+   * @description Administrative unit code (varies by organization)
    */
   codigoUnidadeAdministrativa?: string;
-
   /**
-   * @description User ID (optional)
+   * @description User ID for filtering by specific user
    */
   idUsuario?: number;
-
   /**
    * @description Page number for pagination
    * @default 1
    */
   pagina?: number;
-
   /**
-   * @description Page size for pagination
+   * @description Page size for pagination (max 50)
    * @default 10
    */
   tamanhoPagina?: number;
@@ -56,7 +44,7 @@ interface Props {
 
 /**
  * @title PNCP - List Procurements with Open Proposals
- * @description List procurements that are currently accepting proposals, filtered by end date and other criteria.
+ * @description List procurements that are currently accepting proposals, filtered by proposal deadline and other criteria. This endpoint shows active bidding opportunities where suppliers can still submit proposals. Requires valid authentication token.
  */
 const loader = async (
   props: Props,

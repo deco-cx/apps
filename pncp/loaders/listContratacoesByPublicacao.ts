@@ -11,23 +11,11 @@ interface Props {
    */
   dataFinal: string;
   /**
-   * @description Code of the contracting modality. Common values:
-   * - 1: Concorrência
-   * - 2: Tomada de Preços
-   * - 3: Convite
-   * - 4: Concurso
-   * - 5: Leilão
-   * - 6: Pregão Eletrônico
-   * - 7: Pregão Presencial
-   * - 8: Dispensa
-   * - 9: Inexigibilidade
+   * @description Code of the contracting modality. Common values: 1=Concorrência, 2=Tomada de Preços, 3=Convite, 4=Concurso, 5=Leilão, 6=Pregão Eletrônico, 7=Pregão Presencial, 8=Dispensa, 9=Inexigibilidade
    */
   codigoModalidadeContratacao: number;
   /**
-   * @description Code of the dispute mode (optional). Common values:
-   * - 1: Aberto
-   * - 2: Fechado
-   * - 3: Combinado
+   * @description Code of the dispute mode (optional). Common values: 1=Aberto, 2=Fechado, 3=Combinado
    */
   codigoModoDisputa?: number;
   /**
