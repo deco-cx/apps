@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("pncp"),
     app("google-calendar"),
     app("apify"),
     app("google-docs"),
