@@ -592,8 +592,6 @@ export interface PostalAddress extends Omit<ContactPoint, "@type"> {
   addressLocality?: string;
   /** The region in which the locality is, and which is in the country. For example, California. */
   addressRegion?: string;
-  /** The district in which the locality is, and which is in the region. For example, San Francisco. */
-  addressDistrict?: string;
   /** The postal code. For example, 94043. */
   postalCode?: string;
   /** The street address. For example, 1600 Amphitheatre Pkwy. */

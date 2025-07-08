@@ -1,5 +1,6 @@
 import { PostalAddress } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
+import { toPostalAddress } from "../../utils/transform.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
 
 interface AddressInput {
@@ -127,20 +128,12 @@ async function action(
     { headers: { cookie } },
   );
 
-  return {
-    "@type": "PostalAddress",
-    "@id": savedAddress.id,
-    name: savedAddress.addressName,
-    additionalType: savedAddress.addressType,
-    alternateName: savedAddress.receiverName,
-    addressLocality: savedAddress.city,
-    addressRegion: savedAddress.state,
-    addressCountry: savedAddress.country,
-    postalCode: savedAddress.postalCode,
-    streetAddress: savedAddress.street,
-    description: savedAddress.complement,
-    disambiguatingDescription: savedAddress.reference,
-  };
+  return toPostalAddress({
+    ...savedAddress,
+    addressId: savedAddress.id || "",
+    complement: savedAddress.complement || null,
+    receiverName: savedAddress.receiverName || null,
+  });
 }
 
 export const defaultVisibility = "private";
