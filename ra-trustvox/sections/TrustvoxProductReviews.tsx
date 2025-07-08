@@ -57,8 +57,9 @@ export default function TrustvoxProductReviews(
     </>
   );
 }
-export const loader = (_props: unknown, _req: Request, ctx: AppContext) => {
+export const loader = (props: Props, _req: Request, ctx: AppContext) => {
   return {
+    ...props,
     storeId: ctx.storeId,
     enableStaging: ctx.enableStaging,
   };
