@@ -1284,5 +1284,7 @@ export const toPostalAddress = (address: Address): PostalAddress => {
     alternateName: address.receiverName || undefined,
     description: address.complement || undefined,
     disambiguatingDescription: address.reference || undefined,
+    latitude: address.geoCoordinates?.[0] || undefined,
+    longitude: address.geoCoordinates?.[1] || undefined,
   };
 };
