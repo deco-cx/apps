@@ -2,7 +2,7 @@ import { AppContext } from "../../mod.ts";
 import { CreateEventParams, Event } from "../../utils/types.ts";
 
 export interface Props extends Omit<CreateEventParams, "calendarId"> {
-  /** ID do calendário onde criar o evento */
+  /** ID do calendario onde criar o evento */
   calendarId: string;
   /** Dados do evento a ser criado */
   event: Omit<
@@ -20,7 +20,7 @@ export interface Props extends Omit<CreateEventParams, "calendarId"> {
 
 /**
  * @title Criar Evento
- * @description Cria um novo evento no calendário especificado
+ * @description Cria um novo evento no calendario especificado
  */
 export default async function createEvent(
   props: Props,

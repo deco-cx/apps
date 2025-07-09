@@ -1,16 +1,16 @@
 import { AppContext } from "../../mod.ts";
 
 export interface Props {
-  /** ID do calendário onde criar o evento */
+  /** ID do calendario onde criar o evento */
   calendarId: string;
-  /** Texto descrevendo o evento (ex: "Reunião com cliente amanhã às 14h") */
+  /** Texto descrevendo o evento (ex: "Reuniao com cliente amanha as 14h") */
   text: string;
-  /** Se deve enviar notificações sobre a criação do evento. Default é false */
+  /** Se deve enviar notificacoes sobre a criacao do evento. Default e false */
   sendNotifications?: boolean;
 }
 
 /**
- * @title Adicionar Evento Rápido
+ * @title Adicionar Evento Rapido
  * @description Cria um evento rapidamente usando texto natural
  */
 export default async function quickAddEvent(

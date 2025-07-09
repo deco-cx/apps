@@ -1,19 +1,19 @@
 import { AppContext } from "../../mod.ts";
 
 export interface Props {
-  /** ID do calendário de origem */
+  /** ID do calendario de origem */
   calendarId: string;
   /** ID do evento a ser movido */
   eventId: string;
-  /** ID do calendário de destino */
+  /** ID do calendario de destino */
   destination: string;
-  /** Se deve enviar notificações sobre a mudança. Default é false */
+  /** Se deve enviar notificacoes sobre a mudanca. Default e false */
   sendNotifications?: boolean;
 }
 
 /**
  * @title Mover Evento
- * @description Move um evento de um calendário para outro
+ * @description Move um evento de um calendario para outro
  */
 export default async function moveEvent(
   props: Props,
