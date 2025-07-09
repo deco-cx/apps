@@ -278,6 +278,8 @@ export interface CreateEventParams {
   maxAttendees?: number;
   /** Whether to support v2 of calendar attachments. Default is false. */
   supportsAttachments?: boolean;
+  /** Version of conference data supported by the API client. Default is 1. */
+  conferenceDataVersion?: number;
 }
 
 export interface UpdateEventParams extends CreateEventParams {

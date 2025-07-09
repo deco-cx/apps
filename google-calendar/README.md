@@ -19,16 +19,50 @@ Este app integra o Google Calendar com o MCP (Model Context Protocol), fornecend
 ## Ações Disponíveis
 
 ### Eventos
-- `create.ts` - Criar novo evento
+- `create.ts` - **Criar novo evento (com opção de Google Meet automático)** 🎥 (Atualizada)
 - `decline.ts` - **Negar convite de evento** ✨ (Nova funcionalidade)
 - `delete.ts` - Excluir evento completamente
 - `move.ts` - Mover evento entre calendários
-- `quickAdd.ts` - Criar evento com texto natural
+- `quickAdd.ts` - **Criar evento com texto natural (com opção de Google Meet automático)** 🎥 (Atualizada)
 - `update.ts` - Atualizar evento existente
 
 ### Exemplo de Uso
 
 ```typescript
+// Para criar um evento com Google Meet automático
+await ctx.invoke["google-calendar"].actions.events.create({
+  calendarId: "primary",
+  event: {
+    summary: "Reunião de Planejamento",
+    start: { dateTime: "2024-01-15T14:00:00-03:00" },
+    end: { dateTime: "2024-01-15T15:00:00-03:00" },
+    attendees: [
+      { email: "participante1@email.com" },
+      { email: "participante2@email.com" }
+    ]
+  },
+  addGoogleMeet: true // NOVO: Adiciona link do Google Meet automaticamente
+});
+
+// Para criar um evento rápido com Google Meet automático
+await ctx.invoke["google-calendar"].actions.events.quickAdd({
+  calendarId: "primary",
+  text: "Reunião com cliente amanhã às 14h",
+  addGoogleMeet: true, // NOVO: Adiciona link do Google Meet automaticamente
+  sendNotifications: true
+});
+
+// Para criar um evento normal sem Google Meet
+await ctx.invoke["google-calendar"].actions.events.create({
+  calendarId: "primary",
+  event: {
+    summary: "Evento sem Meet",
+    start: { dateTime: "2024-01-15T14:00:00-03:00" },
+    end: { dateTime: "2024-01-15T15:00:00-03:00" }
+  },
+  addGoogleMeet: false // Ou omitir esta propriedade (default é false)
+});
+
 // Para negar um convite (mantém o evento, mas nega participação)
 await ctx.invoke["google-calendar"].actions.events.decline({
   calendarId: "primary",
