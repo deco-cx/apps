@@ -121,6 +121,8 @@ export interface EventAttendee {
   self?: boolean;
   /** Whether the attendee is the organizer of the event. */
   organizer?: boolean;
+  /** The attendee's response comment. */
+  comment?: string;
 }
 
 export interface EventReminder {
