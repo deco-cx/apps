@@ -12,7 +12,6 @@ export interface Props {
  * @name LIST_CAPTIONS
  * @title List Video Captions
  * @description Lists all available caption tracks for a specific video.
- * @internal true
  */
 export default async function list(
   props: Props,

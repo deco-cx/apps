@@ -29,8 +29,8 @@ import * as $$$5 from "./loaders/livestreams/list.ts";
 import * as $$$6 from "./loaders/livestreams/streams.ts";
 import * as $$$7 from "./loaders/oauth/start.ts";
 import * as $$$8 from "./loaders/oauth/whoami.ts";
-import * as $$$9 from "./loaders/videos/captions.ts";
-import * as $$$10 from "./loaders/videos/captions/get.ts";
+import * as $$$9 from "./loaders/videos/captions/get.ts";
+import * as $$$10 from "./loaders/videos/captions/getFormated.ts";
 import * as $$$11 from "./loaders/videos/captions/list.ts";
 import * as $$$12 from "./loaders/videos/categories.ts";
 import * as $$$13 from "./loaders/videos/channelVideos.ts";
@@ -49,8 +49,8 @@ const manifest = {
     "google-youtube/loaders/livestreams/streams.ts": $$$6,
     "google-youtube/loaders/oauth/start.ts": $$$7,
     "google-youtube/loaders/oauth/whoami.ts": $$$8,
-    "google-youtube/loaders/videos/captions.ts": $$$9,
-    "google-youtube/loaders/videos/captions/get.ts": $$$10,
+    "google-youtube/loaders/videos/captions/get.ts": $$$9,
+    "google-youtube/loaders/videos/captions/getFormated.ts": $$$10,
     "google-youtube/loaders/videos/captions/list.ts": $$$11,
     "google-youtube/loaders/videos/categories.ts": $$$12,
     "google-youtube/loaders/videos/channelVideos.ts": $$$13,

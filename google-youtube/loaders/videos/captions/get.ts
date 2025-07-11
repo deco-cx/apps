@@ -40,7 +40,9 @@ export default async function get(
 
   try {
     if (!ctx.tokens?.access_token) {
-      throw new Error("Access token not available");
+      throw new Error(
+        "Authentication required. Please authenticate with YouTube first.",
+      );
     }
 
     const accessToken = ctx.tokens.access_token;
@@ -66,6 +68,12 @@ export default async function get(
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error(
+          "Authentication token expired or invalid. Please refresh your YouTube authentication.",
+        );
+      }
+
       if (response.status === 400 && tfmt !== "vtt") {
         const fallbackParams = new URLSearchParams();
         fallbackParams.append("tfmt", "vtt");
@@ -87,20 +95,49 @@ export default async function get(
         });
 
         if (!fallbackResponse.ok) {
+          let errorDetails = "";
+          try {
+            const errorJson = await fallbackResponse.json();
+            errorDetails = JSON.stringify(errorJson);
+          } catch {
+            errorDetails = `Status code: ${fallbackResponse.status}`;
+          }
+
           throw new Error(
-            `Failed to fetch caption: ${fallbackResponse.status}`,
+            `Failed to fetch caption with fallback format: ${errorDetails}`,
           );
         }
 
         return await fallbackResponse.text();
       }
 
-      throw new Error(`Failed to fetch caption: ${response.status}`);
+      let errorDetails = "";
+      try {
+        const errorJson = await response.json();
+        errorDetails = JSON.stringify(errorJson);
+      } catch {
+        errorDetails = `Status code: ${response.status}`;
+      }
+
+      throw new Error(`Failed to fetch caption: ${errorDetails}`);
     }
 
     return await response.text();
-  } catch (error) {
-    throw ctx.errorHandler.toHttpError(
+  } catch (error: unknown) {
+    if (
+      error instanceof Error &&
+      (error.message.includes("Authentication required") ||
+        error.message.includes("token expired") ||
+        error.message.includes("invalid"))
+    ) {
+      ctx.errorHandler.toHttpError(
+        error,
+        error.message,
+        401,
+      );
+    }
+
+    ctx.errorHandler.toHttpError(
       error,
       `Error fetching caption with ID ${id}`,
     );
