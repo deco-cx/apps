@@ -1,19 +1,19 @@
 import { AppContext } from "../../mod.ts";
 
 export interface Props {
-  /** ID do calendário */
+  /** ID do calendario */
   calendarId: string;
   /** ID do evento a ser deletado */
   eventId: string;
-  /** Se deve enviar notificações sobre a exclusão do evento. Default é false */
+  /** Se deve enviar notificacoes sobre a exclusao do evento. Default e false */
   sendNotifications?: boolean;
-  /** Convidados que devem receber notificações sobre a exclusão do evento */
-  sendUpdates?: 'all' | 'externalOnly' | 'none';
+  /** Convidados que devem receber notificacoes sobre a exclusao do evento */
+  sendUpdates?: "all" | "externalOnly" | "none";
 }
 
 /**
  * @title Deletar Evento
- * @description Deleta um evento do calendário
+ * @description Deleta um evento do calendario
  */
 export default async function deleteEvent(
   props: Props,
@@ -21,17 +21,20 @@ export default async function deleteEvent(
   ctx: AppContext,
 ) {
   const { calendarId, eventId, ...searchParams } = props;
-  
-  const response = await ctx.client["DELETE /calendars/:calendarId/events/:eventId"]({
-    calendarId,
-    eventId,
-    ...searchParams,
-  });
+
+  const response = await ctx.client
+    ["DELETE /calendars/:calendarId/events/:eventId"]({
+      calendarId,
+      eventId,
+      ...searchParams,
+    });
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Failed to delete event: ${response.status} ${response.statusText} - ${errorText}`);
+    throw new Error(
+      `Failed to delete event: ${response.status} ${response.statusText} - ${errorText}`,
+    );
   }
 
   return { success: true, message: "Event deleted successfully" };
-} 
+}

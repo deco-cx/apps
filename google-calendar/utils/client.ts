@@ -1,4 +1,14 @@
-import { Calendar, CalendarList, CalendarListParams, Example, Event, EventsList, EventsListParams, CreateEventParams, UpdateEventParams } from "./types.ts";
+import {
+  Calendar,
+  CalendarList,
+  CalendarListParams,
+  CreateEventParams,
+  Event,
+  EventsList,
+  EventsListParams,
+  Example,
+  UpdateEventParams,
+} from "./types.ts";
 
 export interface AuthClient {
   "POST /token": {
@@ -52,7 +62,7 @@ export interface Client {
   };
   "GET /calendars/:calendarId/events": {
     response: EventsList;
-    searchParams: Omit<EventsListParams, 'calendarId'>;
+    searchParams: Omit<EventsListParams, "calendarId">;
   };
   "GET /calendars/:calendarId/events/:eventId": {
     response: Event;
@@ -67,17 +77,17 @@ export interface Client {
   };
   "POST /calendars/:calendarId/events": {
     response: Event;
-    searchParams: Omit<CreateEventParams, 'calendarId'>;
+    searchParams: Omit<CreateEventParams, "calendarId">;
     body: Event;
   };
   "PUT /calendars/:calendarId/events/:eventId": {
     response: Event;
-    searchParams: Omit<UpdateEventParams, 'calendarId' | 'eventId'>;
+    searchParams: Omit<UpdateEventParams, "calendarId" | "eventId">;
     body: Event;
   };
   "PATCH /calendars/:calendarId/events/:eventId": {
     response: Event;
-    searchParams: Omit<UpdateEventParams, 'calendarId' | 'eventId'>;
+    searchParams: Omit<UpdateEventParams, "calendarId" | "eventId">;
     body: Partial<Event>;
   };
   "DELETE /calendars/:calendarId/events/:eventId": {
@@ -86,7 +96,7 @@ export interface Client {
       /** Whether to send notifications about the deletion of the event. Default is false. */
       sendNotifications?: boolean;
       /** Guests who should receive notifications about the deletion of the event. */
-      sendUpdates?: 'all' | 'externalOnly' | 'none';
+      sendUpdates?: "all" | "externalOnly" | "none";
     };
   };
   "POST /calendars/:calendarId/events/quickAdd": {

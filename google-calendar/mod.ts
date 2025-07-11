@@ -40,7 +40,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Google Calendar
- * @description Integração com Google Calendar usando OAuth 2.0 com refresh automático de tokens
+ * @description Integracao com Google Calendar usando OAuth 2.0 com refresh automatico de tokens
  * @category Produtividade
  * @logo https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg
  */

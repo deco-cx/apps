@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("pncp"),
     app("google-calendar"),
     app("apify"),
     app("google-docs"),
@@ -88,6 +89,7 @@ const config = {
     app("tiptap-cloud"),
     app("browser-use"),
     app("clearsale"),
+    app("spotify"),
     ...compatibilityApps,
   ],
 };

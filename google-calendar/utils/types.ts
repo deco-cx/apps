@@ -90,7 +90,7 @@ export interface EventsListParams {
   /** Upper bound for an event's start time to filter by. RFC3339 timestamp. */
   timeMax?: string;
   /** The order of the events returned. Default is 'startTime'. */
-  orderBy?: 'startTime' | 'updated';
+  orderBy?: "startTime" | "updated";
   /** Token for incremental synchronization. */
   syncToken?: string;
   /** Whether to expand recurring events into instances. Default is false. */
@@ -116,16 +116,18 @@ export interface EventAttendee {
   /** Whether this is an optional attendee. */
   optional?: boolean;
   /** The attendee's response status. */
-  responseStatus?: 'needsAction' | 'declined' | 'tentative' | 'accepted';
+  responseStatus?: "needsAction" | "declined" | "tentative" | "accepted";
   /** Whether this entry represents the calendar on which this copy of the event appears. */
   self?: boolean;
   /** Whether the attendee is the organizer of the event. */
   organizer?: boolean;
+  /** The attendee's response comment. */
+  comment?: string;
 }
 
 export interface EventReminder {
   /** The method used by this reminder. */
-  method: 'email' | 'popup';
+  method: "email" | "popup";
   /** Number of minutes before the start of the event when the reminder should trigger. */
   minutes: number;
 }
@@ -138,7 +140,7 @@ export interface Event {
   /** Opaque identifier of the event. */
   id: string;
   /** Status of the event. */
-  status?: 'confirmed' | 'tentative' | 'cancelled';
+  status?: "confirmed" | "tentative" | "cancelled";
   /** HTML link to the event in Google Calendar Web UI. */
   htmlLink: string;
   /** Title of the event. */
@@ -172,9 +174,9 @@ export interface Event {
   /** For an instance of a recurring event, this is the id of the recurring event to which this instance belongs. */
   recurringEventId?: string;
   /** Whether the event blocks time on the calendar. */
-  transparency?: 'opaque' | 'transparent';
+  transparency?: "opaque" | "transparent";
   /** Visibility of the event. */
-  visibility?: 'default' | 'public' | 'private' | 'confidential';
+  visibility?: "default" | "public" | "private" | "confidential";
   /** Event unique identifier as defined in RFC5545. */
   iCalUID: string;
   /** Sequence number as per iCalendar. */
@@ -271,11 +273,13 @@ export interface CreateEventParams {
   /** Whether to send notifications about the creation of the new event. Default is false. */
   sendNotifications?: boolean;
   /** Deprecated. Please use sendNotifications instead. */
-  sendUpdates?: 'all' | 'externalOnly' | 'none';
+  sendUpdates?: "all" | "externalOnly" | "none";
   /** The maximum number of attendees to include in the response. */
   maxAttendees?: number;
   /** Whether to support v2 of calendar attachments. Default is false. */
   supportsAttachments?: boolean;
+  /** Version of conference data supported by the API client. Default is 1. */
+  conferenceDataVersion?: number;
 }
 
 export interface UpdateEventParams extends CreateEventParams {
