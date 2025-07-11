@@ -68,6 +68,13 @@ export interface Props {
   /**
    * @title Default Segment
    */
+  /**
+   * @title Set Refresh Token
+   * @description Set the refresh token in the cookies in headless login actions (actions/authentication/*)
+   * @default false
+   */
+  setRefreshToken?: boolean;
+  /**
   defaultSegment?: SegmentCulture;
   usePortalSitemap?: boolean;
   /**
