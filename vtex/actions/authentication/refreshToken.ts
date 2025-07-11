@@ -8,6 +8,10 @@ interface Props {
   fingerprint?: string;
 }
 
+/**
+ * @title VTEX Integration - Refresh Authentication Token
+ * @description This function refreshes the VTEX authentication token using current session cookies.
+ */
 export default async function refreshToken(
   props: Props,
   req: Request,
@@ -16,6 +20,10 @@ export default async function refreshToken(
   const { fingerprint } = props;
   const { vcsDeprecated } = ctx;
   const cookies = getLoginCookies({ cookies: getCookies(req.headers) });
+
+  if (!cookies.vid_rt) {
+    throw new Error("Refresh token cookie is missing");
+  }
 
   const response = await vcsDeprecated
     ["POST /api/vtexid/refreshtoken/webstore"]({}, {
@@ -50,6 +58,7 @@ export default async function refreshToken(
         name: cookie.name,
         value: cookie.value,
         httpOnly: true,
+        secure: true,
         maxAge: cookie.maxAge,
         path: cookie.path,
       });

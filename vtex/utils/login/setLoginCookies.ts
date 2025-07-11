@@ -41,11 +41,15 @@ export default async function completeLogin(
             );
 
             if (vidRtCookie) {
+                // Calculate maxAge from expires date to maintain consistency with other cookies
+                const expiresDate = new Date(vidRtCookie.expires ?? 0);
+                const maxAge = Math.max(0, Math.floor((expiresDate.getTime() - Date.now()) / 1000));
+                
                 setCookie(ctx.response.headers, {
                     name: VID_RT_COOKIE_NAME,
                     value: vidRtCookie.value,
                     httpOnly: true,
-                    expires: new Date(vidRtCookie.expires ?? 0),
+                    maxAge: maxAge,
                     path: "/",
                     secure: true,
                     sameSite: "Strict",
