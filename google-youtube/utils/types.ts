@@ -657,3 +657,5 @@ export interface YoutubeCategoryListResponse {
     details?: unknown;
   };
 }
+
+export type LegendOptions = "sbv" | "scc" | "srt" | "ttml" | "vtt";

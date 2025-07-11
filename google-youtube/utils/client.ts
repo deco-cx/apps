@@ -58,18 +58,14 @@ export interface Client {
       part: string;
       videoId: string;
     };
-    headers: Headers;
   };
   "GET /captions/:id": {
     response: string;
-    pathParams: {
-      id: string;
-    };
     searchParams: {
-      tfmt?: "srt" | "sbv" | "vtt";
+      tfmt?: "sbv" | "scc" | "srt" | "ttml" | "vtt";
       tlang?: string;
+      onBehalfOfContentOwner?: string;
     };
-    headers: Headers;
   };
   "GET /commentThreads": {
     response: YouTubeCommentThreadListResponse;
