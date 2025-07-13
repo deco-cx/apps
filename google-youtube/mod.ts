@@ -51,10 +51,10 @@ export interface State extends Props {
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
- * @title Google YouTube
- * @description Integração com YouTube usando OAuth 2.0 com refresh automático de tokens
+ * @title YouTube
+ * @description Search and retrieve videos, playlists, and channels.
  * @category Social
- * @logo https://cdn.pixabay.com/photo/2021/09/11/18/21/youtube-6616310_1280.png
+ * @logo https://assets.decocache.com/mcp/cac50532-150e-437d-a996-91fd9a0c115e/YouTube.svg
  */
 export default function App(
   props: Props,

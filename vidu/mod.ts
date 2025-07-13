@@ -22,9 +22,9 @@ export interface State {
 
 /**
  * @title Vidu
- * @description An app for interacting with the Vidu Image to Video API.
+ * @description Transform text or images into video using Vidu’s AI tools.
  * @category AI & Generative
- * @logo https://asset.swimm.io/Users/user-l0dshhh3e7f6y2y2/logo-vidu.png?א=0
+ * @logo https://assets.decocache.com/mcp/551c6502-caaf-498a-82b5-d6c586244fbd/Vidu.svg
  */
 export default function App(
   props: Props,

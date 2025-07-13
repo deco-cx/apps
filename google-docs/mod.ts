@@ -51,9 +51,9 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Google Docs
- * @description Integração com Google Docs usando OAuth 2.0 com refresh automático de tokens
+ * @description Read, write, and edit content in Google Docs.
  * @category Produtividade
- * @logo https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Google_Docs_logo_%282014-2020%29.svg/1024px-Google_Docs_logo_%282014-2020%29.svg.png
+ * @logo https://assets.decocache.com/mcp/e0a00fae-ba76-487a-9f62-7b21bbb08d50/Google-Docs.svg
  */
 export default function App(
   props: Props,

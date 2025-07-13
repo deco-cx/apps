@@ -88,9 +88,9 @@ export const color = 0xf71963;
 /**
  * @name VTEX
  * @title VTEX
- * @description Interact with VTEX Commerce Platform account
+ * @description Power your store with product, inventory, and checkout tools from VTEX.
  * @category Ecommmerce
- * @logo https://raw.githubusercontent.com/deco-cx/apps/main/vtex/logo.png
+ * @logo https://assets.decocache.com/mcp/0d6e795b-cefd-4853-9a51-93b346c52c3f/VTEX.svg
  */
 export default function VTEX(
   { appKey, appToken, account, publicUrl, salesChannel, ...props }: Props,

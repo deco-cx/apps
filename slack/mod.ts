@@ -83,8 +83,8 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 /**
  * @name Slack
  * @title Slack OAuth
- * @description Send messages and interact with Slack channels using OAuth 2.0
- * @logo https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/306_Slack_logo-512.png
+ * @description Send messages and automate actions in Slack channels.
+ * @logo https://assets.decocache.com/mcp/f7e005a9-1c53-48f7-989b-955baa422be1/Slack.svg
  */
 export default function App(
   appProps: Props,

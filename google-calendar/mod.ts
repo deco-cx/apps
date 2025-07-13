@@ -40,9 +40,9 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Google Calendar
- * @description Integracao com Google Calendar usando OAuth 2.0 com refresh automatico de tokens
+ * @description Create and retrieve events from your calendar.
  * @category Produtividade
- * @logo https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg
+ * @logo https://assets.decocache.com/mcp/b5fffe71-647a-461c-aa39-3da07b86cc96/Google-Meets.svg
  */
 export default function App(
   props: Props,
