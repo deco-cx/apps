@@ -54,7 +54,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
  * @title Google Gmail
  * @description Integração com Google Gmail usando OAuth 2.0 com refresh automático de tokens
  * @category Produtividade
- * @logo https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Gmail_icon_%282020%29.svg/1024px-Gmail_icon_%282020%29.svg.png
+ * @logo https://assets.decocache.com/mcp/2dab99c8-4db1-4eaa-89c8-aeb8930e4300/gmail.svg
  */
 export default function App(
   props: Props,
