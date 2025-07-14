@@ -4,6 +4,7 @@ import {
 } from "../../../../mcp/bindings.ts";
 import type { AppContext } from "../../../mod.ts";
 
+export const DECO_CHAT_CHANNEL_ID = "@deco.chat"
 /**
  * @name DECO_CHAT_CHANNELS_LIST
  * @description This action is triggered when slack channels are needed
@@ -24,8 +25,8 @@ export default async function list(
       }),
       ...ctx.botUserId
         ? [{
-          label: "@deco.chat",
-          value: ctx.botUserId!,
+          label: DECO_CHAT_CHANNEL_ID,
+          value: DECO_CHAT_CHANNEL_ID,
         }]
         : [],
     ],
