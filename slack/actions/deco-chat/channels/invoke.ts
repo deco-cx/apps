@@ -10,6 +10,7 @@ export default async function invoke(
   _req: Request,
   ctx: AppContext,
 ) {
+  console.log("slack request", { props });
   const challenge = props.challenge;
   if (challenge) {
     return { challenge };
