@@ -22,11 +22,13 @@ export default async function invoke(
       ctx.cb.forTeam(props.event.team, joinChannel),
     ) ??
     undefined;
+  console.log({ props, joinChannel, channel, thread, linkProps });
   if (!linkProps) {
     return;
   }
 
   const config = await ctx.getConfiguration(linkProps.installId);
+  console.log({ config });
   const botId = config.botUserId;
   // avoid loops
   if (
@@ -36,6 +38,7 @@ export default async function invoke(
   ) {
     return;
   }
+  console.log({ botId });
   const client = ctx.slackClientFor(config);
   const streamCallbackUrl = linkProps.callbacks?.stream ??
     config?.callbacks?.stream;
