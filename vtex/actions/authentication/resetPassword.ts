@@ -1,7 +1,8 @@
-import { setCookie } from "std/http/mod.ts";
 import { AppContext } from "../../mod.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
 import { AuthResponse } from "../../utils/types.ts";
+import setLoginCookies from "../../utils/login/setLoginCookies.ts";
+import { getSetCookies } from "std/http/cookie.ts";
 
 export interface Props {
   email: string;
@@ -64,33 +65,8 @@ export default async function action(
   }
 
   const data: AuthResponse = await response.json();
-  if (data.authStatus === "Success") {
-    const VTEXID_EXPIRES = data.expiresIn;
-
-    if (data.authCookie) {
-      setCookie(ctx.response.headers, {
-        name: data.authCookie.Name,
-        value: data.authCookie.Value,
-        httpOnly: true,
-        maxAge: VTEXID_EXPIRES,
-        path: "/",
-        secure: true,
-      });
-    }
-
-    if (data.accountAuthCookie) {
-      setCookie(ctx.response.headers, {
-        name: data.accountAuthCookie.Name,
-        value: data.accountAuthCookie.Value,
-        httpOnly: true,
-        maxAge: VTEXID_EXPIRES,
-        path: "/",
-        secure: true,
-      });
-    }
-  }
-
-  await ctx.invoke.vtex.actions.session.editSession({});
+  const setCookies = getSetCookies(response.headers);
+  await setLoginCookies(data, ctx, setCookies);
 
   return data;
 }

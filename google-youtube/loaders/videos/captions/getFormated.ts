@@ -1,6 +1,6 @@
-import { AppContext } from "../../mod.ts";
-import { YouTubeCaptionListResponse } from "../../utils/types.ts";
-import { COMMON_ERROR_MESSAGES } from "../../utils/constant.ts";
+import { AppContext } from "../../../mod.ts";
+import { YouTubeCaptionListResponse } from "../../../utils/types.ts";
+import { COMMON_ERROR_MESSAGES } from "../../../utils/constant.ts";
 
 export interface Props {
   /**
@@ -20,18 +20,6 @@ export interface Props {
    * @description Caption output format
    */
   format?: "srt" | "sbv" | "vtt";
-
-  /**
-   * @title Translation Language
-   * @description Language code for translation
-   */
-  translationLanguage?: string;
-
-  /**
-   * @title Preferred Language
-   * @description Preferred language code to fetch caption directly
-   */
-  preferredLanguage?: string;
 
   /**
    * @title Auto Load Caption
@@ -69,8 +57,6 @@ const loader = async (
     videoId,
     captionId,
     format = "srt",
-    translationLanguage,
-    preferredLanguage,
     autoLoadCaption = true,
   } = props;
 
@@ -82,27 +68,14 @@ const loader = async (
   }
 
   try {
-    const captionsListResponse = await ctx.client["GET /captions"](
-      {
-        part: "snippet",
-        videoId,
-      },
-      {
-        headers: ctx.tokens?.access_token
-          ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
-          : {},
-      },
-    );
-
-    if (!captionsListResponse.ok) {
-      ctx.errorHandler.toHttpError(
-        captionsListResponse,
-        `Failed to fetch captions list: ${captionsListResponse.statusText}`,
+    const captionsListResponse = await ctx.invoke["google-youtube"].loaders
+      .videos.captions.list(
+        {
+          videoId,
+        },
       );
-    }
 
-    const captionsList = await captionsListResponse
-      .json() as YouTubeCaptionListResponse;
+    const captionsList = captionsListResponse;
 
     const response: CaptionResponse = {
       available: captionsList.items?.length > 0
@@ -111,7 +84,7 @@ const loader = async (
     };
 
     const targetCaptionId = captionId ||
-      findCaptionToLoad(response.available, preferredLanguage, autoLoadCaption);
+      findCaptionToLoad(response.available, autoLoadCaption);
 
     if (targetCaptionId) {
       await loadCaption(
@@ -119,7 +92,6 @@ const loader = async (
         response,
         targetCaptionId,
         format,
-        translationLanguage,
       );
     }
 
@@ -134,17 +106,9 @@ const loader = async (
 
 function findCaptionToLoad(
   available: YouTubeCaptionListResponse,
-  preferredLanguage?: string,
   autoLoadCaption = true,
 ): string | undefined {
   if (!autoLoadCaption || !available.items?.length) return undefined;
-
-  if (preferredLanguage) {
-    const preferredCaption = available.items.find(
-      (item) => item.snippet.language.startsWith(preferredLanguage),
-    );
-    if (preferredCaption) return preferredCaption.id;
-  }
 
   return available.items[0]?.id;
 }
@@ -154,31 +118,13 @@ async function loadCaption(
   response: CaptionResponse,
   captionId: string,
   format: "srt" | "sbv" | "vtt",
-  translationLanguage: string | undefined,
 ): Promise<void> {
   try {
-    const captionResponse = await ctx.client["GET /captions/:id"](
-      {
+    const captionText = await ctx.invoke["google-youtube"].loaders.videos
+      .captions.get({
         id: captionId,
-        tfmt: format,
-        tlang: translationLanguage,
-      },
-      {
-        headers: ctx.tokens?.access_token
-          ? { Authorization: `Bearer ${ctx.tokens.access_token}` }
-          : {},
-      },
-    );
+      });
 
-    if (!captionResponse.ok) {
-      ctx.errorHandler.toHttpError(
-        captionResponse,
-        `Failed to fetch caption text: ${captionResponse.statusText}`,
-      );
-      return;
-    }
-
-    const captionText = await captionResponse.text();
     response.loadedCaptionId = captionId;
     response.format = format;
 

@@ -3,11 +3,12 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$$$$0 from "./actions/events/create.ts";
-import * as $$$$$$$$$1 from "./actions/events/delete.ts";
-import * as $$$$$$$$$2 from "./actions/events/move.ts";
-import * as $$$$$$$$$3 from "./actions/events/quickAdd.ts";
-import * as $$$$$$$$$4 from "./actions/events/update.ts";
-import * as $$$$$$$$$5 from "./actions/oauth/callback.ts";
+import * as $$$$$$$$$1 from "./actions/events/decline.ts";
+import * as $$$$$$$$$2 from "./actions/events/delete.ts";
+import * as $$$$$$$$$3 from "./actions/events/move.ts";
+import * as $$$$$$$$$4 from "./actions/events/quickAdd.ts";
+import * as $$$$$$$$$5 from "./actions/events/update.ts";
+import * as $$$$$$$$$6 from "./actions/oauth/callback.ts";
 import * as $$$0 from "./loaders/calendarList/list.ts";
 import * as $$$1 from "./loaders/calendars/get.ts";
 import * as $$$2 from "./loaders/events/freeBusy.ts";
@@ -28,11 +29,12 @@ const manifest = {
   },
   "actions": {
     "google-calendar/actions/events/create.ts": $$$$$$$$$0,
-    "google-calendar/actions/events/delete.ts": $$$$$$$$$1,
-    "google-calendar/actions/events/move.ts": $$$$$$$$$2,
-    "google-calendar/actions/events/quickAdd.ts": $$$$$$$$$3,
-    "google-calendar/actions/events/update.ts": $$$$$$$$$4,
-    "google-calendar/actions/oauth/callback.ts": $$$$$$$$$5,
+    "google-calendar/actions/events/decline.ts": $$$$$$$$$1,
+    "google-calendar/actions/events/delete.ts": $$$$$$$$$2,
+    "google-calendar/actions/events/move.ts": $$$$$$$$$3,
+    "google-calendar/actions/events/quickAdd.ts": $$$$$$$$$4,
+    "google-calendar/actions/events/update.ts": $$$$$$$$$5,
+    "google-calendar/actions/oauth/callback.ts": $$$$$$$$$6,
   },
   "name": "google-calendar",
   "baseUrl": import.meta.url,

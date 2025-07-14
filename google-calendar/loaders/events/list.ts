@@ -5,7 +5,7 @@ export interface Props extends EventsListParams {}
 
 /**
  * @title Lista Eventos
- * @description Lista eventos de um calendário específico
+ * @description Lista eventos de um calendario especifico
  */
 export default async function listEvents(
   props: Props,

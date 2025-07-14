@@ -62,9 +62,9 @@ export interface State extends Props {
 
 /**
  * @title AWS
- * @description Integrate with AWS Cost Explorer API for cost analysis, budget monitoring, and billing insights
+ * @description Track cloud costs, budgets, and billing insights using AWS tools.
  * @category Analytics
- * @logo https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2xQcwKitRgXfqdi34DYlocPSEXD2G2zZipg&s
+ * @logo https://assets.decocache.com/mcp/ece686cd-c380-41e8-97c8-34616a3bf5ba/AWS.svg
  */
 export default function App(state: Props): App<Manifest, State> {
   // Validate required credentials

@@ -61,9 +61,9 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Airtable
- * @description Connect to Airtable bases and manage records, tables, and fields with OAuth 2.0 support
+ * @description Access and manage data from Airtable bases, tables, and records.
  * @category Productivity
- * @logo https://static-00.iconduck.com/assets.00/airtable-icon-512x428-olxouyvv.png
+ * @logo https://assets.decocache.com/mcp/e724f447-3b98-46c4-9194-6b79841305a2/Airtable.svg
  */
 export default function App(
   props: Props,

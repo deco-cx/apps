@@ -1,5 +1,3 @@
-export const COOKIE_EXPIRATION_TIME = 24 * 60 * 60 * 1000;
-
 export const SCOPES = [
   "https://www.googleapis.com/auth/youtube.readonly",
   "https://www.googleapis.com/auth/youtube.force-ssl",
@@ -8,9 +6,6 @@ export const SCOPES = [
 export const API_URL = "https://www.googleapis.com/youtube/v3";
 export const OAUTH_URL = "https://oauth2.googleapis.com";
 export const OAUTH_URL_AUTH = "https://accounts.google.com/o/oauth2/v2/auth";
-
-export const CLIENT_ID =
-  "1030232647128-t3lept0ser9ik2oq333pfs53l2pnkon0.apps.googleusercontent.com";
 
 // Common YouTube API parts
 export const YOUTUBE_PARTS = {

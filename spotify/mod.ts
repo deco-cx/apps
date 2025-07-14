@@ -55,9 +55,9 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Spotify
- * @description Integration with the Spotify Web API for music, playlists, playback control, and more
+ * @description Search and retrieve music, albums, artists, and playlists.
  * @category Music
- * @logo https://s3-alpha.figma.com/hub/file/2734964093/9f5edc36-eb4d-414a-8447-10514f2bc224-cover.png
+ * @logo https://assets.decocache.com/mcp/18f88493-1165-40a8-b165-31d15a367f16/Spotify.svg
  */
 export default function App(
   props: Props,

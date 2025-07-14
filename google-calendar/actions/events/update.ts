@@ -3,7 +3,7 @@ import { Event, UpdateEventParams } from "../../utils/types.ts";
 
 export interface Props
   extends Omit<UpdateEventParams, "calendarId" | "eventId"> {
-  /** ID do calendário */
+  /** ID do calendario */
   calendarId: string;
   /** ID do evento a ser atualizado */
   eventId: string;
@@ -21,13 +21,13 @@ export interface Props
       | "kind"
     >
   >;
-  /** Se deve fazer uma atualização completa (PUT) ou parcial (PATCH). Default é PATCH */
+  /** Se deve fazer uma atualizacao completa (PUT) ou parcial (PATCH). Default e PATCH */
   fullUpdate?: boolean;
 }
 
 /**
  * @title Atualizar Evento
- * @description Atualiza um evento existente no calendário
+ * @description Atualiza um evento existente no calendario
  */
 export default async function updateEvent(
   props: Props,

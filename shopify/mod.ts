@@ -57,9 +57,9 @@ export interface State extends Props {
 export const color = 0x96BF48;
 /**
  * @title Shopify
- * @description Loaders, actions and workflows for adding Shopify Commerce Platform to your website.
+ * @description Manage products, carts, and checkout flows across channels.
  * @category Ecommmerce
- * @logo https://raw.githubusercontent.com/deco-cx/apps/main/shopify/logo.png
+ * @logo https://assets.decocache.com/mcp/37122d09-6ceb-4d25-a641-11ce4af8a19b/Shopify.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { storeName, storefrontAccessToken, adminAccessToken } = props;

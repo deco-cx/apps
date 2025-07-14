@@ -8,9 +8,9 @@ export type AppContext = FnContext<State, Manifest>;
 
 /**
  * @title PNCP.gov.br
- * @description Explore and integrate with Brazil's public procurement data through the official PNCP API.
+ * @description Explore Brazil’s public procurement data via PNCP.
  * @category Government
- * @logo https://t2.tudocdn.net/668858?w=500&h=500
+ * @logo https://assets.decocache.com/mcp/41461083-ef8c-496c-a336-ba6101b0b0f4/PNCP-gov-br.svg
  */
 export default function App(): App<Manifest, State> {
   const api = createHttpClient<PNCPClient>({

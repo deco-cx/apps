@@ -15,12 +15,18 @@ export interface Props {
    * @description The number of context snippets to retrieve. Defaults to 15.
    */
   topK?: number;
+
+  /**
+   * @description Whether to include metadata in the response. Defaults to false.
+   */
+  includeMetadata?: boolean;
 }
 
 interface QueryResult {
   content: {
     type: string;
     text: string;
+    metadata?: Record<string, string>;
   }[];
 }
 
@@ -58,6 +64,9 @@ const action = async (
         return {
           type: "text",
           text,
+          metadata: props.includeMetadata
+            ? snippet.reference.file.metadata ?? {}
+            : undefined,
         };
       }),
     };

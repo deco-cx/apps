@@ -28,9 +28,9 @@ export type AppContext = FnContext<State, Manifest>;
 
 /**
  * @title Apify
- * @description Integrate with Apify platform for web scraping and automation
+ * @description Automate scraping and browser workflows with prebuilt actors.
  * @category Automation
- * @logo https://apify.com/favicon.ico
+ * @logo https://assets.decocache.com/mcp/4eda8c60-503f-4001-9edb-89de961ab7f0/Apify.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { token } = props;
