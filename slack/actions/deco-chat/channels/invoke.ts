@@ -10,14 +10,17 @@ export default async function invoke(
   _req: Request,
   ctx: AppContext,
 ) {
-  console.log("slack request", { props });
   const challenge = props.challenge;
   if (challenge) {
     return { challenge };
   }
+
+  const [channel, thread] = props.type === "event_callback"
+    ? [props.event.user, props.event.channel]
+    : [props.event.channel, props.event.channel];
   const linkProps =
     await ctx.appStorage.getItem<JoinChannelProps & { installId: string }>(
-      ctx.cb.forTeam(props.event.team, props.event.channel),
+      ctx.cb.forTeam(props.event.team, channel),
     ) ??
       undefined;
   if (!linkProps) {
@@ -40,7 +43,7 @@ export default async function invoke(
   const streamURL = new URL(streamCallbackUrl);
   streamURL.searchParams.set(
     "__d",
-    `slack-${props.event.team}-${props.event.channel}`,
+    `slack-${props.event.team}-${channel}`,
   );
   const toolCallMessageTs: Record<
     string,
@@ -55,8 +58,8 @@ export default async function invoke(
         role: "user",
       }],
       options: {
-        threadId: props.event.channel,
-        resourceId: props.event.channel,
+        threadId: thread,
+        resourceId: thread,
       },
     },
     onToolCallPart: async (toolCall) => {
@@ -92,7 +95,7 @@ export default async function invoke(
           ],
         },
       ];
-      const response = await client.postMessage(props.event.channel, "", {
+      const response = await client.postMessage(channel, "", {
         thread_ts: props.event.ts,
         blocks,
       });
@@ -153,7 +156,7 @@ export default async function invoke(
             ],
           },
         ];
-        await client.updateMessage(props.event.channel, call.ts, "", {
+        await client.updateMessage(channel, call.ts, "", {
           blocks,
         });
       }
@@ -162,7 +165,7 @@ export default async function invoke(
       buffer += part;
     },
     onErrorPart: async (err: string) => {
-      await client.postMessage(props.event.channel, `❌ Error: ${err}`, {
+      await client.postMessage(channel, `❌ Error: ${err}`, {
         thread_ts: props.event.ts,
       });
     },
@@ -170,7 +173,7 @@ export default async function invoke(
       if (linkProps.agentLink && linkProps.agentName) {
         buffer = `<${linkProps.agentLink}|${linkProps.agentName}>: ${buffer}`;
       }
-      await client.postMessage(props.event.channel, buffer, {
+      await client.postMessage(channel, buffer, {
         thread_ts: props.event.ts,
       }).then((response) => {
         if (!response.ok) {

@@ -51,7 +51,7 @@ export default async function refreshToken(
       cookie.name.startsWith("VtexIdclientAutCookie")
     ),
   ].filter((cookie) => cookie !== undefined);
-  
+
   for (const cookie of cookiesToBeSet) {
     if (cookie) {
       setCookie(ctx.response.headers, {

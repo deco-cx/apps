@@ -34,14 +34,18 @@ export default async function createEvent(
   // Configura o Google Meet automaticamente se solicitado
   const eventWithMeet: Event = {
     ...event,
-    conferenceData: addGoogleMeet ? {
-      createRequest: {
-        requestId: `meet-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        conferenceSolutionKey: {
-          type: "hangoutsMeet"
-        }
+    conferenceData: addGoogleMeet
+      ? {
+        createRequest: {
+          requestId: `meet-${Date.now()}-${
+            Math.random().toString(36).substr(2, 9)
+          }`,
+          conferenceSolutionKey: {
+            type: "hangoutsMeet",
+          },
+        },
       }
-    } : event.conferenceData,
+      : event.conferenceData,
   } as Event;
 
   const response = await ctx.client["POST /calendars/:calendarId/events"]({
@@ -60,11 +64,11 @@ export default async function createEvent(
   }
 
   const createdEvent = await response.json();
-  
+
   return {
     ...createdEvent,
     meetLink: addGoogleMeet && createdEvent.conferenceData?.entryPoints?.find(
-      (ep: any) => ep.entryPointType === "video"
+      (ep: any) => ep.entryPointType === "video",
     )?.uri,
   };
 }
