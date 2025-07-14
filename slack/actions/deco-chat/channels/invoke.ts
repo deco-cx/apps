@@ -14,9 +14,8 @@ export default async function invoke(
   if (challenge) {
     return { challenge };
   }
-
-  const [channel, thread] = props.type === "event_callback"
-    ? [props.event.user, props.event.channel]
+  const [channel, thread] = props.event.channel_type === "im"
+    ? [ctx.botUserId ?? props.event.channel, props.event.user]
     : [props.event.channel, props.event.channel];
   const linkProps =
     await ctx.appStorage.getItem<JoinChannelProps & { installId: string }>(
