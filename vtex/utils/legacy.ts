@@ -80,8 +80,7 @@ export const getMapAndTerm = (
   return [map, term];
 };
 
-
-const SEARCH_PAGE_NAME = "search"
+const SEARCH_PAGE_NAME = "search";
 export const pageTypesToBreadcrumbList = (
   pages: PageType[],
   baseUrl: string,
@@ -89,14 +88,13 @@ export const pageTypesToBreadcrumbList = (
   const filteredPages = pages
     .filter(({ pageType, name }) =>
       pageType === "Category" || pageType === "Department" ||
-      pageType === "SubCategory" || pageType === "Brand" || (pageType === "FullText" && name !== SEARCH_PAGE_NAME)
+      pageType === "SubCategory" || pageType === "Brand" ||
+      (pageType === "FullText" && name !== SEARCH_PAGE_NAME)
     );
 
   return filteredPages.map((page, index) => {
-
     const position = index + 1;
     const slug = filteredPages.slice(0, position).map((x) => slugify(x.name!));
-
 
     return ({
       "@type": "ListItem" as const,
@@ -116,6 +114,8 @@ export const pageTypesToSeo = (
   const url = new URL(baseUrl);
   const fullTextSearch = url.searchParams.get("q");
 
+  const canonical = `https://${url.host + url.pathname}`;
+
   if (
     (!current || current.pageType === "Search" ||
       current.pageType === "FullText") && fullTextSearch
@@ -123,7 +123,7 @@ export const pageTypesToSeo = (
     return {
       title: capitalize(fullTextSearch),
       description: capitalize(fullTextSearch),
-      canonical: url.href,
+      canonical,
       noIndexing: true,
     };
   }
