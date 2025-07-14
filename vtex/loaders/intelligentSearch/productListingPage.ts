@@ -314,7 +314,7 @@ const loader = async (
     selectedFacets: baseSelectedFacets,
     page,
     ...args
-  } = searchArgsOf(props, url);
+  } = searchArgsOf(props, url, ctx);
 
   const aditionalFieldsInQuery: {
     [key in keyof typeof AdditionalParameters | string]?:
