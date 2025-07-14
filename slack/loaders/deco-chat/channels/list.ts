@@ -15,11 +15,15 @@ export default async function leave(
 ): Promise<ListChannelsResponse> {
   const channels = await ctx.invoke.slack.loaders.channels({});
   return {
-    channels: channels.channels.map((ch) => {
+    channels: [...channels.channels.map((ch) => {
       return {
         label: ch.name,
         value: ch.id,
       };
     }),
+    ...ctx.botUserId ? [{
+      label: "@deco.chat",
+      value: ctx.botUserId!,
+    }] : []],
   };
 }
