@@ -1,4 +1,5 @@
 import { JoinChannelProps, processStream } from "../../../../mcp/bindings.ts";
+import { DECO_CHAT_CHANNEL_ID } from "../../../loaders/deco-chat/channels/list.ts";
 import type { AppContext, SlackWebhookPayload } from "../../../mod.ts";
 
 /**
@@ -15,20 +16,18 @@ export default async function invoke(
     return { challenge };
   }
   const [joinChannel, channel, thread] = props.event.channel_type === "im"
-    ? [ctx.botUserId ?? props.event.channel, props.event.channel, props.event.user]
+    ? [DECO_CHAT_CHANNEL_ID, props.event.channel, props.event.user]
     : [props.event.channel, props.event.channel, props.event.channel];
   const linkProps =
     await ctx.appStorage.getItem<JoinChannelProps & { installId: string }>(
       ctx.cb.forTeam(props.event.team, joinChannel),
     ) ??
     undefined;
-  console.log({ props, joinChannel, channel, thread, linkProps });
   if (!linkProps) {
     return;
   }
 
   const config = await ctx.getConfiguration(linkProps.installId);
-  console.log({ config });
   const botId = config.botUserId;
   // avoid loops
   if (
@@ -38,7 +37,6 @@ export default async function invoke(
   ) {
     return;
   }
-  console.log({ botId });
   const client = ctx.slackClientFor(config);
   const streamCallbackUrl = linkProps.callbacks?.stream ??
     config?.callbacks?.stream;
