@@ -32,8 +32,10 @@ export default async function invoke(
   // avoid loops
   if (
     botId &&
-    (props.type === "app_mention" || props.event.channel_type === "im") &&
-    props.user === botId
+    ((props.type === "app_mention" &&
+      props.user === botId) ||
+      (props.event.channel_type === "im" &&
+        props.event.user === botId))
   ) {
     return;
   }
