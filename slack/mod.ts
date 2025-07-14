@@ -32,6 +32,7 @@ export interface SlackWebhookPayload {
   user: string;
   bot_id: string;
   event: {
+    user: string;
     text: string;
     team: string;
     channel: string;

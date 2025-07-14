@@ -20,7 +20,8 @@ export default async function quickAddEvent(
   _req: Request,
   ctx: AppContext,
 ) {
-  const { calendarId, text, sendNotifications = false, addGoogleMeet = false } = props;
+  const { calendarId, text, sendNotifications = false, addGoogleMeet = false } =
+    props;
 
   // Primeiro cria o evento com quickAdd
   const quickAddResponse = await ctx.client
@@ -51,12 +52,14 @@ export default async function quickAddEvent(
         body: {
           conferenceData: {
             createRequest: {
-              requestId: `meet-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              requestId: `meet-${Date.now()}-${
+                Math.random().toString(36).substr(2, 9)
+              }`,
               conferenceSolutionKey: {
-                type: "hangoutsMeet"
-              }
-            }
-          }
+                type: "hangoutsMeet",
+              },
+            },
+          },
         },
       });
 
@@ -68,11 +71,11 @@ export default async function quickAddEvent(
     }
 
     const updatedEvent = await updateResponse.json();
-    
+
     return {
       ...updatedEvent,
       meetLink: updatedEvent.conferenceData?.entryPoints?.find(
-        (ep: any) => ep.entryPointType === "video"
+        (ep: any) => ep.entryPointType === "video",
       )?.uri,
     };
   }
