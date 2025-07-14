@@ -14,14 +14,14 @@ export default async function invoke(
   if (challenge) {
     return { challenge };
   }
-  const [channel, thread] = props.event.channel_type === "im"
-    ? [ctx.botUserId ?? props.event.channel, props.event.user]
-    : [props.event.channel, props.event.channel];
+  const [joinChannel, channel, thread] = props.event.channel_type === "im"
+    ? [ctx.botUserId ?? props.event.channel, props.event.channel, props.event.user]
+    : [props.event.channel, props.event.channel, props.event.channel];
   const linkProps =
     await ctx.appStorage.getItem<JoinChannelProps & { installId: string }>(
-      ctx.cb.forTeam(props.event.team, channel),
+      ctx.cb.forTeam(props.event.team, joinChannel),
     ) ??
-      undefined;
+    undefined;
   if (!linkProps) {
     return;
   }
@@ -31,7 +31,7 @@ export default async function invoke(
   // avoid loops
   if (
     botId &&
-    props.type === "app_mention" &&
+    (props.type === "app_mention" || props.event.channel_type === "im") &&
     props.user === botId
   ) {
     return;
