@@ -1,3 +1,6 @@
+import { PaymentData as PaymentDataOpenAPI } from "./openapi/vcs.openapi.gen.ts";
+import { ChangesAttachment } from "./openapi/vcs.openapi.gen.ts";
+
 /**
  * @format dynamic-options
  * @options vtex/loaders/options/productIdByTerm.ts
@@ -62,11 +65,12 @@ export interface ClientProfileData {
 
 export interface ClientPreferencesData {
   locale: string;
-  optinNewsLetter: null;
+  optinNewsLetter: boolean;
 }
 
 export interface ItemMetadata {
-  items: ItemMetadataItem[];
+  items?: ItemMetadataItem[];
+  Items?: ItemMetadataItemUppercase[];
 }
 
 export interface ItemMetadataItem {
@@ -80,6 +84,19 @@ export interface ItemMetadataItem {
   imageUrl: string;
   detailUrl: string;
   assemblyOptions: AssemblyOption[];
+}
+
+export interface ItemMetadataItemUppercase {
+  Id: string;
+  Seller: string;
+  Name: string;
+  SkuName: string;
+  ProductId: string;
+  RefId: string;
+  Ean: null | string;
+  ImageUrl: string;
+  DetailUrl: string;
+  AssemblyOptions: AssemblyOption[];
 }
 
 export interface AssemblyOption {
@@ -161,6 +178,12 @@ export interface AdditionalInfo {
   offeringInfo: null;
   offeringType: null;
   offeringTypeId: null;
+  categories: CategoryItem[];
+}
+
+export interface CategoryItem {
+  id: number;
+  name: string;
 }
 
 export interface AttachmentOffering {
@@ -259,11 +282,43 @@ export interface Fields {
   skuName?: string;
 }
 
+export interface Transaction {
+  isActive: boolean;
+  transactionId: string;
+  merchantName: string;
+  payments: Payment[];
+}
+
+export interface Payment {
+  id: string;
+  paymentSystem: string;
+  paymentSystemName: string;
+  value: number;
+  installments: number;
+  referenceValue: number;
+  cardHolder: string | null;
+  cardNumber: string | null;
+  firstDigits: string | null;
+  lastDigits: string | null;
+  cvv2: string | null;
+  expireMonth: string | null;
+  expireYear: string | null;
+  url: string;
+  giftCardId: null;
+  giftCardName: null;
+  giftCardCaption: null;
+  redemptionCode: null;
+  group: string;
+  tid: null;
+  dueDate: Date;
+}
+
 export interface PaymentData {
   updateStatus: string;
   installmentOptions: InstallmentOption[];
   paymentSystems: PaymentSystem[];
   payments: unknown[];
+  transactions: Transaction[];
   giftCards: unknown[];
   giftCardMessages: unknown[];
   availableAccounts: unknown[];
@@ -364,7 +419,8 @@ export interface ShippingData {
 
 export interface Address {
   addressType: string;
-  receiverName: null;
+  addressName: string;
+  receiverName: string | null;
   addressId: string;
   isDisposable: boolean;
   postalCode: string;
@@ -382,8 +438,16 @@ export interface Address {
 export interface LogisticsInfo {
   itemIndex: number;
   selectedSla: SelectedSla | null;
+  price: number;
+  listPrice: number;
+  sellingPrice: number;
+  deliveryCompany: string;
+  shippingEstimate: string;
+  shippingEstimateDate: string;
   selectedDeliveryChannel: SelectedDeliveryChannel;
   addressId: string;
+  pickupPointId: string;
+  pickupStoreInfo: PickupStoreInfo;
   slas: Sla[];
   shipsTo: string[];
   itemId: string;
@@ -1301,6 +1365,7 @@ export interface Order {
   invoiceOutput: string[];
   isAllDelivered: boolean;
   isAnyDelivered: boolean;
+  itemMetadata: ItemMetadata;
   items: OrderFormItem[];
   lastChange: string;
   lastMessageUnread: string;
@@ -1321,6 +1386,140 @@ export interface Order {
   totalValue: number;
   workflowInErrorState: boolean;
   workflowInRetry: boolean;
+}
+
+export interface Package {
+  cfop: string | null;
+  invoiceNumber: string;
+  invoiceValue: number;
+  invoiceUrl: string | null;
+  issuanceDate: string;
+  trackingNumber: string | null;
+  invoiceKey: string;
+  trackingUrl: string | null;
+  embeddedInvoice: string;
+  courierStatus: {
+    status: string | null;
+    finished: boolean;
+    deliveredDate: string;
+  };
+  type: "Input" | "Output";
+}
+
+export interface OrderItem {
+  orderId: string;
+  sequence: string;
+  origin: string;
+  sellerOrderId: string;
+  salesChannel: string;
+  affiliateId: string;
+  workflowIsInError: boolean;
+  orderGroup: string;
+  status: string;
+  statusDescription: string;
+  value: number;
+  allowCancellation: boolean;
+  allowEdition?: boolean;
+  authorizedDate: string;
+  callCenterOperatorData: string;
+  cancelReason: string;
+  packageAttachment: {
+    packages: Package[];
+  } | null;
+  cancellationData: {
+    RequestedByUser: boolean;
+    RequestedBySystem: boolean;
+    RequestedBySellerNotification: boolean;
+    RequestedByPaymentNotification: boolean;
+    Reason: string;
+    CancellationDate: string;
+  };
+  cancellationRequests?: {
+    id: string;
+    reason: string;
+    cancellationRequestDate: string;
+    requestedByUser: boolean;
+    deniedBySeller: boolean;
+    deniedBySellerReason: string | null;
+    cancellationRequestDenyDate: string | null;
+  }[] | null;
+  changesAttachment: ChangesAttachment;
+  checkedInPickupPointId: string | null;
+  paymentData: PaymentDataOpenAPI;
+  shippingData: ShippingData;
+  clientPreferencesData: ClientPreferencesData;
+  clientProfileData: ClientProfileData;
+  totals: Total[];
+  commercialConditionData?: string | null;
+  creationDate: string;
+  // deno-lint-ignore no-explicit-any
+  customData?: Record<string, any> | null;
+  followUpEmail?: string;
+  giftRegistryData?: GiftRegistry | null;
+  hostname: string;
+  invoiceData: string | null;
+  invoicedDate: string | null;
+  isCheckedIn: boolean;
+  isCompleted: boolean;
+  storePreferencesData: StorePreferencesData;
+  sellers?: {
+    id: string;
+    name: string;
+    logo: string;
+    fulfillmentEndpoint: string;
+  }[];
+  itemMetadata: ItemMetadata;
+  items: OrderFormItem[];
+  lastChange: string;
+  lastMessage: string;
+  marketingData: OrderFormMarketingData | null;
+  marketplace: Marketplace;
+  marketplaceItems: [];
+  marketplaceOrderId: string;
+  marketplaceServicesEndpoint: string;
+  merchantName: string;
+  openTextField: string | null;
+}
+
+export interface CanceledOrder {
+  date?: string;
+  orderId?: string;
+  receipt?: string | null;
+}
+
+interface CancellationData {
+  requestedByUser: true;
+  reason: string;
+  cancellationDate: string;
+  cancellationRequestId: string;
+  requestedBy: null;
+  cancellationSource: null;
+}
+
+interface Marketplace {
+  baseURL: string;
+  // deno-lint-ignore no-explicit-any
+  isCertified?: any | null;
+  name: string;
+}
+
+interface OrderFormMarketingData {
+  utmCampaign?: string;
+  utmMedium?: string;
+  utmSource?: string;
+  utmiCampaign?: string;
+  utmiPart?: string;
+  utmipage?: string;
+  marketingTags?: string | string[];
+}
+
+interface GiftRegistry {
+  attachmentId: string;
+  giftRegistryId: string;
+  giftRegistryType: string;
+  giftRegistryTypeName: string;
+  addressId: string;
+  description: string;
 }
 
 export interface Orders {
@@ -1536,3 +1735,90 @@ export interface AdvancedLoaderConfig {
 }
 
 export type Maybe<T> = T | null | undefined;
+
+export interface ReceiptData {
+  ReceiptCollection: Receipt[];
+}
+
+export interface Receipt {
+  ReceiptType: string;
+  Date: string;
+  ReceiptToken: string;
+  Source: string;
+  InvoiceNumber: string | null;
+  TransactionId: string;
+  MerchantName: string;
+  SellerOrderId: string | null;
+  ValueAsInt: number | null;
+}
+
+export interface OrderFormOrder {
+  sellers: Seller[];
+  receiptData?: ReceiptData;
+  sequence?: string;
+  marketPlaceOrderId?: string;
+  origin?: number;
+  items: OrderFormItem[];
+  giftRegistryData?: unknown;
+  contextData?: unknown;
+  marketPlaceOrderGroup?: string | null;
+  marketplaceServicesEndpoint?: string | null;
+  orderFormId?: string;
+  affiliateId?: string;
+  status?: string;
+  callCenterOperator?: string;
+  userProfileId?: string;
+  creationVersion?: string;
+  creationEnvironment?: string;
+  lastChangeVersion?: string;
+  workflowInstanceId?: string;
+  workflowInstanceGroupId?: string | null;
+  marketplacePaymentValue?: number | null;
+  marketplacePaymentReferenceValue?: number | null;
+  marketplace?: string | null;
+  orderId: string;
+  orderGroup: string;
+  state: string;
+  isCheckedIn: boolean;
+  sellerOrderId: string;
+  storeId?: string | null;
+  checkedInPickupPointId?: string | null;
+  value: number;
+  totals: Total[];
+  clientProfileData: ClientProfileData;
+  ratesAndBenefitsData: RatesAndBenefitsData;
+  shippingData: ShippingData;
+  paymentData: PaymentData;
+  clientPreferencesData: ClientPreferencesData;
+  commercialConditionData?: unknown;
+  marketingData?: MarketingData | null;
+  storePreferencesData: StorePreferencesData;
+  openTextField?: unknown;
+  invoiceData?: unknown;
+  itemMetadata: ItemMetadata;
+  taxData?: unknown;
+  customData?: unknown;
+  hooksData?: unknown;
+  changeData?: unknown;
+  subscriptionData?: unknown;
+  merchantContextData?: unknown;
+  purchaseAgentData?: unknown;
+  salesChannel: string;
+  followUpEmail?: string;
+  creationDate: string;
+  lastChange: string;
+  timeZoneCreationDate: string;
+  timeZoneLastChange: string;
+  isCompleted: boolean;
+  hostName: string;
+  merchantName?: string | null;
+  userType?: string;
+  roundingError?: number;
+  allowEdition?: boolean;
+  allowCancellation?: boolean;
+  isUserDataVisible?: boolean;
+  allowChangeSeller?: boolean;
+  cancellationData?: CancellationData;
+  orderFormCreationDate?: string;
+  marketplaceRequestedCancellationWindow?: unknown;
+}

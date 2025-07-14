@@ -15,3 +15,5 @@ export default async function loader(
 
   return pickupPoints.map((pickup) => toPlace(pickup));
 }
+
+export const cache = "stale-while-revalidate";
