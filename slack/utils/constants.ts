@@ -8,7 +8,7 @@ export const SCOPES = [
   "app_mentions:read",
   "channels:join",
   "groups:read",
-  "im:history,
+  "im:history",
   "im:read",
   "im:write",
 ];
