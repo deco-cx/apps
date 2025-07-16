@@ -77,7 +77,6 @@ export default function App(
     clientId: clientId ?? "",
     clientSecret: clientSecret ?? "",
   };
-
   const options: OAuthClientOptions = {
     headers: DEFAULT_OAUTH_HEADERS,
     authClientConfig: {
@@ -100,6 +99,30 @@ export default function App(
           tokens: newTokens,
         });
       }
+    },
+    customRefreshFunction: async (params: {
+      refresh_token: string;
+      client_id: string;
+      client_secret: string;
+    }) => {
+      const response = await fetch(OAUTH_URL_TOKEN, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json",
+          "Authorization": `Basic ${
+            btoa(`${params.client_id}:${params.client_secret}`)
+          }`,
+        },
+        body: new URLSearchParams({
+          grant_type: "refresh_token",
+          refresh_token: params.refresh_token,
+          client_id: params.client_id,
+          client_secret: params.client_secret,
+        }),
+      });
+
+      return response.json();
     },
   });
 
