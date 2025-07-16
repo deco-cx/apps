@@ -4,29 +4,36 @@ import { AppContext } from "../mod.ts";
 import { type SectionProps } from "@deco/deco";
 declare global {
   interface Window {
-    _trustvox: Array<[
-      string,
-      string | number | Array<string | undefined> | undefined,
-    ]>;
+    _trustvox: Array<
+      [string, string | number | Array<string | undefined> | undefined]
+    >;
   }
 }
 export interface Props {
   page: ProductDetailsPage | null;
+  enableVTEX?: boolean;
 }
 export default function TrustvoxProductReviews(
-  { page, storeId, enableStaging }: Props & SectionProps<typeof loader>,
+  props: Props & SectionProps<typeof loader>
 ) {
+  const { page, storeId, enableStaging, enableVTEX } = props;
   const scriptUrl = enableStaging
     ? "https://static.trustvox.com.br/trustvox-sincero-staging/sincero.js"
     : "https://static.trustvox.com.br/sincero/sincero.js";
+  const VTEX_PRODUCT_ID = page?.product?.inProductGroupWithID;
+  const VTEX_PRODUCT_NAME = page?.product?.alternateName;
   const productId = page?.product?.productID;
   const productName = page?.product?.name;
   const productImage = page?.product?.image?.[0]?.url;
+
+  const usedProductId = enableVTEX ? VTEX_PRODUCT_ID : productId;
+  const usedProductName = enableVTEX ? VTEX_PRODUCT_NAME : productName;
+
   function setupTrustvoxProductReviews(
     storeId: string,
     productId?: string,
     productName?: string,
-    productImage?: string,
+    productImage?: string
   ) {
     globalThis.window._trustvox = [];
     globalThis.window._trustvox.push(["_storeId", storeId]);
@@ -41,9 +48,9 @@ export default function TrustvoxProductReviews(
         src={scriptAsDataURI(
           setupTrustvoxProductReviews,
           storeId,
-          productId,
-          productName,
-          productImage,
+          usedProductId,
+          usedProductName,
+          productImage
         )}
       />
       <script defer type="text/javascript" src={scriptUrl} />
