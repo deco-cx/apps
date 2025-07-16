@@ -10,29 +10,7 @@ export default async function completeLogin(
   setCookies?: Cookie[],
 ) {
   if (data.authStatus === "Success") {
-    const VTEXID_EXPIRES = data.expiresIn;
-
-    if (data.authCookie) {
-      setCookie(ctx.response.headers, {
-        name: data.authCookie.Name,
-        value: data.authCookie.Value,
-        httpOnly: true,
-        maxAge: VTEXID_EXPIRES,
-        path: "/",
-        secure: true,
-      });
-    }
-
-    if (data.accountAuthCookie) {
-      setCookie(ctx.response.headers, {
-        name: data.accountAuthCookie.Name,
-        value: data.accountAuthCookie.Value,
-        httpOnly: true,
-        maxAge: VTEXID_EXPIRES,
-        path: "/",
-        secure: true,
-      });
-    }
+    let maxAge = data.expiresIn;
 
     // Set vid_rt cookie from setCookies array if available and setRefreshToken is true
     if (setCookies && ctx.setRefreshToken) {
@@ -43,7 +21,7 @@ export default async function completeLogin(
       if (vidRtCookie) {
         // Calculate maxAge from expires date to maintain consistency with other cookies
         const expiresDate = new Date(vidRtCookie.expires ?? 0);
-        const maxAge = Math.max(
+        maxAge = Math.max(
           0,
           Math.floor((expiresDate.getTime() - Date.now()) / 1000),
         );
@@ -55,9 +33,30 @@ export default async function completeLogin(
           maxAge: maxAge,
           path: "/",
           secure: true,
-          sameSite: "Strict",
         });
       }
+    }
+
+    if (data.authCookie) {
+      setCookie(ctx.response.headers, {
+        name: data.authCookie.Name,
+        value: data.authCookie.Value,
+        httpOnly: true,
+        maxAge: maxAge,
+        path: "/",
+        secure: true,
+      });
+    }
+
+    if (data.accountAuthCookie) {
+      setCookie(ctx.response.headers, {
+        name: data.accountAuthCookie.Name,
+        value: data.accountAuthCookie.Value,
+        httpOnly: true,
+        maxAge: maxAge,
+        path: "/",
+        secure: true,
+      });
     }
   }
 

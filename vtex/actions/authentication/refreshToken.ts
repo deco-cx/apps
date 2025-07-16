@@ -45,24 +45,41 @@ export default async function refreshToken(
 
   const data = await response.json();
   const setCookies = getSetCookies(response.headers);
-  const cookiesToBeSet = [
-    setCookies?.find((cookie) => cookie.name === VID_RT_COOKIE_NAME),
-    ...setCookies?.filter((cookie) =>
-      cookie.name.startsWith("VtexIdclientAutCookie")
-    ),
-  ].filter((cookie) => cookie !== undefined);
+  const vidRtCookie = setCookies?.find((cookie) =>
+    cookie.name === VID_RT_COOKIE_NAME
+  );
+  const authCookies = setCookies?.filter((cookie) =>
+    cookie.name.startsWith("VtexIdclientAutCookie")
+  ).filter((cookie) => cookie !== undefined);
 
-  for (const cookie of cookiesToBeSet) {
-    if (cookie) {
-      setCookie(ctx.response.headers, {
-        name: cookie.name,
-        value: cookie.value,
-        httpOnly: true,
-        secure: true,
-        maxAge: cookie.maxAge,
-        path: cookie.path,
-      });
-    }
+  if (!vidRtCookie) {
+    return;
+  }
+
+  const expiresDate = new Date(vidRtCookie.expires ?? 0);
+  const maxAge = Math.max(
+    0,
+    Math.floor((expiresDate.getTime() - Date.now()) / 1000),
+  );
+
+  setCookie(ctx.response.headers, {
+    name: VID_RT_COOKIE_NAME,
+    value: vidRtCookie.value,
+    httpOnly: true,
+    maxAge: maxAge,
+    path: "/",
+    secure: true,
+  });
+
+  for (const cookie of authCookies) {
+    setCookie(ctx.response.headers, {
+      name: cookie.name,
+      value: cookie.value,
+      httpOnly: true,
+      maxAge: maxAge,
+      path: "/",
+      secure: true,
+    });
   }
 
   return data;
