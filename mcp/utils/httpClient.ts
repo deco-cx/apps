@@ -7,7 +7,11 @@ import {
   OAuthTokenEndpoints,
   OAuthTokens,
 } from "./types.ts";
-import { createTokenRefresher, TokenRefresher } from "./refresh.ts";
+import {
+  createTokenRefresher,
+  CustomRefreshFunction,
+  TokenRefresher,
+} from "./refresh.ts";
 import { createOAuthProxy } from "./proxy.ts";
 import {
   DEFAULT_BUFFER_SECONDS,
@@ -29,6 +33,8 @@ export interface OAuthClientConfig<TApiClient, TAuthClient> {
   apiBaseUrl: string;
   tokens?: OAuthTokens;
   onTokenRefresh?: (newTokens: OAuthTokens) => Promise<void> | void;
+  /** Função customizada para refresh token - substitui o endpoint padrão quando definida */
+  customRefreshFunction?: CustomRefreshFunction;
   options?: OAuthClientOptions;
 }
 
@@ -118,6 +124,7 @@ export const createOAuthHttpClient = <TApiClient, TAuthClient = TApiClient>(
     provider: config.provider,
     tokenEndpoint,
     onTokenRefresh: config.onTokenRefresh,
+    customRefreshFunction: config.customRefreshFunction,
   });
 
   const fetchWithAutoRefresh = createFetchWithAutoRefresh(
