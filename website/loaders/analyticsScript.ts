@@ -14,13 +14,9 @@ export const DEFAULT_ANALYTICS_SCRIPT_URL = "https://s.lilstts.com/deco.js";
 export default async function AnalyticsScript(
   props: Props,
   _req: Request,
-  ctx: AppContext,
+  _ctx: AppContext,
 ): Promise<Response> {
   const url = props.url || DEFAULT_ANALYTICS_SCRIPT_URL;
-
-  if (ctx.disableProxy) {
-    return new Response("Proxy disabled", { status: 403 });
-  }
 
   try {
     // Fetch the script content using fetchSafe
@@ -33,7 +29,7 @@ export default async function AnalyticsScript(
     return response;
   } catch (error) {
     console.error("Error fetching analytics script:", error);
-    return new Response(`Failed to fetch analytics script: ${error.message}`, {
+    return new Response(`Failed to fetch analytics script: ${error}`, {
       status: 500,
       headers: {
         "Content-Type": "text/plain",
