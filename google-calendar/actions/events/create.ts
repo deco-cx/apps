@@ -68,6 +68,7 @@ export default async function createEvent(
   return {
     ...createdEvent,
     meetLink: addGoogleMeet && createdEvent.conferenceData?.entryPoints?.find(
+      // deno-lint-ignore no-explicit-any
       (ep: any) => ep.entryPointType === "video",
     )?.uri,
   };
