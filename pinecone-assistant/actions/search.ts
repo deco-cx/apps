@@ -68,7 +68,7 @@ const action = async (
             ? snippet.reference.file.metadata ?? {}
             : undefined,
         };
-      }),
+      }) as QueryResult["content"],
     };
   } catch (error) {
     throw error;
