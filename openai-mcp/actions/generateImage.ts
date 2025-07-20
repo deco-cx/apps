@@ -2,7 +2,6 @@ import { AppContext } from "../mod.ts";
 import { Buffer } from "node:buffer";
 import OpenAI from "npm:openai";
 
-
 export interface Props {
   /**
    * @description The presigned URLs to upload the generated images to. The images will be
@@ -148,7 +147,8 @@ export default async function generateImageAction(
   if (props.n && props.n !== presignedUrls.length) {
     return {
       success: false,
-      message: "Number of presigned URLs does not match number of images to generate.",
+      message:
+        "Number of presigned URLs does not match number of images to generate.",
     };
   }
 
@@ -158,7 +158,11 @@ export default async function generateImageAction(
 
   return {
     success: true,
-    message: `Image generation completed. ${failedResults && failedResults.length > 0 ? `Failed to upload ${failedResults.length} images.` : ""}`,
+    message: `Image generation completed. ${
+      failedResults && failedResults.length > 0
+        ? `Failed to upload ${failedResults.length} images.`
+        : ""
+    }`,
   };
 }
 
@@ -238,7 +242,7 @@ async function processImageGeneration(
       }),
     );
 
-    return results
+    return results;
   }
 }
 
