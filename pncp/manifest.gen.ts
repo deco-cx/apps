@@ -2,21 +2,21 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/search.ts";
-import * as $$$1 from "./loaders/getCompra.ts";
-import * as $$$2 from "./loaders/listContratacoesByPublicacao.ts";
-import * as $$$3 from "./loaders/listContratacoesByProposta.ts";
+import * as $$$0 from "./loaders/getCompra.ts";
+import * as $$$1 from "./loaders/listAtas.ts";
+import * as $$$2 from "./loaders/listContratacoesByProposta.ts";
+import * as $$$3 from "./loaders/listContratacoesByPublicacao.ts";
 import * as $$$4 from "./loaders/listContratos.ts";
-import * as $$$5 from "./loaders/listAtas.ts";
+import * as $$$5 from "./loaders/search.ts";
 
 const manifest = {
   "loaders": {
-    "pncp/loaders/search.ts": $$$0,
-    "pncp/loaders/getCompra.ts": $$$1,
-    "pncp/loaders/listContratacoesByPublicacao.ts": $$$2,
-    "pncp/loaders/listContratacoesByProposta.ts": $$$3,
+    "pncp/loaders/getCompra.ts": $$$0,
+    "pncp/loaders/listAtas.ts": $$$1,
+    "pncp/loaders/listContratacoesByProposta.ts": $$$2,
+    "pncp/loaders/listContratacoesByPublicacao.ts": $$$3,
     "pncp/loaders/listContratos.ts": $$$4,
-    "pncp/loaders/listAtas.ts": $$$5,
+    "pncp/loaders/search.ts": $$$5,
   },
   "name": "pncp",
   "baseUrl": import.meta.url,
