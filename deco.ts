@@ -17,6 +17,7 @@ const config = {
     app("google-drive"),
     app("google-youtube"),
     app("barte"),
+    app("hubspot"),
     app("pinecone-assistant"),
     app("shopify-mcp"),
     app("superfrete"),
