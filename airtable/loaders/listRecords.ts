@@ -59,12 +59,11 @@ interface Props extends Record<string, unknown> {
     direction: "asc" | "desc";
   }>;
 
-  // TODO: Add fields to the response
-  // /**
-  //  * @title Fields
-  //  * @description Array of field names to include in the response.
-  //  */
-  // fields?: string[];
+  /**
+   * @title Fields
+   * @description Array of field names to include in the response.
+   */
+  fields?: string[];
 }
 
 /**
