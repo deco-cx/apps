@@ -209,14 +209,8 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
-  const _props = expandedProps.props ??
+  const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
-  const props = {
-    ..._props,
-    simulationBehavior: getSkipSimulationBehaviorFromBag(ctx)
-      ? "skip"
-      : _props.simulationBehavior || "default",
-  };
   const { vcsDeprecated } = ctx;
   const { url } = req;
   const segment = getSegmentFromBag(ctx);
@@ -314,19 +308,15 @@ export const cacheKey = (
   req: Request,
   ctx: AppContext,
 ) => {
-  const _props = expandedProps.props ??
+  const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
-  const props = {
-    ..._props,
-    simulationBehavior: getSkipSimulationBehaviorFromBag(ctx)
-      ? "skip"
-      : _props.simulationBehavior || "default",
-  };
 
   const url = new URL(req.url);
 
-  // Avoid cache on loader call over call as it should be handled by the caller
-  if (ctx.isInvoke) {
+  if (
+    // Avoid cache on loader call over call and on search pages
+    (!isQueryList(props) && url.searchParams.has("q")) || ctx.isInvoke
+  ) {
     return null;
   }
 
