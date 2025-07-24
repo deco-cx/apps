@@ -2,291 +2,181 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-<<<<<<< HEAD
-import * as $$$$$$$$$0 from "./actions/address/createAddress.ts";
-import * as $$$$$$$$$1 from "./actions/address/deleteAddress.ts";
-import * as $$$$$$$$$2 from "./actions/address/updateAddress.ts";
-import * as $$$$$$$$$3 from "./actions/analytics/sendEvent.ts";
-import * as $$$$$$$$$4 from "./actions/cart/addItems.ts";
-import * as $$$$$$$$$5 from "./actions/cart/addOfferings.ts";
-import * as $$$$$$$$$6 from "./actions/cart/clearOrderformMessages.ts";
-import * as $$$$$$$$$7 from "./actions/cart/getInstallment.ts";
-import * as $$$$$$$$$8 from "./actions/cart/removeItemAttachment.ts";
-import * as $$$$$$$$$9 from "./actions/cart/removeItems.ts";
-import * as $$$$$$$$$10 from "./actions/cart/removeOffering.ts";
-import * as $$$$$$$$$11 from "./actions/cart/simulation.ts";
-import * as $$$$$$$$$12 from "./actions/cart/updateAttachment.ts";
-import * as $$$$$$$$$13 from "./actions/cart/updateCoupons.ts";
-import * as $$$$$$$$$14 from "./actions/cart/updateGifts.ts";
-import * as $$$$$$$$$15 from "./actions/cart/updateItemAttachment.ts";
-import * as $$$$$$$$$16 from "./actions/cart/updateItemPrice.ts";
-import * as $$$$$$$$$17 from "./actions/cart/updateItems.ts";
-import * as $$$$$$$$$18 from "./actions/cart/updateProfile.ts";
-import * as $$$$$$$$$19 from "./actions/cart/updateUser.ts";
-import * as $$$$$$$$$20 from "./actions/masterdata/createDocument.ts";
-import * as $$$$$$$$$21 from "./actions/masterdata/updateDocument.ts";
-import * as $$$$$$$$$22 from "./actions/masterdata/updatePartialDocument.ts";
-import * as $$$$$$$$$23 from "./actions/newsletter/subscribe.ts";
-import * as $$$$$$$$$24 from "./actions/notifyme.ts";
-import * as $$$$$$$$$25 from "./actions/orders/cancel.ts";
-import * as $$$$$$$$$26 from "./actions/payments/delete.ts";
-import * as $$$$$$$$$27 from "./actions/profile/newsletterProfile.ts";
-import * as $$$$$$$$$28 from "./actions/profile/updateProfile.ts";
-import * as $$$$$$$$$29 from "./actions/review/submit.ts";
-import * as $$$$$$$$$30 from "./actions/sessions/delete.ts";
-import * as $$$$$$$$$31 from "./actions/trigger.ts";
-import * as $$$$$$$$$32 from "./actions/wishlist/addItem.ts";
-import * as $$$$$$$$$33 from "./actions/wishlist/removeItem.ts";
-import * as $$$$0 from "./handlers/sitemap.ts";
-import * as $$$0 from "./loaders/address/getAddressByZIP.ts";
-import * as $$$1 from "./loaders/address/list.ts";
-=======
 import * as $$$$$$$$$0 from "./actions/address/create.ts";
-import * as $$$$$$$$$1 from "./actions/address/delete.ts";
-import * as $$$$$$$$$2 from "./actions/address/update.ts";
-import * as $$$$$$$$$3 from "./actions/analytics/sendEvent.ts";
-import * as $$$$$$$$$4 from "./actions/authentication/accessKeySignIn.ts";
-import * as $$$$$$$$$5 from "./actions/authentication/classicSignIn.ts";
-import * as $$$$$$$$$6 from "./actions/authentication/logout.ts";
-import * as $$$$$$$$$7 from "./actions/authentication/recoveryPassword.ts";
-import * as $$$$$$$$$8 from "./actions/authentication/refreshToken.ts";
-import * as $$$$$$$$$9 from "./actions/authentication/resetPassword.ts";
-import * as $$$$$$$$$10 from "./actions/authentication/sendEmailVerification.ts";
-import * as $$$$$$$$$11 from "./actions/authentication/startAuthentication.ts";
-import * as $$$$$$$$$12 from "./actions/cart/addItems.ts";
-import * as $$$$$$$$$13 from "./actions/cart/addOfferings.ts";
-import * as $$$$$$$$$14 from "./actions/cart/clearOrderformMessages.ts";
-import * as $$$$$$$$$15 from "./actions/cart/getInstallment.ts";
-import * as $$$$$$$$$16 from "./actions/cart/removeItemAttachment.ts";
-import * as $$$$$$$$$17 from "./actions/cart/removeItems.ts";
-import * as $$$$$$$$$18 from "./actions/cart/removeOffering.ts";
-import * as $$$$$$$$$19 from "./actions/cart/simulation.ts";
-import * as $$$$$$$$$20 from "./actions/cart/updateAttachment.ts";
-import * as $$$$$$$$$21 from "./actions/cart/updateCoupons.ts";
-import * as $$$$$$$$$22 from "./actions/cart/updateGifts.ts";
-import * as $$$$$$$$$23 from "./actions/cart/updateItemAttachment.ts";
-import * as $$$$$$$$$24 from "./actions/cart/updateItemPrice.ts";
-import * as $$$$$$$$$25 from "./actions/cart/updateItems.ts";
-import * as $$$$$$$$$26 from "./actions/cart/updateProfile.ts";
-import * as $$$$$$$$$27 from "./actions/cart/updateUser.ts";
-import * as $$$$$$$$$28 from "./actions/masterdata/createDocument.ts";
-import * as $$$$$$$$$29 from "./actions/masterdata/updateDocument.ts";
-import * as $$$$$$$$$30 from "./actions/newsletter/subscribe.ts";
-import * as $$$$$$$$$31 from "./actions/newsletter/updateNewsletterOptIn.ts";
-import * as $$$$$$$$$32 from "./actions/notifyme.ts";
-import * as $$$$$$$$$33 from "./actions/orders/cancel.ts";
-import * as $$$$$$$$$34 from "./actions/payment/deletePaymentToken.ts";
-import * as $$$$$$$$$35 from "./actions/profile/updateProfile.ts";
-import * as $$$$$$$$$36 from "./actions/review/submit.ts";
-import * as $$$$$$$$$37 from "./actions/session/createSession.ts";
-import * as $$$$$$$$$38 from "./actions/session/deleteSession.ts";
-import * as $$$$$$$$$39 from "./actions/session/editSession.ts";
-import * as $$$$$$$$$40 from "./actions/trigger.ts";
-import * as $$$$$$$$$41 from "./actions/wishlist/addItem.ts";
-import * as $$$$$$$$$42 from "./actions/wishlist/removeItem.ts";
+import * as $$$$$$$$$1 from "./actions/address/createAddress.ts";
+import * as $$$$$$$$$2 from "./actions/address/delete.ts";
+import * as $$$$$$$$$3 from "./actions/address/deleteAddress.ts";
+import * as $$$$$$$$$4 from "./actions/address/update.ts";
+import * as $$$$$$$$$5 from "./actions/address/updateAddress.ts";
+import * as $$$$$$$$$6 from "./actions/analytics/sendEvent.ts";
+import * as $$$$$$$$$7 from "./actions/authentication/accessKeySignIn.ts";
+import * as $$$$$$$$$8 from "./actions/authentication/classicSignIn.ts";
+import * as $$$$$$$$$9 from "./actions/authentication/logout.ts";
+import * as $$$$$$$$$10 from "./actions/authentication/recoveryPassword.ts";
+import * as $$$$$$$$$11 from "./actions/authentication/refreshToken.ts";
+import * as $$$$$$$$$12 from "./actions/authentication/resetPassword.ts";
+import * as $$$$$$$$$13 from "./actions/authentication/sendEmailVerification.ts";
+import * as $$$$$$$$$14 from "./actions/authentication/startAuthentication.ts";
+import * as $$$$$$$$$15 from "./actions/cart/addItems.ts";
+import * as $$$$$$$$$16 from "./actions/cart/addOfferings.ts";
+import * as $$$$$$$$$17 from "./actions/cart/clearOrderformMessages.ts";
+import * as $$$$$$$$$18 from "./actions/cart/getInstallment.ts";
+import * as $$$$$$$$$19 from "./actions/cart/removeItemAttachment.ts";
+import * as $$$$$$$$$20 from "./actions/cart/removeItems.ts";
+import * as $$$$$$$$$21 from "./actions/cart/removeOffering.ts";
+import * as $$$$$$$$$22 from "./actions/cart/simulation.ts";
+import * as $$$$$$$$$23 from "./actions/cart/updateAttachment.ts";
+import * as $$$$$$$$$24 from "./actions/cart/updateCoupons.ts";
+import * as $$$$$$$$$25 from "./actions/cart/updateGifts.ts";
+import * as $$$$$$$$$26 from "./actions/cart/updateItemAttachment.ts";
+import * as $$$$$$$$$27 from "./actions/cart/updateItemPrice.ts";
+import * as $$$$$$$$$28 from "./actions/cart/updateItems.ts";
+import * as $$$$$$$$$29 from "./actions/cart/updateProfile.ts";
+import * as $$$$$$$$$30 from "./actions/cart/updateUser.ts";
+import * as $$$$$$$$$31 from "./actions/masterdata/createDocument.ts";
+import * as $$$$$$$$$32 from "./actions/masterdata/updateDocument.ts";
+import * as $$$$$$$$$33 from "./actions/masterdata/updatePartialDocument.ts";
+import * as $$$$$$$$$34 from "./actions/newsletter/subscribe.ts";
+import * as $$$$$$$$$35 from "./actions/newsletter/updateNewsletterOptIn.ts";
+import * as $$$$$$$$$36 from "./actions/notifyme.ts";
+import * as $$$$$$$$$37 from "./actions/orders/cancel.ts";
+import * as $$$$$$$$$38 from "./actions/payment/deletePaymentToken.ts";
+import * as $$$$$$$$$39 from "./actions/payments/delete.ts";
+import * as $$$$$$$$$40 from "./actions/profile/newsletterProfile.ts";
+import * as $$$$$$$$$41 from "./actions/profile/updateProfile.ts";
+import * as $$$$$$$$$42 from "./actions/review/submit.ts";
+import * as $$$$$$$$$43 from "./actions/session/createSession.ts";
+import * as $$$$$$$$$44 from "./actions/session/deleteSession.ts";
+import * as $$$$$$$$$45 from "./actions/session/editSession.ts";
+import * as $$$$$$$$$46 from "./actions/sessions/delete.ts";
+import * as $$$$$$$$$47 from "./actions/trigger.ts";
+import * as $$$$$$$$$48 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$49 from "./actions/wishlist/removeItem.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/address/getAddressByPostalCode.ts";
-import * as $$$1 from "./loaders/address/getUserAddresses.ts";
->>>>>>> b6df91f0591a61757f6a9eafa66acf966b0d83ce
-import * as $$$2 from "./loaders/cart.ts";
-import * as $$$3 from "./loaders/categories/tree.ts";
-import * as $$$4 from "./loaders/collections/list.ts";
-import * as $$$5 from "./loaders/config.ts";
-import * as $$$6 from "./loaders/intelligentSearch/productDetailsPage.ts";
-import * as $$$7 from "./loaders/intelligentSearch/productList.ts";
-import * as $$$8 from "./loaders/intelligentSearch/productListingPage.ts";
-<<<<<<< HEAD
-import * as $$$9 from "./loaders/intelligentSearch/productListingPageReduced.ts";
-import * as $$$10 from "./loaders/intelligentSearch/productSearchValidator.ts";
-import * as $$$11 from "./loaders/intelligentSearch/searches.ts";
-import * as $$$12 from "./loaders/intelligentSearch/suggestions.ts";
-import * as $$$13 from "./loaders/intelligentSearch/topsearches.ts";
-import * as $$$14 from "./loaders/legacy/brands.ts";
-import * as $$$15 from "./loaders/legacy/pageType.ts";
-import * as $$$16 from "./loaders/legacy/productDetailsPage.ts";
-import * as $$$17 from "./loaders/legacy/productList.ts";
-import * as $$$18 from "./loaders/legacy/productListingPage.ts";
-import * as $$$19 from "./loaders/legacy/relatedProductsLoader.ts";
-import * as $$$20 from "./loaders/legacy/suggestions.ts";
-import * as $$$21 from "./loaders/logistics/getSalesChannelById.ts";
-import * as $$$22 from "./loaders/logistics/listPickupPoints.ts";
-import * as $$$23 from "./loaders/logistics/listPickupPointsByLocation.ts";
-import * as $$$24 from "./loaders/logistics/listSalesChannelById.ts";
-import * as $$$25 from "./loaders/logistics/listStockByStore.ts";
-import * as $$$26 from "./loaders/masterdata/searchDocuments.ts";
-import * as $$$27 from "./loaders/navbar.ts";
-import * as $$$28 from "./loaders/options/productIdByTerm.ts";
-import * as $$$29 from "./loaders/orders/getById.ts";
-import * as $$$30 from "./loaders/orders/list.ts";
-import * as $$$31 from "./loaders/orders/order.ts";
-import * as $$$32 from "./loaders/orders/orderplaced.ts";
-import * as $$$33 from "./loaders/paths/PDPDefaultPath.ts";
-import * as $$$34 from "./loaders/paths/PLPDefaultPath.ts";
-import * as $$$35 from "./loaders/payments/info.ts";
-import * as $$$36 from "./loaders/payments/userPayments.ts";
-import * as $$$37 from "./loaders/product/extend.ts";
-import * as $$$38 from "./loaders/product/extensions/detailsPage.ts";
-import * as $$$39 from "./loaders/product/extensions/list.ts";
-import * as $$$40 from "./loaders/product/extensions/listingPage.ts";
-import * as $$$41 from "./loaders/product/extensions/suggestions.ts";
-import * as $$$42 from "./loaders/product/wishlist.ts";
-import * as $$$43 from "./loaders/profile/passwordLastUpdate.ts";
-import * as $$$44 from "./loaders/promotion/getPromotionById.ts";
-import * as $$$45 from "./loaders/proxy.ts";
-import * as $$$46 from "./loaders/sessions/info.ts";
-import * as $$$47 from "./loaders/user.ts";
-import * as $$$48 from "./loaders/wishlist.ts";
-import * as $$$49 from "./loaders/workflow/product.ts";
-import * as $$$50 from "./loaders/workflow/products.ts";
-=======
-import * as $$$9 from "./loaders/intelligentSearch/productSearchValidator.ts";
-import * as $$$10 from "./loaders/intelligentSearch/suggestions.ts";
-import * as $$$11 from "./loaders/intelligentSearch/topsearches.ts";
-import * as $$$12 from "./loaders/legacy/brands.ts";
-import * as $$$13 from "./loaders/legacy/pageType.ts";
-import * as $$$14 from "./loaders/legacy/productDetailsPage.ts";
-import * as $$$15 from "./loaders/legacy/productList.ts";
-import * as $$$16 from "./loaders/legacy/productListingPage.ts";
-import * as $$$17 from "./loaders/legacy/relatedProductsLoader.ts";
-import * as $$$18 from "./loaders/legacy/suggestions.ts";
-import * as $$$19 from "./loaders/logistics/getSalesChannelById.ts";
-import * as $$$20 from "./loaders/logistics/listPickupPoints.ts";
-import * as $$$21 from "./loaders/logistics/listPickupPointsByLocation.ts";
-import * as $$$22 from "./loaders/logistics/listSalesChannelById.ts";
-import * as $$$23 from "./loaders/logistics/listStockByStore.ts";
-import * as $$$24 from "./loaders/masterdata/searchDocuments.ts";
-import * as $$$25 from "./loaders/navbar.ts";
-import * as $$$26 from "./loaders/options/productIdByTerm.ts";
-import * as $$$27 from "./loaders/orders/getById.ts";
-import * as $$$28 from "./loaders/orders/list.ts";
-import * as $$$29 from "./loaders/orders/orderplaced.ts";
-import * as $$$30 from "./loaders/paths/PDPDefaultPath.ts";
-import * as $$$31 from "./loaders/paths/PLPDefaultPath.ts";
-import * as $$$32 from "./loaders/payment/paymentSystems.ts";
-import * as $$$33 from "./loaders/payment/userPayments.ts";
-import * as $$$34 from "./loaders/product/extend.ts";
-import * as $$$35 from "./loaders/product/extensions/detailsPage.ts";
-import * as $$$36 from "./loaders/product/extensions/list.ts";
-import * as $$$37 from "./loaders/product/extensions/listingPage.ts";
-import * as $$$38 from "./loaders/product/extensions/suggestions.ts";
-import * as $$$39 from "./loaders/product/wishlist.ts";
-import * as $$$40 from "./loaders/profile/getCurrentProfile.ts";
-import * as $$$41 from "./loaders/profile/getProfileByEmail.ts";
-import * as $$$42 from "./loaders/promotion/getPromotionById.ts";
-import * as $$$43 from "./loaders/proxy.ts";
-import * as $$$44 from "./loaders/session/getSession.ts";
-import * as $$$45 from "./loaders/session/getUserSessions.ts";
-import * as $$$46 from "./loaders/user.ts";
-import * as $$$47 from "./loaders/wishlist.ts";
-import * as $$$48 from "./loaders/workflow/product.ts";
-import * as $$$49 from "./loaders/workflow/products.ts";
->>>>>>> b6df91f0591a61757f6a9eafa66acf966b0d83ce
+import * as $$$1 from "./loaders/address/getAddressByZIP.ts";
+import * as $$$2 from "./loaders/address/getUserAddresses.ts";
+import * as $$$3 from "./loaders/address/list.ts";
+import * as $$$4 from "./loaders/cart.ts";
+import * as $$$5 from "./loaders/categories/tree.ts";
+import * as $$$6 from "./loaders/collections/list.ts";
+import * as $$$7 from "./loaders/config.ts";
+import * as $$$8 from "./loaders/intelligentSearch/productDetailsPage.ts";
+import * as $$$9 from "./loaders/intelligentSearch/productList.ts";
+import * as $$$10 from "./loaders/intelligentSearch/productListingPage.ts";
+import * as $$$11 from "./loaders/intelligentSearch/productListingPageReduced.ts";
+import * as $$$12 from "./loaders/intelligentSearch/productSearchValidator.ts";
+import * as $$$13 from "./loaders/intelligentSearch/searches.ts";
+import * as $$$14 from "./loaders/intelligentSearch/suggestions.ts";
+import * as $$$15 from "./loaders/intelligentSearch/topsearches.ts";
+import * as $$$16 from "./loaders/legacy/brands.ts";
+import * as $$$17 from "./loaders/legacy/pageType.ts";
+import * as $$$18 from "./loaders/legacy/productDetailsPage.ts";
+import * as $$$19 from "./loaders/legacy/productList.ts";
+import * as $$$20 from "./loaders/legacy/productListingPage.ts";
+import * as $$$21 from "./loaders/legacy/relatedProductsLoader.ts";
+import * as $$$22 from "./loaders/legacy/suggestions.ts";
+import * as $$$23 from "./loaders/logistics/getSalesChannelById.ts";
+import * as $$$24 from "./loaders/logistics/listPickupPoints.ts";
+import * as $$$25 from "./loaders/logistics/listPickupPointsByLocation.ts";
+import * as $$$26 from "./loaders/logistics/listSalesChannelById.ts";
+import * as $$$27 from "./loaders/logistics/listStockByStore.ts";
+import * as $$$28 from "./loaders/masterdata/searchDocuments.ts";
+import * as $$$29 from "./loaders/navbar.ts";
+import * as $$$30 from "./loaders/options/productIdByTerm.ts";
+import * as $$$31 from "./loaders/orders/getById.ts";
+import * as $$$32 from "./loaders/orders/list.ts";
+import * as $$$33 from "./loaders/orders/order.ts";
+import * as $$$34 from "./loaders/orders/orderplaced.ts";
+import * as $$$35 from "./loaders/paths/PDPDefaultPath.ts";
+import * as $$$36 from "./loaders/paths/PLPDefaultPath.ts";
+import * as $$$37 from "./loaders/payment/paymentSystems.ts";
+import * as $$$38 from "./loaders/payment/userPayments.ts";
+import * as $$$39 from "./loaders/payments/info.ts";
+import * as $$$40 from "./loaders/payments/userPayments.ts";
+import * as $$$41 from "./loaders/product/extend.ts";
+import * as $$$42 from "./loaders/product/extensions/detailsPage.ts";
+import * as $$$43 from "./loaders/product/extensions/list.ts";
+import * as $$$44 from "./loaders/product/extensions/listingPage.ts";
+import * as $$$45 from "./loaders/product/extensions/suggestions.ts";
+import * as $$$46 from "./loaders/product/wishlist.ts";
+import * as $$$47 from "./loaders/profile/getCurrentProfile.ts";
+import * as $$$48 from "./loaders/profile/getProfileByEmail.ts";
+import * as $$$49 from "./loaders/profile/passwordLastUpdate.ts";
+import * as $$$50 from "./loaders/promotion/getPromotionById.ts";
+import * as $$$51 from "./loaders/proxy.ts";
+import * as $$$52 from "./loaders/session/getSession.ts";
+import * as $$$53 from "./loaders/session/getUserSessions.ts";
+import * as $$$54 from "./loaders/sessions/info.ts";
+import * as $$$55 from "./loaders/user.ts";
+import * as $$$56 from "./loaders/wishlist.ts";
+import * as $$$57 from "./loaders/workflow/product.ts";
+import * as $$$58 from "./loaders/workflow/products.ts";
 import * as $$$$$$0 from "./sections/Analytics/Vtex.tsx";
 import * as $$$$$$$$$$0 from "./workflows/events.ts";
 import * as $$$$$$$$$$1 from "./workflows/product/index.ts";
 
 const manifest = {
   "loaders": {
-<<<<<<< HEAD
-    "vtex/loaders/address/getAddressByZIP.ts": $$$0,
-    "vtex/loaders/address/list.ts": $$$1,
-=======
     "vtex/loaders/address/getAddressByPostalCode.ts": $$$0,
-    "vtex/loaders/address/getUserAddresses.ts": $$$1,
->>>>>>> b6df91f0591a61757f6a9eafa66acf966b0d83ce
-    "vtex/loaders/cart.ts": $$$2,
-    "vtex/loaders/categories/tree.ts": $$$3,
-    "vtex/loaders/collections/list.ts": $$$4,
-    "vtex/loaders/config.ts": $$$5,
-    "vtex/loaders/intelligentSearch/productDetailsPage.ts": $$$6,
-    "vtex/loaders/intelligentSearch/productList.ts": $$$7,
-    "vtex/loaders/intelligentSearch/productListingPage.ts": $$$8,
-<<<<<<< HEAD
-    "vtex/loaders/intelligentSearch/productListingPageReduced.ts": $$$9,
-    "vtex/loaders/intelligentSearch/productSearchValidator.ts": $$$10,
-    "vtex/loaders/intelligentSearch/searches.ts": $$$11,
-    "vtex/loaders/intelligentSearch/suggestions.ts": $$$12,
-    "vtex/loaders/intelligentSearch/topsearches.ts": $$$13,
-    "vtex/loaders/legacy/brands.ts": $$$14,
-    "vtex/loaders/legacy/pageType.ts": $$$15,
-    "vtex/loaders/legacy/productDetailsPage.ts": $$$16,
-    "vtex/loaders/legacy/productList.ts": $$$17,
-    "vtex/loaders/legacy/productListingPage.ts": $$$18,
-    "vtex/loaders/legacy/relatedProductsLoader.ts": $$$19,
-    "vtex/loaders/legacy/suggestions.ts": $$$20,
-    "vtex/loaders/logistics/getSalesChannelById.ts": $$$21,
-    "vtex/loaders/logistics/listPickupPoints.ts": $$$22,
-    "vtex/loaders/logistics/listPickupPointsByLocation.ts": $$$23,
-    "vtex/loaders/logistics/listSalesChannelById.ts": $$$24,
-    "vtex/loaders/logistics/listStockByStore.ts": $$$25,
-    "vtex/loaders/masterdata/searchDocuments.ts": $$$26,
-    "vtex/loaders/navbar.ts": $$$27,
-    "vtex/loaders/options/productIdByTerm.ts": $$$28,
-    "vtex/loaders/orders/getById.ts": $$$29,
-    "vtex/loaders/orders/list.ts": $$$30,
-    "vtex/loaders/orders/order.ts": $$$31,
-    "vtex/loaders/orders/orderplaced.ts": $$$32,
-    "vtex/loaders/paths/PDPDefaultPath.ts": $$$33,
-    "vtex/loaders/paths/PLPDefaultPath.ts": $$$34,
-    "vtex/loaders/payments/info.ts": $$$35,
-    "vtex/loaders/payments/userPayments.ts": $$$36,
-    "vtex/loaders/product/extend.ts": $$$37,
-    "vtex/loaders/product/extensions/detailsPage.ts": $$$38,
-    "vtex/loaders/product/extensions/list.ts": $$$39,
-    "vtex/loaders/product/extensions/listingPage.ts": $$$40,
-    "vtex/loaders/product/extensions/suggestions.ts": $$$41,
-    "vtex/loaders/product/wishlist.ts": $$$42,
-    "vtex/loaders/profile/passwordLastUpdate.ts": $$$43,
-    "vtex/loaders/promotion/getPromotionById.ts": $$$44,
-    "vtex/loaders/proxy.ts": $$$45,
-    "vtex/loaders/sessions/info.ts": $$$46,
-    "vtex/loaders/user.ts": $$$47,
-    "vtex/loaders/wishlist.ts": $$$48,
-    "vtex/loaders/workflow/product.ts": $$$49,
-    "vtex/loaders/workflow/products.ts": $$$50,
-=======
-    "vtex/loaders/intelligentSearch/productSearchValidator.ts": $$$9,
-    "vtex/loaders/intelligentSearch/suggestions.ts": $$$10,
-    "vtex/loaders/intelligentSearch/topsearches.ts": $$$11,
-    "vtex/loaders/legacy/brands.ts": $$$12,
-    "vtex/loaders/legacy/pageType.ts": $$$13,
-    "vtex/loaders/legacy/productDetailsPage.ts": $$$14,
-    "vtex/loaders/legacy/productList.ts": $$$15,
-    "vtex/loaders/legacy/productListingPage.ts": $$$16,
-    "vtex/loaders/legacy/relatedProductsLoader.ts": $$$17,
-    "vtex/loaders/legacy/suggestions.ts": $$$18,
-    "vtex/loaders/logistics/getSalesChannelById.ts": $$$19,
-    "vtex/loaders/logistics/listPickupPoints.ts": $$$20,
-    "vtex/loaders/logistics/listPickupPointsByLocation.ts": $$$21,
-    "vtex/loaders/logistics/listSalesChannelById.ts": $$$22,
-    "vtex/loaders/logistics/listStockByStore.ts": $$$23,
-    "vtex/loaders/masterdata/searchDocuments.ts": $$$24,
-    "vtex/loaders/navbar.ts": $$$25,
-    "vtex/loaders/options/productIdByTerm.ts": $$$26,
-    "vtex/loaders/orders/getById.ts": $$$27,
-    "vtex/loaders/orders/list.ts": $$$28,
-    "vtex/loaders/orders/orderplaced.ts": $$$29,
-    "vtex/loaders/paths/PDPDefaultPath.ts": $$$30,
-    "vtex/loaders/paths/PLPDefaultPath.ts": $$$31,
-    "vtex/loaders/payment/paymentSystems.ts": $$$32,
-    "vtex/loaders/payment/userPayments.ts": $$$33,
-    "vtex/loaders/product/extend.ts": $$$34,
-    "vtex/loaders/product/extensions/detailsPage.ts": $$$35,
-    "vtex/loaders/product/extensions/list.ts": $$$36,
-    "vtex/loaders/product/extensions/listingPage.ts": $$$37,
-    "vtex/loaders/product/extensions/suggestions.ts": $$$38,
-    "vtex/loaders/product/wishlist.ts": $$$39,
-    "vtex/loaders/profile/getCurrentProfile.ts": $$$40,
-    "vtex/loaders/profile/getProfileByEmail.ts": $$$41,
-    "vtex/loaders/promotion/getPromotionById.ts": $$$42,
-    "vtex/loaders/proxy.ts": $$$43,
-    "vtex/loaders/session/getSession.ts": $$$44,
-    "vtex/loaders/session/getUserSessions.ts": $$$45,
-    "vtex/loaders/user.ts": $$$46,
-    "vtex/loaders/wishlist.ts": $$$47,
-    "vtex/loaders/workflow/product.ts": $$$48,
-    "vtex/loaders/workflow/products.ts": $$$49,
->>>>>>> b6df91f0591a61757f6a9eafa66acf966b0d83ce
+    "vtex/loaders/address/getAddressByZIP.ts": $$$1,
+    "vtex/loaders/address/getUserAddresses.ts": $$$2,
+    "vtex/loaders/address/list.ts": $$$3,
+    "vtex/loaders/cart.ts": $$$4,
+    "vtex/loaders/categories/tree.ts": $$$5,
+    "vtex/loaders/collections/list.ts": $$$6,
+    "vtex/loaders/config.ts": $$$7,
+    "vtex/loaders/intelligentSearch/productDetailsPage.ts": $$$8,
+    "vtex/loaders/intelligentSearch/productList.ts": $$$9,
+    "vtex/loaders/intelligentSearch/productListingPage.ts": $$$10,
+    "vtex/loaders/intelligentSearch/productListingPageReduced.ts": $$$11,
+    "vtex/loaders/intelligentSearch/productSearchValidator.ts": $$$12,
+    "vtex/loaders/intelligentSearch/searches.ts": $$$13,
+    "vtex/loaders/intelligentSearch/suggestions.ts": $$$14,
+    "vtex/loaders/intelligentSearch/topsearches.ts": $$$15,
+    "vtex/loaders/legacy/brands.ts": $$$16,
+    "vtex/loaders/legacy/pageType.ts": $$$17,
+    "vtex/loaders/legacy/productDetailsPage.ts": $$$18,
+    "vtex/loaders/legacy/productList.ts": $$$19,
+    "vtex/loaders/legacy/productListingPage.ts": $$$20,
+    "vtex/loaders/legacy/relatedProductsLoader.ts": $$$21,
+    "vtex/loaders/legacy/suggestions.ts": $$$22,
+    "vtex/loaders/logistics/getSalesChannelById.ts": $$$23,
+    "vtex/loaders/logistics/listPickupPoints.ts": $$$24,
+    "vtex/loaders/logistics/listPickupPointsByLocation.ts": $$$25,
+    "vtex/loaders/logistics/listSalesChannelById.ts": $$$26,
+    "vtex/loaders/logistics/listStockByStore.ts": $$$27,
+    "vtex/loaders/masterdata/searchDocuments.ts": $$$28,
+    "vtex/loaders/navbar.ts": $$$29,
+    "vtex/loaders/options/productIdByTerm.ts": $$$30,
+    "vtex/loaders/orders/getById.ts": $$$31,
+    "vtex/loaders/orders/list.ts": $$$32,
+    "vtex/loaders/orders/order.ts": $$$33,
+    "vtex/loaders/orders/orderplaced.ts": $$$34,
+    "vtex/loaders/paths/PDPDefaultPath.ts": $$$35,
+    "vtex/loaders/paths/PLPDefaultPath.ts": $$$36,
+    "vtex/loaders/payment/paymentSystems.ts": $$$37,
+    "vtex/loaders/payment/userPayments.ts": $$$38,
+    "vtex/loaders/payments/info.ts": $$$39,
+    "vtex/loaders/payments/userPayments.ts": $$$40,
+    "vtex/loaders/product/extend.ts": $$$41,
+    "vtex/loaders/product/extensions/detailsPage.ts": $$$42,
+    "vtex/loaders/product/extensions/list.ts": $$$43,
+    "vtex/loaders/product/extensions/listingPage.ts": $$$44,
+    "vtex/loaders/product/extensions/suggestions.ts": $$$45,
+    "vtex/loaders/product/wishlist.ts": $$$46,
+    "vtex/loaders/profile/getCurrentProfile.ts": $$$47,
+    "vtex/loaders/profile/getProfileByEmail.ts": $$$48,
+    "vtex/loaders/profile/passwordLastUpdate.ts": $$$49,
+    "vtex/loaders/promotion/getPromotionById.ts": $$$50,
+    "vtex/loaders/proxy.ts": $$$51,
+    "vtex/loaders/session/getSession.ts": $$$52,
+    "vtex/loaders/session/getUserSessions.ts": $$$53,
+    "vtex/loaders/sessions/info.ts": $$$54,
+    "vtex/loaders/user.ts": $$$55,
+    "vtex/loaders/wishlist.ts": $$$56,
+    "vtex/loaders/workflow/product.ts": $$$57,
+    "vtex/loaders/workflow/products.ts": $$$58,
   },
   "handlers": {
     "vtex/handlers/sitemap.ts": $$$$0,
@@ -295,86 +185,56 @@ const manifest = {
     "vtex/sections/Analytics/Vtex.tsx": $$$$$$0,
   },
   "actions": {
-<<<<<<< HEAD
-    "vtex/actions/address/createAddress.ts": $$$$$$$$$0,
-    "vtex/actions/address/deleteAddress.ts": $$$$$$$$$1,
-    "vtex/actions/address/updateAddress.ts": $$$$$$$$$2,
-    "vtex/actions/analytics/sendEvent.ts": $$$$$$$$$3,
-    "vtex/actions/cart/addItems.ts": $$$$$$$$$4,
-    "vtex/actions/cart/addOfferings.ts": $$$$$$$$$5,
-    "vtex/actions/cart/clearOrderformMessages.ts": $$$$$$$$$6,
-    "vtex/actions/cart/getInstallment.ts": $$$$$$$$$7,
-    "vtex/actions/cart/removeItemAttachment.ts": $$$$$$$$$8,
-    "vtex/actions/cart/removeItems.ts": $$$$$$$$$9,
-    "vtex/actions/cart/removeOffering.ts": $$$$$$$$$10,
-    "vtex/actions/cart/simulation.ts": $$$$$$$$$11,
-    "vtex/actions/cart/updateAttachment.ts": $$$$$$$$$12,
-    "vtex/actions/cart/updateCoupons.ts": $$$$$$$$$13,
-    "vtex/actions/cart/updateGifts.ts": $$$$$$$$$14,
-    "vtex/actions/cart/updateItemAttachment.ts": $$$$$$$$$15,
-    "vtex/actions/cart/updateItemPrice.ts": $$$$$$$$$16,
-    "vtex/actions/cart/updateItems.ts": $$$$$$$$$17,
-    "vtex/actions/cart/updateProfile.ts": $$$$$$$$$18,
-    "vtex/actions/cart/updateUser.ts": $$$$$$$$$19,
-    "vtex/actions/masterdata/createDocument.ts": $$$$$$$$$20,
-    "vtex/actions/masterdata/updateDocument.ts": $$$$$$$$$21,
-    "vtex/actions/masterdata/updatePartialDocument.ts": $$$$$$$$$22,
-    "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$23,
-    "vtex/actions/notifyme.ts": $$$$$$$$$24,
-    "vtex/actions/orders/cancel.ts": $$$$$$$$$25,
-    "vtex/actions/payments/delete.ts": $$$$$$$$$26,
-    "vtex/actions/profile/newsletterProfile.ts": $$$$$$$$$27,
-    "vtex/actions/profile/updateProfile.ts": $$$$$$$$$28,
-    "vtex/actions/review/submit.ts": $$$$$$$$$29,
-    "vtex/actions/sessions/delete.ts": $$$$$$$$$30,
-    "vtex/actions/trigger.ts": $$$$$$$$$31,
-    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$32,
-    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$33,
-=======
     "vtex/actions/address/create.ts": $$$$$$$$$0,
-    "vtex/actions/address/delete.ts": $$$$$$$$$1,
-    "vtex/actions/address/update.ts": $$$$$$$$$2,
-    "vtex/actions/analytics/sendEvent.ts": $$$$$$$$$3,
-    "vtex/actions/authentication/accessKeySignIn.ts": $$$$$$$$$4,
-    "vtex/actions/authentication/classicSignIn.ts": $$$$$$$$$5,
-    "vtex/actions/authentication/logout.ts": $$$$$$$$$6,
-    "vtex/actions/authentication/recoveryPassword.ts": $$$$$$$$$7,
-    "vtex/actions/authentication/refreshToken.ts": $$$$$$$$$8,
-    "vtex/actions/authentication/resetPassword.ts": $$$$$$$$$9,
-    "vtex/actions/authentication/sendEmailVerification.ts": $$$$$$$$$10,
-    "vtex/actions/authentication/startAuthentication.ts": $$$$$$$$$11,
-    "vtex/actions/cart/addItems.ts": $$$$$$$$$12,
-    "vtex/actions/cart/addOfferings.ts": $$$$$$$$$13,
-    "vtex/actions/cart/clearOrderformMessages.ts": $$$$$$$$$14,
-    "vtex/actions/cart/getInstallment.ts": $$$$$$$$$15,
-    "vtex/actions/cart/removeItemAttachment.ts": $$$$$$$$$16,
-    "vtex/actions/cart/removeItems.ts": $$$$$$$$$17,
-    "vtex/actions/cart/removeOffering.ts": $$$$$$$$$18,
-    "vtex/actions/cart/simulation.ts": $$$$$$$$$19,
-    "vtex/actions/cart/updateAttachment.ts": $$$$$$$$$20,
-    "vtex/actions/cart/updateCoupons.ts": $$$$$$$$$21,
-    "vtex/actions/cart/updateGifts.ts": $$$$$$$$$22,
-    "vtex/actions/cart/updateItemAttachment.ts": $$$$$$$$$23,
-    "vtex/actions/cart/updateItemPrice.ts": $$$$$$$$$24,
-    "vtex/actions/cart/updateItems.ts": $$$$$$$$$25,
-    "vtex/actions/cart/updateProfile.ts": $$$$$$$$$26,
-    "vtex/actions/cart/updateUser.ts": $$$$$$$$$27,
-    "vtex/actions/masterdata/createDocument.ts": $$$$$$$$$28,
-    "vtex/actions/masterdata/updateDocument.ts": $$$$$$$$$29,
-    "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$30,
-    "vtex/actions/newsletter/updateNewsletterOptIn.ts": $$$$$$$$$31,
-    "vtex/actions/notifyme.ts": $$$$$$$$$32,
-    "vtex/actions/orders/cancel.ts": $$$$$$$$$33,
-    "vtex/actions/payment/deletePaymentToken.ts": $$$$$$$$$34,
-    "vtex/actions/profile/updateProfile.ts": $$$$$$$$$35,
-    "vtex/actions/review/submit.ts": $$$$$$$$$36,
-    "vtex/actions/session/createSession.ts": $$$$$$$$$37,
-    "vtex/actions/session/deleteSession.ts": $$$$$$$$$38,
-    "vtex/actions/session/editSession.ts": $$$$$$$$$39,
-    "vtex/actions/trigger.ts": $$$$$$$$$40,
-    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$41,
-    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$42,
->>>>>>> b6df91f0591a61757f6a9eafa66acf966b0d83ce
+    "vtex/actions/address/createAddress.ts": $$$$$$$$$1,
+    "vtex/actions/address/delete.ts": $$$$$$$$$2,
+    "vtex/actions/address/deleteAddress.ts": $$$$$$$$$3,
+    "vtex/actions/address/update.ts": $$$$$$$$$4,
+    "vtex/actions/address/updateAddress.ts": $$$$$$$$$5,
+    "vtex/actions/analytics/sendEvent.ts": $$$$$$$$$6,
+    "vtex/actions/authentication/accessKeySignIn.ts": $$$$$$$$$7,
+    "vtex/actions/authentication/classicSignIn.ts": $$$$$$$$$8,
+    "vtex/actions/authentication/logout.ts": $$$$$$$$$9,
+    "vtex/actions/authentication/recoveryPassword.ts": $$$$$$$$$10,
+    "vtex/actions/authentication/refreshToken.ts": $$$$$$$$$11,
+    "vtex/actions/authentication/resetPassword.ts": $$$$$$$$$12,
+    "vtex/actions/authentication/sendEmailVerification.ts": $$$$$$$$$13,
+    "vtex/actions/authentication/startAuthentication.ts": $$$$$$$$$14,
+    "vtex/actions/cart/addItems.ts": $$$$$$$$$15,
+    "vtex/actions/cart/addOfferings.ts": $$$$$$$$$16,
+    "vtex/actions/cart/clearOrderformMessages.ts": $$$$$$$$$17,
+    "vtex/actions/cart/getInstallment.ts": $$$$$$$$$18,
+    "vtex/actions/cart/removeItemAttachment.ts": $$$$$$$$$19,
+    "vtex/actions/cart/removeItems.ts": $$$$$$$$$20,
+    "vtex/actions/cart/removeOffering.ts": $$$$$$$$$21,
+    "vtex/actions/cart/simulation.ts": $$$$$$$$$22,
+    "vtex/actions/cart/updateAttachment.ts": $$$$$$$$$23,
+    "vtex/actions/cart/updateCoupons.ts": $$$$$$$$$24,
+    "vtex/actions/cart/updateGifts.ts": $$$$$$$$$25,
+    "vtex/actions/cart/updateItemAttachment.ts": $$$$$$$$$26,
+    "vtex/actions/cart/updateItemPrice.ts": $$$$$$$$$27,
+    "vtex/actions/cart/updateItems.ts": $$$$$$$$$28,
+    "vtex/actions/cart/updateProfile.ts": $$$$$$$$$29,
+    "vtex/actions/cart/updateUser.ts": $$$$$$$$$30,
+    "vtex/actions/masterdata/createDocument.ts": $$$$$$$$$31,
+    "vtex/actions/masterdata/updateDocument.ts": $$$$$$$$$32,
+    "vtex/actions/masterdata/updatePartialDocument.ts": $$$$$$$$$33,
+    "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$34,
+    "vtex/actions/newsletter/updateNewsletterOptIn.ts": $$$$$$$$$35,
+    "vtex/actions/notifyme.ts": $$$$$$$$$36,
+    "vtex/actions/orders/cancel.ts": $$$$$$$$$37,
+    "vtex/actions/payment/deletePaymentToken.ts": $$$$$$$$$38,
+    "vtex/actions/payments/delete.ts": $$$$$$$$$39,
+    "vtex/actions/profile/newsletterProfile.ts": $$$$$$$$$40,
+    "vtex/actions/profile/updateProfile.ts": $$$$$$$$$41,
+    "vtex/actions/review/submit.ts": $$$$$$$$$42,
+    "vtex/actions/session/createSession.ts": $$$$$$$$$43,
+    "vtex/actions/session/deleteSession.ts": $$$$$$$$$44,
+    "vtex/actions/session/editSession.ts": $$$$$$$$$45,
+    "vtex/actions/sessions/delete.ts": $$$$$$$$$46,
+    "vtex/actions/trigger.ts": $$$$$$$$$47,
+    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$48,
+    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$49,
   },
   "workflows": {
     "vtex/workflows/events.ts": $$$$$$$$$$0,
