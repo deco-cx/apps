@@ -6,6 +6,7 @@ import {
 } from "https://esm.sh/cockatiel@3.1.1?target=es2019";
 import { HttpError } from "./http.ts";
 import { fetch } from "@deco/deco";
+import { logger } from "@deco/deco/o11y";
 // this error is thrown by deno deploy when the connection is closed by the server.
 // check the discussion at discord: https://discord.com/channels/985687648595243068/1107104244517048320/1107111259813466192
 export const CONNECTION_CLOSED_MESSAGE =
@@ -47,6 +48,8 @@ export const fetchSafe = async (
   if (isManual && isRedirect) {
     return response;
   }
+
+  logger.error(`error sending request for url: ${input}, body error is: ${await response.text()}`)
   throw new HttpError(response.status, `${await response.text()}`);
 };
 export const fetchAPI = async <T>(
