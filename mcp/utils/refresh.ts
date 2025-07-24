@@ -2,12 +2,19 @@ import { ClientOf, HttpError } from "../../utils/http.ts";
 import { OAuthProvider, OAuthTokens } from "./types.ts";
 import { isRefreshTokenExpired } from "./utils.ts";
 
+export type CustomRefreshFunction = (params: {
+  refresh_token: string;
+  client_id: string;
+  client_secret: string;
+}) => Promise<OAuthTokens>;
+
 export interface TokenRefresherConfig<TAuthClient> {
   tokens: OAuthTokens;
   authClient: ClientOf<TAuthClient>;
   provider: OAuthProvider;
   tokenEndpoint: keyof TAuthClient;
   onTokenRefresh?: (newTokens: OAuthTokens) => Promise<void> | void;
+  customRefreshFunction?: CustomRefreshFunction;
 }
 
 export interface TokenRefresher<TAuthClient> {
@@ -20,6 +27,36 @@ export function createTokenRefresher<TAuthClient>(
   config: TokenRefresherConfig<TAuthClient>,
 ): TokenRefresher<TAuthClient> {
   const { tokens } = config;
+
+  const fetchNewTokens = async (): Promise<OAuthTokens> => {
+    const refreshToken = tokens.refresh_token!;
+
+    if (config.customRefreshFunction) {
+      return await config.customRefreshFunction({
+        refresh_token: refreshToken,
+        client_id: config.provider.clientId,
+        client_secret: config.provider.clientSecret,
+      });
+    } else {
+      const response =
+        await (config.authClient[config.tokenEndpoint] as unknown as (
+          query: unknown,
+          args: {
+            grant_type: string;
+            refresh_token: string;
+            client_id: string;
+            client_secret: string;
+          },
+        ) => Promise<Response>)({}, {
+          grant_type: "refresh_token",
+          refresh_token: refreshToken,
+          client_id: config.provider.clientId,
+          client_secret: config.provider.clientSecret,
+        });
+
+      return (await response.json()) as OAuthTokens;
+    }
+  };
 
   const updateTokens = (newTokens: OAuthTokens): void => {
     tokens.access_token = newTokens.access_token;
@@ -38,17 +75,7 @@ export function createTokenRefresher<TAuthClient>(
     }
 
     try {
-      const response =
-        await (config.authClient[config.tokenEndpoint] as unknown as (
-          args: unknown,
-        ) => Promise<Response>)({
-          grant_type: "refresh_token",
-          refresh_token: tokens.refresh_token,
-          client_id: config.provider.clientId,
-          client_secret: config.provider.clientSecret,
-        });
-
-      const newTokens = (await response.json()) as OAuthTokens;
+      const newTokens = await fetchNewTokens();
       updateTokens(newTokens);
 
       if (config.onTokenRefresh) {
@@ -58,7 +85,12 @@ export function createTokenRefresher<TAuthClient>(
       if (error instanceof HttpError && isRefreshTokenExpired(error)) {
         throw new Error("Refresh token expired");
       }
-      throw error;
+
+      if (error instanceof HttpError) {
+        throw new HttpError(error.status, error.message);
+      }
+
+      throw new Error(`Unknown error during token refresh: ${error}`);
     }
   };
 

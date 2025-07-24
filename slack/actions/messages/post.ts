@@ -1,5 +1,5 @@
+import type { SlackMessage } from "../../client.ts";
 import type { AppContext } from "../../mod.ts";
-import type { SlackMessage, SlackResponse } from "../../client.ts";
 
 export interface Props {
   /**
@@ -22,7 +22,7 @@ export default async function postMessage(
   _req: Request,
   ctx: AppContext,
 ): Promise<
-  SlackResponse<{ channel: string; ts: string; message: SlackMessage }>
+  { channel: string; ts: string; message: SlackMessage }
 > {
   const { channelId, text } = props;
   return await ctx.slack.postMessage(channelId, text);

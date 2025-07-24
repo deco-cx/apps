@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { Field, UpdateFieldBody } from "../types.ts";
+import type { Field, UpdateFieldBody } from "../utils/types.ts";
 
 // Props will be UpdateFieldBody plus baseId, tableId, and fieldId
 interface Props extends UpdateFieldBody {
@@ -18,32 +18,36 @@ interface Props extends UpdateFieldBody {
    * @description The ID of the field to update.
    */
   fieldId: string;
-  /**
-   * @title API Key
-   */
-  apiKey?: string;
-  // name, description are inherited from UpdateFieldBody
-  // type and options changes are complex and generally not advised via simple updates.
 }
 
 /**
  * @title Update Airtable Field
- * @description Updates an existing field's properties like name or description (Metadata API).
+ * @description Updates an existing field's properties like name or description using OAuth (Metadata API).
  * @see https://airtable.com/developers/web/api/update-field
  */
 const action = async (
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<Field | Response> => {
-  const { baseId, tableId, fieldId, name, description, apiKey } = props;
-
-  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
-  const resolvedApiKey = authHeader || apiKey;
-
-  if (!resolvedApiKey) {
-    return new Response("API Key is required", { status: 403 });
+  if (!ctx.client) {
+    return new Response("OAuth authentication is required", { status: 401 });
   }
+
+  const validationResult = await ctx.invoke["airtable"].loaders.permissioning
+    .validatePermissions({
+      mode: "check",
+      baseId: props.baseId,
+      tableIdOrName: props.tableId,
+    });
+
+  if ("hasPermission" in validationResult && !validationResult.hasPermission) {
+    return new Response(validationResult.message || "Access denied", {
+      status: 403,
+    });
+  }
+
+  const { baseId, tableId, fieldId, name, description } = props;
 
   const body: UpdateFieldBody = {};
   if (name) {
@@ -59,14 +63,44 @@ const action = async (
     );
   }
 
-  const response = await ctx.api(resolvedApiKey)
+  const response = await ctx.client
     ["PATCH /v0/meta/bases/:baseId/tables/:tableId/fields/:fieldId"](
-      { baseId, tableId, fieldId }, // URL params
-      { body }, // Request body
+      { baseId, tableId, fieldId },
+      { body },
     );
 
   if (!response.ok) {
-    throw new Error(`Error updating field: ${response.statusText}`);
+    const errorData = await response.json().catch(() => ({})) as {
+      error?: { type?: string };
+    };
+
+    if (
+      response.status === 422 &&
+      errorData.error?.type === "DUPLICATE_OR_EMPTY_FIELD_NAME"
+    ) {
+      return new Response(
+        JSON.stringify({
+          error:
+            `Field name "${name}" already exists in this table or is empty. Please choose a different name.`,
+          type: "DUPLICATE_OR_EMPTY_FIELD_NAME",
+        }),
+        {
+          status: 422,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        error: `Error updating field: ${response.statusText}`,
+        status: response.status,
+      }),
+      {
+        status: response.status,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   }
 
   return response.json();

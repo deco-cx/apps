@@ -9,9 +9,13 @@ import {
 } from "../../utils/intelligentSearch.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
-import { getSkipSimulationBehaviorFromBag } from "../../utils/simulationBehavior.ts";
 import { sortProducts, toProduct } from "../../utils/transform.ts";
-import type { Item, ProductID, Sort } from "../../utils/types.ts";
+import type {
+  Item,
+  ProductID,
+  SimulationBehavior,
+  Sort,
+} from "../../utils/types.ts";
 import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 import {
   LabelledFuzzy,
@@ -113,7 +117,7 @@ export interface CommonProps {
    * @title Simulation Behavior
    * @description Defines the simulation behavior.
    */
-  simulationBehavior?: "default" | "skip" | "only1P";
+  simulationBehavior?: SimulationBehavior;
 }
 
 /**

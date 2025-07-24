@@ -1,6 +1,3 @@
-import { PaymentData as PaymentDataOpenAPI } from "./openapi/vcs.openapi.gen.ts";
-import { ChangesAttachment } from "./openapi/vcs.openapi.gen.ts";
-
 /**
  * @format dynamic-options
  * @options vtex/loaders/options/productIdByTerm.ts
@@ -65,12 +62,11 @@ export interface ClientProfileData {
 
 export interface ClientPreferencesData {
   locale: string;
-  optinNewsLetter: boolean;
+  optinNewsLetter: null;
 }
 
 export interface ItemMetadata {
-  items?: ItemMetadataItem[];
-  Items?: ItemMetadataItemUppercase[];
+  items: ItemMetadataItem[];
 }
 
 export interface ItemMetadataItem {
@@ -84,19 +80,6 @@ export interface ItemMetadataItem {
   imageUrl: string;
   detailUrl: string;
   assemblyOptions: AssemblyOption[];
-}
-
-export interface ItemMetadataItemUppercase {
-  Id: string;
-  Seller: string;
-  Name: string;
-  SkuName: string;
-  ProductId: string;
-  RefId: string;
-  Ean: null | string;
-  ImageUrl: string;
-  DetailUrl: string;
-  AssemblyOptions: AssemblyOption[];
 }
 
 export interface AssemblyOption {
@@ -178,12 +161,6 @@ export interface AdditionalInfo {
   offeringInfo: null;
   offeringType: null;
   offeringTypeId: null;
-  categories: CategoryItem[];
-}
-
-export interface CategoryItem {
-  id: number;
-  name: string;
 }
 
 export interface AttachmentOffering {
@@ -282,43 +259,11 @@ export interface Fields {
   skuName?: string;
 }
 
-export interface Transaction {
-  isActive: boolean;
-  transactionId: string;
-  merchantName: string;
-  payments: Payment[];
-}
-
-export interface Payment {
-  id: string;
-  paymentSystem: string;
-  paymentSystemName: string;
-  value: number;
-  installments: number;
-  referenceValue: number;
-  cardHolder: string | null;
-  cardNumber: string | null;
-  firstDigits: string | null;
-  lastDigits: string | null;
-  cvv2: string | null;
-  expireMonth: string | null;
-  expireYear: string | null;
-  url: string;
-  giftCardId: null;
-  giftCardName: null;
-  giftCardCaption: null;
-  redemptionCode: null;
-  group: string;
-  tid: null;
-  dueDate: Date;
-}
-
 export interface PaymentData {
   updateStatus: string;
   installmentOptions: InstallmentOption[];
   paymentSystems: PaymentSystem[];
   payments: unknown[];
-  transactions: Transaction[];
   giftCards: unknown[];
   giftCardMessages: unknown[];
   availableAccounts: unknown[];
@@ -418,36 +363,29 @@ export interface ShippingData {
 }
 
 export interface Address {
-  addressType: string;
-  addressName: string;
+  addressType?: string;
   receiverName: string | null;
   addressId: string;
-  isDisposable: boolean;
-  postalCode: string;
-  city: string;
-  state: string;
-  country: string;
-  street: string;
-  number: null | string;
-  neighborhood: string;
-  complement: null | string;
-  reference: null;
-  geoCoordinates: number[];
+  isDisposable?: boolean;
+  postalCode?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  street?: string;
+  number?: string;
+  neighborhood?: string;
+  addressName?: string;
+  complement: string | null;
+  reference?: string;
+  geoCoordinates?: number[];
+  name?: string;
 }
 
 export interface LogisticsInfo {
   itemIndex: number;
   selectedSla: SelectedSla | null;
-  price: number;
-  listPrice: number;
-  sellingPrice: number;
-  deliveryCompany: string;
-  shippingEstimate: string;
-  shippingEstimateDate: string;
   selectedDeliveryChannel: SelectedDeliveryChannel;
   addressId: string;
-  pickupPointId: string;
-  pickupStoreInfo: PickupStoreInfo;
   slas: Sla[];
   shipsTo: string[];
   itemId: string;
@@ -718,16 +656,6 @@ export interface IProduct {
   selectedProperties: Array<{ key: string; value: string }>;
   releaseDate: string;
   origin?: string;
-  advertisement?: AdverTisement;
-}
-
-export interface AdverTisement {
-  "@type": "AdverTisement";
-  adId?: string;
-  campaignId?: string;
-  actionCost?: number;
-  adRequestId?: string;
-  adResponseId?: string;
 }
 
 export type Product = IProduct & {
@@ -1348,6 +1276,71 @@ export interface ProductInventoryData {
   balance?: ProductBalance[];
 }
 
+interface OrderPlacedSeller {
+  id: string;
+  name: string;
+  logo: string;
+}
+
+export interface OrderPlaced {
+  sellers: OrderPlacedSeller[];
+  orderId: string;
+  orderGroup: string;
+  state: string;
+  isCheckedIn: boolean;
+  sellerOrderId: string;
+  storeId: string | null;
+  checkedInPickupPointId: string | null;
+  value: number;
+  items: OrderFormItem[];
+  totals: Total[];
+  clientProfileData: ClientProfileData;
+  ratesAndBenefitsData: RatesAndBenefitsData;
+  shippingData: ShippingData;
+  paymentData: PaymentData;
+  clientPreferencesData: ClientPreferencesData;
+  commercialConditionData: null;
+  giftRegistryData: null;
+  marketingData: MarketingData | null;
+  storePreferencesData: StorePreferencesData;
+  openTextField: null;
+  invoiceData: null;
+  itemMetadata: ItemMetadata;
+  taxData: null;
+  customData: null;
+  hooksData: null;
+  changeData: null;
+  subscriptionData: null;
+  merchantContextData: null;
+  purchaseAgentData: null;
+  salesChannel: string;
+  followUpEmail: string;
+  creationDate: string;
+  lastChange: string;
+  timeZoneCreationDate: string;
+  timeZoneLastChange: string;
+  isCompleted: boolean;
+  hostName: string;
+  merchantName: string | null;
+  userType: string;
+  roundingError: number;
+  allowEdition: boolean;
+  allowCancellation: boolean;
+  isUserDataVisible: boolean;
+  cancellationData: CancelattionData;
+  orderFormCreationDate: string;
+  marketplaceRequestedCancellationWindow: null;
+}
+
+interface CancelattionData {
+  requestedByUser: true;
+  reason: string;
+  cancellationDate: string;
+  cancellationRequestId: string;
+  requestedBy: null;
+  cancellationSource: null;
+}
+
 export interface Order {
   ShippingEstimatedDate?: Date;
   ShippingEstimatedDateMax: string;
@@ -1365,7 +1358,6 @@ export interface Order {
   invoiceOutput: string[];
   isAllDelivered: boolean;
   isAnyDelivered: boolean;
-  itemMetadata: ItemMetadata;
   items: OrderFormItem[];
   lastChange: string;
   lastMessageUnread: string;
@@ -1386,140 +1378,6 @@ export interface Order {
   totalValue: number;
   workflowInErrorState: boolean;
   workflowInRetry: boolean;
-}
-
-export interface Package {
-  cfop: string | null;
-  invoiceNumber: string;
-  invoiceValue: number;
-  invoiceUrl: string | null;
-  issuanceDate: string;
-  trackingNumber: string | null;
-  invoiceKey: string;
-  trackingUrl: string | null;
-  embeddedInvoice: string;
-  courierStatus: {
-    status: string | null;
-    finished: boolean;
-    deliveredDate: string;
-  };
-  type: "Input" | "Output";
-}
-
-export interface OrderItem {
-  orderId: string;
-  sequence: string;
-  origin: string;
-  sellerOrderId: string;
-  salesChannel: string;
-  affiliateId: string;
-  workflowIsInError: boolean;
-  orderGroup: string;
-  status: string;
-  statusDescription: string;
-  value: number;
-  allowCancellation: boolean;
-  allowEdition?: boolean;
-  authorizedDate: string;
-  callCenterOperatorData: string;
-  cancelReason: string;
-  packageAttachment: {
-    packages: Package[];
-  } | null;
-  cancellationData: {
-    RequestedByUser: boolean;
-    RequestedBySystem: boolean;
-    RequestedBySellerNotification: boolean;
-    RequestedByPaymentNotification: boolean;
-    Reason: string;
-    CancellationDate: string;
-  };
-  cancellationRequests?: {
-    id: string;
-    reason: string;
-    cancellationRequestDate: string;
-    requestedByUser: boolean;
-    deniedBySeller: boolean;
-    deniedBySellerReason: string | null;
-    cancellationRequestDenyDate: string | null;
-  }[] | null;
-  changesAttachment: ChangesAttachment;
-  checkedInPickupPointId: string | null;
-  paymentData: PaymentDataOpenAPI;
-  shippingData: ShippingData;
-  clientPreferencesData: ClientPreferencesData;
-  clientProfileData: ClientProfileData;
-  totals: Total[];
-  commercialConditionData?: string | null;
-  creationDate: string;
-  // deno-lint-ignore no-explicit-any
-  customData?: Record<string, any> | null;
-  followUpEmail?: string;
-  giftRegistryData?: GiftRegistry | null;
-  hostname: string;
-  invoiceData: string | null;
-  invoicedDate: string | null;
-  isCheckedIn: boolean;
-  isCompleted: boolean;
-  storePreferencesData: StorePreferencesData;
-  sellers?: {
-    id: string;
-    name: string;
-    logo: string;
-    fulfillmentEndpoint: string;
-  }[];
-  itemMetadata: ItemMetadata;
-  items: OrderFormItem[];
-  lastChange: string;
-  lastMessage: string;
-  marketingData: OrderFormMarketingData | null;
-  marketplace: Marketplace;
-  marketplaceItems: [];
-  marketplaceOrderId: string;
-  marketplaceServicesEndpoint: string;
-  merchantName: string;
-  openTextField: string | null;
-}
-
-export interface CanceledOrder {
-  date?: string;
-  orderId?: string;
-  receipt?: string | null;
-}
-
-interface CancellationData {
-  requestedByUser: true;
-  reason: string;
-  cancellationDate: string;
-  cancellationRequestId: string;
-  requestedBy: null;
-  cancellationSource: null;
-}
-
-interface Marketplace {
-  baseURL: string;
-  // deno-lint-ignore no-explicit-any
-  isCertified?: any | null;
-  name: string;
-}
-
-interface OrderFormMarketingData {
-  utmCampaign?: string;
-  utmMedium?: string;
-  utmSource?: string;
-  utmiCampaign?: string;
-  utmiPart?: string;
-  utmipage?: string;
-  marketingTags?: string | string[];
-}
-
-interface GiftRegistry {
-  attachmentId: string;
-  giftRegistryId: string;
-  giftRegistryType: string;
-  giftRegistryTypeName: string;
-  addressId: string;
-  description: string;
 }
 
 export interface Orders {
@@ -1736,6 +1594,191 @@ export interface AdvancedLoaderConfig {
 
 export type Maybe<T> = T | null | undefined;
 
+export interface AddressInput {
+  name?: string;
+  addressName: string;
+  addressType?: string;
+  city?: string;
+  complement?: string;
+  country?: string;
+  geoCoordinates?: number[];
+  neighborhood?: string;
+  number?: string;
+  postalCode?: string;
+  receiverName?: string;
+  reference?: string;
+  state?: string;
+  street?: string;
+}
+
+export interface SavedAddress {
+  id: string;
+  cacheId: string;
+}
+
+export type SimulationBehavior = "default" | "skip" | "only1P";
+
+export enum DeviceType {
+  Mobile = "MOBILE",
+  Tablet = "TABLET",
+  Desktop = "DESKTOP",
+}
+
+export interface LoginSession {
+  id: string;
+  cacheId: string;
+  deviceType: DeviceType;
+  city?: Maybe<string>;
+  lastAccess: string;
+  browser?: Maybe<string>;
+  os?: Maybe<string>;
+  ip?: Maybe<string>;
+  fullAddress?: Maybe<string>;
+  firstAccess: string;
+}
+
+export interface LoginSessionsInfo {
+  currentLoginSessionId?: Maybe<string>;
+  loginSessions?: Maybe<LoginSession[]>;
+}
+
+export interface Session {
+  id: string;
+  namespaces?: {
+    profile: SessionProfile;
+    impersonate: SessionImpersonate;
+    authentication: Record<string, string>;
+    public: SessionPublic;
+  };
+}
+
+export interface SessionProfile {
+  id?: { value: string };
+  email?: { value: string };
+  firstName?: { value: string };
+  lastName?: { value: string };
+  phone?: { value: string };
+  isAuthenticated?: { value: string };
+  priceTables?: { value: string };
+}
+
+export interface SessionImpersonate {
+  storeUserEmail?: { value: string };
+  storeUserId?: { value: string };
+}
+
+export interface SessionPublic {
+  orderFormId?: { value: string };
+  utm_source?: { value: string };
+  utm_medium?: { value: string };
+  utm_campaign?: { value: string };
+  utm_term?: { value: string };
+  utm_content?: { value: string };
+  utmi_cp?: { value: string };
+  utmi_pc?: { value: string };
+  utmi_p?: { value: string };
+}
+
+export interface ProfileCustomField {
+  key?: Maybe<string>;
+  value?: Maybe<string>;
+}
+
+export interface PaymentProfile {
+  cacheId?: Maybe<string>;
+  id?: Maybe<string>;
+  paymentSystem?: Maybe<string>;
+  paymentSystemName?: Maybe<string>;
+  cardNumber?: Maybe<string>;
+  address?: Maybe<Address>;
+  isExpired?: Maybe<boolean>;
+  expirationDate?: Maybe<string>;
+  accountStatus?: Maybe<string>;
+}
+
+export interface Profile {
+  cacheId?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
+  profilePicture?: Maybe<string>;
+  email?: Maybe<string>;
+  document?: Maybe<string>;
+  userId?: Maybe<string>;
+  birthDate?: Maybe<string>;
+  gender?: Maybe<string>;
+  homePhone?: Maybe<string>;
+  businessPhone?: Maybe<string>;
+  addresses?: Maybe<Address[]>;
+  isCorporate?: Maybe<boolean>;
+  corporateName?: Maybe<string>;
+  corporateDocument?: Maybe<string>;
+  stateRegistration?: Maybe<string>;
+  payments?: Maybe<PaymentProfile[]>;
+  customFields?: Maybe<ProfileCustomField[]>;
+  passwordLastUpdate?: Maybe<string>;
+  pii?: Maybe<boolean>;
+  tradeName?: Maybe<string>;
+}
+
+export interface ProfileInput {
+  email: string;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
+  document?: Maybe<string>;
+  phone?: Maybe<string>;
+  birthDate?: Maybe<string>;
+  gender?: Maybe<string>;
+  homePhone?: Maybe<string>;
+  businessPhone?: Maybe<string>;
+  tradeName?: Maybe<string>;
+  corporateName?: Maybe<string>;
+  corporateDocument?: Maybe<string>;
+  stateRegistration?: Maybe<string>;
+  isCorporate?: Maybe<boolean>;
+}
+
+export interface AuthResponse {
+  authStatus: string | "WrongCredentials" | "BlockedUser" | "Success";
+  promptMFA: boolean;
+  clientToken: string | null;
+  authCookie: {
+    Name: string;
+    Value: string;
+  } | null;
+  accountAuthCookie: {
+    Name: string;
+    Value: string;
+  } | null;
+  expiresIn: number;
+  userId: string | null;
+  phoneNumber: string | null;
+  scope: string | null;
+}
+
+export interface AuthProvider {
+  providerName: string;
+  className: string;
+  expectedContext: unknown[];
+}
+
+export interface StartAuthentication {
+  authenticationToken: string | null;
+  oauthProviders: AuthProvider[];
+  showClassicAuthentication: boolean;
+  showAccessKeyAuthentication: boolean;
+  showPasskeyAuthentication: boolean;
+  authCookie: string | null;
+  isAuthenticated: boolean;
+  selectedProvider: string | null;
+  samlProviders: unknown[];
+}
+
+export interface CanceledOrder {
+  date?: string;
+  orderId?: string;
+  receipt?: string | null;
+}
+
 export interface ReceiptData {
   ReceiptCollection: Receipt[];
 }
@@ -1750,6 +1793,15 @@ export interface Receipt {
   MerchantName: string;
   SellerOrderId: string | null;
   ValueAsInt: number | null;
+}
+
+export interface CancellationData {
+  requestedByUser: boolean;
+  reason: string;
+  cancellationDate: string;
+  cancellationRequestId: string;
+  requestedBy: string | null;
+  cancellationSource: string | null;
 }
 
 export interface OrderFormOrder {

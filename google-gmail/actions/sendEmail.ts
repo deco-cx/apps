@@ -64,6 +64,23 @@ interface SendEmailResponse {
 }
 
 /**
+ * Encode subject line for MIME headers (RFC 2047)
+ * @param subject - The subject string to encode
+ * @returns Encoded subject string
+ */
+function encodeSubject(subject: string): string {
+  // Check if subject contains non-ASCII characters
+  // deno-lint-ignore no-control-regex
+  if (/[^\u0000-\u007F]/.test(subject)) {
+    // Use base64 encoding for UTF-8
+    const encoded = btoa(unescape(encodeURIComponent(subject)));
+    return `=?UTF-8?B?${encoded}?=`;
+  }
+  // Return as-is if only ASCII characters
+  return subject;
+}
+
+/**
  * @title Send Email
  * @description Sends an email through Gmail API
  */
@@ -87,27 +104,27 @@ const action = async (
 
     if (!to) {
       return {
-        error: "Campo 'to' é obrigatório",
+        error: "field 'to' is required",
       };
     }
 
     if (!subject) {
       return {
-        error: "Campo 'subject' é obrigatório",
+        error: "field 'subject' is required",
       };
     }
 
     if (!bodyText && !bodyHtml) {
       return {
         error:
-          "Pelo menos um dos campos 'bodyText' ou 'bodyHtml' é obrigatório",
+          "at least one of the fields 'bodyText' or 'bodyHtml' is required",
       };
     }
 
     const headers = [
       "MIME-Version: 1.0",
       `To: ${to}`,
-      `Subject: ${subject}`,
+      `Subject: ${encodeSubject(subject)}`,
     ];
 
     if (cc) headers.push(`Cc: ${cc}`);
@@ -173,10 +190,10 @@ const action = async (
       });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      return {
-        error: `Gmail API error: ${response.status} - ${errorData}`,
-      };
+      ctx.errorHandler.toHttpError(
+        response,
+        `Error to send email: ${response.statusText}`,
+      );
     }
 
     const result = await response.json() as SendEmailResponse;
@@ -187,11 +204,7 @@ const action = async (
       labelIds: result.labelIds || [],
     };
   } catch (error) {
-    return {
-      error: `Erro interno: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    };
+    ctx.errorHandler.toHttpError(error, "Error to send email");
   }
 };
 

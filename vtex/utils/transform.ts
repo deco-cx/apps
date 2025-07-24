@@ -9,6 +9,7 @@ import type {
   OpeningHoursSpecification,
   PageType,
   Place,
+  PostalAddress,
   Product,
   ProductDetailsPage,
   ProductGroup,
@@ -22,7 +23,7 @@ import type { PickupPoint as PickupPointVCS } from "./openapi/vcs.openapi.gen.ts
 import { pick } from "./pickAndOmit.ts";
 import { slugify } from "./slugify.ts";
 import type {
-  AdverTisement,
+  Address,
   Brand as BrandVTEX,
   Category,
   Facet as FacetVTEX,
@@ -1228,8 +1229,8 @@ export function toPlace(
     : {
       name: pickupPoint.friendlyName,
       country: pickupPoint.address?.country,
-      latitude: pickupPoint.address?.geoCoordinates[0],
-      longitude: pickupPoint.address?.geoCoordinates[1],
+      latitude: pickupPoint.address?.geoCoordinates?.[0],
+      longitude: pickupPoint.address?.geoCoordinates?.[1],
       specialOpeningHoursSpecification: pickupPoint.pickupHolidays?.map(
         toSpecialHoursSpecification,
       ),
@@ -1275,3 +1276,19 @@ export function toPlace(
     ],
   };
 }
+
+export const toPostalAddress = (address: Address): PostalAddress => {
+  return {
+    "@type": "PostalAddress",
+    "@id": address.addressId,
+    addressCountry: address.country,
+    addressLocality: address.city,
+    addressRegion: address.state,
+    addressDistrict: address.neighborhood,
+    postalCode: address.postalCode,
+    streetAddress: address.street,
+    name: address.addressName || undefined,
+    alternateName: address.receiverName || undefined,
+    description: address.complement || undefined,
+  };
+};

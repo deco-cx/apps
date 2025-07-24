@@ -45,7 +45,7 @@ export default async function loader(
   }
 
   const order = await vcsDeprecated["GET /api/checkout/pub/orders/:orderId"]({
-    orderId: orderId.includes("-") ? orderId : orderId + "-01",
+    orderId,
   }, {
     headers: { cookie },
   }).then((res) => res.json());

@@ -1,16 +1,20 @@
 import { useScriptAsDataURI } from "@deco/deco/hooks";
 import {
   DEFAULT_COLLECTOR_ADDRESS,
-  trackerOriginal,
 } from "../../website/components/OneDollarStats.tsx";
 import { Script } from "../../website/types.ts";
 import { type Flag } from "@deco/deco";
+import { DEFAULT_ANALYTICS_SCRIPT_URL } from "../../website/loaders/analyticsScript.ts";
 
 export interface Props {
   /**
    * @description collector address to use
    */
   collectorAddress?: string;
+  /**
+   * @description static script to use
+   */
+  staticScriptUrl?: string;
 }
 
 const snippet = () => {
@@ -66,6 +70,8 @@ const snippet = () => {
 const loader = (props: Props): Script => {
   const transformReq = () => {
     const collector = props.collectorAddress ?? DEFAULT_COLLECTOR_ADDRESS;
+    const staticScriptUrl = props.staticScriptUrl ??
+      DEFAULT_ANALYTICS_SCRIPT_URL;
     const dnsPrefetchLink = `<link rel="dns-prefetch" href="${collector}" />`;
     const preconnectLink =
       `<link rel="preconnect" href="${collector}" crossorigin="anonymous" />`;
@@ -74,7 +80,9 @@ const loader = (props: Props): Script => {
         data-autocollect="false"
         data-hash-routing="true"
         data-url="${collector}"
-      >${trackerOriginal}</script>`;
+        src="/live/invoke/website/loaders/analyticsScript.ts?url=${staticScriptUrl}"
+      ></script>`;
+
     const script = `<script defer src="${
       useScriptAsDataURI(snippet)
     }"></script>`;

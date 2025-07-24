@@ -30,9 +30,9 @@ interface Props {
 /**
  * @title ElevenLabs
  * @name ElevenLabs
- * @description ElevenLabs Text-to-Speech and Voice AI Platform. A presigned URL is required to upload the result of any tool call.
+ * @description Turn text into realistic speech with ElevenLabs voice models.
  * @category Tool
- * @logo https://elevenlabs.io/favicon.ico
+ * @logo https://assets.decocache.com/mcp/d5b8b14e-7611-4cdd-8453-cad6a4c23703/ElevenLabs.svg
  */
 export default function ElevenLabs(props: Props): App<Manifest, State> {
   const { apiKey, baseURL, headers } = props;

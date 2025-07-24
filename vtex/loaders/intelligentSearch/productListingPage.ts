@@ -34,6 +34,7 @@ import type {
   PageType,
   RangeFacet,
   SelectedFacet,
+  SimulationBehavior,
   Sort,
 } from "../../utils/types.ts";
 import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
@@ -176,17 +177,13 @@ export interface Props {
    * @title Simulation Behavior
    * @description Defines the simulation behavior.
    */
-  simulationBehavior?: "default" | "skip" | "only1P";
+  simulationBehavior?: SimulationBehavior;
 }
 const searchArgsOf = (props: Props, url: URL, ctx: AppContext) => {
   const hideUnavailableItems = props.hideUnavailableItems;
-  const simulationBehavior = getSkipSimulationBehaviorFromBag(ctx)
-    ? "skip" as const
-    : (url.searchParams.get("simulationBehavior") as
-      | "skip"
-      | "default"
-      | "only1P") ||
-      props.simulationBehavior || "default";
+  const simulationBehavior =
+    url.searchParams.get("simulationBehavior") as SimulationBehavior ||
+    props.simulationBehavior || "default";
   const countFromSearchParams = url.searchParams.get("PS");
   const count = Number(countFromSearchParams ?? props.count ?? 12);
   const query = props.query ?? url.searchParams.get("q") ?? "";
@@ -527,9 +524,8 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     ["segment", segment],
     [
       "simulationBehavior",
-      getSkipSimulationBehaviorFromBag(ctx)
-        ? "skip"
-        : props.simulationBehavior || "default",
+      url.searchParams.get("simulationBehavior") || props.simulationBehavior ||
+      "default",
     ],
   ]);
   url.searchParams.forEach((value, key) => {

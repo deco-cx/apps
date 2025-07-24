@@ -1,35 +1,35 @@
 import type { AppContext } from "../mod.ts";
-import type { ListBasesResponse } from "../types.ts";
+import type {
+  ListBasesResponse,
+  ValidationFilterResult,
+  ValidationResult,
+} from "../utils/types.ts";
 
 interface Props {
-  // If the API supports pagination for bases via offset, it could be a prop here.
-  // For now, let's assume we fetch all or the first page as per client default.
-  offset?: string;
   /**
-   * @title API Key
+   * @title Offset
+   * @description Pagination offset for listing bases
    */
-  apiKey?: string;
+  offset?: string;
 }
 
 /**
+ * @name List_Bases
  * @title List Airtable Bases
- * @description Fetches a list of bases accessible with the configured API key.
+ * @description Fetches a list of bases accessible with OAuth token.
  */
 const loader = async (
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<ListBasesResponse | Response> => {
-  const { apiKey, offset } = props;
+  const { offset } = props;
 
-  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
-  const resolvedApiKey = authHeader || apiKey;
-
-  if (!resolvedApiKey) {
-    return new Response("API Key is required", { status: 403 });
+  if (!ctx.client) {
+    return new Response("OAuth authentication is required", { status: 401 });
   }
 
-  const response = await ctx.api(resolvedApiKey)["GET /v0/meta/bases"](
+  const response = await ctx.client["GET /v0/meta/bases"](
     offset ? { offset: offset } : {},
   );
 
@@ -37,7 +37,20 @@ const loader = async (
     throw new Error(`Error listing bases: ${response.statusText}`);
   }
 
-  return response.json();
+  const data = await response.json();
+
+  const validationResult: ValidationResult = await ctx.invoke["airtable"]
+    .loaders.permissioning.validatePermissions({
+      mode: "filter",
+      response: data,
+    });
+
+  if ("error" in validationResult && validationResult.error) {
+    return new Response(validationResult.error, { status: 403 });
+  }
+
+  const filterResult = validationResult as ValidationFilterResult;
+  return (filterResult.filteredResponse || data) as ListBasesResponse;
 };
 
 export default loader;

@@ -27,6 +27,7 @@ export class HttpError extends DecoHttpError {
         },
       }),
     );
+    this.message = message ?? `http error ${status}`;
     this.name = `HttpError ${status}`;
   }
 }
@@ -169,16 +170,18 @@ export const createHttpClient = <T>(
           .split("/")
           .flatMap((segment) => {
             const isTemplate = segment.at(0) === ":" || segment.at(0) === "*";
-            const isRequred = segment.at(-1) !== "?";
+            const isRequired = segment.at(-1) !== "?";
             if (!isTemplate) {
               return segment;
             }
-            const name = segment.slice(1, !isRequred ? -1 : undefined);
+
+            const name = segment.slice(1, !isRequired ? -1 : undefined);
 
             const param = mapped.get(name);
-            if (param === undefined && isRequred) {
+            if (param === undefined && isRequired) {
               throw new TypeError(`HttpClient: Missing ${name} at ${path}`);
             }
+
             return param;
           })
           .filter((x) =>

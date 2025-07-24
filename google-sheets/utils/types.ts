@@ -217,6 +217,21 @@ export interface ValueRange {
   range?: string;
   majorDimension?: string;
   values?: CellValue[][];
+  meta?: {
+    totalResults: number;
+    hasResults: boolean;
+    query: string;
+    searchedSheet?: string;
+    searchedSheets?: string[];
+    message: string;
+    resultDetails: Array<{
+      sheet: string;
+      resultIndex: number;
+      originalRowEstimate: number;
+      columnCount: number;
+      columnRange: string;
+    }>;
+  };
 }
 
 export interface BatchUpdateValuesRequest {
@@ -564,4 +579,13 @@ export interface OptimizedSpreadsheetMetadata {
     dataRange?: string;
     filledCells?: number;
   }>;
+}
+
+export interface ActionBatchUpdateProps {
+  first_cell_location?: string;
+  includeValuesInResponse?: boolean;
+  sheet_name: string;
+  spreadsheet_id: string;
+  valueInputOption?: "RAW" | "USER_ENTERED";
+  values: string[][];
 }

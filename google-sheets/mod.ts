@@ -5,10 +5,11 @@ import { McpContext } from "../mcp/context.ts";
 import {
   GOOGLE_OAUTH_URL,
   GOOGLE_OAUTH_URL_AUTH,
+  GOOGLE_SHEETS_ERROR_MESSAGES,
   GOOGLE_SHEETS_URL,
   SCOPES,
 } from "./utils/constant.ts";
-import { GoogleAuthClient, GoogleSheetsClient } from "./utils/client.ts";
+import { GoogleSheetsClient } from "./utils/client.ts";
 import {
   DEFAULT_OAUTH_HEADERS,
   OAuthClientOptions,
@@ -16,6 +17,15 @@ import {
   OAuthProvider,
   OAuthTokens,
 } from "../mcp/oauth.ts";
+import {
+  createErrorHandler,
+  ErrorHandler,
+} from "../mcp/utils/errorHandling.ts";
+import {
+  createGoogleOAuthUserInfoClient,
+  GoogleUserInfoClient,
+} from "../mcp/utils/google/userInfo.ts";
+import { GoogleAuthClient } from "../mcp/utils/google/authClient.ts";
 
 export const GoogleProvider: OAuthProvider = {
   name: "Google",
@@ -34,15 +44,17 @@ export interface Props {
 
 export interface State extends Props {
   client: OAuthClients<GoogleSheetsClient, GoogleAuthClient>;
+  userInfoClient: GoogleUserInfoClient;
+  errorHandler: ErrorHandler;
 }
 
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Google Sheets
- * @description Create, edit and manage Google Sheets spreadsheets
+ * @description Create, read, and update spreadsheets with structured data.
  * @category Productivity
- * @logo https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Google_Sheets_logo_%282014-2020%29.svg/1498px-Google_Sheets_logo_%282014-2020%29.svg.png
+ * @logo https://assets.decocache.com/mcp/0b05c082-ce9d-4879-9258-1acbecf9bf68/Google-Sheets.svg
  */
 export default function App(
   props: Props,
@@ -82,10 +94,31 @@ export default function App(
     },
   });
 
+  const userInfoClient = createGoogleOAuthUserInfoClient({
+    provider: googleProvider,
+    tokens,
+    options,
+    onTokenRefresh: async (newTokens: OAuthTokens) => {
+      if (ctx) {
+        await ctx.configure({
+          ...ctx,
+          tokens: newTokens,
+        });
+      }
+    },
+  });
+
+  const errorHandler = createErrorHandler({
+    errorMessages: GOOGLE_SHEETS_ERROR_MESSAGES,
+    defaultErrorMessage: "Google Sheets operation failed",
+  });
+
   const state: State = {
     ...props,
     tokens,
     client,
+    userInfoClient,
+    errorHandler,
   };
 
   return {

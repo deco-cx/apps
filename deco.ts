@@ -10,8 +10,18 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("pncp"),
+    app("google-calendar"),
+    app("apify"),
+    app("google-docs"),
+    app("google-drive"),
+    app("google-youtube"),
+    app("barte"),
+    app("hubspot"),
+    app("pinecone-assistant"),
+    app("shopify-mcp"),
+    app("superfrete"),
     app("google-gmail"),
-    app("console-binding"),
     app("github"),
     app("turso-db"),
     app("discohook"),
@@ -75,9 +85,12 @@ const config = {
     app("crux"),
     app("decohub"),
     app("htmx"),
+    app("querido-diario"),
     app("sap"),
     app("tiptap-cloud"),
     app("browser-use"),
+    app("clearsale"),
+    app("spotify"),
     ...compatibilityApps,
   ],
 };

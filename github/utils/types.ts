@@ -70,3 +70,49 @@ export interface OauthResponse {
   error?: string;
   error_description?: string;
 }
+
+export interface GithubIssueClean {
+  number: number;
+  state: "open" | "closed";
+  title: string;
+  body: string;
+  url: string;
+  labels: string[];
+  user: string;
+  created_at: string;
+  closed_at?: string;
+  comments: number;
+  assignees: string[];
+}
+
+export interface GithubIssueLabel {
+  id: number;
+  name: string;
+  [key: string]: unknown;
+}
+
+export interface GithubIssueAssignee {
+  login: string;
+  [key: string]: unknown;
+}
+
+export interface GithubIssueUser {
+  login: string;
+  [key: string]: unknown;
+}
+
+export interface GithubIssue {
+  number: number;
+  state: "open" | "closed";
+  title: string;
+  body: string;
+  html_url: string;
+  labels: (GithubIssueLabel | string)[];
+  user: GithubIssueUser;
+  created_at: string;
+  closed_at?: string;
+  comments: number;
+  assignees: GithubIssueAssignee[];
+  pull_request?: unknown;
+  [key: string]: unknown;
+}
