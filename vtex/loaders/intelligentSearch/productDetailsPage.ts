@@ -116,13 +116,13 @@ const loader = async (
     return null;
   }
 
-  const legacyQuery = skuId ? `skuId:${skuId}` : `productId:${productId}`;
-  const res = await vcsDeprecated
-    ["GET /api/catalog_system/pub/products/search/:term?"]({
-      fq: [legacyQuery],
-    });
+  // const legacyQuery = skuId ? `skuId:${skuId}` : `productId:${productId}`;
+  // const res = await vcsDeprecated
+  //   ["GET /api/catalog_system/pub/products/search/:term?"]({
+  //     fq: [legacyQuery],
+  //   });
 
-  const [legacyProduct] = (await res.json()) as LegacyProduct[];
+  // const [legacyProduct] = (await res.json()) as LegacyProduct[];
   const sku = pickSku(product, skuId?.toString());
 
   let kitItems: VTEXProduct[] = [];
@@ -163,8 +163,8 @@ const loader = async (
       ? {
         ...seo,
         noIndexing: props.indexingSkus ? false : seo.noIndexing,
-        legacyProductTitle: legacyProduct?.productTitle || "",
-        legacyDescritionMetaTag: legacyProduct?.metaTagDescription || "",
+        // legacyProductTitle: legacyProduct?.productTitle || "",
+        // legacyDescritionMetaTag: legacyProduct?.metaTagDescription || "",
       }
       : null,
   };
