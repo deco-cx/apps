@@ -16,6 +16,8 @@ export interface OAuthProvider {
   scopes: string[];
   clientId: string;
   clientSecret: string;
+  grant_type?: string;
+  tokenParamsLocation?: "body" | "query";
 }
 
 export interface OAuthTokenEndpoint {

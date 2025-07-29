@@ -34,6 +34,7 @@ export const GoogleProvider: OAuthProvider = {
   scopes: SCOPES,
   clientId: "",
   clientSecret: "",
+  grant_type: "refresh_token",
 };
 
 export interface Props {
@@ -99,6 +100,7 @@ export default function App(
     tokens,
     options,
     onTokenRefresh: async (newTokens: OAuthTokens) => {
+      console.log("onTokenRefresh", newTokens);
       if (ctx) {
         await ctx.configure({
           ...ctx,

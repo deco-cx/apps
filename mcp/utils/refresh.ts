@@ -23,10 +23,47 @@ export interface TokenRefresher<TAuthClient> {
   getTokens: () => OAuthTokens;
 }
 
+type TokenParams = {
+  grant_type: string;
+  refresh_token: string;
+  client_id: string;
+  client_secret: string;
+};
+
+type TokenEndpointWithBody = (
+  query: unknown,
+  body: string,
+) => Promise<Response>;
+type TokenEndpointWithQuery = (query: TokenParams) => Promise<Response>;
+
 export function createTokenRefresher<TAuthClient>(
   config: TokenRefresherConfig<TAuthClient>,
 ): TokenRefresher<TAuthClient> {
   const { tokens } = config;
+
+  const buildTokenParams = (refreshToken: string): TokenParams => ({
+    grant_type: config.provider.grant_type || "refresh_token",
+    refresh_token: refreshToken,
+    client_id: config.provider.clientId,
+    client_secret: config.provider.clientSecret,
+  });
+
+  const callTokenEndpointWithBody = async (
+    params: TokenParams,
+  ): Promise<Response> => {
+    const endpoint = config
+      .authClient[config.tokenEndpoint] as unknown as TokenEndpointWithBody;
+    const body = new URLSearchParams(params).toString();
+    return await endpoint({}, body);
+  };
+
+  const callTokenEndpointWithQuery = async (
+    params: TokenParams,
+  ): Promise<Response> => {
+    const endpoint = config
+      .authClient[config.tokenEndpoint] as unknown as TokenEndpointWithQuery;
+    return await endpoint(params);
+  };
 
   const fetchNewTokens = async (): Promise<OAuthTokens> => {
     const refreshToken = tokens.refresh_token!;
@@ -37,25 +74,17 @@ export function createTokenRefresher<TAuthClient>(
         client_id: config.provider.clientId,
         client_secret: config.provider.clientSecret,
       });
-    } else {
-      const response =
-        await (config.authClient[config.tokenEndpoint] as unknown as (
-          query: unknown,
-          args: {
-            grant_type: string;
-            refresh_token: string;
-            client_id: string;
-            client_secret: string;
-          },
-        ) => Promise<Response>)({}, {
-          grant_type: "refresh_token",
-          refresh_token: refreshToken,
-          client_id: config.provider.clientId,
-          client_secret: config.provider.clientSecret,
-        });
-
-      return (await response.json()) as OAuthTokens;
     }
+
+    const params = buildTokenParams(refreshToken);
+
+    const useBodyParams = config.provider.tokenParamsLocation === "body";
+
+    const response = useBodyParams
+      ? await callTokenEndpointWithBody(params)
+      : await callTokenEndpointWithQuery(params);
+
+    return (await response.json()) as OAuthTokens;
   };
 
   const updateTokens = (newTokens: OAuthTokens): void => {
