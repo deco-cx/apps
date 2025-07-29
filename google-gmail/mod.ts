@@ -34,6 +34,7 @@ export const GoogleProvider: OAuthProvider = {
   scopes: SCOPES,
   clientId: "",
   clientSecret: "",
+  grant_type: "refresh_token",
 };
 
 export interface Props {
