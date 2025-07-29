@@ -18,7 +18,7 @@ export default async function callback(
   { code, installId, clientId, clientSecret, redirectUri }: Props,
   req: Request,
   ctx: AppContext,
-): Promise<{ installId: string }> {
+): Promise<{ installId: string; name: string }> {
   const finalRedirectUri = redirectUri ||
     new URL("/oauth/callback", req.url).href;
 
@@ -63,5 +63,5 @@ export default async function callback(
     },
   });
 
-  return { installId };
+  return { installId, name: `Slack | ${tokenData.team.name}` };
 }

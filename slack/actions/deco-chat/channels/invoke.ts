@@ -1,4 +1,5 @@
 import { JoinChannelProps, processStream } from "../../../../mcp/bindings.ts";
+import { DECO_CHAT_CHANNEL_ID } from "../../../loaders/deco-chat/channels/list.ts";
 import type { AppContext, SlackWebhookPayload } from "../../../mod.ts";
 
 /**
@@ -14,9 +15,12 @@ export default async function invoke(
   if (challenge) {
     return { challenge };
   }
+  const [joinChannel, channel, thread] = props.event.channel_type === "im"
+    ? [DECO_CHAT_CHANNEL_ID, props.event.channel, props.event.user]
+    : [props.event.channel, props.event.channel, props.event.channel];
   const linkProps =
     await ctx.appStorage.getItem<JoinChannelProps & { installId: string }>(
-      ctx.cb.forTeam(props.event.team, props.event.channel),
+      ctx.cb.forTeam(props.event.team, joinChannel),
     ) ??
       undefined;
   if (!linkProps) {
@@ -28,8 +32,10 @@ export default async function invoke(
   // avoid loops
   if (
     botId &&
-    props.type === "app_mention" &&
-    props.user === botId
+    ((props.type === "app_mention" &&
+      props.user === botId) ||
+      (props.event.channel_type === "im" &&
+        props.event.user === botId))
   ) {
     return;
   }
@@ -39,7 +45,7 @@ export default async function invoke(
   const streamURL = new URL(streamCallbackUrl);
   streamURL.searchParams.set(
     "__d",
-    `slack-${props.event.team}-${props.event.channel}`,
+    `slack-${props.event.team}-${channel}`,
   );
   const toolCallMessageTs: Record<
     string,
@@ -54,8 +60,8 @@ export default async function invoke(
         role: "user",
       }],
       options: {
-        threadId: props.event.channel,
-        resourceId: props.event.channel,
+        threadId: thread,
+        resourceId: thread,
       },
     },
     onToolCallPart: async (toolCall) => {
@@ -91,7 +97,7 @@ export default async function invoke(
           ],
         },
       ];
-      const response = await client.postMessage(props.event.channel, "", {
+      const response = await client.postMessage(channel, "", {
         thread_ts: props.event.ts,
         blocks,
       });
@@ -152,7 +158,7 @@ export default async function invoke(
             ],
           },
         ];
-        await client.updateMessage(props.event.channel, call.ts, "", {
+        await client.updateMessage(channel, call.ts, "", {
           blocks,
         });
       }
@@ -161,7 +167,7 @@ export default async function invoke(
       buffer += part;
     },
     onErrorPart: async (err: string) => {
-      await client.postMessage(props.event.channel, `❌ Error: ${err}`, {
+      await client.postMessage(channel, `❌ Error: ${err}`, {
         thread_ts: props.event.ts,
       });
     },
@@ -169,7 +175,7 @@ export default async function invoke(
       if (linkProps.agentLink && linkProps.agentName) {
         buffer = `<${linkProps.agentLink}|${linkProps.agentName}>: ${buffer}`;
       }
-      await client.postMessage(props.event.channel, buffer, {
+      await client.postMessage(channel, buffer, {
         thread_ts: props.event.ts,
       }).then((response) => {
         if (!response.ok) {

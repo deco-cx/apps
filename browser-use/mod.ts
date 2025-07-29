@@ -22,9 +22,9 @@ export interface State {
 
 /**
  * @name Browser Use
- * @description Automate browser tasks with AI agents using browser-use.com API
+ * @description Let agents control browsers to automate UI-based tasks.
  * @category AI Tools
- * @logo https://browser-use.com/favicon.ico
+ * @logo https://assets.decocache.com/mcp/1a7a2573-023c-43ed-82a2-95d77adca3db/Browser-Use.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { token } = props;

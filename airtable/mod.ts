@@ -16,6 +16,7 @@ import {
   OAuthProvider,
   OAuthTokens,
 } from "../mcp/oauth.ts";
+import type { Permission } from "./utils/types.ts";
 
 export const AirtableProvider: OAuthProvider = {
   name: "Airtable",
@@ -44,6 +45,12 @@ export interface Props {
    * @description OAuth client ID for authentication
    */
   clientId?: string;
+
+  /**
+   * @title Permission
+   * @description Permission to access the Airtable API and selected bases and tables
+   */
+  permission: Permission;
 }
 
 export interface State extends Props {
@@ -54,14 +61,14 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Airtable
- * @description Connect to Airtable bases and manage records, tables, and fields with OAuth 2.0 support
+ * @description Access and manage data from Airtable bases, tables, and records.
  * @category Productivity
- * @logo https://static-00.iconduck.com/assets.00/airtable-icon-512x428-olxouyvv.png
+ * @logo https://assets.decocache.com/mcp/e724f447-3b98-46c4-9194-6b79841305a2/Airtable.svg
  */
 export default function App(
   props: Props,
   _req: Request,
-  ctx?: McpContext<Props>,
+  ctx: AppContext,
 ) {
   const { tokens, clientId, clientSecret } = props;
 
@@ -70,7 +77,6 @@ export default function App(
     clientId: clientId ?? "",
     clientSecret: clientSecret ?? "",
   };
-
   const options: OAuthClientOptions = {
     headers: DEFAULT_OAUTH_HEADERS,
     authClientConfig: {
@@ -93,6 +99,30 @@ export default function App(
           tokens: newTokens,
         });
       }
+    },
+    customRefreshFunction: async (params: {
+      refresh_token: string;
+      client_id: string;
+      client_secret: string;
+    }) => {
+      const response = await fetch(OAUTH_URL_TOKEN, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json",
+          "Authorization": `Basic ${
+            btoa(`${params.client_id}:${params.client_secret}`)
+          }`,
+        },
+        body: new URLSearchParams({
+          grant_type: "refresh_token",
+          refresh_token: params.refresh_token,
+          client_id: params.client_id,
+          client_secret: params.client_secret,
+        }),
+      });
+
+      return response.json();
     },
   });
 

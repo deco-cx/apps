@@ -12,9 +12,18 @@ import type {
   UpdateFieldBody,
   UpdateRecordsBody,
   UpdateTableBody,
+  WhoamiResponse,
 } from "./types.ts";
 
 export interface AirtableClient {
+  /**
+   * Get current user
+   * @see https://airtable.com/developers/web/api/get-user-id-scopes
+   */
+  "GET /v0/meta/whoami": {
+    response: WhoamiResponse;
+  };
+
   /**
    * List bases
    * @see https://airtable.com/developers/web/api/list-bases
@@ -37,7 +46,7 @@ export interface AirtableClient {
    * List records
    * @see https://airtable.com/developers/web/api/list-records
    */
-  "GET /v0/:baseId/:tableIdOrName": {
+  "GET /v0/:baseId/:tableId": {
     response: ListRecordsResponse;
     searchParams?: ListRecordsOptions;
   };
@@ -46,7 +55,7 @@ export interface AirtableClient {
    * Retrieve a record
    * @see https://airtable.com/developers/web/api/get-record
    */
-  "GET /v0/:baseId/:tableIdOrName/:recordId": {
+  "GET /v0/:baseId/:tableId/:recordId": {
     response: AirtableRecord;
   };
 
@@ -57,7 +66,7 @@ export interface AirtableClient {
    * Let's define it for creating a single record as per the IAirtableService.createRecord
    * @see https://airtable.com/developers/web/api/create-records
    */
-  "POST /v0/:baseId/:tableIdOrName": {
+  "POST /v0/:baseId/:tableId": {
     body: CreateRecordBody; // { fields: FieldSet, typecast?: boolean }
     response: AirtableRecord;
   };
@@ -66,7 +75,7 @@ export interface AirtableClient {
    * Update records
    * @see https://airtable.com/developers/web/api/update-records
    */
-  "PATCH /v0/:baseId/:tableIdOrName": {
+  "PATCH /v0/:baseId/:tableId": {
     body: UpdateRecordsBody; // { records: Array<{ id: string; fields: FieldSet }>, typecast?: boolean, performUpsert?: ... }
     response: { records: AirtableRecord[] }; // API returns the updated records
   };
@@ -75,7 +84,7 @@ export interface AirtableClient {
    * Delete records
    * @see https://airtable.com/developers/web/api/delete-records
    */
-  "DELETE /v0/:baseId/:tableIdOrName": {
+  "DELETE /v0/:baseId/:tableId": {
     searchParams: { "records[]": string[] }; // records[]=recXXXXX&records[]=recYYYYY
     response: { records: Array<{ id: string; deleted: boolean }> };
   };
@@ -114,5 +123,34 @@ export interface AirtableClient {
   "PATCH /v0/meta/bases/:baseId/tables/:tableId/fields/:fieldId": {
     body: UpdateFieldBody; // { name?: string, description?: string }
     response: Field; // Returns the full Field object
+  };
+
+  /**
+   * Create base
+   * @see https://airtable.com/developers/web/api/create-base
+   */
+  "POST /v0/meta/bases": {
+    body: {
+      name: string;
+      workspaceId: string;
+      tables: Array<{
+        name: string;
+        description?: string;
+        fields: Array<{
+          name: string;
+          type: string;
+          description?: string;
+          options?: {
+            choices?: Array<{
+              name: string;
+              color?: string;
+            }>;
+            color?: string;
+            icon?: string;
+          };
+        }>;
+      }>;
+    };
+    response: { id: string; tables: Table[] };
   };
 }

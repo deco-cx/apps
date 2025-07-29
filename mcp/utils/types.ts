@@ -16,6 +16,8 @@ export interface OAuthProvider {
   scopes: string[];
   clientId: string;
   clientSecret: string;
+  grant_type?: string;
+  tokenParamsLocation?: "body" | "query";
 }
 
 export interface OAuthTokenEndpoint {
@@ -43,3 +45,13 @@ export type OAuthClients<TApiClient, TAuthClient> =
       refreshTokens: () => Promise<void>;
     };
   };
+
+export interface OverrideAuthHeaderProps {
+  /**
+   * @hide true
+   * The access token to use for the request.
+   * If not provided, the access token will be fetched from the session.
+   * Just for internal use, should not be filled by tool calls.
+   */
+  accessToken?: string;
+}

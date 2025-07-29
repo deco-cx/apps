@@ -1,4 +1,9 @@
-export const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
+import { GOOGLE_USER_INFO_SCOPES } from "../../mcp/utils/google/userInfo.ts";
+
+export const SCOPES = [
+  ...GOOGLE_USER_INFO_SCOPES,
+  "https://www.googleapis.com/auth/spreadsheets",
+];
 
 export const GOOGLE_SHEETS_URL = "https://sheets.googleapis.com";
 export const GOOGLE_OAUTH_URL = "https://oauth2.googleapis.com";

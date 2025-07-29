@@ -13,7 +13,10 @@ export default async function callback(
   { code, redirectUri, clientSecret, clientId, installId }: Props,
   _req: Request,
   ctx: AppContext,
-) {
+): Promise<{
+  installId?: string;
+  account?: string;
+}> {
   const currentCtx = await ctx.getConfiguration();
   const response = await fetch(`${GITHUB_URL_OAUTH_ACCESS_TOKEN}`, {
     method: "POST",
@@ -38,7 +41,14 @@ export default async function callback(
     token_type: authResponse.token_type,
   });
 
+  const account = await ctx.invoke.github.loaders.getAuthenticatedUser({
+    accessToken: authResponse.access_token,
+  })
+    .then((user) => user.login)
+    .catch(console.error) || undefined;
+
   return {
     installId,
+    account,
   };
 }

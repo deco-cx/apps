@@ -1,19 +1,18 @@
 import type { AppContext } from "../mod.ts";
-import type {
-  ListRecordsOptions,
-  ListRecordsResponse,
-} from "../utils/types.ts";
+import type { ListRecordsResponse } from "../utils/types.ts";
 
-interface Props extends Omit<ListRecordsOptions, "filterByFormula"> {
+interface Props extends Record<string, unknown> {
   /**
    * @title Base ID
+   * @description The ID of the Airtable base (e.g., appXXXXXXXXXXXXXX).
    */
   baseId: string;
 
   /**
-   * @title Table ID or Name
+   * @title Table ID
+   * @description The ID of the table within the base.
    */
-  tableIdOrName: string;
+  tableId: string;
 
   /**
    * @title Search Term
@@ -22,70 +21,101 @@ interface Props extends Omit<ListRecordsOptions, "filterByFormula"> {
   searchTerm: string;
 
   /**
-   * @title Fields to Search
-   * @description Optional. Array of field names (or IDs) to search within. If empty, attempts to search in all text-based fields.
+   * @title Search Fields
+   * @description Array of field names to search in. If not provided, searches in all fields.
    */
   searchFields?: string[];
-}
 
-// Helper to escape search term for formula
-function escapeAirtableFormulaValue(term: string): string {
-  return term.replace(/(["\\'])/g, "\\$1");
+  /**
+   * @title Max Records
+   * @description Maximum number of records to return.
+   */
+  maxRecords?: number;
+
+  /**
+   * @title Page Size
+   * @description Number of records per page.
+   */
+  pageSize?: number;
+
+  /**
+   * @title Offset
+   * @description Pagination offset for listing records.
+   */
+  offset?: string;
+
+  /**
+   * @title View
+   * @description The name or ID of the view to use.
+   */
+  view?: string;
+
+  /**
+   * @title Sort
+   * @description Array of sort objects to order the records.
+   */
+  sort?: Array<{
+    field: string;
+    direction: "asc" | "desc";
+  }>;
+
+  // TODO: Add fields to the response
+  // /**
+  //  * @title Fields
+  //  * @description Array of field names to include in the response.
+  //  */
+  // fields?: string[];
 }
 
 /**
+ * @name Search_Table_Records
  * @title Search Airtable Records
- * @description Searches records in a table based on a search term and specified fields using OAuth.
+ * @description Searches for records in a specific table using OAuth with optional field filtering.
  */
 const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<ListRecordsResponse | Response> => {
-  const {
-    baseId,
-    tableIdOrName,
-    searchTerm,
-    searchFields,
-    ...otherOptions
-  } = props;
-
   if (!ctx.client) {
     return new Response("OAuth authentication is required", { status: 401 });
   }
 
+  const validationResult = await ctx.invoke["airtable"].loaders.permissioning
+    .validatePermissions({
+      mode: "check",
+      baseId: props.baseId,
+      tableIdOrName: props.tableId,
+    });
+
+  if ("hasPermission" in validationResult && !validationResult.hasPermission) {
+    return new Response(validationResult.message || "Access denied", {
+      status: 403,
+    });
+  }
+
+  const { searchTerm, searchFields, ...otherProps } = props;
+
   let filterByFormula = "";
-  const escapedSearchTerm = escapeAirtableFormulaValue(searchTerm);
-
   if (searchFields && searchFields.length > 0) {
-    filterByFormula = `OR(${
-      searchFields.map((field) => `FIND("${escapedSearchTerm}", {${field}})`)
-        .join(",")
-    })`;
-  } else {
-    console.warn(
-      "SearchRecords: searchFields not provided. The search might not be effective unless a custom filterByFormula is also passed.",
+    const fieldFormulas = searchFields.map(
+      (field) => `SEARCH("${searchTerm}", {${field}})`,
     );
+    filterByFormula = `OR(${fieldFormulas.join(",")})`;
+  } else {
+    filterByFormula = `SEARCH("${searchTerm}", {*})`;
   }
 
-  const params: ListRecordsOptions = {
-    ...otherOptions,
-  };
-  if (filterByFormula) {
-    params.filterByFormula = filterByFormula;
-  }
-
-  const response = await ctx.client["GET /v0/:baseId/:tableIdOrName"]({
-    ...params,
-    baseId,
-    tableIdOrName,
+  const response = await ctx.client["GET /v0/:baseId/:tableId"]({
+    ...otherProps,
+    filterByFormula,
   });
 
   if (!response.ok) {
     throw new Error(`Error searching records: ${response.statusText}`);
   }
 
-  return response.json();
+  return await response.json();
 };
 
 export default loader;
