@@ -22,7 +22,7 @@ export default async function invoke(
     await ctx.appStorage.getItem<JoinChannelProps & { installId: string }>(
       ctx.cb.forTeam(props.event.team, joinChannel),
     ) ??
-    undefined;
+      undefined;
   if (!linkProps) {
     return;
   }

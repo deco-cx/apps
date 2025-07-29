@@ -131,11 +131,11 @@ export class SlackClient {
     teamId: string,
     limit: number = 100,
     cursor?: string,
-    types: ChannelType[] = ["public_channel"],
+    types: ChannelType[] = ["public_channel", "private_channel"],
   ): Promise<{ channels: SlackChannel[] }> {
     const params = new URLSearchParams({
       types: types.join(","),
-      exclude_archived: "true",
+      exclude_archived: "false",
       limit: Math.min(limit, 200).toString(),
       team_id: teamId,
     });

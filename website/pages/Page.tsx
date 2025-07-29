@@ -26,6 +26,7 @@ const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
 
 const ONEDOLLAR_ENABLED = Deno.env.get("ONEDOLLAR_ENABLED") !== "false";
 const ONEDOLLAR_COLLECTOR = Deno.env.get("ONEDOLLAR_COLLECTOR");
+const ONEDOLLAR_STATIC_SCRIPT = Deno.env.get("ONEDOLLAR_STATIC_SCRIPT");
 
 /**
  * @title Sections
@@ -142,6 +143,7 @@ function Page(
         {ONEDOLLAR_ENABLED && (
           <OneDollarStats
             collectorAddress={ONEDOLLAR_COLLECTOR}
+            staticScriptUrl={ONEDOLLAR_STATIC_SCRIPT}
           />
         )}
         {sections?.map(renderSection)}
