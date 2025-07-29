@@ -1,0 +1,93 @@
+import type { AppContext } from "../mod.ts";
+import { DiscordGuildMember } from "../utils/types.ts";
+
+export interface Props {
+  /**
+   * @title Guild ID
+   * @description ID do servidor Discord onde adicionar o usuário
+   */
+  guildId: string;
+
+  /**
+   * @title User ID
+   * @description ID do usuário a ser adicionado ao servidor
+   */
+  userId: string;
+
+  /**
+   * @title Nickname
+   * @description Nickname opcional para o usuário no servidor
+   */
+  nick?: string;
+
+  /**
+   * @title Roles
+   * @description IDs dos cargos a serem atribuídos ao usuário
+   */
+  roles?: string[];
+
+  /**
+   * @title Mute
+   * @description Se o usuário deve entrar mutado
+   * @default false
+   */
+  mute?: boolean;
+
+  /**
+   * @title Deaf
+   * @description Se o usuário deve entrar surdo
+   * @default false
+   */
+  deaf?: boolean;
+}
+
+/**
+ * @title Add User to Guild
+ * @description Add the authenticated user to a Discord server (OAuth - scope: guilds.join)
+ */
+export default async function addUserToGuild(
+  props: Props,
+  _req: Request,
+  ctx: AppContext,
+): Promise<DiscordGuildMember> {
+  const { guildId, userId, nick, roles, mute = false, deaf = false } = props;
+  const { client, tokens } = ctx;
+
+  if (!guildId) {
+    throw new Error("Guild ID is required");
+  }
+
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
+
+  if (!tokens?.access_token) {
+    throw new Error("Access token is required for guild join");
+  }
+
+  // Add user to guild
+  const response = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${userId}`, {
+    method: "PUT",
+    headers: {
+      "Authorization": `Bearer ${tokens.access_token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      access_token: tokens.access_token,
+      nick,
+      roles,
+      mute,
+      deaf,
+    }),
+  });
+
+  if (!response.ok) {
+    ctx.errorHandler.toHttpError(
+      response,
+      `Failed to add user to guild: ${response.statusText}`,
+    );
+  }
+
+  const member = await response.json();
+  return member;
+}
