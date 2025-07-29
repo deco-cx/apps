@@ -100,7 +100,6 @@ export default function App(
     tokens,
     options,
     onTokenRefresh: async (newTokens: OAuthTokens) => {
-      console.log("onTokenRefresh", newTokens);
       if (ctx) {
         await ctx.configure({
           ...ctx,
