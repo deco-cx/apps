@@ -38,5 +38,7 @@ export default async function loader(
     areaServed: addressByPostalCode.neighborhood || undefined,
     description: addressByPostalCode.complement || undefined,
     disambiguatingDescription: addressByPostalCode.reference || undefined,
+    latitude: addressByPostalCode.geoCoordinates?.[0] || undefined,
+    longitude: addressByPostalCode.geoCoordinates?.[1] || undefined,
   };
 }
