@@ -74,7 +74,6 @@ export interface Props {
    * @default false
    */
   setRefreshToken?: boolean;
-  /**
   defaultSegment?: SegmentCulture;
   usePortalSitemap?: boolean;
   /**

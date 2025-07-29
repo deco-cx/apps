@@ -1,4 +1,4 @@
-<hr/>  
+<hr/>
  
 <a href="https://deco.cx/discord" target="_blank"><img alt="Discord" src="https://img.shields.io/discord/985687648595243068?label=Discord&color=7289da" /></a>
 &nbsp;

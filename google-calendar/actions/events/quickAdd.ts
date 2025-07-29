@@ -75,6 +75,7 @@ export default async function quickAddEvent(
     return {
       ...updatedEvent,
       meetLink: updatedEvent.conferenceData?.entryPoints?.find(
+        // deno-lint-ignore no-explicit-any
         (ep: any) => ep.entryPointType === "video",
       )?.uri,
     };
