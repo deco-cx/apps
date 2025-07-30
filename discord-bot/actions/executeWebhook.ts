@@ -1,5 +1,9 @@
 import type { AppContext } from "../mod.ts";
-import { DiscordMessage, DiscordEmbed } from "../utils/types.ts";
+import {
+  DiscordEmbed,
+  DiscordMessage,
+  ExecuteWebhookBody,
+} from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -95,24 +99,7 @@ export default async function executeWebhook(
   } = props;
   const { client } = ctx;
 
-  if (!webhookId) {
-    throw new Error("Webhook ID is required");
-  }
-
-  if (!webhookToken) {
-    throw new Error("Webhook token is required");
-  }
-
-  if (!content && (!embeds || embeds.length === 0)) {
-    throw new Error("Message content or embeds are required");
-  }
-
-  if (content && content.length > 2000) {
-    throw new Error("Message content cannot exceed 2000 characters");
-  }
-
-  // Build request body
-  const body: any = {
+  const body: ExecuteWebhookBody = {
     tts,
   };
 
@@ -140,16 +127,6 @@ export default async function executeWebhook(
     body.applied_tags = appliedTags;
   }
 
-  // Build search params
-  const searchParams: any = {
-    wait,
-  };
-
-  if (threadId) {
-    searchParams.thread_id = threadId;
-  }
-
-  // Execute webhook
   const response = await client["POST /webhooks/:webhook_id/:webhook_token"]({
     webhook_id: webhookId,
     webhook_token: webhookToken,
@@ -164,7 +141,6 @@ export default async function executeWebhook(
   }
 
   if (wait) {
-    const message = await response.json();
-    return message;
+    return await response.json();
   }
 }

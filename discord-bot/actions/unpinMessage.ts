@@ -35,10 +35,11 @@ export default async function unpinMessage(
   }
 
   // Unpin message
-  const response = await client["DELETE /channels/:channel_id/pins/:message_id"]({
-    channel_id: channelId,
-    message_id: messageId,
-  });
+  const response = await client
+    ["DELETE /channels/:channel_id/pins/:message_id"]({
+      channel_id: channelId,
+      message_id: messageId,
+    });
 
   if (!response.ok) {
     throw new Error(`Failed to unpin message: ${response.statusText}`);

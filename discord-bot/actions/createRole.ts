@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import { DiscordRole } from "../utils/types.ts";
+import { CreateRoleBody, DiscordRole } from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -83,16 +83,7 @@ export default async function createRole(
   } = props;
   const { client } = ctx;
 
-  if (!guildId) {
-    throw new Error("Guild ID is required");
-  }
-
-  if (name.length < 1 || name.length > 100) {
-    throw new Error("Role name must be between 1-100 characters");
-  }
-
-  // Build request body
-  const body: any = {
+  const body: CreateRoleBody = {
     name,
     permissions,
     hoist,
@@ -115,7 +106,6 @@ export default async function createRole(
     body.reason = reason;
   }
 
-  // Create role
   const response = await client["POST /guilds/:guild_id/roles"]({
     guild_id: guildId,
   }, {

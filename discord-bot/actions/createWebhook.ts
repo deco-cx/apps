@@ -1,4 +1,5 @@
 import type { AppContext } from "../mod.ts";
+import { CreateWebhookBody } from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -82,20 +83,7 @@ export default async function createWebhook(
   const { channelId, name, avatar } = props;
   const { client } = ctx;
 
-  if (!channelId) {
-    throw new Error("Channel ID is required");
-  }
-
-  if (!name) {
-    throw new Error("Webhook name is required");
-  }
-
-  if (name.length < 1 || name.length > 80) {
-    throw new Error("Webhook name must be between 1-80 characters");
-  }
-
-  // Build request body
-  const body: any = {
+  const body: CreateWebhookBody = {
     name,
   };
 
@@ -103,7 +91,6 @@ export default async function createWebhook(
     body.avatar = avatar;
   }
 
-  // Create webhook
   const response = await client["POST /channels/:channel_id/webhooks"]({
     channel_id: channelId,
   }, {

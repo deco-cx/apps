@@ -31,9 +31,10 @@ export default async function getRoleConnection(
   }
 
   // Get linked role connection
-  const response = await client["GET /users/@me/applications/:application_id/role-connection"]({
-    application_id: applicationId,
-  });
+  const response = await client
+    ["GET /users/@me/applications/:application_id/role-connection"]({
+      application_id: applicationId,
+    });
 
   if (!response.ok) {
     ctx.errorHandler.toHttpError(

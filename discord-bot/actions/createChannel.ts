@@ -45,6 +45,30 @@ export interface Props {
    * @description Posição do canal na lista
    */
   position?: number;
+
+  /**
+   * @title Bitrate
+   * @description Taxa de bits do canal de voz
+   */
+  bitrate?: number;
+
+  /**
+   * @title User Limit
+   * @description Limite de usuários do canal de voz
+   */
+  user_limit?: number;
+
+  /**
+   * @title Rate Limit Per User
+   * @description Taxa de limite de mensagens por usuário
+   */
+  rate_limit_per_user?: number;
+
+  /**
+   * @title Permission Overwrites
+   * @description Permissões do canal
+   */
+  permission_overwrites?: unknown[];
 }
 
 /**
@@ -56,46 +80,42 @@ export default async function createChannel(
   _req: Request,
   ctx: AppContext,
 ): Promise<DiscordChannel> {
-  const { guildId, name, type = 0, topic, nsfw = false, parentId, position } = props;
+  const {
+    guildId,
+    name,
+    type = 0,
+    topic,
+    nsfw = false,
+    parentId,
+    position,
+    bitrate,
+    user_limit,
+    rate_limit_per_user,
+    permission_overwrites,
+  } = props;
   const { client } = ctx;
 
-  if (!guildId) {
-    throw new Error("Guild ID is required");
-  }
-
-  if (!name) {
-    throw new Error("Channel name is required");
-  }
-
-  if (name.length < 2 || name.length > 100) {
-    throw new Error("Channel name must be between 2-100 characters");
-  }
-
-  if (topic && topic.length > 1024) {
-    throw new Error("Channel topic cannot exceed 1024 characters");
-  }
-
-  // Create channel
-  const response = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bot ${ctx.botToken}`,
-      "Content-Type": "application/json",
+  const response = await client["POST /guilds/:guild_id/channels"](
+    { guild_id: guildId },
+    {
+      body: {
+        name: name,
+        type,
+        topic,
+        bitrate,
+        user_limit,
+        rate_limit_per_user,
+        position,
+        permission_overwrites,
+        parent_id: parentId,
+        nsfw,
+      },
     },
-    body: JSON.stringify({
-      name,
-      type,
-      topic,
-      nsfw,
-      parent_id: parentId,
-      position,
-    }),
-  });
+  );
 
   if (!response.ok) {
     throw new Error(`Failed to create channel: ${response.statusText}`);
   }
 
-  const channel = await response.json();
-  return channel;
+  return await response.json();
 }

@@ -17,13 +17,11 @@ export default async function whoami(
   const { client } = ctx;
 
   try {
-    const response = await client["GET /users/@me"]({},
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+    const response = await client["GET /users/@me"]({}, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
       },
-    );
+    });
     return await response.json();
   } catch (error) {
     throw ctx.errorHandler.toHttpError(

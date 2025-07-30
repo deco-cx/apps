@@ -53,18 +53,21 @@ export default async function setRoleConnection(
   }
 
   // Set linked role connection
-  const response = await fetch(`https://discord.com/api/v10/users/@me/applications/${applicationId}/role-connection`, {
-    method: "PUT",
-    headers: {
-      "Authorization": `Bearer ${tokens.access_token}`,
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `https://discord.com/api/v10/users/@me/applications/${applicationId}/role-connection`,
+    {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${tokens.access_token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        platform_name: platformName,
+        platform_username: platformUsername,
+        metadata,
+      }),
     },
-    body: JSON.stringify({
-      platform_name: platformName,
-      platform_username: platformUsername,
-      metadata,
-    }),
-  });
+  );
 
   if (!response.ok) {
     ctx.errorHandler.toHttpError(

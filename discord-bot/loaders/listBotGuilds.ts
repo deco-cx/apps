@@ -50,19 +50,22 @@ export default async function listBotGuilds(
   // Build query parameters
   const searchParams = new URLSearchParams();
   searchParams.set("limit", validLimit.toString());
-  
+
   if (before) searchParams.set("before", before);
   if (after) searchParams.set("after", after);
   if (withCounts) searchParams.set("with_counts", "true");
 
   // Make request to Discord API to get bot's guilds
-  const response = await fetch(`https://discord.com/api/v10/users/@me/guilds?${searchParams}`, {
-    method: "GET",
-    headers: {
-      "Authorization": `Bot ${botToken}`,
-      "Accept": "application/json",
+  const response = await fetch(
+    `https://discord.com/api/v10/users/@me/guilds?${searchParams}`,
+    {
+      method: "GET",
+      headers: {
+        "Authorization": `Bot ${botToken}`,
+        "Accept": "application/json",
+      },
     },
-  });
+  );
 
   if (!response.ok) {
     throw new Error(`Failed to list bot guilds: ${response.statusText}`);

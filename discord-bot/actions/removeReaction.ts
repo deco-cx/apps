@@ -48,11 +48,12 @@ export default async function removeReaction(
   const encodedEmoji = encodeURIComponent(emoji);
 
   // Remove reaction
-  const response = await client["DELETE /channels/:channel_id/messages/:message_id/reactions/:emoji/@me"]({
-    channel_id: channelId,
-    message_id: messageId,
-    emoji: encodedEmoji,
-  });
+  const response = await client
+    ["DELETE /channels/:channel_id/messages/:message_id/reactions/:emoji/@me"]({
+      channel_id: channelId,
+      message_id: messageId,
+      emoji: encodedEmoji,
+    });
 
   if (!response.ok) {
     throw new Error(`Failed to remove reaction: ${response.statusText}`);

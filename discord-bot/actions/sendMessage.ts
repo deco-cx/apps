@@ -1,5 +1,9 @@
 import type { AppContext } from "../mod.ts";
-import { DiscordMessage, DiscordEmbed } from "../utils/types.ts";
+import {
+  DiscordEmbed,
+  DiscordMessage,
+  SendMessageBody,
+} from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -73,7 +77,7 @@ export default async function sendMessage(
   }
 
   // Build request body
-  const body: any = {
+  const body: SendMessageBody = {
     tts,
   };
 

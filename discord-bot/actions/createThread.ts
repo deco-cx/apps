@@ -1,5 +1,9 @@
 import type { AppContext } from "../mod.ts";
-import { DiscordChannel, DiscordEmbed } from "../utils/types.ts";
+import {
+  CreateThreadBody,
+  DiscordChannel,
+  DiscordEmbed,
+} from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -81,20 +85,7 @@ export default async function createThread(
   } = props;
   const { client } = ctx;
 
-  if (!channelId) {
-    throw new Error("Channel ID is required");
-  }
-
-  if (!name) {
-    throw new Error("Thread name is required");
-  }
-
-  if (name.length < 1 || name.length > 100) {
-    throw new Error("Thread name must be between 1-100 characters");
-  }
-
-  // Build request body
-  const body: any = {
+  const body: CreateThreadBody = {
     name,
     auto_archive_duration: autoArchiveDuration,
   };
@@ -118,17 +109,16 @@ export default async function createThread(
   // Add initial message if provided
   if (messageContent || (messageEmbeds && messageEmbeds.length > 0)) {
     body.message = {};
-    
+
     if (messageContent) {
       body.message.content = messageContent;
     }
-    
+
     if (messageEmbeds && messageEmbeds.length > 0) {
       body.message.embeds = messageEmbeds;
     }
   }
 
-  // Create thread
   const response = await client["POST /channels/:channel_id/threads"]({
     channel_id: channelId,
   }, {

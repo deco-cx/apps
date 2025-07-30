@@ -48,7 +48,7 @@ export default async function listGuilds(
     after,
     with_counts: withCounts,
   });
-  
+
   if (!response.ok) {
     ctx.errorHandler.toHttpError(
       response,
@@ -58,4 +58,4 @@ export default async function listGuilds(
 
   const guilds = await response.json();
   return guilds;
-} 
+}

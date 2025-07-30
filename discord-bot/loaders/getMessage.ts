@@ -36,10 +36,11 @@ export default async function getMessage(
   }
 
   // Get message
-  const response = await client["GET /channels/:channel_id/messages/:message_id"]({
-    channel_id: channelId,
-    message_id: messageId,
-  });
+  const response = await client
+    ["GET /channels/:channel_id/messages/:message_id"]({
+      channel_id: channelId,
+      message_id: messageId,
+    });
 
   if (!response.ok) {
     throw new Error(`Failed to get message: ${response.statusText}`);

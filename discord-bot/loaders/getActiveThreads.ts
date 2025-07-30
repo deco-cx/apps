@@ -15,13 +15,13 @@ export interface ThreadsResponse {
    * @description Lista de threads ativas (inclui posts de forum)
    */
   threads: DiscordChannel[];
-  
+
   /**
    * @title Members
    * @description Membros das threads
    */
-  members: any[];
-  
+  members: unknown[];
+
   /**
    * @title Has More
    * @description Se há mais threads disponíveis

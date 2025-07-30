@@ -25,9 +25,10 @@ export default async function leaveThread(
   }
 
   // Leave thread
-  const response = await client["DELETE /channels/:channel_id/thread-members/@me"]({
-    channel_id: threadId,
-  });
+  const response = await client
+    ["DELETE /channels/:channel_id/thread-members/@me"]({
+      channel_id: threadId,
+    });
 
   if (!response.ok) {
     throw new Error(`Failed to leave thread: ${response.statusText}`);

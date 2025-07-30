@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import { DiscordUser, DiscordGuild } from "../utils/types.ts";
+import { DiscordGuild, DiscordUser } from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -32,7 +32,7 @@ export interface WebhookResponse {
   token?: string;
   application_id?: string;
   source_guild?: DiscordGuild;
-  source_channel?: any;
+  source_channel?: unknown;
   url?: string;
 }
 
@@ -65,17 +65,20 @@ export default async function createWebhook(
   }
 
   // Create webhook
-  const response = await fetch(`https://discord.com/api/v10/channels/${channelId}/webhooks`, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${tokens.access_token}`,
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `https://discord.com/api/v10/channels/${channelId}/webhooks`,
+    {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${tokens.access_token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        avatar,
+      }),
     },
-    body: JSON.stringify({
-      name,
-      avatar,
-    }),
-  });
+  );
 
   if (!response.ok) {
     ctx.errorHandler.toHttpError(

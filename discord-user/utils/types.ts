@@ -1,3 +1,13 @@
+import {
+  DiscordEmbedAuthor,
+  DiscordEmbedField,
+  DiscordEmbedFooter,
+  DiscordEmbedImage,
+  DiscordEmbedProvider,
+  DiscordEmbedThumbnail,
+  DiscordEmbedVideo,
+} from "../../discord-bot/utils/types.ts";
+
 export interface DiscordUser {
   id: string;
   username: string;
@@ -57,7 +67,7 @@ export interface DiscordGuild {
   nsfw_level: number;
   stickers?: DiscordSticker[];
   premium_progress_bar_enabled: boolean;
-} 
+}
 
 export interface DiscordGuildMember {
   user?: DiscordUser;
@@ -74,6 +84,44 @@ export interface DiscordGuildMember {
   communication_disabled_until?: string;
 }
 
+export interface DiscordEmbed {
+  title?: string;
+  type?: string;
+  description?: string;
+  url?: string;
+  timestamp?: string;
+  color?: number;
+  footer?: DiscordEmbedFooter;
+  image?: DiscordEmbedImage;
+  thumbnail?: DiscordEmbedThumbnail;
+  video?: DiscordEmbedVideo;
+  provider?: DiscordEmbedProvider;
+  author?: DiscordEmbedAuthor;
+  fields?: DiscordEmbedField[];
+}
+
+export interface SendMessageBody {
+  content?: string;
+  embeds?: DiscordEmbed[];
+  tts?: boolean;
+  allowed_mentions?: {
+    parse?: ("roles" | "users" | "everyone")[];
+    roles?: string[];
+    users?: string[];
+    replied_user?: boolean;
+  };
+  message_reference?: {
+    message_id?: string;
+    channel_id?: string;
+    guild_id?: string;
+    fail_if_not_exists?: boolean;
+  };
+  components?: unknown[];
+  files?: unknown[];
+  payload_json?: string;
+  attachments?: unknown[];
+  flags?: number;
+}
 export interface DiscordSticker {
   id: string;
   pack_id?: string;
@@ -100,7 +148,6 @@ export interface DiscordWelcomeScreenChannel {
   emoji_id?: string;
   emoji_name?: string;
 }
-
 
 export interface DiscordGuildsResponse {
   guilds: DiscordGuild[];

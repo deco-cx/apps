@@ -271,10 +271,157 @@ export interface DiscordMessageActivity {
 export interface DiscordApplication {
   id: string;
   name: string;
-  icon?: string;
+  icon?: string | null;
   description: string;
-  summary?: string;
-  bot?: DiscordUser;
+  rpc_origins?: string[];
+  bot_public: boolean;
+  bot_require_code_grant: boolean;
+  terms_of_service_url?: string;
+  privacy_policy_url?: string;
+  owner?: DiscordUser;
+  verify_key: string;
+  team?: DiscordTeam | null;
+  guild_id?: string;
+  primary_sku_id?: string;
+  slug?: string;
+  cover_image?: string;
+  flags?: number;
+  tags?: string[];
+  install_params?: DiscordInstallParams;
+  custom_install_url?: string;
+}
+
+export interface DiscordTeam {
+  icon?: string | null;
+  id: string;
+  members: DiscordTeamMember[];
+  name: string;
+  owner_user_id: string;
+}
+
+export interface DiscordTeamMember {
+  membership_state: number;
+  permissions: string[];
+  team_id: string;
+  user: DiscordUser;
+}
+
+export interface DiscordInstallParams {
+  scopes: string[];
+  permissions: string;
+}
+
+export interface DiscordStageInstance {
+  id: string;
+  guild_id: string;
+  channel_id: string;
+  topic: string;
+  privacy_level: number;
+  discoverable_disabled: boolean;
+  guild_scheduled_event_id?: string | null;
+}
+
+export type GuildScheduledEventStatus = 1 | 2 | 3 | 4;
+export type GuildScheduledEventEntityType = 1 | 2 | 3;
+
+export interface DiscordGuildScheduledEvent {
+  id: string;
+  guild_id: string;
+  channel_id?: string | null;
+  creator_id?: string | null;
+  name: string;
+  description?: string | null;
+  scheduled_start_time: string;
+  scheduled_end_time?: string | null;
+  privacy_level: number;
+  status: GuildScheduledEventStatus;
+  entity_type: GuildScheduledEventEntityType;
+  entity_id?: string | null;
+  entity_metadata?: DiscordGuildScheduledEventEntityMetadata | null;
+  creator?: DiscordUser;
+  user_count?: number;
+  image?: string | null;
+}
+
+export interface DiscordGuildScheduledEventEntityMetadata {
+  location?: string;
+}
+
+export interface DiscordPartialEmoji {
+  id?: string | null;
+  name?: string | null;
+  animated?: boolean;
+}
+
+export interface DiscordActionRow {
+  type: 1;
+  components: DiscordMessageComponent[];
+}
+
+export interface DiscordButton {
+  type: 2;
+  style: number;
+  label?: string;
+  emoji?: DiscordPartialEmoji;
+  custom_id?: string;
+  url?: string;
+  disabled?: boolean;
+}
+
+export interface DiscordSelectMenu {
+  type: 3 | 5 | 6 | 7 | 8;
+  custom_id: string;
+  options?: DiscordSelectOption[];
+  channel_types?: number[];
+  placeholder?: string;
+  min_values?: number;
+  max_values?: number;
+  disabled?: boolean;
+}
+
+export interface DiscordSelectOption {
+  label: string;
+  value: string;
+  description?: string;
+  emoji?: DiscordPartialEmoji;
+  default?: boolean;
+}
+
+export interface DiscordTextInput {
+  type: 4;
+  custom_id: string;
+  style: number;
+  label: string;
+  min_length?: number;
+  max_length?: number;
+  required?: boolean;
+  value?: string;
+  placeholder?: string;
+}
+
+export type DiscordMessageComponent =
+  | DiscordActionRow
+  | DiscordButton
+  | DiscordSelectMenu
+  | DiscordTextInput;
+
+export interface DiscordFile {
+  filename: string;
+  content_type?: string;
+  file: Blob | ArrayBuffer | Uint8Array;
+}
+
+export interface DiscordMessageAttachment {
+  id?: string;
+  filename: string;
+  description?: string;
+  content_type?: string;
+  size?: number;
+  url?: string;
+  proxy_url?: string;
+  height?: number | null;
+  width?: number | null;
+  ephemeral?: boolean;
 }
 
 export interface DiscordMessageReference {
@@ -352,27 +499,109 @@ export interface DiscordWelcomeScreenChannel {
 }
 
 export interface DiscordInvite {
+  type?: InviteType;
   code: string;
   guild?: DiscordGuild;
-  channel: DiscordChannel;
+  channel: DiscordChannel | null;
   inviter?: DiscordUser;
-  target_type?: number;
+  target_type?: InviteTargetType;
   target_user?: DiscordUser;
-  target_application?: any;
+  target_application?: DiscordApplication;
   approximate_presence_count?: number;
   approximate_member_count?: number;
-  expires_at?: string;
-  stage_instance?: any;
-  guild_scheduled_event?: any;
-  type: number;
-  created_at: string;
-  max_age: number;
-  max_uses: number;
-  temporary: boolean;
-  uses: number;
+  expires_at?: string | null;
+  stage_instance?: DiscordStageInstance;
+  guild_scheduled_event?: DiscordGuildScheduledEvent;
 }
-
 
 export interface DiscordGuildsResponse {
   guilds: DiscordGuild[];
+}
+
+export interface EditRoleBody {
+  name?: string;
+  permissions?: string;
+  color?: number;
+  hoist?: boolean;
+  icon?: string;
+  unicode_emoji?: string;
+  mentionable?: boolean;
+  reason?: string;
+}
+
+export type InviteType = 0 | 1 | 2;
+export type InviteTargetType = 1 | 2;
+
+export interface AllowedMentions {
+  parse?: ("roles" | "users" | "everyone")[];
+  roles?: string[];
+  users?: string[];
+  replied_user?: boolean;
+}
+
+export interface MessageReference {
+  message_id?: string;
+  channel_id?: string;
+  guild_id?: string;
+  fail_if_not_exists?: boolean;
+}
+
+export interface SendMessageBody {
+  content?: string;
+  nonce?: number | string;
+  tts?: boolean;
+  embeds?: DiscordEmbed[];
+  allowed_mentions?: AllowedMentions;
+  message_reference?: MessageReference;
+  components?: DiscordMessageComponent[];
+  files?: DiscordFile[];
+  payload_json?: string;
+  attachments?: DiscordMessageAttachment[];
+  flags?: number;
+  sticker_ids?: string[];
+  thread_name?: string;
+}
+
+export interface ExecuteWebhookBody {
+  content?: string;
+  username?: string;
+  avatar_url?: string;
+  tts?: boolean;
+  embeds?: DiscordEmbed[];
+  thread_name?: string;
+  applied_tags?: string[];
+}
+
+export interface EditMessageBody {
+  content?: string;
+  embeds?: DiscordEmbed[];
+}
+
+export interface CreateWebhookBody {
+  name: string;
+  avatar?: string;
+}
+
+export interface CreateThreadBody {
+  name: string;
+  auto_archive_duration?: number;
+  type?: number;
+  invitable?: boolean;
+  rate_limit_per_user?: number;
+  applied_tags?: string[];
+  message?: {
+    content?: string;
+    embeds?: DiscordEmbed[];
+  };
+}
+
+export interface CreateRoleBody {
+  name?: string;
+  permissions?: string;
+  color?: number;
+  hoist?: boolean;
+  icon?: string;
+  unicode_emoji?: string;
+  mentionable?: boolean;
+  reason?: string;
 }

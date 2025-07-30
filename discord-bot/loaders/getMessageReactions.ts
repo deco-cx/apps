@@ -66,13 +66,14 @@ export default async function getMessageReactions(
   const encodedEmoji = encodeURIComponent(emoji);
 
   // Get message reactions
-  const response = await client["GET /channels/:channel_id/messages/:message_id/reactions/:emoji"]({
-    channel_id: channelId,
-    message_id: messageId,
-    emoji: encodedEmoji,
-    limit,
-    after,
-  });
+  const response = await client
+    ["GET /channels/:channel_id/messages/:message_id/reactions/:emoji"]({
+      channel_id: channelId,
+      message_id: messageId,
+      emoji: encodedEmoji,
+      limit,
+      after,
+    });
 
   if (!response.ok) {
     throw new Error(`Failed to get message reactions: ${response.statusText}`);

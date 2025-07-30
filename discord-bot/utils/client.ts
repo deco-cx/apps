@@ -1,12 +1,13 @@
 import {
-  DiscordMessage,
   DiscordChannel,
-  DiscordGuild,
-  DiscordUser,
   DiscordEmbed,
+  DiscordGuild,
   DiscordGuildMember,
-  DiscordRole,
   DiscordInvite,
+  DiscordMessage,
+  DiscordRole,
+  DiscordUser,
+  EditRoleBody,
 } from "./types.ts";
 
 export interface Client {
@@ -99,11 +100,11 @@ export interface Client {
         guild_id?: string;
         fail_if_not_exists?: boolean;
       };
-      components?: any[];
+      components?: unknown[];
       sticker_ids?: string[];
-      files?: any[];
+      files?: unknown[];
       payload_json?: string;
-      attachments?: any[];
+      attachments?: unknown[];
       flags?: number;
     };
   };
@@ -121,10 +122,10 @@ export interface Client {
         users?: string[];
         replied_user?: boolean;
       };
-      components?: any[];
-      files?: any[];
+      components?: unknown[];
+      files?: unknown[];
       payload_json?: string;
-      attachments?: any[];
+      attachments?: unknown[];
     };
   };
 
@@ -169,7 +170,7 @@ export interface Client {
       user_limit?: number;
       rate_limit_per_user?: number;
       position?: number;
-      permission_overwrites?: any[];
+      permission_overwrites?: unknown[];
       parent_id?: string;
       nsfw?: boolean;
     };
@@ -185,7 +186,7 @@ export interface Client {
       rate_limit_per_user?: number;
       bitrate?: number;
       user_limit?: number;
-      permission_overwrites?: any[];
+      permission_overwrites?: unknown[];
       parent_id?: string | null;
       rtc_region?: string | null;
       video_quality_mode?: number;
@@ -266,7 +267,7 @@ export interface Client {
   "GET /guilds/:guild_id/threads/active": {
     response: {
       threads: DiscordChannel[];
-      members: any[];
+      members: unknown[];
       has_more: boolean;
     };
   };
@@ -275,7 +276,7 @@ export interface Client {
   "GET /channels/:channel_id/threads/archived/public": {
     response: {
       threads: DiscordChannel[];
-      members: any[];
+      members: unknown[];
       has_more: boolean;
     };
     searchParams: {
@@ -288,7 +289,7 @@ export interface Client {
   "GET /channels/:channel_id/threads/archived/private": {
     response: {
       threads: DiscordChannel[];
-      members: any[];
+      members: unknown[];
       has_more: boolean;
     };
     searchParams: {
@@ -309,7 +310,7 @@ export interface Client {
       applied_tags?: string[];
       message?: {
         content?: string;
-        embeds?: any[];
+        embeds?: unknown[];
       };
     };
   };
@@ -347,16 +348,7 @@ export interface Client {
   // Editar role
   "PATCH /guilds/:guild_id/roles/:role_id": {
     response: DiscordRole;
-    body: {
-      name?: string;
-      permissions?: string;
-      color?: number;
-      hoist?: boolean;
-      icon?: string;
-      unicode_emoji?: string;
-      mentionable?: boolean;
-      reason?: string;
-    };
+    body: EditRoleBody;
   };
 
   // Deletar role
@@ -379,8 +371,8 @@ export interface Client {
       avatar?: string;
       token?: string;
       application_id?: string;
-      source_guild?: any;
-      source_channel?: any;
+      source_guild?: unknown;
+      source_channel?: unknown;
       url?: string;
     }>;
   };
@@ -397,8 +389,8 @@ export interface Client {
       avatar?: string;
       token?: string;
       application_id?: string;
-      source_guild?: any;
-      source_channel?: any;
+      source_guild?: unknown;
+      source_channel?: unknown;
       url?: string;
     }>;
   };
@@ -415,8 +407,8 @@ export interface Client {
       avatar?: string;
       token?: string;
       application_id?: string;
-      source_guild?: any;
-      source_channel?: any;
+      source_guild?: unknown;
+      source_channel?: unknown;
       url?: string;
     };
     body: {
@@ -440,10 +432,10 @@ export interface Client {
         users?: string[];
         replied_user?: boolean;
       };
-      components?: any[];
-      files?: any[];
+      components?: unknown[];
+      files?: unknown[];
       payload_json?: string;
-      attachments?: any[];
+      attachments?: unknown[];
       flags?: number;
       thread_name?: string;
       applied_tags?: string[];

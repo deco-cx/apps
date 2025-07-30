@@ -1,8 +1,4 @@
-import {
-  DiscordGuild,
-  DiscordUser,
-  DiscordGuildMember,
-} from "./types.ts";
+import { DiscordGuild, DiscordGuildMember, DiscordUser } from "./types.ts";
 
 export interface Client {
   "GET /users/@me/guilds": {
@@ -33,7 +29,7 @@ export interface Client {
       name: string;
       type: string;
       revoked?: boolean;
-      integrations?: any[];
+      integrations?: unknown[];
       verified: boolean;
       friend_sync: boolean;
       show_activity: boolean;
@@ -45,7 +41,6 @@ export interface Client {
   "PUT /guilds/:guild_id/members/:user_id": {
     response: DiscordGuildMember;
     body: {
-      access_token: string;
       nick?: string;
       roles?: string[];
       mute?: boolean;
@@ -86,7 +81,7 @@ export interface Client {
       token?: string;
       application_id?: string;
       source_guild?: DiscordGuild;
-      source_channel?: any;
+      source_channel?: unknown;
       url?: string;
     };
     body: {

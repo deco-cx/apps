@@ -39,28 +39,16 @@ export default async function banMember(
   const { guildId, userId, deleteMessageDays = 0, reason } = props;
   const { client } = ctx;
 
-  if (!guildId) {
-    throw new Error("Guild ID is required");
-  }
-
-  if (!userId) {
-    throw new Error("User ID is required");
-  }
-
-  // Validate delete message days
   const validDeleteDays = Math.min(Math.max(deleteMessageDays, 0), 7);
 
-  // Ban member from guild
-  const response = await fetch(`https://discord.com/api/v10/guilds/${guildId}/bans/${userId}`, {
-    method: "PUT",
-    headers: {
-      "Authorization": `Bot ${ctx.botToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+  const response = await client["PUT /guilds/:guild_id/bans/:user_id"]({
+    guild_id: guildId,
+    user_id: userId,
+  }, {
+    body: {
       delete_message_days: validDeleteDays,
       reason,
-    }),
+    },
   });
 
   if (!response.ok) {

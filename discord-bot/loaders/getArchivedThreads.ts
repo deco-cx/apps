@@ -35,13 +35,13 @@ export interface ThreadsResponse {
    * @description Lista de threads arquivadas
    */
   threads: DiscordChannel[];
-  
+
   /**
    * @title Members
    * @description Membros das threads
    */
-  members: any[];
-  
+  members: unknown[];
+
   /**
    * @title Has More
    * @description Se há mais threads disponíveis
@@ -70,11 +70,12 @@ export default async function getArchivedThreads(
   }
 
   // Get archived threads
-  const response = await client[`GET /channels/:channel_id/threads/archived/${type}`]({
-    channel_id: channelId,
-    before,
-    limit,
-  });
+  const response = await client
+    [`GET /channels/:channel_id/threads/archived/${type}`]({
+      channel_id: channelId,
+      before,
+      limit,
+    });
 
   if (!response.ok) {
     throw new Error(`Failed to get archived threads: ${response.statusText}`);

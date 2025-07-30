@@ -51,34 +51,18 @@ export default async function addUserToGuild(
   ctx: AppContext,
 ): Promise<DiscordGuildMember> {
   const { guildId, userId, nick, roles, mute = false, deaf = false } = props;
-  const { client, tokens } = ctx;
+  const { client } = ctx;
 
-  if (!guildId) {
-    throw new Error("Guild ID is required");
-  }
-
-  if (!userId) {
-    throw new Error("User ID is required");
-  }
-
-  if (!tokens?.access_token) {
-    throw new Error("Access token is required for guild join");
-  }
-
-  // Add user to guild
-  const response = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${userId}`, {
-    method: "PUT",
-    headers: {
-      "Authorization": `Bearer ${tokens.access_token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      access_token: tokens.access_token,
+  const response = await client["PUT /guilds/:guild_id/members/:user_id"]({
+    guild_id: guildId,
+    user_id: userId,
+  }, {
+    body: {
       nick,
       roles,
       mute,
       deaf,
-    }),
+    },
   });
 
   if (!response.ok) {

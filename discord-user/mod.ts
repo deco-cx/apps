@@ -47,17 +47,17 @@ export interface DiscordAuthClient {
 
 export interface Props {
   /**
-   * @title OAuth Tokens  
+   * @title OAuth Tokens
    * @description OAuth tokens for user-based operations
    */
   tokens?: OAuthTokens;
-  
+
   /**
    * @title Client Secret
    * @description Client Secret from Discord Developer Portal (required for OAuth)
    */
   clientSecret?: string;
-  
+
   /**
    * @title Client ID
    * @description Client ID from Discord Developer Portal (required for OAuth)
@@ -134,9 +134,11 @@ export default function App(
         grant_type: "refresh_token",
         refresh_token: tokens.refresh_token,
       });
-      
-      const authHeader = `Basic ${btoa(`${tokens.client_id}:${tokens.client_secret}`)}`;
-      
+
+      const authHeader = `Basic ${
+        btoa(`${tokens.client_id}:${tokens.client_secret}`)
+      }`;
+
       const response = await fetch(OAUTH_URL, {
         method: "POST",
         headers: {
@@ -145,19 +147,21 @@ export default function App(
         },
         body: requestBody,
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         console.error("Refresh token failed:", data);
-        
+
         if (data.error === "invalid_grant") {
-          throw new Error("REFRESH_TOKEN_EXPIRED: The refresh token has expired or is invalid. User needs to re-authorize the application.");
+          throw new Error(
+            "REFRESH_TOKEN_EXPIRED: The refresh token has expired or is invalid. User needs to re-authorize the application.",
+          );
         }
-        
+
         throw new Error(`Refresh token failed: ${JSON.stringify(data)}`);
       }
-      
+
       return {
         access_token: data.access_token,
         refresh_token: data.refresh_token,

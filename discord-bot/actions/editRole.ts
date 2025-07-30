@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import { DiscordRole } from "../utils/types.ts";
+import { DiscordRole, EditRoleBody } from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -86,20 +86,7 @@ export default async function editRole(
   } = props;
   const { client } = ctx;
 
-  if (!guildId) {
-    throw new Error("Guild ID is required");
-  }
-
-  if (!roleId) {
-    throw new Error("Role ID is required");
-  }
-
-  if (name && (name.length < 1 || name.length > 100)) {
-    throw new Error("Role name must be between 1-100 characters");
-  }
-
-  // Build request body
-  const body: any = {};
+  const body: EditRoleBody = {};
 
   if (name !== undefined) {
     body.name = name;
@@ -133,7 +120,6 @@ export default async function editRole(
     body.reason = reason;
   }
 
-  // Edit role
   const response = await client["PATCH /guilds/:guild_id/roles/:role_id"]({
     guild_id: guildId,
     role_id: roleId,
@@ -145,6 +131,5 @@ export default async function editRole(
     throw new Error(`Failed to edit role: ${response.statusText}`);
   }
 
-  const role = await response.json();
-  return role;
+  return await response.json();
 }

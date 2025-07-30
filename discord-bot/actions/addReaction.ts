@@ -45,11 +45,12 @@ export default async function addReaction(
   }
 
   // Add reaction to message
-  const response = await client["PUT /channels/:channel_id/messages/:message_id/reactions/:emoji/@me"]({
-    channel_id: channelId,
-    message_id: messageId,
-    emoji: encodeURIComponent(emoji),
-  });
+  const response = await client
+    ["PUT /channels/:channel_id/messages/:message_id/reactions/:emoji/@me"]({
+      channel_id: channelId,
+      message_id: messageId,
+      emoji: encodeURIComponent(emoji),
+    });
 
   if (!response.ok) {
     throw new Error(`Failed to add reaction: ${response.statusText}`);

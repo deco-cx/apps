@@ -1,5 +1,9 @@
 import type { AppContext } from "../mod.ts";
-import { DiscordMessage, DiscordEmbed } from "../utils/types.ts";
+import {
+  DiscordEmbed,
+  DiscordMessage,
+  EditMessageBody,
+} from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -39,24 +43,7 @@ export default async function editMessage(
   const { channelId, messageId, content, embeds } = props;
   const { client } = ctx;
 
-  if (!channelId) {
-    throw new Error("Channel ID is required");
-  }
-
-  if (!messageId) {
-    throw new Error("Message ID is required");
-  }
-
-  if (!content && (!embeds || embeds.length === 0)) {
-    throw new Error("Message content or embeds are required");
-  }
-
-  if (content && content.length > 2000) {
-    throw new Error("Message content cannot exceed 2000 characters");
-  }
-
-  // Build request body
-  const body: any = {};
+  const body: EditMessageBody = {};
 
   if (content) {
     body.content = content;
@@ -66,13 +53,13 @@ export default async function editMessage(
     body.embeds = embeds;
   }
 
-  // Edit message
-  const response = await client["PATCH /channels/:channel_id/messages/:message_id"]({
-    channel_id: channelId,
-    message_id: messageId,
-  }, {
-    body,
-  });
+  const response = await client
+    ["PATCH /channels/:channel_id/messages/:message_id"]({
+      channel_id: channelId,
+      message_id: messageId,
+    }, {
+      body,
+    });
 
   if (!response.ok) {
     throw new Error(`Failed to edit message: ${response.statusText}`);

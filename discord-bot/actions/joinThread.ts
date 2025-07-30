@@ -25,9 +25,11 @@ export default async function joinThread(
   }
 
   // Join thread
-  const response = await client["PUT /channels/:channel_id/thread-members/@me"]({
-    channel_id: threadId,
-  });
+  const response = await client["PUT /channels/:channel_id/thread-members/@me"](
+    {
+      channel_id: threadId,
+    },
+  );
 
   if (!response.ok) {
     throw new Error(`Failed to join thread: ${response.statusText}`);

@@ -95,7 +95,9 @@ export default async function listWebhooks(
   }
 
   if (!response || !response.ok) {
-    throw new Error(`Failed to list webhooks: ${response?.statusText || 'Unknown error'}`);
+    throw new Error(
+      `Failed to list webhooks: ${response?.statusText || "Unknown error"}`,
+    );
   }
 
   const webhooks = await response.json();
