@@ -36,7 +36,7 @@ export interface State extends Omit<Props, "token"> {
 }
 
 /**
- * @name SuperFrete
+ * @name @deco/superfrete
  * @description Calculate shipping prices and manage freight logistics.
  * @category Logistics
  * @logo https://assets.decocache.com/mcp/2fdb628e-c10c-4fac-8985-b55e383a64b2/SuperFrete.svg

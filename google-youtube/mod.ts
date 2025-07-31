@@ -52,6 +52,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title YouTube
+ * @name @deco/google-youtube
  * @description Search and retrieve videos, playlists, and channels.
  * @category Social
  * @logo https://assets.decocache.com/mcp/cac50532-150e-437d-a996-91fd9a0c115e/YouTube.svg

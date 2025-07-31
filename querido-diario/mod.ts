@@ -12,6 +12,7 @@ export interface State {
 
 /**
  * @title Querido Diário
+ * @name @deco/querido-diario
  * @description Search and explore Brazilian government gazettes.
  * @category Government
  * @logo https://assets.decocache.com/mcp/0bb451a6-db7c-4f9a-9720-8f87b8898da5/QueridoDirio.svg

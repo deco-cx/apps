@@ -22,7 +22,7 @@ export interface State {
 }
 
 /**
- * @name Readwise
+ * @name @deco/readwise
  * @description Access highlights and notes synced from your favorite reading sources.
  * @category Productivity
  * @logo https://assets.decocache.com/mcp/609eb29f-fa70-4170-ae1c-4108f3a42ea0/Readwise.svg

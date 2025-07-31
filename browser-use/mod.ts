@@ -21,7 +21,8 @@ export interface State {
 }
 
 /**
- * @name Browser Use
+ * @title Browser Use
+ * @name @deco/browser-use
  * @description Let agents control browsers to automate UI-based tasks.
  * @category AI Tools
  * @logo https://assets.decocache.com/mcp/1a7a2573-023c-43ed-82a2-95d77adca3db/Browser-Use.svg

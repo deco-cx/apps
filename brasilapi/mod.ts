@@ -21,7 +21,8 @@ export interface State {
 }
 
 /**
- * @name BrasilAPI
+ * @title BrasilAPI
+ * @name @deco/brasilapi
  * @description Retrieve Brazilian data like CEPs, CNPJs, holidays, and more.
  * @category APIs Públicas
  * @logo https://assets.decocache.com/mcp/bd684c47-0525-4659-a298-97fa60ba24f1/BrasilAPI.svg

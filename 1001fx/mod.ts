@@ -16,7 +16,7 @@ export interface Props {
 
 /**
  * @title 1001fx
- * @name 1001fx
+ * @name @deco/1001fx
  * @description Process and transform audio and video using AI-powered tools.
  * @category Media
  * @logo https://assets.decocache.com/mcp/b9109fab-421a-4275-911d-cec5651737d2/1001fx.svg

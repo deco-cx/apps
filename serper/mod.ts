@@ -22,7 +22,7 @@ export interface State {
 }
 
 /**
- * @name Serper
+ * @name @deco/serper
  * @description Perform intelligent Google searches with structured results.
  * @category SEO
  * @logo https://assets.decocache.com/mcp/ffd61ea7-851d-4a8b-8a02-dedb0d5156ed/Serper.svg

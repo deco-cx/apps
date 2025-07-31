@@ -8,7 +8,8 @@ export type AppContext = FnContext<State, Manifest>;
 
 /**
  * @title PNCP.gov.br
- * @description Explore Brazil’s public procurement data via PNCP.
+ * @name @deco/pncp
+ * @description Explore Brazil's public procurement data via PNCP.
  * @category Government
  * @logo https://assets.decocache.com/mcp/41461083-ef8c-496c-a336-ba6101b0b0f4/PNCP-gov-br.svg
  */
