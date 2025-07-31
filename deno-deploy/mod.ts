@@ -30,7 +30,7 @@ export interface State {
 
 /**
  * @title Deno Deploy
- * @name @deco/deno-deploy
+ * @appName deno-deploy
  * @description Deploy edge functions globally with Deno’s cloud platform.
  * @category Cloud Services
  * @logo https://assets.decocache.com/mcp/f8ee96b7-9d64-4680-a2a8-008bf5f0a6e9/Deno-Deploy.svg

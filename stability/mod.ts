@@ -21,7 +21,7 @@ interface Props {
 
 /**
  * @title Stability
- * @name @deco/stability
+ * @appName stability
  * @description Create images from text using Stability AI’s diffusion models.
  * @category Tool
  * @logo https://assets.decocache.com/mcp/438d786a-4266-4196-876d-eccde1310e24/Stability.svg

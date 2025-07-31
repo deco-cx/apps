@@ -30,7 +30,7 @@ export interface State {
 
 /**
  * @title Exa AI
- * @name @deco/exa
+ * @appName exa
  * @description Run semantic web searches powered by Exa’s intelligent retrieval.
  * @category AI Tools
  * @logo https://assets.decocache.com/mcp/e71a6d5a-81e1-486d-91f9-8f950c8b9f91/ExaAI.svg

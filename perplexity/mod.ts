@@ -29,7 +29,7 @@ export interface State {
 
 /**
  * @title Perplexity
- * @name @deco/perplexity
+ * @appName perplexity
  * @description Ask natural language questions and get grounded, web-backed answers.
  * @category AI and Machine Learning
  * @logo https://assets.decocache.com/mcp/1b3b7880-e7a5-413b-8db2-601e84b22bcd/Perplexity.svg

@@ -85,7 +85,7 @@ export interface Props {
 }
 export const color = 0xf71963;
 /**
- * @name @deco/vtex
+ * @appName vtex
  * @title VTEX
  * @description Power your store with product, inventory, and checkout tools from VTEX.
  * @category Ecommmerce
