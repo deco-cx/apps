@@ -21,7 +21,7 @@ interface Props {
 
 /**
  * @title TipTapCloud
- * @name @deco/tiptap-cloud
+ * @appName tiptap-cloud
  * @description Enable rich text editing with real-time collaboration.
  * @category Content
  * @logo https://assets.decocache.com/mcp/d22f78d5-354f-4dd0-a8f3-226ef05c7a9e/TiptapCloud.svg

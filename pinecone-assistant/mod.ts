@@ -30,7 +30,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Pinecone Assistant
- * @name @deco/pinecone-assistant
+ * @appName pinecone-assistant
  * @description Build conversational agents using vector search from Pinecone.
  * @category IA
  * @logo https://assets.decocache.com/mcp/57d30250-ed40-4f13-8b50-3a5ddff95ca0/Pinecone.svg

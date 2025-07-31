@@ -27,7 +27,7 @@ interface Props {
 }
 /**
  * @title Vertex
- * @name @deco/vertex
+ * @appName vertex
  * @description Use Google’s Vertex AI for language, vision, and generative tasks.
  * @category Tool
  * @logo https://assets.decocache.com/mcp/156feb88-2648-43e0-b7d9-40c1bc2e1d1d/Vertex.svg

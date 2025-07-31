@@ -27,7 +27,7 @@ export interface State extends Omit<Props, "token"> {
 
 /**
  * @title Barte
- * @name @deco/barte
+ * @appName barte
  * @description Centralize and structure your product data with Barte’s catalog tools.
  * @category Payment Platform
  * @logo https://assets.decocache.com/mcp/2b4f178a-73be-44c9-a342-4d4c0e9bcad4/Barte.svg

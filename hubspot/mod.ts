@@ -45,7 +45,7 @@ export type AppContext = FnContext<State, Manifest>;
 
 /**
  * @title HubSpot
- * @name @deco/hubspot
+ * @appName hubspot
  * @description Integrate with HubSpot CRM, Marketing, and other APIs
  * @category CRM
  * @logo https://www.hubspot.com/hubfs/HubSpot_Logos/HubSpot-Inversed-Favicon.png

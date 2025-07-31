@@ -51,7 +51,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Google Docs
- * @name @deco/google-docs
+ * @appName google-docs
  * @description Read, write, and edit content in Google Docs.
  * @category Produtividade
  * @logo https://assets.decocache.com/mcp/e0a00fae-ba76-487a-9f62-7b21bbb08d50/Google-Docs.svg

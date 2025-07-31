@@ -10,7 +10,7 @@ export interface State {
 }
 /**
  * @title OpenAI
- * @name @deco/openai
+ * @appName openai
  */
 export default function App(state: Props): App<Manifest, State> {
   const getToken = state?.apiKey?.get;

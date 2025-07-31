@@ -55,7 +55,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Spotify
- * @name @deco/spotify
+ * @appName spotify
  * @description Search and retrieve music, albums, artists, and playlists.
  * @category Music
  * @logo https://assets.decocache.com/mcp/18f88493-1165-40a8-b165-31d15a367f16/Spotify.svg

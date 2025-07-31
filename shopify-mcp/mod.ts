@@ -11,7 +11,7 @@ interface AppProps extends Props {
 export const color = 0x96BF48;
 /**
  * @title Shopify MCP
- * @name @deco/shopify-mcp
+ * @appName shopify-mcp
  * @description Manage products, carts, and checkout flows across channels.
  * @category Ecommmerce
  * @logo https://assets.decocache.com/mcp/37122d09-6ceb-4d25-a641-11ce4af8a19b/Shopify.svg
