@@ -21,6 +21,7 @@ export interface State {
 }
 
 /**
+ * @title RD Station Marketing
  * @name @deco/rd-station-marketing
  * @description Manage contacts, segments, and campaigns in RD Station.
  * @category Marketing

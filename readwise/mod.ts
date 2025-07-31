@@ -22,6 +22,7 @@ export interface State {
 }
 
 /**
+ * @title Readwise
  * @name @deco/readwise
  * @description Access highlights and notes synced from your favorite reading sources.
  * @category Productivity

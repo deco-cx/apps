@@ -20,7 +20,7 @@ interface Props {
 }
 
 /**
- * @title TipTap Cloud
+ * @title TipTapCloud
  * @name @deco/tiptap-cloud
  * @description Enable rich text editing with real-time collaboration.
  * @category Content

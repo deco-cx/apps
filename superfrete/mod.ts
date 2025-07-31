@@ -36,6 +36,7 @@ export interface State extends Omit<Props, "token"> {
 }
 
 /**
+ * @title SuperFrete
  * @name @deco/superfrete
  * @description Calculate shipping prices and manage freight logistics.
  * @category Logistics

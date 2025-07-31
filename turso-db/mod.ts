@@ -28,6 +28,7 @@ export interface State {
 }
 
 /**
+ * @title TursoDB
  * @name @deco/turso-db
  * @description Run fast SQL queries on distributed SQLite databases.
  * @category Databases

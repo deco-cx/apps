@@ -84,7 +84,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @name @deco/slack
- * @title Slack OAuth
+ * @title Slack
  * @description Send messages and automate actions in Slack channels.
  * @logo https://assets.decocache.com/mcp/f7e005a9-1c53-48f7-989b-955baa422be1/Slack.svg
  */

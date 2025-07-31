@@ -28,6 +28,7 @@ export interface State {
 }
 
 /**
+ * @title Perplexity
  * @name @deco/perplexity
  * @description Ask natural language questions and get grounded, web-backed answers.
  * @category AI and Machine Learning

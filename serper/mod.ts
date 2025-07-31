@@ -22,6 +22,7 @@ export interface State {
 }
 
 /**
+ * @title Serper
  * @name @deco/serper
  * @description Perform intelligent Google searches with structured results.
  * @category SEO
