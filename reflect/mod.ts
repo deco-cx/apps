@@ -19,7 +19,7 @@ export interface State extends Props {
 export type AppContext = FnContext<State, Manifest>;
 
 /**
- * @name Reflect
+ * @name @deco/reflect
  * @title Reflect
  * @description Capture and organize your thoughts in a connected notes app.
  * @logo https://assets.decocache.com/mcp/dede3890-36bb-4cd4-a574-2c10fed1fb85/Reflect.svg

@@ -19,7 +19,7 @@ export interface State extends Props {
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
- * @name GitHub
+ * @name @deco/github
  * @title GitHub
  * @description Create and manage issues, repositories, and pull requests.
  * @logo https://assets.decocache.com/mcp/02e06fe6-a820-4c42-b960-bce022362702/GitHub.svg

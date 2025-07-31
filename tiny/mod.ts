@@ -35,6 +35,7 @@ export interface State {
 
 /**
  * @title Tiny ERP
+ * @name @deco/tiny
  * @description Sync products, contacts, invoices, and financial data.
  * @category ERP
  * @logo https://assets.decocache.com/mcp/c073765e-e869-4244-9504-1edf6af02073/TinyERP.svg

@@ -12,6 +12,7 @@ export interface State {
 
 /**
  * @title Discord Webhook
+ * @name @deco/discohook
  * @description Send rich, formatted messages to Discord channels.
  * @category Communication
  * @logo https://assets.decocache.com/mcp/a626d828-e641-4931-8557-850276e91702/DiscordWebhook.svg

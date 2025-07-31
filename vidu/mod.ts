@@ -22,7 +22,8 @@ export interface State {
 
 /**
  * @title Vidu
- * @description Transform text or images into video using Vidu’s AI tools.
+ * @name @deco/vidu
+ * @description Transform text or images into video using Vidu's AI tools.
  * @category AI & Generative
  * @logo https://assets.decocache.com/mcp/551c6502-caaf-498a-82b5-d6c586244fbd/Vidu.svg
  */

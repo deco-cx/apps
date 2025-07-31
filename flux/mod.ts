@@ -21,8 +21,8 @@ export interface Props {
 }
 
 /**
- * @title FLUX.1 Kontext
- * @name FLUX
+ * @title FLUX
+ * @name @deco/flux
  * @description Generate high-quality images from text prompts with FLUX AI.
  * @category AI
  * @logo https://images.flux1.ai/flux-logo.png

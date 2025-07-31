@@ -31,7 +31,7 @@ export interface State extends Props {
   apiWrite: ReturnType<typeof createHttpClient<ResendApi>>;
 }
 /**
- * @name Resend
+ * @name @deco/resend
  * @title Resend
  * @description Send transactional or marketing emails with a reliable delivery API.
  * @logo https://assets.decocache.com/mcp/932e4c3a-6045-40af-9fd1-42894bdd138e/Resend.svg

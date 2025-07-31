@@ -40,6 +40,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Google Calendar
+ * @name @deco/google-calendar
  * @description Create and retrieve events from your calendar.
  * @category Produtividade
  * @logo https://assets.decocache.com/mcp/b5fffe71-647a-461c-aa39-3da07b86cc96/Google-Meets.svg

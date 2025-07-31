@@ -29,7 +29,7 @@ interface Props {
 
 /**
  * @title ElevenLabs
- * @name ElevenLabs
+ * @name @deco/elevenlabs
  * @description Turn text into realistic speech with ElevenLabs voice models.
  * @category Tool
  * @logo https://assets.decocache.com/mcp/d5b8b14e-7611-4cdd-8453-cad6a4c23703/ElevenLabs.svg
