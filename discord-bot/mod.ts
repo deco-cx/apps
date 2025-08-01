@@ -22,6 +22,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Discord Bot
+ * @appName discordbot
  * @description Discord Bot integration for sending messages, managing channels, and server moderation
  * @category Communication
  * @logo https://support.discord.com/hc/user_images/PRywUXcqg0v5DD6s7C3LyQ.jpeg
