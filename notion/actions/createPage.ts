@@ -103,7 +103,8 @@ const action = async (
       Object.assign(properties, additionalProps);
     } catch (error) {
       throw new Error(
-        "Invalid JSON in additional_properties: " + (error instanceof Error ? error.message : String(error)),
+        "Invalid JSON in additional_properties: " +
+          (error instanceof Error ? error.message : String(error)),
       );
     }
   }
