@@ -10,6 +10,8 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("discord-user"),
+    app("discord-bot"),
     app("pncp"),
     app("google-calendar"),
     app("apify"),
