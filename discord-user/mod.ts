@@ -76,7 +76,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
  * @title Discord User
  * @description Integração Discord com OAuth para usuários - ler mensagens, enviar mensagens e gerenciar dados pessoais
  * @category Comunicação
- * @logo https://logoeps.com/wp-content/uploads/2013/03/discord-vector-logo.png
+ * @logo https://support.discord.com/hc/user_images/PRywUXcqg0v5DD6s7C3LyQ.jpeg
  */
 export default function App(
   props: Props,
