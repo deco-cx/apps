@@ -43,6 +43,11 @@ export interface Props {
    */
   account: string;
   /**
+   * @title Store Name
+   * @description VTEX Store name For more info, read here: https://help.vtex.com/en/tutorial/account-details-page--2vhUVOKfCaswqLguT2F9xq#stores
+   */
+  subAccount?: string;
+  /**
    * @title Public store URL
    * @description Domain that is registered on License Manager (e.g: secure.mystore.com.br) to enable account/checkout/api proxy. Important: dont use the same domain as the public store url, or it will create a loop and break the app.
    */
@@ -92,7 +97,7 @@ export const color = 0xf71963;
  * @logo https://assets.decocache.com/mcp/0d6e795b-cefd-4853-9a51-93b346c52c3f/VTEX.svg
  */
 export default function VTEX(
-  { appKey, appToken, account, publicUrl, salesChannel, ...props }: Props,
+  { appKey, appToken, account, publicUrl, salesChannel, subAccount, ...props }: Props,
 ) {
   const headers = new Headers();
   appKey &&
@@ -122,7 +127,7 @@ export default function VTEX(
   });
   const io = createGraphqlClient({
     endpoint:
-      `https://${account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
+      `https://${subAccount || account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });

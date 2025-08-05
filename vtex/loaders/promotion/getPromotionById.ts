@@ -18,7 +18,7 @@ export default async function loader(
 ): Promise<Document[]> {
   const { vcs } = ctx;
   const { idCalculatorConfiguration } = props;
-  const { cookie } = parseCookie(req.headers, ctx.account);
+  const { cookie } = parseCookie(req.headers);
 
   const promotionById = await vcs
     ["GET /api/rnb/pvt/calculatorconfiguration/:idCalculatorConfiguration"]({
