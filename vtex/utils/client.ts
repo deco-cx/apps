@@ -298,6 +298,19 @@ export interface VTEXCommerceStable {
   "GET /api/oms/user/orders": {
     response: Userorderslist;
   };
+  "POST /api/vtexid/credential/validate": {
+    response: {
+      authStatus: string;
+      id: string;
+      user: string;
+      account: string;
+      audience: string;
+      tokenType: string;
+    };
+    body: {
+      token: string;
+    };
+  };
   "GET /api/oms/user/orders/:orderId": {
     response: Userorderdetails;
   };
