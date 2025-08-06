@@ -209,6 +209,7 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
+  console.log("list", expandedProps);
   const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
   const { vcsDeprecated } = ctx;
@@ -308,6 +309,7 @@ export const cacheKey = (
   req: Request,
   ctx: AppContext,
 ) => {
+  console.log("cacheKey", expandedProps);
   const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
 

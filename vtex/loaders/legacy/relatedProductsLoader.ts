@@ -5,7 +5,7 @@ import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { isFilterParam, toSegmentParams } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
-import { pickSku } from "../../utils/transform.ts";
+import { pickSku, toProduct } from "../../utils/transform.ts";
 import type { CrossSellingType } from "../../utils/types.ts";
 import productList from "./productList.ts";
 
@@ -94,6 +94,15 @@ async function loader(
       `Error while fetching VTEX data ${JSON.stringify(products)}`,
     );
   }
+  
+  const toProducts = products.map((p) => 
+    toProduct(p, p.items[0], 0, {
+      baseUrl: req.url,
+      priceCurrency: segment?.payload?.currencyCode ?? "BRL",
+    })
+  );
+
+  return toProducts;
 
   // unique Ids
   const relatedIds = [...new Set(
