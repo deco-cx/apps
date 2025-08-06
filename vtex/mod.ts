@@ -121,8 +121,8 @@ export default function VTEX(
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
-  const alscom = createHttpClient<VTEXCommerceStable>({
-    base: "https://als.com",
+  const secureAPI = createHttpClient<VTEXCommerceStable>({
+    base: publicUrl.startsWith("http") ? publicUrl : `https://${publicUrl}`,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
@@ -155,7 +155,7 @@ export default function VTEX(
     vcs,
     my,
     api,
-    alscom,
+    secureAPI,
   };
   const app: A<Manifest, typeof state, [
     ReturnType<typeof workflow>,
