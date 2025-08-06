@@ -1,18 +1,3 @@
-import { createGraphqlClient } from "../utils/graphql.ts";
-import { createHttpClient } from "../utils/http.ts";
-import workflow from "../workflows/mod.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
-import { middleware } from "./middleware.ts";
-import { SP, VTEXCommerceStable } from "./utils/client.ts";
-import { fetchSafe } from "./utils/fetchVTEX.ts";
-import { OpenAPI as VCS } from "./utils/openapi/vcs.openapi.gen.ts";
-import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
-import { OpenAPI as MY } from "./utils/openapi/my.openapi.gen.ts";
-import { Segment } from "./utils/types.ts";
-import type { Secret } from "../website/loaders/secret.ts";
-import { removeDirtyCookies } from "../utils/normalize.ts";
-import { Markdown } from "../decohub/components/Markdown.tsx";
-import { PreviewVtex } from "./preview/Preview.tsx";
 import {
   type App as A,
   type AppContext as AC,
@@ -21,6 +6,22 @@ import {
   asResolved,
   type ManifestOf,
 } from "@deco/deco";
+import { Matcher } from "@deco/deco/blocks";
+import { Markdown } from "../decohub/components/Markdown.tsx";
+import { createGraphqlClient } from "../utils/graphql.ts";
+import { createHttpClient } from "../utils/http.ts";
+import { removeDirtyCookies } from "../utils/normalize.ts";
+import type { Secret } from "../website/loaders/secret.ts";
+import workflow from "../workflows/mod.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
+import { middleware } from "./middleware.ts";
+import { PreviewVtex } from "./preview/Preview.tsx";
+import { SP, VTEXCommerceStable } from "./utils/client.ts";
+import { fetchSafe } from "./utils/fetchVTEX.ts";
+import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
+import { OpenAPI as MY } from "./utils/openapi/my.openapi.gen.ts";
+import { OpenAPI as VCS } from "./utils/openapi/vcs.openapi.gen.ts";
+import { Segment } from "./utils/types.ts";
 export type App = ReturnType<typeof VTEX>;
 export type AppContext = AC<App>;
 export type AppManifest = ManifestOf<App>;
@@ -37,7 +38,6 @@ export type SegmentCulture = Omit<
   | "priceTables"
   | "regionId"
 >;
-import { Matcher } from "@deco/deco/blocks";
 
 /** @title VTEX */
 export interface Props {
@@ -121,6 +121,11 @@ export default function VTEX(
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
+  const alscom = createHttpClient<VTEXCommerceStable>({
+    base: "https://als.com",
+    processHeaders: removeDirtyCookies,
+    fetcher: fetchSafe,
+  });
   const io = createGraphqlClient({
     endpoint:
       `https://${account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
@@ -150,6 +155,7 @@ export default function VTEX(
     vcs,
     my,
     api,
+    alscom,
   };
   const app: A<Manifest, typeof state, [
     ReturnType<typeof workflow>,

@@ -1,4 +1,5 @@
 import { redirect } from "@deco/deco";
+import { SpanStatusCode } from "npm:@opentelemetry/api@1.9.0";
 import type { ProductListingPage } from "../../../commerce/types.ts";
 import { parseRange } from "../../../commerce/utils/filters.ts";
 import { STALE } from "../../../utils/fetch.ts";
@@ -39,7 +40,6 @@ import type {
 } from "../../utils/types.ts";
 import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
-import { SpanStatusCode } from "npm:@opentelemetry/api@1.9.0";
 
 /** this type is more friendly user to fuzzy type that is 0, 1 or auto. */
 export type LabelledFuzzy = "automatic" | "disabled" | "enabled";
@@ -294,7 +294,7 @@ const loader = async (
   const start = performance.now();
   const span = ctx.monitoring?.tracer.startSpan("intelligent-search-metrics");
   try {
-    const { vcsDeprecated } = ctx;
+    const { vcsDeprecated, alscom } = ctx;
     const { url: baseUrl } = req;
     const url = new URL(props.pageHref || baseUrl);
     span?.setAttribute("url", url.href);
@@ -349,7 +349,7 @@ const loader = async (
     const productsStart = performance.now();
     // search products on VTEX. Feel free to change any of these parameters
     const [productsResult, facetsResult] = await Promise.all([
-      vcsDeprecated
+      alscom
         ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
           ...params,
           facets: toPath(selected),
@@ -364,7 +364,7 @@ const loader = async (
           span?.setAttribute("fetch-products-status", res.status.toString());
           return res.json();
         }),
-      vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
+      alscom["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
         ...params,
         facets: toPath(fselected),
       }, {
