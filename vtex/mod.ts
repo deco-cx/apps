@@ -82,6 +82,10 @@ export interface Props {
    * @hide true
    */
   platform: "vtex";
+
+  advancedConfigs?: {
+    doNotFetchVariantsForRelatedProducts?: boolean;
+  }
 }
 export const color = 0xf71963;
 /**

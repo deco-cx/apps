@@ -94,15 +94,21 @@ async function loader(
       `Error while fetching VTEX data ${JSON.stringify(products)}`,
     );
   }
-  
-  const toProducts = products.map((p) => 
-    toProduct(p, p.items[0], 0, {
-      baseUrl: req.url,
-      priceCurrency: segment?.payload?.currencyCode ?? "BRL",
-    })
-  );
 
-  return toProducts;
+  const inStock = (p: Product) =>
+    p.offers?.offers.find((o) =>
+      o.availability === "https://schema.org/InStock"
+    );
+  
+  if(ctx.advancedConfigs?.doNotFetchVariantsForRelatedProducts) {
+    const toProducts = products.slice(0, count).map((p) => 
+      toProduct(p, p.items[0], 0, {
+        baseUrl: req.url,
+        priceCurrency: segment?.payload?.currencyCode ?? "BRL",
+      })
+    );
+    return toProducts.filter(inStock);
+  }
 
   // unique Ids
   const relatedIds = [...new Set(
@@ -112,6 +118,9 @@ async function loader(
   /** Batch fetches due to VTEX API limits */
   const batchedIds = batch(relatedIds, 50);
 
+  // this new API call is necessary if you want to fetch variants
+  // the related products API call does not return all variants, only one
+  // use advancedConfigs?.doNotFetchVariantsForRelatedProducts to avoid this call
   const relatedProductsResults = await Promise.allSettled(
     batchedIds.map((ids) =>
       productList({ props: { similars: false, ids } }, req, ctx)
@@ -136,10 +145,6 @@ async function loader(
     });
 
   if (hideUnavailableItems && relatedProducts) {
-    const inStock = (p: Product) =>
-      p.offers?.offers.find((o) =>
-        o.availability === "https://schema.org/InStock"
-      );
 
     return relatedProducts.filter(inStock);
   }
