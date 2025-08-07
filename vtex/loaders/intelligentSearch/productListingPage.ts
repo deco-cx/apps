@@ -294,7 +294,7 @@ const loader = async (
   const start = performance.now();
   const span = ctx.monitoring?.tracer.startSpan("intelligent-search-metrics");
   try {
-    const { secureAPI } = ctx;
+    const { vcsDeprecated } = ctx;
     const { url: baseUrl } = req;
     const url = new URL(props.pageHref || baseUrl);
     span?.setAttribute("url", url.href);
@@ -349,7 +349,7 @@ const loader = async (
     const productsStart = performance.now();
     // search products on VTEX. Feel free to change any of these parameters
     const [productsResult, facetsResult] = await Promise.all([
-      secureAPI
+      vcsDeprecated
         ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
           ...params,
           facets: toPath(selected),
@@ -364,7 +364,7 @@ const loader = async (
           span?.setAttribute("fetch-products-status", res.status.toString());
           return res.json();
         }),
-      secureAPI["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
+      vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
         ...params,
         facets: toPath(fselected),
       }, {
