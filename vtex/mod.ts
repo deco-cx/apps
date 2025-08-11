@@ -120,9 +120,11 @@ export default function VTEX(
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
+  const ioUrl = publicUrl.endsWith("/")
+    ? `${publicUrl}api/io/_v/private/graphql/v1`
+    : `${publicUrl}/api/io/_v/private/graphql/v1`;
   const io = createGraphqlClient({
-    endpoint:
-      `https://${account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
+    endpoint: ioUrl,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
