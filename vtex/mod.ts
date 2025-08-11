@@ -116,18 +116,20 @@ export default function VTEX(
     fetcher: fetchSafe,
   });
   const vcsDeprecated = createHttpClient<VTEXCommerceStable>({
-    base: `https://${account}.vtexcommercestable.com.br`,
+    base: publicUrl,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
+  const ioUrl = publicUrl.endsWith("/")
+    ? `${publicUrl}api/io/_v/private/graphql/v1`
+    : `${publicUrl}/api/io/_v/private/graphql/v1`;
   const io = createGraphqlClient({
-    endpoint:
-      `https://${account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
+    endpoint: ioUrl,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
   const vcs = createHttpClient<VCS>({
-    base: `https://${account}.vtexcommercestable.com.br`,
+    base: publicUrl,
     fetcher: fetchSafe,
     processHeaders: removeDirtyCookies,
     headers: headers,
