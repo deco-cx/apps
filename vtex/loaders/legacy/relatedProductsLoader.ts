@@ -99,15 +99,18 @@ async function loader(
     p.offers?.offers.find((o) =>
       o.availability === "https://schema.org/InStock"
     );
-  
-  if(ctx.advancedConfigs?.doNotFetchVariantsForRelatedProducts) {
-    const toProducts = products.slice(0, count).map((p) => 
+
+  if (ctx.advancedConfigs?.doNotFetchVariantsForRelatedProducts) {
+    const toProducts = products.slice(0, count).map((p) =>
       toProduct(p, p.items[0], 0, {
         baseUrl: req.url,
         priceCurrency: segment?.payload?.currencyCode ?? "BRL",
       })
     );
-    return toProducts.filter(inStock);
+    if (hideUnavailableItems) {
+      return toProducts.filter(inStock);
+    }
+    return toProducts;
   }
 
   // unique Ids
@@ -145,7 +148,6 @@ async function loader(
     });
 
   if (hideUnavailableItems && relatedProducts) {
-
     return relatedProducts.filter(inStock);
   }
 
