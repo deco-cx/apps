@@ -61,7 +61,6 @@ export interface Props {
   /**
    * @title Default Sales Channel
    * @description (Use defaultSegment instead)
-   * @default 1
    * @deprecated
    */
   salesChannel?: string;
