@@ -61,7 +61,6 @@ export interface Props {
   /**
    * @title Default Sales Channel
    * @description (Use defaultSegment instead)
-   * @default 1
    * @deprecated
    */
   salesChannel?: string;
@@ -82,6 +81,10 @@ export interface Props {
    * @hide true
    */
   platform: "vtex";
+
+  advancedConfigs?: {
+    doNotFetchVariantsForRelatedProducts?: boolean;
+  };
 }
 export const color = 0xf71963;
 /**
