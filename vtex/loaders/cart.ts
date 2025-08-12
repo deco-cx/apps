@@ -30,6 +30,8 @@ const loader = async (
 
   logger.info("cart headers", {
     headers: Object.fromEntries(ctx.response.headers),
+    reqHost: req.headers.get("host"),
+    resHost: ctx.response.headers.get("host"),
   });
 
   if (!segment?.payload) {
