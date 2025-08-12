@@ -31,7 +31,8 @@ export const Source = forwardRef<HTMLSourceElement, SourceProps>(
   (props, ref) => {
     const { preload } = useContext(Context);
 
-    const srcSet = getSrcSet(props.src, props.width, props.height);
+    const srcSet = props.srcSet ??
+      getSrcSet(props.src, props.width, props.height);
     const linkProps = {
       imagesrcset: srcSet,
       imagesizes: props.sizes,
