@@ -117,7 +117,7 @@ export default function VTEX(
     fetcher: fetchSafe,
   });
   const vcsDeprecated = createHttpClient<VTEXCommerceStable>({
-    base: publicUrl.startsWith("http") ? publicUrl : `https://${publicUrl}`,
+    base: `https://${account}.vtexcommercestable.com.br`,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
@@ -128,6 +128,12 @@ export default function VTEX(
     fetcher: fetchSafe,
   });
   const vcs = createHttpClient<VCS>({
+    base: `https://${account}.vtexcommercestable.com.br`,
+    fetcher: fetchSafe,
+    processHeaders: removeDirtyCookies,
+    headers: headers,
+  });
+  const secure = createHttpClient<VTEXCommerceStable>({
     base: publicUrl.startsWith("http") ? publicUrl : `https://${publicUrl}`,
     fetcher: fetchSafe,
     processHeaders: removeDirtyCookies,
@@ -150,6 +156,7 @@ export default function VTEX(
     vcs,
     my,
     api,
+    secure,
   };
   const app: A<Manifest, typeof state, [
     ReturnType<typeof workflow>,
