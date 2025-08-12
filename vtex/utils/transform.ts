@@ -1276,11 +1276,15 @@ export const toPostalAddress = (address: Address): PostalAddress => {
     addressCountry: address.country,
     addressLocality: address.city,
     addressRegion: address.state,
-    addressDistrict: address.neighborhood,
+    areaServed: address.neighborhood || undefined,
     postalCode: address.postalCode,
     streetAddress: address.street,
+    identifier: address.number || undefined,
     name: address.addressName || undefined,
     alternateName: address.receiverName || undefined,
     description: address.complement || undefined,
+    disambiguatingDescription: address.reference || undefined,
+    latitude: address.geoCoordinates?.[0] || undefined,
+    longitude: address.geoCoordinates?.[1] || undefined,
   };
 };
