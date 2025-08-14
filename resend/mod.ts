@@ -49,7 +49,7 @@ export default function App({
     ? apiKey
     : apiKey?.get?.() ?? "";
   const apiWrite = createHttpClient<ResendApi>({
-    base: "https://api.resend.com/emails",
+    base: "https://api.resend.com",
     fetcher: fetchSafe,
     headers: new Headers({
       Authorization: `Bearer ${apiKeyToken}`,
