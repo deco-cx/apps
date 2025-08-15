@@ -5,7 +5,7 @@ import type {
   FigmaNode,
   FigmaResponse,
   FigmaStyle,
-} from "../client.ts";
+} from "../utils/client.ts";
 import {
   simplifyComponent,
   simplifyComponentSet,
@@ -60,21 +60,26 @@ export default async function getFileSimplified(
   ctx: AppContext,
 ): Promise<FigmaResponse<SimplifiedResponse>> {
   const { fileKey, version, depth, branch_data } = props;
-  const response = await ctx.figma.getFile(fileKey, {
+  const response = await ctx.client["GET /v1/files/:fileKey"]({
+    fileKey,
     version,
     depth,
     branch_data,
   });
 
-  // If there's an error in the response, return the original response
-  if (response.err || !response.data) {
-    return response;
+  if (!response.ok) {
+    return {
+      err: `HTTP ${response.status}: ${response.statusText}`,
+      status: response.status,
+    };
   }
+
+  const data = await response.json();
 
   // Simplify the data
   const simplifiedComponents: Record<string, FigmaComponent> = {};
   for (
-    const [key, component] of Object.entries(response.data.components || {})
+    const [key, component] of Object.entries(data.components || {})
   ) {
     const simplified = simplifyComponent(component);
     if (simplified) {
@@ -85,7 +90,7 @@ export default async function getFileSimplified(
   const simplifiedComponentSets: Record<string, FigmaComponentSet> = {};
   for (
     const [key, componentSet] of Object.entries(
-      response.data.componentSets || {},
+      data.componentSets || {},
     )
   ) {
     const simplified = simplifyComponentSet(componentSet);
@@ -95,28 +100,28 @@ export default async function getFileSimplified(
   }
 
   const simplifiedStyles: Record<string, FigmaStyle> = {};
-  for (const [key, style] of Object.entries(response.data.styles || {})) {
+  for (const [key, style] of Object.entries(data.styles || {})) {
     const simplified = simplifyStyle(style);
     if (simplified) {
       simplifiedStyles[key] = simplified as FigmaStyle;
     }
   }
 
-  const simplifiedDoc = simplifyDocument(response.data.document);
+  const simplifiedDoc = simplifyDocument(data.document);
   if (!simplifiedDoc) {
     throw new Error("Failed to simplify document");
   }
 
   // Return the simplified data
   return {
-    ...response,
+    status: response.status,
     data: {
-      name: response.data.name,
-      role: response.data.role,
-      lastModified: response.data.lastModified,
-      editorType: response.data.editorType,
-      thumbnailUrl: response.data.thumbnailUrl,
-      version: response.data.version,
+      name: data.name,
+      role: data.role,
+      lastModified: data.lastModified,
+      editorType: data.editorType,
+      thumbnailUrl: data.thumbnailUrl,
+      version: data.version,
       document: simplifiedDoc as FigmaNode,
       components: simplifiedComponents,
       componentSets: simplifiedComponentSets,

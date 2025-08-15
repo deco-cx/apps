@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { FigmaResponse } from "../client.ts";
+import type { FigmaResponse } from "../utils/client.ts";
 
 export interface Props {
   /**
@@ -90,7 +90,9 @@ export default async function getFileImages(
     version,
   } = props;
 
-  return await ctx.figma.getImages(fileKey, nodeIds, {
+  const response = await ctx.client["GET /v1/images/:fileKey"]({
+    fileKey,
+    ids: nodeIds.join(","),
     scale,
     format,
     svg_outline_text,
@@ -101,4 +103,18 @@ export default async function getFileImages(
     use_absolute_bounds,
     version,
   });
+
+  if (!response.ok) {
+    return {
+      err: `HTTP ${response.status}: ${response.statusText}`,
+      status: response.status,
+    };
+  }
+
+  const data = await response.json();
+
+  return {
+    status: response.status,
+    data: data,
+  };
 }
