@@ -31,7 +31,6 @@ type MutationDraftOrderCalculateArgs = {
   input: DraftOrderCalculateProps["input"];
 };
 
-
 const action = async (
   { input }: DraftOrderCalculateProps,
   _req: Request,
