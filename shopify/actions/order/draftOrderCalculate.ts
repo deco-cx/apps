@@ -4,11 +4,13 @@ import { draftOrderCalculate } from "../../utils/admin/queries.ts";
 
 import {
   CalculatedDraftOrder,
-  CountryCode,
   DraftOrderCalculatePayload,
+} from "../../utils/admin/admin.ts";
+
+import {
+  CountryCode,
   Maybe,
-  MutationDraftOrderCalculateArgs,
-} from "../../utils/admin/admin.graphql.gen.ts";
+} from "../../utils/storefront/storefront.graphql.gen.ts";
 
 type DraftOrderCalculateProps = {
   input: {
@@ -23,6 +25,12 @@ type DraftOrderCalculateProps = {
     };
   };
 };
+
+/** The schema's entry point for all mutation operations. */
+type MutationDraftOrderCalculateArgs = {
+  input: DraftOrderCalculateProps["input"];
+};
+
 
 const action = async (
   { input }: DraftOrderCalculateProps,
