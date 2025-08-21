@@ -7,6 +7,18 @@ const MIN_RATING_VALUE = 0;
 export const toReview = (
   ProductReviews: PDPReview["reviews"][0],
 ): { aggregateRating: AggregateRating; review: Review[] } => {
+  if (!ProductReviews || !Array.isArray(ProductReviews.reviews)) {
+    return {
+      review: [],
+      aggregateRating: {
+        "@type": "AggregateRating",
+        reviewCount: 0,
+        ratingValue: 0,
+        bestRating: MAX_RATING_VALUE,
+        worstRating: MIN_RATING_VALUE,
+      },
+    };
+  }
   const review = ProductReviews.reviews.map((
     { _id: id, name, verified, created, text, rating },
   ) =>
