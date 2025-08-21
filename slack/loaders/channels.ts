@@ -50,7 +50,7 @@ export default async function listChannels(
       );
       allChannels.push(...response.channels);
       nextCursor = response.response_metadata?.next_cursor;
-      if (!nextCursor) {
+      if (!nextCursor || response.channels.length === 0) {
         break;
       }
     }
