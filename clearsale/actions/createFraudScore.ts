@@ -17,7 +17,7 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<Score[]> => {
+): Promise<{ scores: Score[] }> => {
   const { transactionId } = props;
 
   // First, authenticate to get the token
@@ -31,7 +31,7 @@ const action = async (
   );
 
   const result = await response.json();
-  return result;
+  return { scores: result };
 };
 
 export default action;
