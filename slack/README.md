@@ -10,6 +10,8 @@ A Deco app for integrating with Slack using OAuth 2.0 authentication. This app a
 - 👥 **User Management** - Get user information and profiles
 - 🎯 **Reactions** - Add emoji reactions to messages
 - 🔄 **Automatic Token Refresh** - Handles token expiration automatically
+- ⚡ **Rate Limiting Protection** - Built-in retry logic and exponential backoff for API rate limits
+- 🛡️ **Error Handling** - Robust handling of 429 responses and Slack API errors
 
 ## Setup Instructions
 
@@ -94,6 +96,47 @@ If you're migrating from the previous bot token approach:
 - OAuth scopes limit app permissions to only what's needed
 - HTTPS is required for redirect URLs in production
 
+## Rate Limiting & Error Handling
+
+This app includes built-in protection against Slack's API rate limits with automatic retry logic and exponential backoff.
+
+### Channel Listing with Rate Limiting
+
+When fetching all channels, you can configure rate limiting parameters:
+
+```typescript
+// Fetch all channels with custom rate limiting
+const channels = await ctx.invoke.slack.loaders.channels({
+  // Don't set limit to fetch all channels
+  delayBetweenRequests: 2000, // 2 seconds between requests
+  maxRetries: 5, // Retry up to 5 times on rate limit
+  baseDelay: 1500, // Start with 1.5 second delay for retries
+});
+
+// Fetch specific number of channels with retry protection
+const channelsLimited = await ctx.invoke.slack.loaders.channels({
+  limit: 100,
+  maxRetries: 3,
+  baseDelay: 1000,
+});
+```
+
+### Rate Limiting Features
+
+- **Automatic Retry**: Handles HTTP 429 responses and Slack API `rate_limited` errors
+- **Exponential Backoff**: Increases delay between retry attempts
+- **Retry-After Header Support**: Respects Slack's suggested retry timing
+- **Configurable Delays**: Customize delays between requests and retry attempts
+- **Request Throttling**: Built-in rate limiter for batch operations
+
+### Error Handling
+
+The app handles various error scenarios:
+- HTTP 429 (Too Many Requests) with automatic retry
+- Slack API errors (`rate_limited`, `invalid_auth`, etc.)
+- Network timeouts and connection issues
+- OAuth token expiration with automatic refresh
+
 ## Troubleshooting
 
 ### Common Issues
@@ -102,6 +145,8 @@ If you're migrating from the previous bot token approach:
 2. **"Invalid redirect URI" error**: Check that redirect URL matches exactly in Slack app settings
 3. **"Invalid scope" error**: Verify all required scopes are added to your Slack app
 4. **Token refresh failures**: Check that `client_secret` is correctly configured
+5. **Rate limiting errors**: If you encounter frequent 429 errors, increase `delayBetweenRequests` or `baseDelay` values
+6. **Timeout issues**: For large workspaces, consider increasing `maxRetries` and using pagination with `limit` parameter
 
 ### Debug Mode
 
