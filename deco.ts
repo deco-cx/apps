@@ -93,6 +93,7 @@ const config = {
     app("browser-use"),
     app("clearsale"),
     app("spotify"),
+    app("google-slides"),
     ...compatibilityApps,
   ],
 };
