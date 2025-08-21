@@ -151,7 +151,28 @@ export class SlackClient {
       { headers: this.botHeaders },
     );
 
-    return response.json();
+    // Handle HTTP status codes
+    if (!response.ok) {
+      if (response.status === 429) {
+        // Extract retry-after header if available
+        const retryAfter = response.headers.get("retry-after");
+        const retryMessage = retryAfter
+          ? ` Retry after ${retryAfter} seconds.`
+          : "";
+        throw new Error(`HTTP 429 - Rate limited by Slack API.${retryMessage}`);
+      }
+
+      throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    // Handle Slack API errors in response body
+    if (data && !data.ok && data.error) {
+      throw new Error(`Slack API error: ${data.error}`);
+    }
+
+    return data;
   }
 
   /**
