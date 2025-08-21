@@ -1,4 +1,5 @@
 import { AppContext } from "../../mod.ts";
+import { whoami } from "../../../mcp/utils/google/whoami.ts";
 
 interface OAuthCallbackResponse {
   access_token: string;
@@ -64,9 +65,9 @@ export default async function callback(
     clientId: clientId,
   });
 
-  const account = await ctx.invoke["google-drive"].loaders.oauth.whoami({
+  const account = await whoami(ctx.userInfoClient, {
     accessToken: tokenData.access_token,
-  })
+  }, "Google Drive API")
     .then((user: { email: string }) => user.email)
     .catch(console.error) || undefined;
 
