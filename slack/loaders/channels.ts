@@ -42,15 +42,19 @@ export default async function listChannels(
     const allChannels = [];
     let nextCursor = cursor;
     while (true) {
-      const response = await ctx.slack.getChannels(
-        teamId,
-        limit,
-        nextCursor,
-        types,
-      );
-      allChannels.push(...response.channels);
-      nextCursor = response.response_metadata?.next_cursor;
-      if (!nextCursor || response.channels.length === 0) {
+      try {
+        const response = await ctx.slack.getChannels(
+          teamId,
+          limit,
+          nextCursor,
+          types,
+        );
+        allChannels.push(...response.channels);
+        nextCursor = response.response_metadata?.next_cursor;
+        if (!nextCursor || response.channels.length === 0) {
+          break;
+        }
+      } catch {
         break;
       }
     }
