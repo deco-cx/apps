@@ -1,4 +1,7 @@
+import { GOOGLE_USER_INFO_SCOPES } from "../../mcp/utils/google/userInfo.ts";
+
 export const SCOPES = [
+  ...GOOGLE_USER_INFO_SCOPES,
   "https://www.googleapis.com/auth/drive",
   "https://www.googleapis.com/auth/drive.file",
   "https://www.googleapis.com/auth/drive.readonly",
@@ -53,6 +56,13 @@ export const DEFAULT_FIELDS = [
   "nextPageToken",
   `files(${COMMON_FIELDS})`,
 ].join(",");
+
+export const DEFAULT_FIELDS_SLIDES = COMMON_FIELDS;
+
+// Default fields for individual file operations (GET /files/:fileId)
+export const DEFAULT_FIELDS_FILE = COMMON_FIELDS;
+export const DEFAULT_FIELDS_DOCS = COMMON_FIELDS;
+export const DEFAULT_FIELDS_SHEETS = COMMON_FIELDS;
 
 // Error messages
 export const ERROR_FAILED_TO_LIST_FILES = "Failed to list files";

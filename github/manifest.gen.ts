@@ -7,80 +7,80 @@ import * as $$$$$$$$$1 from "./actions/createGist.ts";
 import * as $$$$$$$$$2 from "./actions/createIssue.ts";
 import * as $$$$$$$$$3 from "./actions/oauth/callback.ts";
 import * as $$$0 from "./loaders/getAuthenticatedUser.ts";
-import * as $$$1 from "./loaders/getPullRequest.ts";
-import * as $$$2 from "./loaders/getPullRequestDiff.ts";
-import * as $$$3 from "./loaders/getRateLimit.ts";
-import * as $$$4 from "./loaders/getRepo.ts";
-import * as $$$5 from "./loaders/getRepoArchiveLink.ts";
-import * as $$$6 from "./loaders/getRepoFileContent.ts";
-import * as $$$7 from "./loaders/getRepoLanguages.ts";
-import * as $$$8 from "./loaders/getRepoStatsCommitActivity.ts";
-import * as $$$9 from "./loaders/getRepoTopics.ts";
-import * as $$$10 from "./loaders/getRepoTrafficClones.ts";
-import * as $$$11 from "./loaders/getRepoTrafficPopularPaths.ts";
-import * as $$$12 from "./loaders/getRepoTrafficPopularReferrers.ts";
-import * as $$$13 from "./loaders/getRepoTrafficViews.ts";
-import * as $$$14 from "./loaders/getWorkflowRun.ts";
-import * as $$$15 from "./loaders/listAuthenticatedUserRepos.ts";
-import * as $$$16 from "./loaders/listOrgMembers.ts";
-import * as $$$17 from "./loaders/listOrgOutsideCollaborators.ts";
-import * as $$$18 from "./loaders/listOrgRepos.ts";
-import * as $$$19 from "./loaders/listOrgTeams.ts";
-import * as $$$20 from "./loaders/listPublicGists.ts";
-import * as $$$21 from "./loaders/listRepoBranches.ts";
-import * as $$$22 from "./loaders/listRepoCollaborators.ts";
-import * as $$$23 from "./loaders/listRepoCommits.ts";
-import * as $$$24 from "./loaders/listRepoIssues.ts";
-import * as $$$25 from "./loaders/listRepoIssuesRaw.ts";
-import * as $$$26 from "./loaders/listRepoPulls.ts";
-import * as $$$27 from "./loaders/listRepoTeams.ts";
-import * as $$$28 from "./loaders/listRepoWorkflowRuns.ts";
-import * as $$$29 from "./loaders/listRepoWorkflows.ts";
-import * as $$$30 from "./loaders/listWorkflowRunJobs.ts";
-import * as $$$31 from "./loaders/oauth/start.ts";
-import * as $$$32 from "./loaders/searchIssuesAndPRs.ts";
-import * as $$$33 from "./loaders/listTeamMembers.ts";
-import * as $$$34 from "./loaders/listRepoContributors.ts";
-import * as $$$35 from "./loaders/getBranchProtection.ts";
+import * as $$$1 from "./loaders/getBranchProtection.ts";
+import * as $$$2 from "./loaders/getPullRequest.ts";
+import * as $$$3 from "./loaders/getPullRequestDiff.ts";
+import * as $$$4 from "./loaders/getRateLimit.ts";
+import * as $$$5 from "./loaders/getRepo.ts";
+import * as $$$6 from "./loaders/getRepoArchiveLink.ts";
+import * as $$$7 from "./loaders/getRepoFileContent.ts";
+import * as $$$8 from "./loaders/getRepoLanguages.ts";
+import * as $$$9 from "./loaders/getRepoStatsCommitActivity.ts";
+import * as $$$10 from "./loaders/getRepoTopics.ts";
+import * as $$$11 from "./loaders/getRepoTrafficClones.ts";
+import * as $$$12 from "./loaders/getRepoTrafficPopularPaths.ts";
+import * as $$$13 from "./loaders/getRepoTrafficPopularReferrers.ts";
+import * as $$$14 from "./loaders/getRepoTrafficViews.ts";
+import * as $$$15 from "./loaders/getWorkflowRun.ts";
+import * as $$$16 from "./loaders/listAuthenticatedUserRepos.ts";
+import * as $$$17 from "./loaders/listOrgMembers.ts";
+import * as $$$18 from "./loaders/listOrgOutsideCollaborators.ts";
+import * as $$$19 from "./loaders/listOrgRepos.ts";
+import * as $$$20 from "./loaders/listOrgTeams.ts";
+import * as $$$21 from "./loaders/listPublicGists.ts";
+import * as $$$22 from "./loaders/listRepoBranches.ts";
+import * as $$$23 from "./loaders/listRepoCollaborators.ts";
+import * as $$$24 from "./loaders/listRepoCommits.ts";
+import * as $$$25 from "./loaders/listRepoContributors.ts";
+import * as $$$26 from "./loaders/listRepoIssues.ts";
+import * as $$$27 from "./loaders/listRepoIssuesRaw.ts";
+import * as $$$28 from "./loaders/listRepoPulls.ts";
+import * as $$$29 from "./loaders/listRepoTeams.ts";
+import * as $$$30 from "./loaders/listRepoWorkflowRuns.ts";
+import * as $$$31 from "./loaders/listRepoWorkflows.ts";
+import * as $$$32 from "./loaders/listTeamMembers.ts";
+import * as $$$33 from "./loaders/listWorkflowRunJobs.ts";
+import * as $$$34 from "./loaders/oauth/start.ts";
+import * as $$$35 from "./loaders/searchIssuesAndPRs.ts";
 
 const manifest = {
   "loaders": {
     "github/loaders/getAuthenticatedUser.ts": $$$0,
-    "github/loaders/getPullRequest.ts": $$$1,
-    "github/loaders/getPullRequestDiff.ts": $$$2,
-    "github/loaders/getRateLimit.ts": $$$3,
-    "github/loaders/getRepo.ts": $$$4,
-    "github/loaders/getRepoArchiveLink.ts": $$$5,
-    "github/loaders/getRepoFileContent.ts": $$$6,
-    "github/loaders/getRepoLanguages.ts": $$$7,
-    "github/loaders/getRepoStatsCommitActivity.ts": $$$8,
-    "github/loaders/getRepoTopics.ts": $$$9,
-    "github/loaders/getRepoTrafficClones.ts": $$$10,
-    "github/loaders/getRepoTrafficPopularPaths.ts": $$$11,
-    "github/loaders/getRepoTrafficPopularReferrers.ts": $$$12,
-    "github/loaders/getRepoTrafficViews.ts": $$$13,
-    "github/loaders/getWorkflowRun.ts": $$$14,
-    "github/loaders/listAuthenticatedUserRepos.ts": $$$15,
-    "github/loaders/listOrgMembers.ts": $$$16,
-    "github/loaders/listOrgOutsideCollaborators.ts": $$$17,
-    "github/loaders/listOrgRepos.ts": $$$18,
-    "github/loaders/listOrgTeams.ts": $$$19,
-    "github/loaders/listPublicGists.ts": $$$20,
-    "github/loaders/listRepoBranches.ts": $$$21,
-    "github/loaders/listRepoCollaborators.ts": $$$22,
-    "github/loaders/listRepoCommits.ts": $$$23,
-    "github/loaders/listRepoIssues.ts": $$$24,
-    "github/loaders/listRepoIssuesRaw.ts": $$$25,
-    "github/loaders/listRepoPulls.ts": $$$26,
-    "github/loaders/listRepoTeams.ts": $$$27,
-    "github/loaders/listRepoWorkflowRuns.ts": $$$28,
-    "github/loaders/listRepoWorkflows.ts": $$$29,
-    "github/loaders/listWorkflowRunJobs.ts": $$$30,
-    "github/loaders/oauth/start.ts": $$$31,
-    "github/loaders/searchIssuesAndPRs.ts": $$$32,
-    "github/loaders/listTeamMembers.ts": $$$33,
-    "github/loaders/listRepoContributors.ts": $$$34,
-    "github/loaders/getBranchProtection.ts": $$$35,
+    "github/loaders/getBranchProtection.ts": $$$1,
+    "github/loaders/getPullRequest.ts": $$$2,
+    "github/loaders/getPullRequestDiff.ts": $$$3,
+    "github/loaders/getRateLimit.ts": $$$4,
+    "github/loaders/getRepo.ts": $$$5,
+    "github/loaders/getRepoArchiveLink.ts": $$$6,
+    "github/loaders/getRepoFileContent.ts": $$$7,
+    "github/loaders/getRepoLanguages.ts": $$$8,
+    "github/loaders/getRepoStatsCommitActivity.ts": $$$9,
+    "github/loaders/getRepoTopics.ts": $$$10,
+    "github/loaders/getRepoTrafficClones.ts": $$$11,
+    "github/loaders/getRepoTrafficPopularPaths.ts": $$$12,
+    "github/loaders/getRepoTrafficPopularReferrers.ts": $$$13,
+    "github/loaders/getRepoTrafficViews.ts": $$$14,
+    "github/loaders/getWorkflowRun.ts": $$$15,
+    "github/loaders/listAuthenticatedUserRepos.ts": $$$16,
+    "github/loaders/listOrgMembers.ts": $$$17,
+    "github/loaders/listOrgOutsideCollaborators.ts": $$$18,
+    "github/loaders/listOrgRepos.ts": $$$19,
+    "github/loaders/listOrgTeams.ts": $$$20,
+    "github/loaders/listPublicGists.ts": $$$21,
+    "github/loaders/listRepoBranches.ts": $$$22,
+    "github/loaders/listRepoCollaborators.ts": $$$23,
+    "github/loaders/listRepoCommits.ts": $$$24,
+    "github/loaders/listRepoContributors.ts": $$$25,
+    "github/loaders/listRepoIssues.ts": $$$26,
+    "github/loaders/listRepoIssuesRaw.ts": $$$27,
+    "github/loaders/listRepoPulls.ts": $$$28,
+    "github/loaders/listRepoTeams.ts": $$$29,
+    "github/loaders/listRepoWorkflowRuns.ts": $$$30,
+    "github/loaders/listRepoWorkflows.ts": $$$31,
+    "github/loaders/listTeamMembers.ts": $$$32,
+    "github/loaders/listWorkflowRunJobs.ts": $$$33,
+    "github/loaders/oauth/start.ts": $$$34,
+    "github/loaders/searchIssuesAndPRs.ts": $$$35,
   },
   "actions": {
     "github/actions/commentIssue.ts": $$$$$$$$$0,

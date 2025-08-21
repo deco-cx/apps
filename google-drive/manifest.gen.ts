@@ -15,11 +15,10 @@ import * as $$$2 from "./loaders/files/get.ts";
 import * as $$$3 from "./loaders/files/list.ts";
 import * as $$$4 from "./loaders/files/search.ts";
 import * as $$$5 from "./loaders/oauth/start.ts";
-import * as $$$6 from "./loaders/oauth/whoami.ts";
-import * as $$$7 from "./loaders/sheets/get.ts";
-import * as $$$8 from "./loaders/sheets/list.ts";
-import * as $$$9 from "./loaders/slides/get.ts";
-import * as $$$10 from "./loaders/slides/list.ts";
+import * as $$$6 from "./loaders/sheets/get.ts";
+import * as $$$7 from "./loaders/sheets/list.ts";
+import * as $$$8 from "./loaders/slides/get.ts";
+import * as $$$9 from "./loaders/slides/list.ts";
 
 const manifest = {
   "loaders": {
@@ -29,11 +28,10 @@ const manifest = {
     "google-drive/loaders/files/list.ts": $$$3,
     "google-drive/loaders/files/search.ts": $$$4,
     "google-drive/loaders/oauth/start.ts": $$$5,
-    "google-drive/loaders/oauth/whoami.ts": $$$6,
-    "google-drive/loaders/sheets/get.ts": $$$7,
-    "google-drive/loaders/sheets/list.ts": $$$8,
-    "google-drive/loaders/slides/get.ts": $$$9,
-    "google-drive/loaders/slides/list.ts": $$$10,
+    "google-drive/loaders/sheets/get.ts": $$$6,
+    "google-drive/loaders/sheets/list.ts": $$$7,
+    "google-drive/loaders/slides/get.ts": $$$8,
+    "google-drive/loaders/slides/list.ts": $$$9,
   },
   "actions": {
     "google-drive/actions/docs/create.ts": $$$$$$$$$0,

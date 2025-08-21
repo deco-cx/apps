@@ -19,7 +19,7 @@ export interface Props {
 
 /**
  * @name OAUTH_CALLBACK
- * @title OAuth Google Callback
+ * @title OAuth Callback
  * @description Exchanges the authorization code for access tokens
  */
 export default async function callback(
@@ -67,8 +67,8 @@ export default async function callback(
 
   const account = await whoami(ctx.userInfoClient, {
     accessToken: tokenData.access_token,
-  }, "Google Sheets API")
-    .then((user) => user.email)
+  }, "Google Slides API")
+    .then((user: { email: string }) => user.email)
     .catch(console.error) || undefined;
 
   return { installId, account };

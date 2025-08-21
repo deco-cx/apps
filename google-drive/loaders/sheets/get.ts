@@ -1,6 +1,6 @@
 import type { AppContext } from "../../mod.ts";
 import {
-  DEFAULT_FIELDS,
+  DEFAULT_FIELDS_SHEETS,
   ERROR_FAILED_TO_GET_FILE,
   ERROR_MISSING_FILE_ID,
   FIELDS,
@@ -18,7 +18,7 @@ export default async function getSpreadsheet(
   _req: Request,
   ctx: AppContext,
 ): Promise<DriveFile> {
-  const { fileId, fields = DEFAULT_FIELDS } = props;
+  const { fileId, fields = DEFAULT_FIELDS_SHEETS } = props;
 
   if (!fileId) {
     ctx.errorHandler.toHttpError(ERROR_MISSING_FILE_ID, ERROR_MISSING_FILE_ID);
