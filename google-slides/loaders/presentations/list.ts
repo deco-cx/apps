@@ -66,12 +66,13 @@ export default async function listPresentations(
   // Note: We need to use a direct HTTP call since we're calling Drive API
   // from Slides app context. In a real implementation, you might want to
   // create a Drive client or use a shared service.
-  
+
   const searchParams = new URLSearchParams({
     pageSize: pageSize.toString(),
     q: fullQuery,
     orderBy,
-    fields: "nextPageToken,files(id,name,createdTime,modifiedTime,webViewLink,iconLink)",
+    fields:
+      "nextPageToken,files(id,name,createdTime,modifiedTime,webViewLink,iconLink)",
   });
 
   if (pageToken) {
@@ -79,8 +80,9 @@ export default async function listPresentations(
   }
 
   // Using the oauth client to make the Drive API call
-  const driveApiUrl = `https://www.googleapis.com/drive/v3/files?${searchParams.toString()}`;
-  
+  const driveApiUrl =
+    `https://www.googleapis.com/drive/v3/files?${searchParams.toString()}`;
+
   const response = await fetch(driveApiUrl, {
     headers: {
       "Authorization": `Bearer ${ctx.client.oauth.tokens.access_token}`,
@@ -89,11 +91,14 @@ export default async function listPresentations(
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to list presentations: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to list presentations: ${response.status} ${response.statusText}`,
+    );
   }
 
   const data = await response.json();
 
+  // deno-lint-ignore no-explicit-any
   const presentations: PresentationItem[] = data.files?.map((file: any) => ({
     id: file.id,
     name: file.name,

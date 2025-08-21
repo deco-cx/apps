@@ -29,11 +29,15 @@ export const REVISION_ID = "revisionId";
 export const DEFAULT_PAGE_SIZE = 100;
 
 // Error messages
-export const ERROR_FAILED_TO_LIST_PRESENTATIONS = "Failed to list presentations";
+export const ERROR_FAILED_TO_LIST_PRESENTATIONS =
+  "Failed to list presentations";
 export const ERROR_FAILED_TO_GET_PRESENTATION = "Failed to get presentation";
-export const ERROR_FAILED_TO_CREATE_PRESENTATION = "Failed to create presentation";
-export const ERROR_FAILED_TO_UPDATE_PRESENTATION = "Failed to update presentation";
-export const ERROR_FAILED_TO_DELETE_PRESENTATION = "Failed to delete presentation";
+export const ERROR_FAILED_TO_CREATE_PRESENTATION =
+  "Failed to create presentation";
+export const ERROR_FAILED_TO_UPDATE_PRESENTATION =
+  "Failed to update presentation";
+export const ERROR_FAILED_TO_DELETE_PRESENTATION =
+  "Failed to delete presentation";
 export const ERROR_PRESENTATION_NOT_FOUND = "Presentation not found";
 export const ERROR_INVALID_PARAMETERS = "Invalid parameters";
 export const ERROR_MISSING_PRESENTATION_ID = "Missing presentation ID";

@@ -1,10 +1,4 @@
-// deno-lint-ignore-file no-explicit-any
-import {
-  BatchUpdateRequest,
-  Page,
-  PageElement,
-  Presentation,
-} from "./types.ts";
+import { Page, PageElement, Presentation } from "./types.ts";
 
 export interface AuthClient {
   "POST /token": {
@@ -45,14 +39,6 @@ export interface Client {
     body: {
       title?: string;
     };
-  };
-
-  "POST /presentations/:presentationId:batchUpdate": {
-    response: {
-      presentationId: string;
-      replies: any[];
-    };
-    body: BatchUpdateRequest;
   };
 
   "GET /presentations/:presentationId/pages/:pageObjectId": {

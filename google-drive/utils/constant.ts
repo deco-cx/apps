@@ -57,7 +57,7 @@ export const DEFAULT_FIELDS = [
   `files(${COMMON_FIELDS})`,
 ].join(",");
 
-export const DEFAULT_FIELDS_SLIDES = COMMON_FIELDS
+export const DEFAULT_FIELDS_SLIDES = COMMON_FIELDS;
 
 // Default fields for individual file operations (GET /files/:fileId)
 export const DEFAULT_FIELDS_FILE = COMMON_FIELDS;

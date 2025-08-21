@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { Request as SlideRequest } from "../utils/types.ts";
+import type { Request as BatchRequest } from "../utils/types.ts";
 import getSlideTemplates from "../loaders/presentation/get.ts";
 import { fetchSafe } from "../../utils/fetch.ts";
 
@@ -57,7 +57,7 @@ const action = async (
     }));
 
     // Build the requests array for the batch update
-    const requests: SlideRequest[] = [];
+    const requests: BatchRequest[] = [];
     const updatedSlideIds: string[] = [];
 
     // Get the full presentation to access the elements
@@ -151,9 +151,10 @@ const action = async (
     // Only proceed if there are updates to make
     if (requests.length > 0) {
       // Make direct API call since httpClient doesn't handle :batchUpdate endpoints properly
-      const url = `https://slides.googleapis.com/v1/presentations/${props.presentationId}:batchUpdate`;
+      const url =
+        `https://slides.googleapis.com/v1/presentations/${props.presentationId}:batchUpdate`;
       const accessToken = ctx.client.oauth.tokens.access_token;
-      
+
       const updateResponse = await fetchSafe(url, {
         method: "POST",
         headers: {

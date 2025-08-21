@@ -39,6 +39,7 @@ export default async function createPresentation(
   return {
     presentationId: presentation.presentationId,
     title: presentation.title,
-    url: `https://docs.google.com/presentation/d/${presentation.presentationId}/edit`,
+    url:
+      `https://docs.google.com/presentation/d/${presentation.presentationId}/edit`,
   };
 }

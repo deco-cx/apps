@@ -1,8 +1,5 @@
 import type { OverrideAuthHeaderProps } from "../../oauth.ts";
-import {
-  getCurrentUser,
-  GoogleUserInfo,
-} from "./userInfo.ts";
+import { getCurrentUser, GoogleUserInfo } from "./userInfo.ts";
 import type { GoogleUserInfoClient } from "./userInfo.ts";
 
 /**

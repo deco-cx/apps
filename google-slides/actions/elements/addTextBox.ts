@@ -1,5 +1,5 @@
 import type { AppContext } from "../../mod.ts";
-import type { Request } from "../../utils/types.ts";
+import type { Request as BatchRequest } from "../../utils/types.ts";
 import { fetchSafe } from "../../../utils/fetch.ts";
 
 interface Props {
@@ -85,7 +85,7 @@ export default async function addTextBox(
 
   const textBoxId = elementId || `textbox_${Date.now()}`;
 
-  const requests: Request[] = [
+  const requests: BatchRequest[] = [
     // First request: Create the text box shape
     {
       createShape: {
@@ -124,9 +124,10 @@ export default async function addTextBox(
   ];
 
   // Make direct API call since httpClient doesn't handle :batchUpdate endpoints properly
-  const url = `https://slides.googleapis.com/v1/presentations/${presentationId}:batchUpdate`;
+  const url =
+    `https://slides.googleapis.com/v1/presentations/${presentationId}:batchUpdate`;
   const accessToken = ctx.client.oauth.tokens.access_token;
-  
+
   const response = await fetchSafe(url, {
     method: "POST",
     headers: {

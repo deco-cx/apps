@@ -1,5 +1,5 @@
 import type { AppContext } from "../../mod.ts";
-import type { Request } from "../../utils/types.ts";
+import type { Request as BatchRequest } from "../../utils/types.ts";
 import { fetchSafe } from "../../../utils/fetch.ts";
 
 interface TextReplacement {
@@ -59,7 +59,7 @@ export default async function replaceAllText(
   const { presentationId, replacements } = props;
 
   // Build requests for each replacement
-  const requests: Request[] = replacements.map((replacement) => ({
+  const requests: BatchRequest[] = replacements.map((replacement) => ({
     replaceAllText: {
       containsText: {
         text: replacement.findText,
@@ -70,9 +70,10 @@ export default async function replaceAllText(
   }));
 
   // Make direct API call since httpClient doesn't handle :batchUpdate endpoints properly
-  const url = `https://slides.googleapis.com/v1/presentations/${presentationId}:batchUpdate`;
+  const url =
+    `https://slides.googleapis.com/v1/presentations/${presentationId}:batchUpdate`;
   const accessToken = ctx.client.oauth.tokens.access_token;
-  
+
   const response = await fetchSafe(url, {
     method: "POST",
     headers: {
