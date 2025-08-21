@@ -104,7 +104,10 @@ function debugRequest(
 
   // Add headers
   headers.forEach((value, key) => {
-    console.log(`  -H "${key}: ${value}" \\`);
+    const redacted = key.toLowerCase() === "authorization"
+      ? "<redacted>"
+      : value;
+    console.log(`  -H "${key}: ${redacted}" \\`);
   });
 
   // Add body if present
