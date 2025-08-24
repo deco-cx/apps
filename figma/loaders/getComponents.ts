@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { FigmaFile, FigmaResponse } from "../client.ts";
+import type { FigmaFile, FigmaResponse } from "../utils/client.ts";
 
 export interface Props {
   /**
@@ -35,30 +35,30 @@ export default async function getFileComponents(
   ctx: AppContext,
 ): Promise<FigmaResponse<FigmaFile>> {
   const { fileKey, version, depth, branch_data } = props;
-  const response = await ctx.figma.getFile(fileKey, {
+  const response = await ctx.client["GET /v1/files/:fileKey"]({
+    fileKey,
     version,
     depth,
     branch_data,
   });
 
-  // If there's an error in the response, return the original response
-  if (response.err) {
-    return response;
+  if (!response.ok) {
+    return {
+      err: `HTTP ${response.status}: ${response.statusText}`,
+      status: response.status,
+    };
   }
 
-  // If there's no data, return the original response
-  if (!response.data) {
-    return response;
-  }
+  const data = await response.json();
 
   // Return only the components of the file
   return {
-    ...response,
+    status: response.status,
     data: {
-      ...response.data,
-      document: response.data.document,
-      components: response.data.components,
-      componentSets: response.data.componentSets,
+      ...data,
+      document: data.document,
+      components: data.components,
+      componentSets: data.componentSets,
     },
   };
 }

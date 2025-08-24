@@ -1,13 +1,13 @@
 import type { AppContext } from "../mod.ts";
-import type { FigmaResponse } from "../client.ts";
+import type { FigmaResponse } from "../utils/client.ts";
 import { simplifyNode } from "../utils/simplifier.ts";
-import { FigmaClient } from "../client.ts";
+
 import type {
   FigmaComponent,
   FigmaComponentSet,
   FigmaNode,
   FigmaStyle,
-} from "../client.ts";
+} from "../utils/client.ts";
 
 export interface Props {
   /**
@@ -61,39 +61,53 @@ export default async function getFileSimplifiedNodes(
   ctx: AppContext,
 ): Promise<FigmaResponse<FileNodesResponse>> {
   const { fileKey, nodeIds, version, depth, geometry } = props;
-  const client = new FigmaClient(ctx.accessToken.toString());
-  const response = await client.getFileNodes(fileKey, nodeIds, {
+
+  const response = await ctx.client["GET /v1/files/:fileKey/nodes"]({
+    fileKey,
+    ids: nodeIds.join(","),
     version,
     depth,
     geometry,
   });
 
-  // If there's an error in the response, return the original response
-  if (response.err || !response.data) {
-    return response;
+  if (!response.ok) {
+    return {
+      err: `HTTP ${response.status}: ${response.statusText}`,
+      status: response.status,
+    };
   }
+
+  const data = await response.json();
 
   // Simplify the nodes
   const simplifiedNodes: Record<string, SimplifiedNodeData | null> = {};
 
-  for (const [nodeId, nodeData] of Object.entries(response.data.nodes)) {
+  for (const [nodeId, nodeData] of Object.entries(data.nodes)) {
     if (!nodeData) {
       simplifiedNodes[nodeId] = null;
       continue;
     }
 
+    const node = nodeData as {
+      document: FigmaNode;
+      components: Record<string, FigmaComponent>;
+      componentSets: Record<string, FigmaComponentSet>;
+      styles: Record<string, FigmaStyle>;
+      schemaVersion: number;
+    };
+
     simplifiedNodes[nodeId] = {
-      document: simplifyNode(nodeData.document),
-      components: nodeData.components || {},
-      componentSets: nodeData.componentSets || {},
-      styles: nodeData.styles || {},
-      schemaVersion: nodeData.schemaVersion || 0,
+      document: simplifyNode(node.document),
+      components: node.components || {},
+      componentSets: node.componentSets || {},
+      styles: node.styles || {},
+      schemaVersion: node.schemaVersion || 0,
     };
   }
 
   // Return the simplified nodes
   return {
-    ...response,
+    status: response.status,
     data: {
       nodes: simplifiedNodes,
     },

@@ -5,7 +5,7 @@ import type {
   FigmaNode,
   FigmaResponse,
   FigmaStyle,
-} from "../client.ts";
+} from "../utils/client.ts";
 
 export interface Props {
   /**
@@ -57,9 +57,25 @@ export default async function getFileNodes(
   ctx: AppContext,
 ): Promise<FigmaResponse<FileNodesResponse>> {
   const { fileKey, nodeIds, version, depth, geometry } = props;
-  return await ctx.figma.getFileNodes(fileKey, nodeIds, {
+  const response = await ctx.client["GET /v1/files/:fileKey/nodes"]({
+    fileKey,
+    ids: nodeIds.join(","),
     version,
     depth,
     geometry,
   });
+
+  if (!response.ok) {
+    return {
+      err: `HTTP ${response.status}: ${response.statusText}`,
+      status: response.status,
+    };
+  }
+
+  const data = await response.json();
+
+  return {
+    status: response.status,
+    data: data,
+  };
 }
