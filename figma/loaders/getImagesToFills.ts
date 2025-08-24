@@ -7,6 +7,10 @@ export interface Props {
    * @example "FpnkfUhKcNS9S4JQFJexL"
    */
   fileKey: string;
+  /**
+   * @description The image references to get. If not provided, all images will be returned. But if you can, you should provide this.
+   */
+  imageRef?: string[];
 }
 
 /**
@@ -18,11 +22,17 @@ export default async function getFileImageFills(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<
-  FigmaResponse<{
-    images: Record<string, string>;
-  }>
-> {
+): Promise<Record<string, string>> {
   const { fileKey } = props;
-  return await ctx.figma.getImageFills(fileKey);
+  const images = (await ctx.figma.getImageFills(fileKey))?.meta?.images;
+  let imagesToReturn: Record<string, string> = {};
+  if (props.imageRef) {
+    props.imageRef.forEach((ref) => {
+      imagesToReturn[ref] = images?.[ref] ?? "";
+    });
+  } else {
+    imagesToReturn = images;
+  }
+
+  return imagesToReturn;
 }

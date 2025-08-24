@@ -279,11 +279,11 @@ export class FigmaClient {
    */
   async getImageFills(
     fileKey: string,
-  ): Promise<
-    FigmaResponse<{
+  ): Promise<{
+    meta: {
       images: Record<string, string>;
-    }>
-  > {
+    };
+  }> {
     const response = await fetch(
       `https://api.figma.com/v1/files/${fileKey}/images`,
       { headers: this.headers },
