@@ -7,6 +7,10 @@ export interface Props {
    * @example "FpnkfUhKcNS9S4JQFJexL"
    */
   fileKey: string;
+  /**
+   * @description The image references to get
+   */
+  imageRef: string[];
 }
 
 /**
@@ -24,5 +28,11 @@ export default async function getFileImageFills(
   }>
 > {
   const { fileKey } = props;
-  return await ctx.figma.getImageFills(fileKey);
+  const images = (await ctx.figma.getImageFills(fileKey))?.meta?.images;
+  const imagesToReturn: Record<string, string> = {};
+  props.imageRef.forEach((ref) => {
+    imagesToReturn[ref] = images?.[ref] ?? "";
+  });
+
+  return imagesToReturn;
 }
