@@ -1,5 +1,4 @@
 import type { AppContext } from "../mod.ts";
-import type { FigmaResponse } from "../client.ts";
 
 export interface Props {
   /**
