@@ -32,7 +32,6 @@ export interface Props {
      * @description Phone number of the contact
      */
     phone: string;
-    /**
   };
 
   /**
