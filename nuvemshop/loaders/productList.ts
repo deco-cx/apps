@@ -31,7 +31,7 @@ async function loader(
     const response = await api["GET /v1/:storeId/products"]({
       storeId: storeId,
       q: props.term || "",
-      sort_by: props.sort || "user",
+      sort_by: "price-ascending",
       per_page: props.limit || 10,
     });
     result = await response.json();
