@@ -45,16 +45,11 @@ function abortHandler(
     }
     try {
       if (!ctrl.signal.aborted) {
-        const isProd = Boolean(
-          Deno.env.get("DENO_DEPLOYMENT_ID") ||
-            Deno.env.get("ENV") === "production",
-        );
         const skipLog =
           (typeof info?.completed === "function" && info.completed()) ||
           (info?.url?.startsWith("/.well-known")) ||
           (info?.url?.endsWith(".css")) ||
-          (info?.url?.endsWith(".map")) ||
-          (!isProd); // suppress noisy request-abort logs in local/dev
+          (info?.url?.endsWith(".map"));
 
         const elapsed = info?.startedAt
           ? (Date.now() - info.startedAt)
@@ -112,6 +107,7 @@ export default function Fresh(
       return new Response(null, { status: 200 });
     }
     const timing = appContext?.monitoring?.timings?.start?.("load-data");
+    let didFinish = false;
     const url = new URL(req.url);
     const startedAt = Date.now();
     const asJson = url.searchParams.get("asJson");
@@ -123,21 +119,8 @@ export default function Fresh(
       // deno-lint-ignore no-explicit-any
       ? (ctx as any).state?.pathTemplate
       : undefined;
-    const abortCtrl = abortHandler(ctrl, req.signal, {
-      url: `${url.pathname}${url.search}`,
-      startedAt,
-      pathTemplate,
-      userAgent: req.headers.get("user-agent") ?? undefined,
-      referer: req.headers.get("referer") ?? undefined,
-      completed: () =>
-        Boolean(
-          appContext?.response?.headers?.get("Content-Length") ||
-            appContext?.response?.headers?.get("Content-Type"),
-        ),
-    });
-    /** Aborts when: Incomming request is aborted */
-    req.signal.addEventListener("abort", abortCtrl, { once: true });
-    registerFinilizer(req, abortCtrl);
+    // Only wire request-abort propagation when async render (firstByteThreshold) is in effect.
+    let abortCtrl: (() => void) | undefined;
     /**
      * Aborts when:
      *
@@ -167,6 +150,20 @@ export default function Fresh(
           ctrl.abort();
         }, delay))
       : undefined;
+
+    // Propagate client aborts to loaders only when async render is enabled
+    if (!asJson && delay && !appContext.isBot) {
+      abortCtrl = abortHandler(ctrl, req.signal, {
+        url: `${url.pathname}${url.search}`,
+        startedAt,
+        pathTemplate,
+        userAgent: req.headers.get("user-agent") ?? undefined,
+        referer: req.headers.get("referer") ?? undefined,
+        completed: () => didFinish,
+      });
+      req.signal.addEventListener("abort", abortCtrl, { once: true });
+      registerFinilizer(req, abortCtrl);
+    }
     try {
       const getPage = RequestContext.bind(
         { signal: ctrl.signal },
@@ -236,6 +233,7 @@ export default function Fresh(
         },
       );
       if (asJson !== null) {
+        didFinish = true;
         return Response.json(page, { headers: allowCorsFor(req) });
       }
       if (isFreshCtx<DecoState>(ctx)) {
@@ -266,6 +264,14 @@ export default function Fresh(
                   pagePath: ctx.state.pathTemplate,
                 },
               });
+              if (!asJson && delay && !appContext.isBot) {
+                console.info(
+                  `[fresh][async-render-response] returned initial HTML with async render` +
+                    ` url=${url.pathname}${url.search}` +
+                    (pathTemplate ? ` pathTemplate=${pathTemplate}` : "") +
+                    ` thresholdMs=${delay}`,
+                );
+              }
               const setCookies = getSetCookies(appContext.response.headers);
               if (appContext?.caching?.enabled && setCookies.length === 0) {
                 appContext.response.headers.set(
@@ -298,14 +304,19 @@ export default function Fresh(
             }
           },
         );
+        didFinish = true;
         return response;
       }
+      didFinish = true;
       return Response.json({ message: "Fresh is not being used" }, {
         status: 500,
       });
     } finally {
       if (firstByteThreshold) {
         clearTimeout(firstByteThreshold);
+      }
+      if (abortCtrl) {
+        req.signal.removeEventListener("abort", abortCtrl);
       }
     }
   };
