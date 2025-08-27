@@ -27,6 +27,12 @@ export interface Props {
      * @description Email of the contact
      */
     email: string;
+    /**
+     * @title Phone
+     * @description Phone number of the contact
+     */
+    phone: string;
+    /**
   };
 
   /**
