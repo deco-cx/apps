@@ -96,8 +96,12 @@ export const color = 0xf71963;
  * @logo https://assets.decocache.com/mcp/0d6e795b-cefd-4853-9a51-93b346c52c3f/VTEX.svg
  */
 export default function VTEX(
-  { appKey, appToken, account, publicUrl, salesChannel, ...props }: Props,
+  { appKey, appToken, account, publicUrl: _publicUrl, salesChannel, ...props }:
+    Props,
 ) {
+  const publicUrl = _publicUrl.startsWith("https://")
+    ? _publicUrl
+    : `https://${_publicUrl}`;
   const headers = new Headers();
   appKey &&
     headers.set(
