@@ -136,7 +136,7 @@ export default function App(state: Props): App<Manifest, State, [
   ReturnType<typeof openai>,
 ]> {
   const openAIApp = openai(state);
-  const assistantsAPI = openAIApp.state.openAI.beta.assistants;
+  const assistantsAPI = openAIApp.state.openAI?.beta?.assistants;
   // Sets assistantId only if state.assistants exists
   const assistantId = (state.assistants?.[0] ?? null) !== null
     ? state.assistantId
@@ -165,7 +165,9 @@ export default function App(state: Props): App<Manifest, State, [
         {},
       ),
       instructions: `${state.instructions ?? ""}`,
-      assistant: assistantsAPI.retrieve(assistantId),
+      assistant: typeof assistantsAPI?.retrieve === "function"
+        ? assistantsAPI.retrieve(assistantId)
+        : Promise.resolve({} as Assistant),
       s3: new AWS.S3({
         region: state.assistantAwsProps?.assistantBucketRegion.get?.() ??
           Deno.env.get("ASSISTANT_BUCKET_REGION"),
