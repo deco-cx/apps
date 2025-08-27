@@ -2,7 +2,6 @@ import { GOOGLE_USER_INFO_SCOPES } from "../../mcp/utils/google/userInfo.ts";
 export const SCOPES = [
   ...GOOGLE_USER_INFO_SCOPES,
   "https://www.googleapis.com/auth/drive.readonly",
-  "https://www.googleapis.com/auth/sites.readonly",
 ];
 
 export const API_URL = "https://www.googleapis.com";
