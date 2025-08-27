@@ -94,6 +94,7 @@ const config = {
     app("clearsale"),
     app("spotify"),
     app("google-slides"),
+    app("google-sites"),
     ...compatibilityApps,
   ],
 };
