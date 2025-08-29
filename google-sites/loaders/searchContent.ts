@@ -1,23 +1,15 @@
 import { AppContext } from "../mod.ts";
-import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.43/deno-dom-wasm.ts";
 import type { SearchResult } from "../utils/types.ts";
+import { normalize, PT_STOP_WORDS } from "../utils/helpers.ts";
+import type { CloudSearchResponse } from "../utils/client.ts";
+import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.43/deno-dom-wasm.ts";
 
 export interface Props {
   /**
-   * @title ID do Site (Arquivo no Google Drive)
-   * @description O ID do arquivo do Google Site que pode ser encontrado na URL do Drive
-   */
-  siteId?: string;
-  /**
    * @title URL pública do Google Sites
-   * @description URL completa do site (ex.: https://sites.google.com/view/<slug>/home). Para sites públicos, o conteúdo será resolvido automaticamente por esta URL. Também detecta URLs no formato 'https://sites.google.com/d/<siteId>/p/<pageId>/edit' e extrai automaticamente o siteId para usar a exportação do Drive (ideal para sites privados).
+   * @description URL completa do site (ex.: https://sites.google.com/view/<slug>/home)
    */
   siteUrl?: string;
-  /**
-   * @title URL do arquivo no Google Drive
-   * @description Alternativa ao siteId: informe a URL do arquivo no Drive que contenha o ID
-   */
-  fileUrl?: string;
   /**
    * @title Termo de busca
    * @description O texto ou palavra-chave que você deseja encontrar no site
@@ -37,194 +29,729 @@ export interface Props {
 }
 
 /**
+ * Normaliza uma URL para garantir consistência.
+ * @param url A URL a ser normalizada.
+ * @returns A URL normalizada.
+ */
+function normalizeUrl(url: string): string {
+  let normalized = url.trim();
+  if (!/^https?:\/\//i.test(normalized)) {
+    normalized = "https://" + normalized;
+  }
+  if (normalized.endsWith("/")) {
+    normalized = normalized.slice(0, -1);
+  }
+  return normalized;
+}
+
+/**
+ * Cria um trecho de texto (snippet) ao redor do termo encontrado.
+ * @param text O texto completo.
+ * @param index O índice onde o termo foi encontrado.
+ * @param termLength O tamanho do termo de busca.
+ * @returns Um snippet formatado.
+ */
+function createSnippet(
+  text: string,
+  index: number,
+  termLength: number,
+): string {
+  const context = 80; // Quantos caracteres antes e depois mostrar
+  const start = Math.max(0, index - context);
+  const end = Math.min(text.length, index + termLength + context);
+
+  let snippet = text.substring(start, end);
+
+  if (start > 0) {
+    snippet = "... " + snippet;
+  }
+  if (end < text.length) {
+    snippet = snippet + " ...";
+  }
+  return snippet;
+}
+
+/**
+ * Extrai links de um conteúdo HTML usando Regex.
+ * @param html O conteúdo HTML.
+ * @param baseUrl A URL base para resolver links relativos.
+ * @returns Um array de URLs absolutas.
+ */
+function extractLinksFromHtml(html: string, baseUrl: string): string[] {
+  const links = new Set<string>();
+  try {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    if (doc) {
+      const base = new URL(baseUrl);
+      const anchors = doc.querySelectorAll("a[href]");
+
+      for (const a of anchors) {
+        const href = (a as unknown as Element).getAttribute?.("href");
+        if (!href) continue;
+        try {
+          const absoluteUrl = new URL(href, base).toString();
+          const clean = sanitizeUrlString(absoluteUrl.split("#")[0]);
+          links.add(clean);
+        } catch { /* ignore */ }
+      }
+      if (links.size > 0) {
+        return Array.from(links);
+      }
+    }
+  } catch (e) {
+    console.warn(
+      "[extractLinksFromHtml] parser error, falling back to regex:",
+      e,
+    );
+  }
+
+  // Fallback regex
+  const linkRegex = /<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1/gi;
+  let match;
+  let regexMatches = 0;
+  while ((match = linkRegex.exec(html)) !== null) {
+    regexMatches++;
+    const href = match[2];
+    if (!href) continue;
+    try {
+      const absoluteUrl = new URL(href, baseUrl).toString();
+      const clean = sanitizeUrlString(absoluteUrl.split("#")[0]);
+      links.add(clean);
+    } catch { /* ignore */ }
+  }
+
+  return Array.from(links);
+}
+
+/**
+ * Decodifica entidades HTML comuns
+ */
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
+/**
+ * Limpa o HTML removendo tags, scripts, styles e decodificando entidades
+ * usando Regex, retornando apenas o texto.
+ * @param html O conteúdo HTML.
+ * @returns O texto limpo.
+ */
+function cleanHtmlAndGetText(html: string): string {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    if (doc) {
+      const junk = doc.querySelectorAll("script,style,noscript");
+      for (const el of junk) {
+        // garantir separação ao remover lixo
+        if (typeof ((el as unknown) as Element).replaceWith === "function") {
+          (el as unknown as HTMLElement).replaceWith(" ");
+        } else {
+          const parent = (el as unknown as Element).parentNode;
+          try {
+            if (parent && (doc as unknown as Document).createTextNode) {
+              parent.insertBefore((doc as unknown as Document).createTextNode(" "), el as unknown as Node);
+            }
+          } catch { /* ignore */ }
+          ((el as unknown) as Element).remove?.();
+        }
+      }
+
+      // Transformar HTML restante em texto, garantindo espaços entre tags
+      const bodyHtml = ((doc as unknown as Document).body?.innerHTML ??
+        ((doc as unknown as Document).documentElement?.innerHTML) ??
+        html) as string;
+
+      let text = bodyHtml
+        .replace(/<br\s*\/?>/gi, " ")
+        .replace(
+          /<\/?(p|div|section|article|header|footer|nav|li|ul|ol|h[1-6]|table|thead|tbody|tfoot|tr|td|th|blockquote|pre)[^>]*>/gi,
+          " ",
+        )
+        .replace(/<[^>]+>/g, " ");
+      text = decodeHtmlEntities(text);
+
+      const stripped = stripBoilerplate(text.replace(/\s\s+/g, " ").trim());
+      const collapsed = collapseRepeatedPhrases(stripped);
+
+      // NOVO: deduplicar sentenças/chunks repetidos ao longo do texto
+      const deduped = dedupeRepeatedChunks(collapsed);
+      return deduped;
+    }
+  } catch (e) {
+    console.warn(
+      "[cleanHtmlAndGetText] parser error, falling back to regex:",
+      e,
+    );
+  }
+
+  // Fallback (também garantindo espaços)
+  let text = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, " ");
+  text = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, " ");
+  text = text.replace(/<br\s*\/?>/gi, " ");
+  text = text.replace(
+    /<\/?(p|div|section|article|header|footer|nav|li|ul|ol|h[1-6]|table|thead|tbody|tfoot|tr|td|th|blockquote|pre)[^>]*>/gi,
+    " ",
+  );
+  text = text.replace(/<[^>]+>/g, " ");
+  text = decodeHtmlEntities(text);
+  const stripped = stripBoilerplate(text.replace(/\s\s+/g, " ").trim());
+  const collapsed = collapseRepeatedPhrases(stripped);
+
+  // NOVO: deduplicação também no fallback
+  const deduped = dedupeRepeatedChunks(collapsed);
+  return deduped;
+}
+
+/**
+ * Normaliza um snippet para deduplicação (remove pontuação, normaliza case e espaços)
+ */
+function normalizeSnippet(snippet: string): string {
+  return snippet
+    .toLowerCase()
+    // remove pontuação (unicode)
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Fetch com timeout para evitar pendurar em páginas lentas
+ */
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit & { timeoutMs?: number } = {},
+): Promise<Response> {
+  const { timeoutMs = 8000, ...opts } = init;
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  const startedAt = Date.now();
+  try {
+    const res = await fetch(url, { ...opts, signal: controller.signal });
+ 
+    return res;
+  } catch (err) {
+    const duration = Date.now() - startedAt;
+    if ((err as Error)?.name === "AbortError") {
+      console.warn(
+        `[fetchWithTimeout] ABORTED ${url} after ${duration}ms (timeout=${timeoutMs}ms)`,
+      );
+    } else {
+      console.error(`[fetchWithTimeout] ERROR ${url} after ${duration}ms`, err);
+    }
+    throw err;
+  } finally {
+    clearTimeout(id);
+  }
+}
+
+/**
+ * Executa map assíncrono com limite de concorrência
+ */
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  mapper: (item: T, index: number) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let i = 0;
+  const workers = Array.from(
+    { length: Math.min(limit, items.length) },
+    async () => {
+      while (true) {
+        const current = i++;
+        if (current >= items.length) break;
+        results[current] = await mapper(items[current], current);
+      }
+    },
+  );
+  await Promise.all(workers);
+  return results;
+}
+
+/**
+ * Formata resultados do Cloud Search API para o padrão SearchResult
+ */
+function formatCloudSearchResults(
+  response: CloudSearchResponse,
+): SearchResult[] {
+  if (!response.results) return [];
+
+  return response.results.map((item) => ({
+    pageTitle: item.title,
+    relevantSnippet: item.snippet,
+    link: item.link,
+    score: 1,
+  }));
+}
+
+function sanitizeUrlString(u: string): string {
+  return u.trim().replace(/^`+|`+$/g, "");
+}
+
+function stripBoilerplate(text: string): string {
+  const patterns = [
+    /skip to main content/gi,
+    /skip to navigation/gi,
+    /google sites/gi,
+    /report abuse/gi,
+    /page details/gi,
+    /page updated/gi,
+    /embedded files/gi,
+    /\bmore\b/gi,
+    /search this site/gi,
+    /\bmais\b/gi,
+    /\bmenu\b/gi,
+    /\bhome\b/gi,
+    /\bp[áa]gina inicial\b/gi,
+    /\bin[íi]cio\b/gi,
+    /\bnavega[cç][aã]o\b/gi,
+  ];
+  let t = text;
+  for (const p of patterns) t = t.replace(p, " ");
+  return t.replace(/\s\s+/g, " ").trim();
+}
+
+function collapseRepeatedPhrases(text: string): string {
+  // Remove repetições consecutivas de n-gramas (2 a 8 palavras)
+  const words = text.split(/\s+/);
+  if (words.length < 4) return text;
+
+  const out: string[] = [];
+  for (let i = 0; i < words.length;) {
+    let collapsedLen = 0;
+    const maxWindow = Math.min(8, Math.floor((words.length - i) / 2));
+    for (let n = maxWindow; n >= 2; n--) {
+      let repeated = true;
+      for (let k = 0; k < n; k++) {
+        if (
+          (words[i + k] || "").toLowerCase() !==
+            (words[i + n + k] || "").toLowerCase()
+        ) {
+          repeated = false;
+          break;
+        }
+      }
+      if (repeated) {
+        // Mantém apenas a primeira ocorrência e pula a repetida
+        for (let k = 0; k < n; k++) out.push(words[i + k]);
+        collapsedLen = n;
+        break;
+      }
+    }
+    if (collapsedLen > 0) {
+      i += collapsedLen * 2;
+    } else {
+      out.push(words[i]);
+      i += 1;
+    }
+  }
+  return out.join(" ").replace(/\s\s+/g, " ").trim();
+}
+
+function dedupeRepeatedChunks(text: string): string {
+  const MIN_CHUNK_LEN = 25; // só deduplica trechos mais longos
+  const seen = new Set<string>();
+  const out: string[] = [];
+
+  // Marca pontuação de término e depois faz split por marcador ou quebra de linha
+  const marked = text.replace(/([\.!\?;:])\s+/g, "$1|");
+  const candidates = marked.split(/\|+|[\n\r]+/g).filter(Boolean);
+
+  for (const part of candidates) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+
+    // evita deduplicar pedaços curtos (listas, palavras repetidas etc.)
+    if (trimmed.length < MIN_CHUNK_LEN) {
+      out.push(trimmed);
+      continue;
+    }
+
+    // normaliza para comparação robusta
+    const norm = normalizeSnippet(trimmed);
+    if (!seen.has(norm)) {
+      seen.add(norm);
+      out.push(trimmed);
+    }
+  }
+
+  return out.join(" ").replace(/\s\s+/g, " ").trim();
+}
+
+function tokenizeQuery(query: string): string[] {
+  const lowered = query.toLowerCase();
+  // separa por não letras/números (unicode)
+  const rawTokens = lowered.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+  // filtra stopwords e tokens muito curtos
+  const tokens = rawTokens.filter((t) =>
+    !PT_STOP_WORDS.has(t) && t.length >= 2
+  );
+  // dedup
+  return Array.from(new Set(tokens));
+}
+
+/**
+ * Busca usando Google Custom Search API
+ */
+async function searchWithCustomSearch(
+  query: string,
+  siteUrl: string,
+  page: number = 1,
+  pageSize: number = 10,
+): Promise<
+  {
+    results: SearchResult[];
+    total: number;
+    isPrivate?: boolean;
+    invalidSite?: boolean;
+  }
+> {
+  try {
+    // 1. Fazer o fetch da página inicial e tratar erros primários
+    let initialResponse;
+    try {
+      initialResponse = await fetchWithTimeout(siteUrl, {
+        headers: { "User-Agent": "SimpleBot/1.0" },
+        timeoutMs: 8000,
+      });
+    } catch (error) {
+      console.error(
+        `[CustomSearch] network error accessing ${siteUrl}:`,
+        error,
+      );
+      return { results: [], total: 0, invalidSite: true };
+    }
+
+    if (!initialResponse.ok) {
+      console.warn(`[CustomSearch] initial status=${initialResponse.status}`);
+      if (initialResponse.status === 401 || initialResponse.status === 403) {
+        return { results: [], total: 0, isPrivate: true };
+      }
+      return { results: [], total: 0, invalidSite: true };
+    }
+
+    const initialHtml = await initialResponse.text();
+
+    // 2. Extrair todos os links internos únicos da página inicial
+    const allLinksExtracted = extractLinksFromHtml(initialHtml, siteUrl);
+
+    const internalLinks = new Set<string>([siteUrl]);
+    const baseUrl = new URL(siteUrl);
+
+    let filteredOut = 0;
+    for (const link of allLinksExtracted) {
+      try {
+        const urlObject = new URL(link);
+        if (urlObject.hostname === baseUrl.hostname) {
+          const cleanUrl = link.split("#")[0];
+          if (
+            !/\.(pdf|jpg|jpeg|png|gif|webp|zip|rar|css|js|svg|ico)$/i.test(
+              cleanUrl,
+            )
+          ) {
+            internalLinks.add(normalizeUrl(cleanUrl));
+          } else {
+            filteredOut++;
+          }
+        } else {
+          filteredOut++;
+        }
+      } catch {
+        filteredOut++;
+      }
+    }
+
+    const MAX_PAGES = 50;
+    const CONCURRENCY = 6;
+    const PER_PAGE_SNIPPET_LIMIT = 5;
+
+    const urlsToScrape = Array.from(internalLinks).slice(0, MAX_PAGES);
+
+    // 3. Buscar o conteúdo com concorrência limitada
+    const allMatches: SearchResult[] = [];
+    const seenSnippets = new Set<string>();
+    const perPageCount = new Map<string, number>();
+
+    let tokens = tokenizeQuery(query);
+    if (tokens.length === 0) {
+      // fallback: se tudo for stopword, usa palavras com >=2 chars do original
+      tokens = query.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter((t) =>
+        t.length >= 2
+      );
+      tokens = Array.from(new Set(tokens));
+    }
+    const tokensSet = new Set(tokens);
+    await mapWithConcurrency(urlsToScrape, CONCURRENCY, async (url) => {
+      try {
+        const response = await fetchWithTimeout(url, {
+          headers: { "User-Agent": "SimpleBot/1.0" },
+          timeoutMs: 8000,
+        });
+        if (!response.ok) {
+          console.warn(`[CustomSearch] ${url} -> ${response.status}`);
+          return;
+        }
+
+        const html = await response.text();
+        const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+        const titleFromHtml = titleMatch
+          ? decodeHtmlEntities(titleMatch[1].replace(/\s+/g, " ").trim())
+          : undefined;
+
+        const cleanText = cleanHtmlAndGetText(html);
+        const textLower = cleanText.toLowerCase();
+        const titleLower = (titleFromHtml || "").toLowerCase();
+
+        // bônus por termos no título
+        const titleTokenMatches = new Set(tokens.filter((t) =>
+          titleLower.includes(t)
+        )).size;
+
+        let addedForUrl = 0;
+
+        // procurar cada token no texto
+        for (const t of tokens) {
+          let fromIndex = 0;
+          while (true) {
+            if ((perPageCount.get(url) || 0) >= PER_PAGE_SNIPPET_LIMIT) break;
+
+            const idx = textLower.indexOf(t, fromIndex);
+            if (idx === -1) break;
+
+            const snippet = createSnippet(cleanText, idx, t.length);
+            const normalized = normalizeSnippet(snippet);
+
+            if (normalized && !seenSnippets.has(normalized)) {
+              // quantos termos distintos aparecem no snippet?
+              const snippetLower = snippet.toLowerCase();
+              const matchedTerms = new Set<string>();
+              for (const tk of tokensSet) {
+                if (snippetLower.includes(tk)) matchedTerms.add(tk);
+              }
+              const coverage = matchedTerms.size; // nº de termos distintos presentes
+              const score = 1 + coverage + titleTokenMatches;
+
+              allMatches.push({
+                link: sanitizeUrlString(url),
+                relevantSnippet: snippet,
+                pageTitle: titleFromHtml || url.split("/").pop() || url,
+                score,
+              });
+              seenSnippets.add(normalized);
+              perPageCount.set(url, (perPageCount.get(url) || 0) + 1);
+              addedForUrl++;
+            }
+
+            fromIndex = idx + 1;
+          }
+          if ((perPageCount.get(url) || 0) >= PER_PAGE_SNIPPET_LIMIT) break;
+        }
+      } catch (error) {
+        console.error(`[CustomSearch] fail processing url=${url}:`, error);
+      }
+    });
+
+    // Ordenar por score (desc) antes da paginação
+    allMatches.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+
+    // Deduplicar por URL (mantém o primeiro após a ordenação, ou seja, o de maior score)
+    const uniqueByLink = new Map<string, SearchResult>();
+    for (const r of allMatches) {
+      const k = sanitizeUrlString(r.link || "");
+      if (!uniqueByLink.has(k)) {
+        uniqueByLink.set(k, { ...r, link: k });
+      }
+    }
+    const deduped = Array.from(uniqueByLink.values());
+
+    // 6. Paginar os resultados e retornar
+    const total = deduped.length;
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedResults = deduped.slice(startIndex, endIndex);
+
+    return { results: paginatedResults, total };
+  } catch (error) {
+    console.error("Custom Search Error:", error);
+    return { results: [], total: 0, isPrivate: true };
+  }
+}
+
+/**
+ * Busca usando Google Cloud Search API (para sites privados)
+ */
+async function searchWithCloudSearch(
+  ctx: AppContext,
+  query: string,
+  siteUrl?: string,
+  start: number = 0,
+  pageSize: number = 10,
+): Promise<{ results: SearchResult[]; total: number; unavailable?: boolean }> {
+  try {
+    const body: {
+      query: string;
+      pageSize: number;
+      start: number;
+      dataSourceRestrictions?: Array<{
+        source: {
+          name: string;
+        };
+      }>;
+    } = {
+      query,
+      pageSize,
+      start,
+    };
+
+    // Se temos URL do site, adicionar restrição de domínio
+    if (siteUrl) {
+      const domain = new URL(siteUrl).hostname;
+      body.dataSourceRestrictions = [{
+        source: {
+          name: `datasources/${domain}`,
+        },
+      }];
+    }
+
+    const response = await ctx.cloudSearchClient["POST /v1/query/search"]("", {
+      body,
+    });
+
+    if ("error" in response) {
+      const err = response.error as {
+        code?: number;
+        message?: string;
+        status?: string;
+      };
+      // Cloud Search não disponível para contas pessoais (Google Workspace required)
+      if (
+        err.code === 403 &&
+        (err.message?.includes("only available to G Suite users") ||
+          err.status === "PERMISSION_DENIED")
+      ) {
+        return { results: [], total: 0, unavailable: true };
+      }
+      throw new Error(`Cloud Search API Error: ${err.message}`);
+    }
+
+    const results = formatCloudSearchResults(response as CloudSearchResponse);
+    const total = (response as CloudSearchResponse).searchInformation
+      ? parseInt(
+        (response as CloudSearchResponse).searchInformation?.totalResults ||
+          "0",
+      )
+      : results.length;
+
+    return { results, total };
+  } catch (error) {
+    console.error("Cloud Search Error:", error);
+    return { results: [], total: 0 };
+  }
+}
+
+/**
  * @title Buscar conteúdo em um Google Site
- * @description Realiza uma busca textual no conteúdo do site e retorna parágrafos relevantes
+ * @description Realiza uma busca textual no conteúdo do site usando Custom Search API primeiro, e Cloud Search API para sites privados
  */
 const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<
-  {
+): Promise<{
+  results: SearchResult[];
+  total: number;
+  page: number;
+  pageSize: number;
+  info?: string;
+}> => {
+  const { siteUrl, query, page = 1, pageSize = 10 } = props;
+
+  const siteUrlNorm = normalize(siteUrl);
+
+  // Exigir pelo menos um identificador ou termo de busca
+  if (!query.trim()) {
+    return {
+      results: [],
+      total: 0,
+      page,
+      pageSize,
+      info: "Termo de busca é obrigatório.",
+    };
+  }
+
+  const start = (page - 1) * pageSize;
+  let searchResults: {
     results: SearchResult[];
     total: number;
-    page: number;
-    pageSize: number;
-    info?: string;
-  }
-> => {
-  const { siteId, siteUrl, fileUrl, query, page = 1, pageSize = 10 } = props;
+    isPrivate?: boolean;
+  };
+  let info: string | undefined;
 
-  // Normalização: remove espaços extras e aspas/crases ao redor
-  const normalize = (s?: string) =>
-    s?.trim().replace(/^['"`]\s*|\s*['"`]$/g, "");
-  const siteIdNorm = normalize(siteId);
-  const siteUrlNorm = normalize(siteUrl);
-  const fileUrlNorm = normalize(fileUrl);
+  // Tentar primeiro com Custom Search API
+  searchResults = await searchWithCustomSearch(
+    query,
+    siteUrlNorm || "",
+    start + 1,
+    pageSize,
+  );
 
-  // Exigir pelo menos um identificador de origem do conteúdo
-  if (!siteUrlNorm && !fileUrlNorm && !siteIdNorm) {
+  if ("invalidSite" in searchResults && searchResults.invalidSite) {
     return {
       results: [],
       total: 0,
       page,
       pageSize,
-      info:
-        "Forneça pelo menos um dos parâmetros: siteUrl (público), fileUrl (Drive) ou siteId (Drive).",
+      info: "Site inválido. Verifique se a URL está correta.",
     };
   }
 
-  // Detecta siteId em URLs do tipo sites.google.com/d/<siteId>/...
-  const extractSiteIdFromSiteUrl = (url: string): string | null => {
-    const m = url.match(
-      /https?:\/\/sites\.google\.com\/(?:u\/\d+\/)?d\/([a-zA-Z0-9_-]+)/,
+  // Se Custom Search indicar site privado ou não retornar resultados, tentar Cloud Search
+  if (
+    searchResults.isPrivate ||
+    (searchResults.results.length === 0 && searchResults.total === 0)
+  ) {
+    const cloudSearchResults = await searchWithCloudSearch(
+      ctx,
+      query,
+      siteUrlNorm,
+      start, // Cloud Search usa 0-based indexing
+      pageSize,
     );
-    return m ? m[1] : null;
-  };
-  const siteIdFromSiteUrl = siteUrlNorm
-    ? extractSiteIdFromSiteUrl(siteUrlNorm)
-    : null;
 
-  // Tenta resolver via siteUrl (site público) primeiro, a menos que a URL seja do tipo /d/<siteId> (caso em que iremos direto via Drive)
-  // Dentro do loader...
-  // Tenta resolver via siteUrl (site público) primeiro...
-  let html: string | null = null;
-  if (siteUrlNorm && !siteIdFromSiteUrl) {
-    try {
-      const r = await fetch(siteUrlNorm, { redirect: "follow" });
-      if (r.ok) {
-        const maybeHtml = await r.text();
-        const finalUrl = r.url ?? siteUrlNorm; // Obtém a URL final após redirects
-        // Verifica se houve redirect para login (ex: accounts.google.com)
-        const hadRedirectToLogin = finalUrl !== siteUrlNorm &&
-          /accounts\.google\.com|ServiceLogin|signin/i.test(finalUrl);
-        if (
-          hadRedirectToLogin ||
-          /sign-?in|login|accounts\.google\.com/i.test(maybeHtml)
-        ) {
-          // Detectado como privado via redirect ou conteúdo de login: ignora e vai para fallback
-        } else {
-          html = maybeHtml;
-        }
-      }
-    } catch (_e) {
-      // Ignora e cai para o fallback via Drive
-    }
-  }
-
-  // Helper para extrair fileId de uma URL do Drive (se fornecida)
-  const extractDriveFileId = (url: string): string | null => {
-    const patterns = [
-      /\/file\/d\/([a-zA-Z0-9_-]+)/, // https://drive.google.com/file/d/<id>/...
-      /[?&]id=([a-zA-Z0-9_-]+)/, // https://drive.google.com/open?id=<id>
-      /\/(?:u\/\d+\/)?d\/([a-zA-Z0-9_-]+)/, // https://sites.google.com/d/<id>/...
-    ];
-    for (const re of patterns) {
-      const m = url.match(re);
-      if (m) return m[1];
-    }
-    return null;
-  };
-
-  // Se não conseguiu via siteUrl (ou detectamos /d/<siteId>), tenta via Drive export (requer OAuth)
-  if (!html) {
-    const resolvedFileId = siteIdFromSiteUrl ??
-      (fileUrlNorm ? extractDriveFileId(fileUrlNorm) : null) ??
-      siteIdNorm;
-
-    if (!resolvedFileId) {
-      // Nova mensagem para URLs /view/ privadas
-      if (siteUrlNorm?.includes("/view/")) {
-        return {
-          results: [],
-          total: 0,
-          page,
-          pageSize,
-          info:
-            "Para sites privados com URLs /view/, forneça o siteId ou fileUrl, pois não é possível extrair o ID automaticamente da URL de visualização.",
-        };
-      }
-      return {
-        results: [],
-        total: 0,
-        page,
-        pageSize,
-        info:
-          "Não foi possível resolver um fileId. Forneça um siteId (Drive), um fileUrl (Drive) ou uma siteUrl pública (ou no formato sites.google.com/d/<siteId>/...).",
-      };
-    }
-
-    const response = await ctx.client["GET /drive/v3/files/:fileId/export"]({
-      fileId: resolvedFileId,
-      mimeType: "text/html",
-    });
-
-    if (!response.ok) {
-      const errBody = await response.text().catch(() => "");
-      let infoMessage = "Não foi possível exportar o conteúdo via Drive.";
-      if (response.status === 401 || response.status === 403) {
-        infoMessage =
-          "Falha de autenticação: verifique se o token de acesso OAuth está válido e se as permissões (drive.readonly) estão configuradas corretamente.";
-      }
-      return {
-        results: [],
-        total: 0,
-        page,
-        pageSize,
-        info: infoMessage + (errBody ? ` Detalhes: ${errBody}` : ""),
-      };
-    }
-
-    html = await response.text();
-  }
-
-  // 2. Parsear o HTML
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  if (!doc) {
-    return {
-      results: [],
-      total: 0,
-      page,
-      pageSize,
-      info: "Falha ao parsear o HTML.",
+    searchResults = {
+      results: cloudSearchResults.results,
+      total: cloudSearchResults.total,
     };
+
+    if (cloudSearchResults.unavailable) {
+      info =
+        "Cloud Search API não está disponível para contas pessoais. É necessário usar uma conta Google Workspace com o serviço Cloud Search habilitado e permissões de consulta.";
+    } else if (cloudSearchResults.results.length > 0) {
+      info = "Resultados obtidos via Cloud Search API (site privado)";
+    } else {
+      info =
+        "Nenhum resultado encontrado. Verifique se o site está acessível e se as credenciais estão corretas.";
+    }
+  } else if (searchResults.results.length > 0) {
+    info = "Resultados obtidos via Custom Search";
   }
 
-  doc.querySelectorAll("script, style").forEach((el) => {
-    el._remove();
-  });
-
-  // Extrair texto plano: remover tags HTML e normalizar espaços
-  const plainText = (doc.body.textContent || "").replace(/\s+/g, " ").trim();
-
-  // Dividir em chunks de ~1000 caracteres
-  const chunkSize = 1000;
-  const allChunks: string[] = [];
-  for (let i = 0; i < plainText.length; i += chunkSize) {
-    let chunk = plainText.substring(i, i + chunkSize);
-    chunk =
-      `Instrução: Busque por '${query}' neste texto e extraia trechos relevantes. Texto: ` +
-      chunk;
-    allChunks.push(chunk);
-  }
-
-  // Paginação
-  const total = allChunks.length;
-  const start = (page - 1) * pageSize;
-  const end = start + pageSize;
-  const paginatedChunks = allChunks.slice(start, end);
-
-  // Converter para SearchResult
-  const results: SearchResult[] = paginatedChunks.map((chunk, index) => ({
-    pageTitle: `Chunk ${index + 1} do Site`,
-    relevantSnippet: chunk,
-  }));
+  // Aplicar paginação nos resultados
+  const paginatedResults = searchResults.results;
 
   return {
-    results,
-    total,
+    results: paginatedResults,
+    total: searchResults.total,
     page,
     pageSize,
+    info,
   };
 };
 

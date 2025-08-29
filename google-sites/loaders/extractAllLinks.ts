@@ -1,23 +1,12 @@
-import { AppContext } from "../mod.ts";
 import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.43/deno-dom-wasm.ts";
 import type { ExtractedLink } from "../utils/types.ts";
 
 export interface Props {
   /**
-   * @title ID do Site (Arquivo no Google Drive)
-   * @description O ID do arquivo do Google Site que pode ser encontrado na URL do Drive
-   */
-  siteId?: string;
-  /**
-   * @title URL pública do Google Sites
+   * @title URL do Google Sites
    * @description URL completa do site (ex.: https://sites.google.com/view/<slug>/home). Para sites públicos, o conteúdo será resolvido automaticamente por esta URL. Também detecta URLs no formato 'https://sites.google.com/d/<siteId>/p/<pageId>/edit' e extrai automaticamente o siteId para usar a exportação do Drive (ideal para sites privados).
    */
   siteUrl?: string;
-  /**
-   * @title URL do arquivo no Google Drive
-   * @description Alternativa ao siteId: informe a URL do arquivo no Drive que contenha o ID
-   */
-  fileUrl?: string;
   /**
    * @title Página
    * @description Número da página de resultados (para paginação de links)
@@ -42,10 +31,10 @@ export interface Props {
  * @title Extrair todos os links de um Google Site
  * @description Varre o site e retorna uma lista estruturada de todos os links encontrados
  */
+// Dentro da função `loader`
 const loader = async (
   props: Props,
   _req: Request,
-  ctx: AppContext,
 ): Promise<
   | {
     links: ExtractedLink[];
@@ -63,9 +52,7 @@ const loader = async (
   }
 > => {
   const {
-    siteId,
     siteUrl,
-    fileUrl,
     page = 1,
     pageSize = 50,
     format = "json",
@@ -74,11 +61,9 @@ const loader = async (
   // Normalização: remove espaços extras e aspas/crases ao redor
   const normalize = (s?: string) =>
     s?.trim().replace(/^['"`]\s*|\s*['"`]$/g, "");
-  const siteIdNorm = normalize(siteId);
   const siteUrlNorm = normalize(siteUrl);
-  const fileUrlNorm = normalize(fileUrl);
 
-  if (!siteUrlNorm && !fileUrlNorm && !siteIdNorm) {
+  if (!siteUrlNorm) {
     const info =
       "Forneça pelo menos um dos parâmetros: siteUrl (público), fileUrl (Drive) ou siteId (Drive).";
     return format === "csv"
@@ -86,20 +71,10 @@ const loader = async (
       : { links: [], total: 0, page, pageSize, info };
   }
 
-  // Detecta siteId em URLs do tipo sites.google.com/d/<siteId>/...
-  const extractSiteIdFromSiteUrl = (url: string): string | null => {
-    const m = url.match(
-      /https?:\/\/sites\.google\.com\/(?:u\/\d+\/)?d\/([a-zA-Z0-9_-]+)/,
-    );
-    return m ? m[1] : null;
-  };
-  const siteIdFromSiteUrl = siteUrlNorm
-    ? extractSiteIdFromSiteUrl(siteUrlNorm)
-    : null;
-
   // Tenta resolver via siteUrl (site público) primeiro, a menos que a URL seja do tipo /d/<siteId> (caso em que iremos direto via Drive)
   let html: string | null = null;
-  if (siteUrlNorm && !siteIdFromSiteUrl) {
+
+  if (siteUrlNorm) {
     try {
       const r = await fetch(siteUrlNorm, { redirect: "follow" });
       if (r.ok) {
@@ -110,65 +85,8 @@ const loader = async (
     }
   }
 
-  // Helper para extrair fileId de uma URL do Drive (se fornecida)
-  const extractDriveFileId = (url: string): string | null => {
-    const patterns = [
-      /\/file\/d\/([a-zA-Z0-9_-]+)/, // https://drive.google.com/file/d/<id>/...
-      /[?&]id=([a-zA-Z0-9_-]+)/, // https://drive.google.com/open?id=<id>
-      /\/(?:u\/\d+\/)?d\/([a-zA-Z0-9_-]+)/, // https://sites.google.com/d/<id>/...
-    ];
-    for (const re of patterns) {
-      const m = url.match(re);
-      if (m) return m[1];
-    }
-    return null;
-  };
-
-  // Se não conseguiu via siteUrl (ou detectamos /d/<siteId>), tenta via Drive export (requer OAuth)
-  if (!html) {
-    const resolvedFileId = siteIdFromSiteUrl ??
-      (fileUrlNorm ? extractDriveFileId(fileUrlNorm) : null) ??
-      siteIdNorm;
-
-    if (!resolvedFileId) {
-      const info =
-        "Não foi possível resolver um fileId. Forneça um siteId (Drive), um fileUrl (Drive) ou uma siteUrl pública (ou no formato sites.google.com/d/<siteId>/...).";
-      return format === "csv"
-        ? { csv: "", total: 0, page, pageSize, info }
-        : { links: [], total: 0, page, pageSize, info };
-    }
-
-    const response = await ctx.client["GET /drive/v3/files/:fileId/export"]({
-      fileId: resolvedFileId,
-      mimeType: "text/html",
-    });
-
-    if (!response.ok) {
-      const errBody = await response.text().catch(() => "");
-      const info =
-        `Falha ao buscar conteúdo do site. Status: ${response.status} ${response.statusText}. Para sites privados, use 'siteId' ou 'fileUrl'. Para sites públicos, forneça 'siteUrl'.`;
-      return format === "csv"
-        ? {
-          csv: "",
-          total: 0,
-          page,
-          pageSize,
-          info: `${info} ${errBody}`.trim(),
-        }
-        : {
-          links: [],
-          total: 0,
-          page,
-          pageSize,
-          info: `${info} ${errBody}`.trim(),
-        };
-    }
-
-    html = await response.text();
-  }
-
   // 2. Parsear o HTML
-  const doc = new DOMParser().parseFromString(html, "text/html");
+  const doc = html ? new DOMParser().parseFromString(html, "text/html") : null;
   if (!doc) {
     const info =
       "Falha ao parsear o HTML do site. O arquivo pode não ser exportável como 'text/html'.";
@@ -180,17 +98,30 @@ const loader = async (
   const links: ExtractedLink[] = [];
   const anchorTags = doc.querySelectorAll("a");
 
+  // Evitar duplicados
+  const seen = new Set<string>();
+
   // 3. Iterar sobre todas as tags <a> e extrair as informações
   for (const a of anchorTags) {
     const el = a as unknown as Element; // Cast seguro
-    const href = el.getAttribute("href");
-    if (href) {
-      links.push({
-        anchorText: (el.textContent ?? "").trim(),
-        linkUrl: href,
-        isInternal: href.startsWith("/") || href.includes("sites.google.com"),
-      });
+    const rawHref = el.getAttribute("href") || "";
+    const href = rawHref.trim();
+
+    // Ignorar âncoras e links inválidos (não iniciam com http/https)
+    if (!href || href.startsWith("#") || !/^https?:\/\//i.test(href)) {
+      continue;
     }
+
+    // Ignorar duplicados
+    if (seen.has(href)) continue;
+    seen.add(href);
+
+    links.push({
+      anchorText: (el.textContent ?? "").trim(),
+      linkUrl: href,
+      // Com o filtro acima, links relativos já ficam de fora; considera interno se for do domínio do Google Sites
+      isInternal: href.includes("sites.google.com"),
+    });
   }
 
   // 4. Paginação
