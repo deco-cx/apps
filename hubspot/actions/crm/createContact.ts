@@ -1,3 +1,4 @@
+import { logger } from "@deco/deco/o11y";
 import type { AppContext } from "../../mod.ts";
 import { HubSpotClient } from "../../utils/client.ts";
 import type {
@@ -6,6 +7,33 @@ import type {
 } from "../../utils/types.ts";
 
 export interface Props {
+  /**
+   * @title Contact required data
+   * @description Required data for creating a contact
+   */
+  requiredData: {
+    /**
+     * @title First name
+     * @description First name of the contact
+     */
+    firstname: string;
+    /**
+     * @title Last name
+     * @description Last name of the contact
+     */
+    lastname: string;
+    /**
+     * @title Email
+     * @description Email of the contact
+     */
+    email: string;
+    /**
+     * @title Phone
+     * @description Phone number of the contact
+     */
+    phone: string;
+  };
+
   /**
    * @title Contact Properties
    * @description Key-value pairs of contact properties
@@ -36,15 +64,23 @@ export default async function createContact(
   _req: Request,
   ctx: AppContext,
 ): Promise<SimplePublicObject> {
-  const { properties, associations } = props;
+  const { requiredData, properties, associations } = props;
 
   const client = new HubSpotClient(ctx);
 
   const contactInput: SimplePublicObjectInput = {
-    properties,
+    properties: {
+      ...requiredData,
+      ...properties,
+    },
     ...(associations && { associations }),
   };
 
-  const contact = await client.createObject("contacts", contactInput);
-  return contact;
+  try {
+    const contact = await client.createObject("contacts", contactInput);
+    return contact;
+  } catch (error) {
+    logger.error(error);
+    throw new Error("Failed to create contact");
+  }
 }
