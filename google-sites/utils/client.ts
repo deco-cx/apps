@@ -1,12 +1,3 @@
-// Define as tipagens para as entidades da API do Google Drive.
-// Um arquivo do Google Site no Drive.
-export interface DriveFile {
-  kind: "drive#file";
-  id: string;
-  name: string;
-  mimeType: string;
-}
-
 // Cliente de autenticação OAuth
 export interface AuthClient {
   "POST /token": {
@@ -28,30 +19,107 @@ export interface AuthClient {
   };
 }
 
+// Interface para resposta do Google Cloud Search
+export interface CloudSearchResult {
+  title: string;
+  snippet: string;
+  link: string;
+  displayLink?: string;
+  formattedUrl?: string;
+}
+
+export interface CloudSearchResponse {
+  results?: Array<{
+    title: string;
+    snippet: string;
+    link: string;
+    displayLink?: string;
+    formattedUrl?: string;
+  }>;
+  searchInformation?: {
+    totalResults: string;
+    searchTime: number;
+  };
+  error?: {
+    code: number;
+    message: string;
+  };
+}
+
+// Interface para resposta do Google Custom Search API
+export interface CustomSearchItem {
+  title: string;
+  snippet: string;
+  link: string;
+  displayLink?: string;
+  formattedUrl?: string;
+}
+
+export interface CustomSearchResponse {
+  items?: CustomSearchItem[];
+  searchInformation?: {
+    totalResults: string;
+    searchTime: number;
+  };
+  error?: {
+    code: number;
+    message: string;
+    details?: Array<{
+      "@type": string;
+      reason?: string;
+      domain?: string;
+    }>;
+  };
+}
+
 // A interface do cliente para a API do Google Drive.
-export interface GoogleDriveClient {
+export interface GoogleSearchClient {
   /**
-   * Obtém os metadados de um arquivo (nosso Google Site) pelo seu ID.
-   * Usaremos para verificar a existência e o nome do site.
-   * @see https://developers.google.com/drive/api/reference/v3/files/get
+   * Google Custom Search API
+   * @see https://developers.google.com/custom-search/v1/reference/rest/v1/cse/list
    */
-  "GET /drive/v3/files/:fileId": {
-    response: DriveFile;
+  "GET /customsearch/v1": {
+    response: CustomSearchResponse;
     searchParams: {
-      fields?: string; // Ex: "id,name,mimeType"
+      key: string;
+      cx: string;
+      q: string;
+      start?: number;
+      num?: number;
+      siteSearch?: string;
+      siteSearchFilter?: "e" | "i"; // e = restrict to site, i = exclude site
     };
   };
 
   /**
-   * Exporta o conteúdo de um arquivo do Google Drive.
-   * Usaremos para obter o HTML completo de um Google Site.
-   * @see https://developers.google.com/drive/api/reference/v3/files/export
+   * Busca conteúdo usando Google Cloud Search API
+   * @see https://developers.google.com/workspace/cloud-search/docs/reference/rest/v1/query/search
    */
-  "GET /drive/v3/files/:fileId/export": {
-    // A resposta é o conteúdo bruto (HTML), então usamos Response diretamente.
-    response: Response;
-    searchParams: {
-      mimeType: "text/html";
+  "POST /v1/query/search": {
+    response: CloudSearchResponse;
+    body: {
+      requestOptions?: {
+        searchApplicationId?: string;
+        timeZone?: string;
+      };
+      query: string;
+      pageSize?: number;
+      start?: number;
+      dataSourceRestrictions?: Array<{
+        source: {
+          name: string;
+        };
+        filterOptions?: Array<{
+          filter: {
+            valueFilter: {
+              operatorType: string;
+              value: {
+                stringValue?: string;
+              };
+            };
+          };
+        }>;
+      }>;
     };
   };
 }

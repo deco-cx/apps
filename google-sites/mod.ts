@@ -4,12 +4,13 @@ import type { FnContext } from "@deco/deco";
 import { McpContext } from "../mcp/context.ts";
 import {
   API_URL,
+  CLOUD_SEARCH_API_URL,
   ERROR_MESSAGES,
   OAUTH_URL,
   OAUTH_URL_AUTH,
   SCOPES,
 } from "./utils/constant.ts";
-import { AuthClient, GoogleDriveClient } from "./utils/client.ts";
+import { AuthClient, GoogleSearchClient } from "./utils/client.ts";
 import {
   DEFAULT_OAUTH_HEADERS,
   OAuthClientOptions,
@@ -42,7 +43,8 @@ export interface Props {
 }
 
 export interface State extends Props {
-  client: OAuthClients<GoogleDriveClient, AuthClient>;
+  client: OAuthClients<GoogleSearchClient, AuthClient>;
+  cloudSearchClient: OAuthClients<GoogleSearchClient, AuthClient>;
   userInfoClient: GoogleUserInfoClient;
   errorHandler: ErrorHandler;
 }
@@ -79,9 +81,27 @@ export default function App(
     },
   };
 
-  const client = createOAuthHttpClient<GoogleDriveClient, AuthClient>({
+  const client = createOAuthHttpClient<GoogleSearchClient, AuthClient>({
     provider: googleProvider,
     apiBaseUrl: API_URL,
+    tokens,
+    options,
+    onTokenRefresh: async (newTokens: OAuthTokens) => {
+      if (ctx) {
+        await ctx.configure({
+          ...ctx,
+          tokens: newTokens,
+        });
+      }
+    },
+  });
+
+  const cloudSearchClient = createOAuthHttpClient<
+    GoogleSearchClient,
+    AuthClient
+  >({
+    provider: googleProvider,
+    apiBaseUrl: CLOUD_SEARCH_API_URL,
     tokens,
     options,
     onTokenRefresh: async (newTokens: OAuthTokens) => {
@@ -117,6 +137,7 @@ export default function App(
     ...props,
     tokens,
     client,
+    cloudSearchClient,
     userInfoClient,
     errorHandler,
   };
