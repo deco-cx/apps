@@ -12,11 +12,11 @@ export const DEFAULT_ANALYTICS_SCRIPT_URL = "https://s.lilstts.com/deco.js";
  * @description Fetches analytics script content from a remote URL
  */
 export default async function AnalyticsScript(
-  props: Props,
+  _: Props,
   _req: Request,
   _ctx: AppContext,
 ): Promise<Response> {
-  const url = props.url || DEFAULT_ANALYTICS_SCRIPT_URL;
+  const url = DEFAULT_ANALYTICS_SCRIPT_URL;
 
   try {
     // Fetch the script content using fetchSafe
