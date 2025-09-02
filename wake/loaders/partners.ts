@@ -26,6 +26,11 @@ const loader = async (
 
   const headers = parseHeaders(req.headers);
 
+  // Guard against missing slug to prevent querying with [undefined]
+  if (!slug) {
+    return undefined;
+  }
+
   let data: GetPartnersQuery | undefined;
   try {
     data = await storefront.query<

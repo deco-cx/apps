@@ -46,9 +46,11 @@ For help: https://wakecommerce.readme.io/docs/storefront-api-criacao-e-autentica
     }
 
     // Throw a more user-friendly error for the frontend
-    throw new Error(
-      "Authentication failed - Wake API tokens are missing or invalid",
+    const authError = new Error(
+      `Authentication failed (while trying to ${operationContext}) — Wake API tokens are missing or invalid`,
     );
+    authError.cause = error;
+    throw authError;
   }
 
   // Re-throw if not an auth error
