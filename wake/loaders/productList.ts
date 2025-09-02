@@ -10,6 +10,7 @@ import {
 import { parseHeaders } from "../utils/parseHeaders.ts";
 import { getPartnerCookie } from "../utils/partner.ts";
 import { toProduct } from "../utils/transform.ts";
+import { handleAuthError } from "../utils/authError.ts";
 
 export interface StockFilter {
   dcId?: number[];
@@ -146,15 +147,20 @@ const productListLoader = async (
 
   const headers = parseHeaders(req.headers);
 
-  const data = await storefront.query<
-    GetProductsQuery,
-    GetProductsQueryVariables
-  >({
-    variables: { ...props, partnerAccessToken },
-    ...GetProducts,
-  }, {
-    headers,
-  });
+  let data;
+  try {
+    data = await storefront.query<
+      GetProductsQuery,
+      GetProductsQueryVariables
+    >({
+      variables: { ...props, partnerAccessToken },
+      ...GetProducts,
+    }, {
+      headers,
+    });
+  } catch (error: unknown) {
+    handleAuthError(error, "load product list");
+  }
 
   const products = data.products?.nodes;
 

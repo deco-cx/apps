@@ -36,6 +36,7 @@ import {
 } from "../utils/transform.ts";
 import { Filters } from "./productList.ts";
 import { logger } from "@deco/deco/o11y";
+import { handleAuthError } from "../utils/authError.ts";
 
 export type Sort =
   | "NAME:ASC"
@@ -243,24 +244,32 @@ const searchLoader = async (
     partnerAccessToken,
   };
 
-  if (!query && !isHotsite && !partnerAccessToken) return null;
+  if (!query && !isHotsite && !partnerAccessToken) {
+    console.warn("ProductListingPage: No search query, hotsite, or partner token provided - returning null");
+    return null;
+  }
 
-  const data = isHotsite
-    ? await storefront.query<HotsiteQuery, HotsiteQueryVariables>({
-      variables: {
-        ...commonParams,
-        url: url.pathname,
-      },
-      ...Hotsite,
-    })
-    : await storefront.query<SearchQuery, SearchQueryVariables>({
-      variables: {
-        ...commonParams,
-        query,
-        operation,
-      },
-      ...Search,
-    });
+  let data;
+  try {
+    data = isHotsite
+      ? await storefront.query<HotsiteQuery, HotsiteQueryVariables>({
+        variables: {
+          ...commonParams,
+          url: url.pathname,
+        },
+        ...Hotsite,
+      })
+      : await storefront.query<SearchQuery, SearchQueryVariables>({
+        variables: {
+          ...commonParams,
+          query,
+          operation,
+        },
+        ...Search,
+      });
+  } catch (error: unknown) {
+    handleAuthError(error, "load products");
+  }
 
   const products = data?.result?.productsByOffset?.items ?? [];
 

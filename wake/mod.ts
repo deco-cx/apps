@@ -7,7 +7,7 @@ import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { CheckoutApi } from "./utils/client.ts";
 import { OpenAPI } from "./utils/openapi/wake.openapi.gen.ts";
-import { type App, type FnContext } from "@deco/deco";
+import { type App, type FnContext, context } from "@deco/deco";
 export type AppContext = FnContext<State, Manifest>;
 export let state: null | State = null;
 /** @title Wake */
@@ -52,10 +52,38 @@ export const color = 0xB600EE;
  */
 export default function App(props: Props): App<Manifest, State> {
   const { token, storefrontToken, account, checkoutUrl } = props;
+
+  // Check if we're in development mode using Deco's context
+  const isDev = !context.isDeploy;
+
   if (!token || !storefrontToken) {
-    console.warn(
-      "Missing tokens for wake app. Add it into the wake app config in deco.cx admin. Some functionalities may not work",
-    );
+    const message = "Missing Wake API tokens. Add them in the Wake app config in deco.cx admin. Some functionalities may not work.";
+    console.warn(message);
+
+    if (isDev) {
+      console.error(`
+🚨 Wake API Configuration Missing 🚨
+
+You are running in development mode without Wake API tokens configured.
+
+To fix this:
+1. Create a .env file in your project root
+2. Add the following environment variables:
+   - WAKE_TOKEN=your_storefront_token_here
+   - WAKE_KEY=your_api_token_here
+
+For production:
+1. Go to deco.cx admin
+2. Find the Wake app in your site configuration
+3. Set up secrets for Storefront Token and API Token
+
+Without these tokens, product loading and e-commerce features will fail with authentication errors.
+
+For help: https://wakecommerce.readme.io/docs/storefront-api-criacao-e-autenticacao-do-token
+      `);
+    }
+  } else if (isDev) {
+    console.info("✅ Wake API tokens configured successfully");
   }
   // HEAD
   //
