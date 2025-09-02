@@ -4,13 +4,20 @@ import { context as decoContext } from "@deco/deco";
  * Checks if an error is an authentication error and throws a user-friendly error
  * with development guidance if in development mode.
  */
-export function handleAuthError(error: unknown, operationContext: string = "operation"): never {
-  const errorObj = error as { message?: string; extensions?: { code?: string } };
-  
-  if (errorObj?.message?.includes("AUTH_NOT_AUTHENTICATED") ||
-      errorObj?.extensions?.code === "AUTH_NOT_AUTHENTICATED" ||
-      errorObj?.message?.includes("unauthorized")) {
+export function handleAuthError(
+  error: unknown,
+  operationContext: string = "operation",
+): never {
+  const errorObj = error as {
+    message?: string;
+    extensions?: { code?: string };
+  };
 
+  if (
+    errorObj?.message?.includes("AUTH_NOT_AUTHENTICATED") ||
+    errorObj?.extensions?.code === "AUTH_NOT_AUTHENTICATED" ||
+    errorObj?.message?.includes("unauthorized")
+  ) {
     const isDev = !decoContext.isDeploy;
     if (isDev) {
       console.error(`
@@ -39,7 +46,9 @@ For help: https://wakecommerce.readme.io/docs/storefront-api-criacao-e-autentica
     }
 
     // Throw a more user-friendly error for the frontend
-    throw new Error("Authentication failed - Wake API tokens are missing or invalid");
+    throw new Error(
+      "Authentication failed - Wake API tokens are missing or invalid",
+    );
   }
 
   // Re-throw if not an auth error
@@ -50,9 +59,12 @@ For help: https://wakecommerce.readme.io/docs/storefront-api-criacao-e-autentica
  * Checks if an error is an authentication error without throwing
  */
 export function isAuthError(error: unknown): boolean {
-  const errorObj = error as { message?: string; extensions?: { code?: string } };
-  
+  const errorObj = error as {
+    message?: string;
+    extensions?: { code?: string };
+  };
+
   return !!(errorObj?.message?.includes("AUTH_NOT_AUTHENTICATED") ||
-           errorObj?.extensions?.code === "AUTH_NOT_AUTHENTICATED" ||
-           errorObj?.message?.includes("unauthorized"));
+    errorObj?.extensions?.code === "AUTH_NOT_AUTHENTICATED" ||
+    errorObj?.message?.includes("unauthorized"));
 }

@@ -7,7 +7,7 @@ import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { CheckoutApi } from "./utils/client.ts";
 import { OpenAPI } from "./utils/openapi/wake.openapi.gen.ts";
-import { type App, type FnContext, context } from "@deco/deco";
+import { type App, context, type FnContext } from "@deco/deco";
 export type AppContext = FnContext<State, Manifest>;
 export let state: null | State = null;
 
@@ -72,7 +72,8 @@ export default function App(props: Props): App<Manifest, State> {
   // Only log on the second call and beyond (skip first call during manifest generation)
   if (appCallCount > 1) {
     if (!stringToken || !stringStorefrontToken) {
-      const message = "Missing Wake API tokens. Add them in the Wake app config in deco.cx admin. Some functionalities may not work.";
+      const message =
+        "Missing Wake API tokens. Add them in the Wake app config in deco.cx admin. Some functionalities may not work.";
       console.warn(message);
 
       if (isDev) {

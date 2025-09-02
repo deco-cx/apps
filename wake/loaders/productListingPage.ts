@@ -245,7 +245,9 @@ const searchLoader = async (
   };
 
   if (!query && !isHotsite && !partnerAccessToken) {
-    console.warn("ProductListingPage: No search query, hotsite, or partner token provided - returning null");
+    console.warn(
+      "ProductListingPage: No search query, hotsite, or partner token provided - returning null",
+    );
     return null;
   }
 
@@ -348,7 +350,7 @@ const searchLoader = async (
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
+export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
   const url = new URL(props.pageHref || req.url);
 
   // Don't cache search queries to ensure freshness
@@ -365,7 +367,10 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
 
   // Add any filter parameters
   url.searchParams.forEach((value, key) => {
-    if (key.startsWith("filter.") || key === "q" || key === "sort" || key === "page") {
+    if (
+      key.startsWith("filter.") || key === "q" || key === "sort" ||
+      key === "page"
+    ) {
       params.append(key, value);
     }
   });

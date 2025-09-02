@@ -44,7 +44,7 @@ const loader = async (
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
+export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
   const params = new URLSearchParams([
     ["slug", String(props.slug)],
   ]);

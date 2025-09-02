@@ -51,7 +51,7 @@ const productRecommendationsLoader = async (
     >({
       variables: { quantity, productId, algorithm, partnerAccessToken },
       ...ProductRecommendations,
-  }, { headers });
+    }, { headers });
   } catch (error: unknown) {
     handleAuthError(error, "load product recommendations");
   }
@@ -81,7 +81,7 @@ const productRecommendationsLoader = async (
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
+export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
   const params = new URLSearchParams([
     ["slug", String(props.slug)],
     ["quantity", String(props.quantity)],
