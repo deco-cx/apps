@@ -220,9 +220,10 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
   }
 
   const params = new URLSearchParams([
-    ["first", (props.first || 12).toString()],
-    ["sortKey", props.sortKey || "NAME"],
-    ["sortDirection", props.sortDirection || "ASC"],
+    ["first", String(props.first ?? 12)],
+    ["sortKey", props.sortKey ?? "NAME"],
+    ["sortDirection", props.sortDirection ?? "ASC"],
+    ["getVariations", String(Boolean(props.getVariations ?? false))],
   ]);
 
   // Add filters to cache key with deterministic serialization
