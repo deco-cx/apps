@@ -47,3 +47,6 @@ const loader = async (
 };
 
 export default loader;
+
+// User-specific wishlist data; must not be cached/shared.
+export const cache = "no-store";

@@ -58,3 +58,6 @@ const userLoader = async (
 };
 
 export default userLoader;
+
+// User-specific response; must not be cached/shared.
+export const cache = "no-store";

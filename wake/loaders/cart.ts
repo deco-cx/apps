@@ -55,3 +55,6 @@ const loader = async (
 };
 
 export default loader;
+
+// User-specific cart data; must not be cached/shared.
+export const cache = "no-store";
