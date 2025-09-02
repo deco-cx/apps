@@ -45,12 +45,27 @@ const loader = async (
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
+  // Don't cache if no slug is provided
+  if (!props.slug) {
+    return null;
+  }
+
+  // Use the slug for cache uniqueness - each partner has a unique slug
   const params = new URLSearchParams([
     ["slug", String(props.slug)],
+    ["first", "1"], // Always fetch exactly 1 partner
   ]);
 
   const url = new URL(req.url);
   url.search = params.toString();
+
+  // Sort parameters for consistent cache keys
+  const sortedParams = new URLSearchParams();
+  Array.from(params.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .forEach(([key, value]) => sortedParams.set(key, value));
+
+  url.search = sortedParams.toString();
   return url.href;
 };
 

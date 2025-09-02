@@ -62,9 +62,36 @@ export function isAuthError(error: unknown): boolean {
   const errorObj = error as {
     message?: string;
     extensions?: { code?: string };
+    status?: number;
+    response?: { status?: number };
+    errors?: Array<{ message?: string; extensions?: { code?: string } }>;
   };
 
-  return !!(errorObj?.message?.includes("AUTH_NOT_AUTHENTICATED") ||
-    errorObj?.extensions?.code === "AUTH_NOT_AUTHENTICATED" ||
-    errorObj?.message?.includes("unauthorized"));
+  // Normalize text for case-insensitive comparison
+  const msg = (errorObj?.message ?? "").toLowerCase();
+  const code = (errorObj?.extensions?.code ?? "").toUpperCase();
+
+  // Check HTTP status codes
+  const httpStatus = errorObj?.status ?? errorObj?.response?.status;
+
+  // Check for aggregate errors (multiple errors in an array)
+  const isAggregate = Array.isArray(errorObj?.errors) &&
+    errorObj.errors.some((e) =>
+      String(e?.message ?? "").toLowerCase().includes("unauthorized") ||
+      String(e?.extensions?.code ?? "").toUpperCase() === "UNAUTHENTICATED" ||
+      String(e?.extensions?.code ?? "").toUpperCase() === "AUTH_NOT_AUTHENTICATED" ||
+      String(e?.extensions?.code ?? "").toUpperCase() === "FORBIDDEN"
+    );
+
+  return !!(
+    msg.includes("auth_not_authenticated") ||
+    msg.includes("unauthorized") ||
+    msg.includes("forbidden") ||
+    code === "AUTH_NOT_AUTHENTICATED" ||
+    code === "UNAUTHENTICATED" ||
+    code === "FORBIDDEN" ||
+    httpStatus === 401 ||
+    httpStatus === 403 ||
+    isAggregate
+  );
 }
