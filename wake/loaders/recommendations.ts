@@ -1,4 +1,5 @@
 import type { Product } from "../../commerce/types.ts";
+import { handleAuthError } from "../utils/authError.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import type { AppContext } from "../mod.ts";
 import { ProductRecommendations } from "../utils/graphql/queries.ts";
@@ -42,15 +43,20 @@ const productRecommendationsLoader = async (
 
   const { id: productId } = parseSlug(slug);
 
-  const data = await storefront.query<
-    ProductRecommendationsQuery,
-    ProductRecommendationsQueryVariables
-  >({
-    variables: { quantity, productId, algorithm, partnerAccessToken },
-    ...ProductRecommendations,
-  }, { headers });
+  let data: ProductRecommendationsQuery | undefined;
+  try {
+    data = await storefront.query<
+      ProductRecommendationsQuery,
+      ProductRecommendationsQueryVariables
+    >({
+      variables: { quantity, productId, algorithm, partnerAccessToken },
+      ...ProductRecommendations,
+    }, { headers });
+  } catch (error: unknown) {
+    handleAuthError(error, "load product recommendations");
+  }
 
-  const products = data.productRecommendations;
+  const products = data?.productRecommendations;
 
   if (!Array.isArray(products)) {
     return null;
@@ -71,6 +77,26 @@ const productRecommendationsLoader = async (
 
       return toProduct(variant, { base: url }, productVariations);
     });
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
+  // Avoid cross-tenant cache bleed when a partner token is present
+  if (getPartnerCookie(req.headers)) {
+    return null;
+  }
+
+  const params = new URLSearchParams([
+    ["slug", String(props.slug)],
+    ["quantity", String(props.quantity)],
+    ["algorithm", props.algorithm],
+    ["getVariations", String(props.getVariations ?? false)],
+  ]);
+
+  const url = new URL(req.url);
+  url.search = params.toString();
+  return url.href;
 };
 
 export default productRecommendationsLoader;
