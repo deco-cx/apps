@@ -187,8 +187,32 @@ const productListLoader = async (
 
 export const cache = "stale-while-revalidate";
 
+// Helper function for deterministic filter serialization
+function stableStringify(value: unknown): string {
+  const seen = new WeakSet();
+  const replacer = (_k: string, v: unknown) => {
+    if (v && typeof v === "object") {
+      if (seen.has(v as object)) return "[Circular]";
+      seen.add(v as object);
+      if (Array.isArray(v)) return v; // keep array order
+      const obj = v as Record<string, unknown>;
+      return Object.keys(obj).sort().reduce((acc, key) => {
+        acc[key] = obj[key];
+        return acc;
+      }, {} as Record<string, unknown>);
+    }
+    return v;
+  };
+  return JSON.stringify(value, replacer);
+}
+
 export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
   const url = new URL(req.url);
+
+  // Avoid cross-tenant cache bleed when a partner token is present
+  if (getPartnerCookie(req.headers)) {
+    return null;
+  }
 
   // Don't cache dynamic/random sorts
   if (props.sortKey === "RANDOM") {
@@ -201,9 +225,9 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
     ["sortDirection", props.sortDirection || "ASC"],
   ]);
 
-  // Add filters to cache key
+  // Add filters to cache key with deterministic serialization
   if (props.filters) {
-    const filtersStr = JSON.stringify(props.filters);
+    const filtersStr = stableStringify(props.filters);
     params.append("filters", filtersStr);
   }
 

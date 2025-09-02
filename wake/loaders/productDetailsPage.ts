@@ -186,6 +186,11 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
   const url = new URL(req.url);
   const skuId = url.searchParams.get("skuId") ?? "";
 
+  // Avoid cross-tenant cache bleed when a partner token is present
+  if (getPartnerCookie(req.headers)) {
+    return null;
+  }
+
   const params = new URLSearchParams([
     ["slug", String(props.slug)],
     ["buyTogether", String(props.buyTogether ?? false)],

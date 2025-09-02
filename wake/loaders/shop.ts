@@ -6,6 +6,7 @@ import {
   ShopQueryVariables,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
+import { getPartnerCookie } from "../utils/partner.ts";
 
 /**
  * @title Wake Integration - Shop Infos
@@ -37,7 +38,12 @@ const shopInfos = async (
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (_props: unknown, req: Request): string => {
+export const cacheKey = (_props: unknown, req: Request): string | null => {
+  // Avoid cross-tenant cache bleed when a partner token is present
+  if (getPartnerCookie(req.headers)) {
+    return null;
+  }
+
   // Shop information is generally static, so we can use the URL as the cache key
   return req.url;
 };

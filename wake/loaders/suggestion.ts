@@ -66,7 +66,12 @@ const loader = async (
 
 export const cache = "no-cache";
 
-export const cacheKey = (props: Props, req: Request): string => {
+export const cacheKey = (props: Props, req: Request): string | null => {
+  // Avoid cross-tenant cache bleed when a partner token is present
+  if (getPartnerCookie(req.headers)) {
+    return null;
+  }
+
   const params = new URLSearchParams([
     ["query", props.query],
     ["limit", String(props.limit ?? 10)],

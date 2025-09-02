@@ -82,6 +82,11 @@ const productRecommendationsLoader = async (
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
+  // Avoid cross-tenant cache bleed when a partner token is present
+  if (getPartnerCookie(req.headers)) {
+    return null;
+  }
+
   const params = new URLSearchParams([
     ["slug", String(props.slug)],
     ["quantity", String(props.quantity)],
