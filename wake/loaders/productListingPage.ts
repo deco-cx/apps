@@ -1,6 +1,7 @@
 import type { ProductListingPage } from "../../commerce/types.ts";
 import { SortOption } from "../../commerce/types.ts";
 import { capitalize } from "../../utils/capitalize.ts";
+import { handleAuthError } from "../utils/authError.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import type { AppContext } from "../mod.ts";
 import {
@@ -36,7 +37,6 @@ import {
 } from "../utils/transform.ts";
 import { Filters } from "./productList.ts";
 import { logger } from "@deco/deco/o11y";
-import { handleAuthError } from "../utils/authError.ts";
 
 export type Sort =
   | "NAME:ASC"
@@ -344,6 +344,35 @@ const searchLoader = async (
         return toProduct(variant, { base: url }, productVariations);
       }),
   };
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
+  const url = new URL(props.pageHref || req.url);
+
+  // Don't cache search queries to ensure freshness
+  if (url.searchParams.get("q") || url.searchParams.get("query")) {
+    return null;
+  }
+
+  const params = new URLSearchParams([
+    ["limit", (props.limit || 12).toString()],
+    ["page", (props.page || 0).toString()],
+    ["sort", props.sort || ""],
+    ["pageOffset", (props.pageOffset || 0).toString()],
+  ]);
+
+  // Add any filter parameters
+  url.searchParams.forEach((value, key) => {
+    if (key.startsWith("filter.") || key === "q" || key === "sort" || key === "page") {
+      params.append(key, value);
+    }
+  });
+
+  params.sort();
+  url.search = params.toString();
+  return url.href;
 };
 
 export default searchLoader;

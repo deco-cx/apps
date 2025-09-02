@@ -185,4 +185,31 @@ const productListLoader = async (
     });
 };
 
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
+  const url = new URL(req.url);
+
+  // Don't cache dynamic/random sorts
+  if (props.sortKey === "RANDOM") {
+    return null;
+  }
+
+  const params = new URLSearchParams([
+    ["first", (props.first || 12).toString()],
+    ["sortKey", props.sortKey || "NAME"],
+    ["sortDirection", props.sortDirection || "ASC"],
+  ]);
+
+  // Add filters to cache key
+  if (props.filters) {
+    const filtersStr = JSON.stringify(props.filters);
+    params.append("filters", filtersStr);
+  }
+
+  params.sort();
+  url.search = params.toString();
+  return url.href;
+};
+
 export default productListLoader;
