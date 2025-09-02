@@ -46,12 +46,15 @@ const userLoader = async (
   if (!customer) return null;
 
   return {
-    "@id": customer.id!,
-    email: customer.email!,
-    givenName: customer.customerName!,
-    gender: customer?.gender === "Masculino"
-      ? "https://schema.org/Male"
-      : "https://schema.org/Female",
+    "@id": String(customer.id ?? customer.customerId),
+    email: customer.email ?? undefined,
+    givenName: customer.customerName ?? undefined,
+    gender:
+      customer.gender === "Masculino"
+        ? "https://schema.org/Male"
+        : customer.gender === "Feminino"
+          ? "https://schema.org/Female"
+          : undefined,
   };
 };
 

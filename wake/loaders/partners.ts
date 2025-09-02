@@ -7,6 +7,7 @@ import {
   GetPartnersQueryVariables,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
+import { getPartnerCookie } from "../utils/partner.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -52,6 +53,12 @@ export const cache = "stale-while-revalidate";
 export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
   // Don't cache if no slug is provided
   if (!props.slug) {
+    return null;
+  }
+
+  // Don't cache if partner cookie is present - partner-specific content should not be cached
+  const partnerCookie = getPartnerCookie(req.headers);
+  if (partnerCookie) {
     return null;
   }
 

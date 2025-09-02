@@ -260,7 +260,7 @@ const searchLoader = async (
           url: url.pathname,
         },
         ...Hotsite,
-      })
+      }, { headers })
       : await storefront.query<SearchQuery, SearchQueryVariables>({
         variables: {
           ...commonParams,
@@ -268,7 +268,7 @@ const searchLoader = async (
           operation,
         },
         ...Search,
-      });
+      }, { headers });
   } catch (error: unknown) {
     handleAuthError(error, "load products");
   }
