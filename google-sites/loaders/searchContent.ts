@@ -156,7 +156,10 @@ function cleanHtmlAndGetText(html: string): string {
           const parent = (el as unknown as Element).parentNode;
           try {
             if (parent && (doc as unknown as Document).createTextNode) {
-              parent.insertBefore((doc as unknown as Document).createTextNode(" "), el as unknown as Node);
+              parent.insertBefore(
+                (doc as unknown as Document).createTextNode(" "),
+                el as unknown as Node,
+              );
             }
           } catch { /* ignore */ }
           ((el as unknown) as Element).remove?.();
@@ -234,7 +237,7 @@ async function fetchWithTimeout(
   const startedAt = Date.now();
   try {
     const res = await fetch(url, { ...opts, signal: controller.signal });
- 
+
     return res;
   } catch (err) {
     const duration = Date.now() - startedAt;

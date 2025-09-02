@@ -147,7 +147,7 @@ const productListLoader = async (
 
   const headers = parseHeaders(req.headers);
 
-  let data;
+  let data: GetProductsQuery | undefined;
   try {
     data = await storefront.query<
       GetProductsQuery,
@@ -162,7 +162,7 @@ const productListLoader = async (
     handleAuthError(error, "load product list");
   }
 
-  const products = data.products?.nodes;
+  const products = data?.products?.nodes;
 
   if (!Array.isArray(products)) {
     return null;

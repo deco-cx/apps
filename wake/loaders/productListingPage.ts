@@ -251,7 +251,7 @@ const searchLoader = async (
     return null;
   }
 
-  let data;
+  let data: SearchQuery | HotsiteQuery | undefined;
   try {
     data = isHotsite
       ? await storefront.query<HotsiteQuery, HotsiteQueryVariables>({

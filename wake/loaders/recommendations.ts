@@ -43,7 +43,7 @@ const productRecommendationsLoader = async (
 
   const { id: productId } = parseSlug(slug);
 
-  let data;
+  let data: ProductRecommendationsQuery | undefined;
   try {
     data = await storefront.query<
       ProductRecommendationsQuery,

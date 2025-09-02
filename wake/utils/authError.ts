@@ -79,7 +79,8 @@ export function isAuthError(error: unknown): boolean {
     errorObj.errors.some((e) =>
       String(e?.message ?? "").toLowerCase().includes("unauthorized") ||
       String(e?.extensions?.code ?? "").toUpperCase() === "UNAUTHENTICATED" ||
-      String(e?.extensions?.code ?? "").toUpperCase() === "AUTH_NOT_AUTHENTICATED" ||
+      String(e?.extensions?.code ?? "").toUpperCase() ===
+        "AUTH_NOT_AUTHENTICATED" ||
       String(e?.extensions?.code ?? "").toUpperCase() === "FORBIDDEN"
     );
 

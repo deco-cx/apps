@@ -7,6 +7,7 @@ import {
   GetUserQueryVariables,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
+import { handleAuthError } from "../utils/authError.ts";
 
 /**
  * @title Wake Integration
@@ -25,8 +26,9 @@ const userLoader = async (
 
   if (!customerAccessToken) return null;
 
+  let data: GetUserQuery | undefined;
   try {
-    const data = await storefront.query<
+    data = await storefront.query<
       GetUserQuery,
       GetUserQueryVariables
     >({
@@ -35,22 +37,22 @@ const userLoader = async (
     }, {
       headers,
     });
-
-    const customer = data.customer;
-
-    if (!customer) return null;
-
-    return {
-      "@id": customer.id!,
-      email: customer.email!,
-      givenName: customer.customerName!,
-      gender: customer?.gender === "Masculino"
-        ? "https://schema.org/Male"
-        : "https://schema.org/Female",
-    };
-  } catch {
-    return null;
+  } catch (error: unknown) {
+    handleAuthError(error, "load user data");
   }
+
+  const customer = data?.customer;
+
+  if (!customer) return null;
+
+  return {
+    "@id": customer.id!,
+    email: customer.email!,
+    givenName: customer.customerName!,
+    gender: customer?.gender === "Masculino"
+      ? "https://schema.org/Male"
+      : "https://schema.org/Female",
+  };
 };
 
 export default userLoader;

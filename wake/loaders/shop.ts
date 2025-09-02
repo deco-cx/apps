@@ -20,7 +20,7 @@ const shopInfos = async (
 
   const headers = parseHeaders(req.headers);
 
-  let data;
+  let data: ShopQuery | undefined;
   try {
     data = await storefront.query<
       ShopQuery,

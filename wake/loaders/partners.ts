@@ -26,7 +26,7 @@ const loader = async (
 
   const headers = parseHeaders(req.headers);
 
-  let data;
+  let data: GetPartnersQuery | undefined;
   try {
     data = await storefront.query<
       GetPartnersQuery,

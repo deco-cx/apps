@@ -46,7 +46,7 @@ async function loader(
     throw new Error("Missing product id");
   }
 
-  let wakeBuyList;
+  let wakeBuyList: BuyListQuery["buyList"] | undefined;
   try {
     const buyListResult = await storefront.query<
       BuyListQuery,
@@ -93,7 +93,7 @@ async function loader(
     maybeProductList.filter((node): node is Product => Boolean(node))
   );
 
-  let wakeProduct;
+  let wakeProduct: GetProductQuery["product"] | undefined;
   try {
     const productResult = await storefront.query<
       GetProductQuery,

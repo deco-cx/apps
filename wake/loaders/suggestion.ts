@@ -33,7 +33,7 @@ const loader = async (
 
   if (!query) return null;
 
-  let data;
+  let data: AutocompleteQuery | undefined;
   try {
     data = await storefront.query<
       AutocompleteQuery,
