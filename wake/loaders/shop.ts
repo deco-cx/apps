@@ -1,4 +1,5 @@
 import type { AppContext } from "../mod.ts";
+import { handleAuthError } from "../utils/authError.ts";
 import { Shop } from "../utils/graphql/queries.ts";
 import {
   ShopQuery,
@@ -19,14 +20,26 @@ const shopInfos = async (
 
   const headers = parseHeaders(req.headers);
 
-  const data = await storefront.query<
-    ShopQuery,
-    ShopQueryVariables
-  >({
-    ...Shop,
-  }, { headers });
+  let data;
+  try {
+    data = await storefront.query<
+      ShopQuery,
+      ShopQueryVariables
+    >({
+      ...Shop,
+    }, { headers });
+  } catch (error: unknown) {
+    handleAuthError(error, "load shop information");
+  }
 
-  return data.shop ?? undefined;
+  return data?.shop ?? undefined;
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (_props: unknown, req: Request): string => {
+  // Shop information is generally static, so we can use the URL as the cache key
+  return req.url;
 };
 
 export default shopInfos;

@@ -1,4 +1,5 @@
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import { handleAuthError } from "../utils/authError.ts";
 import type { AppContext } from "../mod.ts";
 import { GetPartners } from "../utils/graphql/queries.ts";
 import {
@@ -25,15 +26,32 @@ const loader = async (
 
   const headers = parseHeaders(req.headers);
 
-  const data = await storefront.query<
-    GetPartnersQuery,
-    GetPartnersQueryVariables
-  >({
-    variables: { first: 1, alias: [slug] },
-    ...GetPartners,
-  }, { headers });
+  let data;
+  try {
+    data = await storefront.query<
+      GetPartnersQuery,
+      GetPartnersQueryVariables
+    >({
+      variables: { first: 1, alias: [slug] },
+      ...GetPartners,
+    }, { headers });
+  } catch (error: unknown) {
+    handleAuthError(error, "load partner information");
+  }
 
-  return data.partners ?? undefined;
+  return data?.partners ?? undefined;
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
+  const params = new URLSearchParams([
+    ["slug", String(props.slug)],
+  ]);
+
+  const url = new URL(req.url);
+  url.search = params.toString();
+  return url.href;
 };
 
 export default loader;
