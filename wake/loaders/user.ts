@@ -49,12 +49,11 @@ const userLoader = async (
     "@id": String(customer.id ?? customer.customerId),
     email: customer.email ?? undefined,
     givenName: customer.customerName ?? undefined,
-    gender:
-      customer.gender === "Masculino"
-        ? "https://schema.org/Male"
-        : customer.gender === "Feminino"
-          ? "https://schema.org/Female"
-          : undefined,
+    gender: customer.gender === "Masculino"
+      ? "https://schema.org/Male"
+      : customer.gender === "Feminino"
+      ? "https://schema.org/Female"
+      : undefined,
   };
 };
 
