@@ -14,6 +14,11 @@ export type HTMLWidget = string;
 export type VideoWidget = string;
 
 /**
+ * @format file-uri
+ */
+export type FileWidget = string;
+
+/**
  * @format dynamic-options
  * @options website/loaders/options/routes.ts
  */
