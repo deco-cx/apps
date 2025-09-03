@@ -21,8 +21,8 @@ const ASSET_LOADER_PATH =
   ]}`;
 
 const getFontFormat = (src: string): string => {
-  const extension = src.toLowerCase().split(".").pop();
-
+  const clean = src.toLowerCase().split(/[?#]/, 1)[0];
+  const extension = clean.slice(clean.lastIndexOf(".") + 1);
   switch (extension) {
     case "woff2":
       return "woff2";
@@ -34,6 +34,8 @@ const getFontFormat = (src: string): string => {
       return "opentype";
     case "eot":
       return "embedded-opentype";
+    case "svg":
+      return "svg";
     default:
       return "truetype"; // fallback
   }
