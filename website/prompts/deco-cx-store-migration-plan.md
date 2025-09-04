@@ -259,12 +259,6 @@ export default defineConfig({
 });
 ```
 
-#### 6.3 Regenerate Manifest
-**Action:** Always regenerate `manifest.gen.ts` after app structure changes:
-```bash
-deno task gen
-```
-
 ### 7. SEO & Robots.txt Setup
 
 #### 7.1 Add robots.txt
@@ -306,8 +300,9 @@ const ClientOnlyComponent = lazy(() => import("../islands/ClientComponent.tsx"))
 ## 🚀 Migration Checklist
 
 ### Phase 1: Dependencies & Structure
-- [ ] Update core deco.cx dependencies to latest stable versions
-- [ ] Migrate std library imports to JSR
+- [ ] **Start with `deno task update`** - Update all dependencies to latest versions first
+- [ ] Update core deco.cx dependencies to latest stable versions (1.120.11+)
+- [ ] Migrate std library imports to JSR (handled by deno task update)
 - [ ] Remove unnecessary dependencies
 - [ ] Clean up DecHub references
 - [ ] Restructure apps directory with proper namespacing
@@ -350,6 +345,47 @@ const ClientOnlyComponent = lazy(() => import("../islands/ClientComponent.tsx"))
 **Cause:** Missing or outdated SEO components
 **Solution:** Migrate to latest SEO component versions
 
+## 📚 Lessons Learned from Real Migration Work
+
+Based on analyzing the miess-01 repository and applying fixes:
+
+### ✅ **What Works Well in Existing Stores**
+- **Apps structure already migrated**: Many stores have already been updated to use `apps/deco/` namespacing
+- **No DecHub references**: Most legacy DecHub cleanup has already been done
+- **Good SEO foundation**: Custom SEO components and robots.txt are properly configured
+- **Proper image handling**: Many components already use explicit dimensions and Picture components
+
+### 🔧 **Critical Fixes Often Needed**
+1. **Dependency versions**: Always update deco.cx core to latest stable (1.120.11+)
+2. **Window object guards**: Analytics and client-side code needs `typeof window !== 'undefined'` checks
+3. **Search parameter encoding**: Use `encodeURIComponent()` instead of manual string replacement
+4. **Image dimensions**: Add explicit `width` and `height` attributes to prevent layout shifts
+5. **Fresh config plugins**: Ensure `tailwind` is passed to plugins configuration
+
+### 🎯 **Common Patterns for Window Guards**
+```typescript
+// ❌ Bad - Direct window access
+window.DECO.events.dispatch(event)
+
+// ✅ Good - With guards
+if (typeof window !== 'undefined' && window.DECO?.events) {
+  window.DECO.events.dispatch(event)
+}
+```
+
+### 🚫 **Don't Need to Regenerate Manifest**
+After dependency updates, you DON'T need to run `deno task gen` - this was a misconception in earlier migration guides. The build process handles this automatically.
+
+### 🔄 **Std Import Migration is Automatic**
+When you run `deno task update`, Deno automatically handles the migration of `std/` imports to JSR `@std/` imports. **DO NOT** manually change import statements in your code files - let Deno handle this automatically through its dependency resolution.
+
+### ⚡ **Priority Order for Fixes**
+1. **SSR compatibility** (window guards) - prevents runtime errors
+2. **Dependency updates** - ensures compatibility and security
+3. **Performance optimizations** - image dimensions, async render
+4. **Search functionality** - parameter encoding affects UX
+5. **Build configuration** - nodeModulesDir, excludes
+
 ## 🤖 Evolution Agent Workflow Menu
 
 These are key optimization workflows that can be applied to any deco.cx store:
@@ -388,9 +424,9 @@ These are key optimization workflows that can be applied to any deco.cx store:
 # 1. Backup current state
 git checkout -b migration-backup
 
-# 2. Update dependencies
-echo "Updating dependencies..."
-# Update deno.json with latest versions
+# 2. Update dependencies (includes automatic std import migration)
+echo "Updating dependencies and migrating std imports automatically..."
+deno task update
 
 # 3. Clean up structure
 echo "Cleaning up DecHub references..."
@@ -401,15 +437,11 @@ rm -f .deco/blocks/Deco\ HUB.json
 echo "Configuring async render..."
 # Update heavy sections with async configuration
 
-# 5. Regenerate manifest
-echo "Regenerating manifest..."
-deno task gen
-
-# 6. Run checks
+# 5. Run checks
 echo "Running checks..."
 deno task check
 
-# 7. Test build
+# 6. Test build
 echo "Testing build..."
 deno task build
 ```
