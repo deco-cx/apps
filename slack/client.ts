@@ -48,11 +48,52 @@ export interface SlackMessage {
   ts: string;
   thread_ts?: string;
   reply_count?: number;
+  files?: SlackFile[];
   reactions?: Array<{
     name: string;
     count: number;
     users: string[];
   }>;
+}
+
+/**
+ * @description A file in Slack
+ */
+export interface SlackFile {
+  id: string;
+  created: number;
+  timestamp: number;
+  name: string;
+  title: string;
+  mimetype: string;
+  filetype: string;
+  pretty_type: string;
+  user: string;
+  editable: boolean;
+  size: number;
+  mode: string;
+  is_external: boolean;
+  external_type: string;
+  is_public: boolean;
+  public_url_shared: boolean;
+  display_as_bot: boolean;
+  username: string;
+  url_private: string;
+  url_private_download: string;
+  thumb_64?: string;
+  thumb_80?: string;
+  thumb_360?: string;
+  thumb_360_w?: number;
+  thumb_360_h?: number;
+  thumb_480?: string;
+  thumb_480_w?: number;
+  thumb_480_h?: number;
+  thumb_160?: string;
+  image_exif_rotation?: number;
+  original_w?: number;
+  original_h?: number;
+  permalink: string;
+  permalink_public: string;
 }
 
 /**
@@ -386,5 +427,72 @@ export class SlackClient {
       body: JSON.stringify(payload),
     });
     return response.json();
+  }
+
+  /**
+   * @description Opens a direct message channel with a user
+   * @param userId The user ID to open a DM with
+   */
+  async openDmChannel(userId: string): Promise<SlackResponse<{ channel: { id: string } }>> {
+    const response = await fetch("https://slack.com/api/conversations.open", {
+      method: "POST",
+      headers: this.botHeaders,
+      body: JSON.stringify({
+        users: userId,
+      }),
+    });
+
+    return response.json();
+  }
+  
+  /**
+   * @description Lists all direct message channels for the bot
+   * @param limit Maximum number of DMs to return
+   * @param cursor Pagination cursor for next page
+   */
+  async listDmChannels(
+    limit: number = 100,
+    cursor?: string,
+  ): Promise<SlackResponse<{ channels: SlackChannel[] }>> {
+    const params = new URLSearchParams({
+      types: "im",
+      limit: Math.min(limit, 100).toString(),
+    });
+
+    if (cursor) {
+      params.append("cursor", cursor);
+    }
+
+    const response = await fetch(
+      `https://slack.com/api/conversations.list?${params}`,
+      { headers: this.botHeaders },
+    );
+
+    return response.json();
+  }
+  
+  /**
+   * @description Gets information about a file
+   * @param fileId The ID of the file
+   */
+  async getFileInfo(fileId: string): Promise<SlackResponse<{ file: SlackFile }>> {
+    const params = new URLSearchParams({
+      file: fileId,
+    });
+
+    const response = await fetch(
+      `https://slack.com/api/files.info?${params}`,
+      { headers: this.botHeaders },
+    );
+
+    return response.json();
+  }
+  
+  /**
+   * @description Downloads a file from Slack
+   * @param fileUrl The URL of the file to download
+   */
+  downloadFile(fileUrl: string): Promise<Response> {
+    return fetch(fileUrl, { headers: this.botHeaders });
   }
 }

@@ -11,6 +11,8 @@ export const SCOPES = [
   "im:history",
   "im:read",
   "im:write",
+  "files:read",
+  "files:write",
 ];
 
 export const API_URL = "https://slack.com/api";
