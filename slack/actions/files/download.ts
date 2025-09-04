@@ -53,11 +53,12 @@ export default async function downloadFile(
       data: base64,
       contentType,
     };
-  } catch (error) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
     console.error("Error downloading file:", error);
     return {
       success: false,
-      message: `Error downloading file: ${error.message || "Unknown error"}`,
+      message: `Error downloading file: ${message}`,
     };
   }
 }
