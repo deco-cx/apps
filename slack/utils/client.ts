@@ -1,5 +1,6 @@
 import {
   SlackChannel,
+  SlackFile,
   SlackMessage,
   SlackResponse,
   SlackUser,
@@ -63,6 +64,18 @@ export interface SlackApiClient {
       user: string;
     };
     response: SlackResponse<{ profile: SlackUserProfile }>;
+  };
+  "POST /conversations.open": {
+    json: {
+      users: string;
+    };
+    response: SlackResponse<{ channel: { id: string } }>;
+  };
+  "GET /files.info": {
+    searchParams: {
+      file: string;
+    };
+    response: SlackResponse<{ file: SlackFile }>;
   };
 }
 
