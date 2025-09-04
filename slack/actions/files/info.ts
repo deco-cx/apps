@@ -30,11 +30,12 @@ export default async function fileInfo(
       success: true,
       file: fileResponse.data.file,
     };
-  } catch (error) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
     console.error("Error getting file info:", error);
     return {
       success: false,
-      message: `Error getting file info: ${error.message || "Unknown error"}`,
+      message: `Error getting file info: ${message}`,
     };
   }
 }
