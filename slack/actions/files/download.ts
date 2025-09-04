@@ -16,8 +16,19 @@ export default async function downloadFile(
   ctx: AppContext,
 ): Promise<{ success: boolean; data?: string; contentType?: string; message?: string }> {
   try {
+    // Host allowlist to prevent SSRF: only allow Slack-hosted URLs
+    const url = new URL(props.fileUrl);
+    const host = url.hostname.toLowerCase();
+    const allowed = (h: string) =>
+      h === "slack.com" ||
+      h.endsWith(".slack.com") ||
+      h === "slack-files.com" ||
+      h.endsWith(".slack-files.com") ||
+      h.endsWith(".slack-edge.com");
+    if (url.protocol !== "https:" || !allowed(host)) {
+      return { success: false, message: "Only Slack-hosted HTTPS file URLs are allowed." };
+    }
     const fileResponse = await ctx.slack.downloadFile(props.fileUrl);
-
     if (!fileResponse.ok) {
       return {
         success: false,
