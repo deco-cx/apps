@@ -1,4 +1,5 @@
 import type { Product, ProductDetailsPage } from "../../commerce/types.ts";
+import { handleAuthError } from "../utils/authError.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { MAXIMUM_REQUEST_QUANTITY } from "../utils/getVariations.ts";
@@ -45,18 +46,24 @@ async function loader(
     throw new Error("Missing product id");
   }
 
-  const { buyList: wakeBuyList } = await storefront.query<
-    BuyListQuery,
-    BuyListQueryVariables
-  >(
-    {
-      variables: { id: productId, partnerAccessToken },
-      ...GetBuyList,
-    },
-    {
-      headers,
-    },
-  );
+  let wakeBuyList: BuyListQuery["buyList"] | undefined;
+  try {
+    const buyListResult = await storefront.query<
+      BuyListQuery,
+      BuyListQueryVariables
+    >(
+      {
+        variables: { id: productId, partnerAccessToken },
+        ...GetBuyList,
+      },
+      {
+        headers,
+      },
+    );
+    wakeBuyList = buyListResult.buyList;
+  } catch (error: unknown) {
+    handleAuthError(error, "load buy list");
+  }
 
   const buyListProducts = await Promise.all(
     wakeBuyList?.buyListProducts?.map(async (buyListProduct) => {
@@ -86,22 +93,28 @@ async function loader(
     maybeProductList.filter((node): node is Product => Boolean(node))
   );
 
-  const { product: wakeProduct } = await storefront.query<
-    GetProductQuery,
-    GetProductQueryVariables
-  >(
-    {
-      variables: {
-        productId,
-        includeParentIdVariants: includeSameParent,
-        partnerAccessToken,
+  let wakeProduct: GetProductQuery["product"] | undefined;
+  try {
+    const productResult = await storefront.query<
+      GetProductQuery,
+      GetProductQueryVariables
+    >(
+      {
+        variables: {
+          productId,
+          includeParentIdVariants: includeSameParent,
+          partnerAccessToken,
+        },
+        ...GetProduct,
       },
-      ...GetProduct,
-    },
-    {
-      headers,
-    },
-  );
+      {
+        headers,
+      },
+    );
+    wakeProduct = productResult.product;
+  } catch (error: unknown) {
+    handleAuthError(error, "load product details");
+  }
 
   const wakeProductOrBuyList = wakeProduct || wakeBuyList;
 
@@ -166,5 +179,27 @@ async function loader(
     },
   };
 }
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
+  const url = new URL(req.url);
+  const skuId = url.searchParams.get("skuId") ?? "";
+
+  // Avoid cross-tenant cache bleed when a partner token is present
+  if (getPartnerCookie(req.headers)) {
+    return null;
+  }
+
+  const params = new URLSearchParams([
+    ["slug", String(props.slug)],
+    ["buyTogether", String(props.buyTogether ?? false)],
+    ["includeSameParent", String(props.includeSameParent ?? false)],
+    ["skuId", skuId],
+  ]);
+
+  url.search = params.toString();
+  return url.href;
+};
 
 export default loader;

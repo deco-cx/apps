@@ -7,6 +7,7 @@ import {
   WishlistReducedProductFragment,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
+import { handleAuthError } from "../utils/authError.ts";
 
 /**
  * @title Wake Integration
@@ -25,15 +26,20 @@ const loader = async (
 
   if (!customerAccessToken) return [];
 
-  const data = await storefront.query<
-    GetWishlistQuery,
-    GetWishlistQueryVariables
-  >({
-    variables: { customerAccessToken },
-    ...GetWishlist,
-  }, {
-    headers,
-  });
+  let data: GetWishlistQuery | undefined;
+  try {
+    data = await storefront.query<
+      GetWishlistQuery,
+      GetWishlistQueryVariables
+    >({
+      variables: { customerAccessToken },
+      ...GetWishlist,
+    }, {
+      headers,
+    });
+  } catch (error: unknown) {
+    handleAuthError(error, "load wishlist");
+  }
 
   return data?.customer?.wishlist?.products?.filter((
     p,
@@ -41,3 +47,6 @@ const loader = async (
 };
 
 export default loader;
+
+// User-specific wishlist data; must not be cached/shared.
+export const cache = "no-store";

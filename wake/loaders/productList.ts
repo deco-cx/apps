@@ -10,6 +10,7 @@ import {
 import { parseHeaders } from "../utils/parseHeaders.ts";
 import { getPartnerCookie } from "../utils/partner.ts";
 import { toProduct } from "../utils/transform.ts";
+import { handleAuthError } from "../utils/authError.ts";
 
 export interface StockFilter {
   dcId?: number[];
@@ -146,17 +147,22 @@ const productListLoader = async (
 
   const headers = parseHeaders(req.headers);
 
-  const data = await storefront.query<
-    GetProductsQuery,
-    GetProductsQueryVariables
-  >({
-    variables: { ...props, partnerAccessToken },
-    ...GetProducts,
-  }, {
-    headers,
-  });
+  let data: GetProductsQuery | undefined;
+  try {
+    data = await storefront.query<
+      GetProductsQuery,
+      GetProductsQueryVariables
+    >({
+      variables: { ...props, partnerAccessToken },
+      ...GetProducts,
+    }, {
+      headers,
+    });
+  } catch (error: unknown) {
+    handleAuthError(error, "load product list");
+  }
 
-  const products = data.products?.nodes;
+  const products = data?.products?.nodes;
 
   if (!Array.isArray(products)) {
     return null;
@@ -177,6 +183,58 @@ const productListLoader = async (
 
       return toProduct(node, { base: url }, productVariations);
     });
+};
+
+export const cache = "stale-while-revalidate";
+
+// Helper function for deterministic filter serialization
+function stableStringify(value: unknown): string {
+  const seen = new WeakSet();
+  const replacer = (_k: string, v: unknown) => {
+    if (v && typeof v === "object") {
+      if (seen.has(v as object)) return "[Circular]";
+      seen.add(v as object);
+      if (Array.isArray(v)) return v; // keep array order
+      const obj = v as Record<string, unknown>;
+      return Object.keys(obj).sort().reduce((acc, key) => {
+        acc[key] = obj[key];
+        return acc;
+      }, {} as Record<string, unknown>);
+    }
+    return v;
+  };
+  return JSON.stringify(value, replacer);
+}
+
+export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
+  const url = new URL(req.url);
+
+  // Avoid cross-tenant cache bleed when a partner token is present
+  if (getPartnerCookie(req.headers)) {
+    return null;
+  }
+
+  // Don't cache dynamic/random sorts
+  if (props.sortKey === "RANDOM") {
+    return null;
+  }
+
+  const params = new URLSearchParams([
+    ["first", String(props.first ?? 12)],
+    ["sortKey", props.sortKey ?? "NAME"],
+    ["sortDirection", props.sortDirection ?? "ASC"],
+    ["getVariations", String(Boolean(props.getVariations ?? false))],
+  ]);
+
+  // Add filters to cache key with deterministic serialization
+  if (props.filters) {
+    const filtersStr = stableStringify(props.filters);
+    params.append("filters", filtersStr);
+  }
+
+  params.sort();
+  url.search = params.toString();
+  return url.href;
 };
 
 export default productListLoader;
