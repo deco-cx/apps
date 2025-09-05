@@ -10,84 +10,87 @@ import * as $$$$$$$$$4 from "./actions/crm/batchCreateContacts.ts";
 import * as $$$$$$$$$5 from "./actions/crm/createAssociation.ts";
 import * as $$$$$$$$$6 from "./actions/crm/createCall.ts";
 import * as $$$$$$$$$7 from "./actions/crm/createCart.ts";
-import * as $$$$$$$$$8 from "./actions/crm/createCompany.ts";
-import * as $$$$$$$$$9 from "./actions/crm/createContact.ts";
-import * as $$$$$$$$$10 from "./actions/crm/createCustomObject.ts";
-import * as $$$$$$$$$11 from "./actions/crm/createDeal.ts";
-import * as $$$$$$$$$12 from "./actions/crm/createInvoice.ts";
-import * as $$$$$$$$$13 from "./actions/crm/createLead.ts";
-import * as $$$$$$$$$14 from "./actions/crm/createLineItem.ts";
-import * as $$$$$$$$$15 from "./actions/crm/createMeeting.ts";
-import * as $$$$$$$$$16 from "./actions/crm/createNote.ts";
-import * as $$$$$$$$$17 from "./actions/crm/createOrder.ts";
-import * as $$$$$$$$$18 from "./actions/crm/createProduct.ts";
-import * as $$$$$$$$$19 from "./actions/crm/createSchema.ts";
-import * as $$$$$$$$$20 from "./actions/crm/createTask.ts";
-import * as $$$$$$$$$21 from "./actions/crm/createTicket.ts";
-import * as $$$$$$$$$22 from "./actions/crm/deleteContact.ts";
-import * as $$$$$$$$$23 from "./actions/crm/updateContact.ts";
-import * as $$$$$$$$$24 from "./actions/crm/updateCustomObject.ts";
-import * as $$$$$$$$$25 from "./actions/crm/updateDeal.ts";
-import * as $$$$$$$$$26 from "./actions/events/sendCustomEvent.ts";
-import * as $$$$$$$$$27 from "./actions/files/uploadFile.ts";
-import * as $$$$$$$$$28 from "./actions/marketing/sendTransactionalEmail.ts";
-import * as $$$$$$$$$29 from "./actions/marketing/updateCommunicationPreferences.ts";
-import * as $$$$$$$$$30 from "./actions/oauth/refreshToken.ts";
-import * as $$$$$$$$$31 from "./actions/settings/createUser.ts";
-import * as $$$$$$$$$32 from "./actions/webhooks/createWebhook.ts";
-import * as $$$$$$$$$33 from "./actions/webhooks/deleteWebhook.ts";
+import * as $$$$$$$$$8 from "./actions/crm/createCommunication.ts";
+import * as $$$$$$$$$9 from "./actions/crm/createCompany.ts";
+import * as $$$$$$$$$10 from "./actions/crm/createContact.ts";
+import * as $$$$$$$$$11 from "./actions/crm/createCustomObject.ts";
+import * as $$$$$$$$$12 from "./actions/crm/createDeal.ts";
+import * as $$$$$$$$$13 from "./actions/crm/createInvoice.ts";
+import * as $$$$$$$$$14 from "./actions/crm/createLead.ts";
+import * as $$$$$$$$$15 from "./actions/crm/createLineItem.ts";
+import * as $$$$$$$$$16 from "./actions/crm/createMeeting.ts";
+import * as $$$$$$$$$17 from "./actions/crm/createNote.ts";
+import * as $$$$$$$$$18 from "./actions/crm/createOrder.ts";
+import * as $$$$$$$$$19 from "./actions/crm/createProduct.ts";
+import * as $$$$$$$$$20 from "./actions/crm/createSchema.ts";
+import * as $$$$$$$$$21 from "./actions/crm/createTask.ts";
+import * as $$$$$$$$$22 from "./actions/crm/createTicket.ts";
+import * as $$$$$$$$$23 from "./actions/crm/deleteContact.ts";
+import * as $$$$$$$$$24 from "./actions/crm/updateContact.ts";
+import * as $$$$$$$$$25 from "./actions/crm/updateCustomObject.ts";
+import * as $$$$$$$$$26 from "./actions/crm/updateDeal.ts";
+import * as $$$$$$$$$27 from "./actions/events/sendCustomEvent.ts";
+import * as $$$$$$$$$28 from "./actions/files/uploadFile.ts";
+import * as $$$$$$$$$29 from "./actions/marketing/sendTransactionalEmail.ts";
+import * as $$$$$$$$$30 from "./actions/marketing/updateCommunicationPreferences.ts";
+import * as $$$$$$$$$31 from "./actions/oauth/refreshToken.ts";
+import * as $$$$$$$$$32 from "./actions/settings/createUser.ts";
+import * as $$$$$$$$$33 from "./actions/webhooks/createWebhook.ts";
+import * as $$$$$$$$$34 from "./actions/webhooks/deleteWebhook.ts";
 import * as $$$0 from "./loaders/automation/getWorkflows.ts";
 import * as $$$1 from "./loaders/cms/getPages.ts";
 import * as $$$2 from "./loaders/conversations/getConversations.ts";
 import * as $$$3 from "./loaders/crm/getAssociations.ts";
 import * as $$$4 from "./loaders/crm/getCall.ts";
 import * as $$$5 from "./loaders/crm/getCarts.ts";
-import * as $$$6 from "./loaders/crm/getCompanies.ts";
-import * as $$$7 from "./loaders/crm/getCompany.ts";
-import * as $$$8 from "./loaders/crm/getContact.ts";
-import * as $$$9 from "./loaders/crm/getContacts.ts";
-import * as $$$10 from "./loaders/crm/getCustomObject.ts";
-import * as $$$11 from "./loaders/crm/getCustomObjects.ts";
-import * as $$$12 from "./loaders/crm/getDeal.ts";
-import * as $$$13 from "./loaders/crm/getDeals.ts";
-import * as $$$14 from "./loaders/crm/getInvoice.ts";
-import * as $$$15 from "./loaders/crm/getInvoices.ts";
-import * as $$$16 from "./loaders/crm/getLead.ts";
-import * as $$$17 from "./loaders/crm/getLeads.ts";
-import * as $$$18 from "./loaders/crm/getLineItems.ts";
-import * as $$$19 from "./loaders/crm/getLists.ts";
-import * as $$$20 from "./loaders/crm/getMeeting.ts";
-import * as $$$21 from "./loaders/crm/getNote.ts";
-import * as $$$22 from "./loaders/crm/getOrder.ts";
-import * as $$$23 from "./loaders/crm/getOrders.ts";
-import * as $$$24 from "./loaders/crm/getOwner.ts";
-import * as $$$25 from "./loaders/crm/getOwners.ts";
-import * as $$$26 from "./loaders/crm/getPayments.ts";
-import * as $$$27 from "./loaders/crm/getPipelines.ts";
-import * as $$$28 from "./loaders/crm/getProduct.ts";
-import * as $$$29 from "./loaders/crm/getProperties.ts";
-import * as $$$30 from "./loaders/crm/getQuote.ts";
-import * as $$$31 from "./loaders/crm/getSchema.ts";
-import * as $$$32 from "./loaders/crm/getSchemaProperties.ts";
-import * as $$$33 from "./loaders/crm/getSchemas.ts";
-import * as $$$34 from "./loaders/crm/getTask.ts";
-import * as $$$35 from "./loaders/crm/getTicket.ts";
-import * as $$$36 from "./loaders/crm/getTickets.ts";
-import * as $$$37 from "./loaders/crm/searchContacts.ts";
-import * as $$$38 from "./loaders/crm/searchDeals.ts";
-import * as $$$39 from "./loaders/events/getEventDefinitions.ts";
-import * as $$$40 from "./loaders/files/getFile.ts";
-import * as $$$41 from "./loaders/files/getFiles.ts";
-import * as $$$42 from "./loaders/marketing/getCampaigns.ts";
-import * as $$$43 from "./loaders/marketing/getCommunicationPreferences.ts";
-import * as $$$44 from "./loaders/marketing/getForm.ts";
-import * as $$$45 from "./loaders/marketing/getForms.ts";
-import * as $$$46 from "./loaders/marketing/getMarketingEmails.ts";
-import * as $$$47 from "./loaders/oauth/getTokenInfo.ts";
-import * as $$$48 from "./loaders/settings/getAccount.ts";
-import * as $$$49 from "./loaders/settings/getBusinessUnits.ts";
-import * as $$$50 from "./loaders/settings/getUsers.ts";
-import * as $$$51 from "./loaders/webhooks/getWebhooks.ts";
+import * as $$$6 from "./loaders/crm/getCommunication.ts";
+import * as $$$7 from "./loaders/crm/getCommunications.ts";
+import * as $$$8 from "./loaders/crm/getCompanies.ts";
+import * as $$$9 from "./loaders/crm/getCompany.ts";
+import * as $$$10 from "./loaders/crm/getContact.ts";
+import * as $$$11 from "./loaders/crm/getContacts.ts";
+import * as $$$12 from "./loaders/crm/getCustomObject.ts";
+import * as $$$13 from "./loaders/crm/getCustomObjects.ts";
+import * as $$$14 from "./loaders/crm/getDeal.ts";
+import * as $$$15 from "./loaders/crm/getDeals.ts";
+import * as $$$16 from "./loaders/crm/getInvoice.ts";
+import * as $$$17 from "./loaders/crm/getInvoices.ts";
+import * as $$$18 from "./loaders/crm/getLead.ts";
+import * as $$$19 from "./loaders/crm/getLeads.ts";
+import * as $$$20 from "./loaders/crm/getLineItems.ts";
+import * as $$$21 from "./loaders/crm/getLists.ts";
+import * as $$$22 from "./loaders/crm/getMeeting.ts";
+import * as $$$23 from "./loaders/crm/getNote.ts";
+import * as $$$24 from "./loaders/crm/getOrder.ts";
+import * as $$$25 from "./loaders/crm/getOrders.ts";
+import * as $$$26 from "./loaders/crm/getOwner.ts";
+import * as $$$27 from "./loaders/crm/getOwners.ts";
+import * as $$$28 from "./loaders/crm/getPayments.ts";
+import * as $$$29 from "./loaders/crm/getPipelines.ts";
+import * as $$$30 from "./loaders/crm/getProduct.ts";
+import * as $$$31 from "./loaders/crm/getProperties.ts";
+import * as $$$32 from "./loaders/crm/getQuote.ts";
+import * as $$$33 from "./loaders/crm/getSchema.ts";
+import * as $$$34 from "./loaders/crm/getSchemaProperties.ts";
+import * as $$$35 from "./loaders/crm/getSchemas.ts";
+import * as $$$36 from "./loaders/crm/getTask.ts";
+import * as $$$37 from "./loaders/crm/getTicket.ts";
+import * as $$$38 from "./loaders/crm/getTickets.ts";
+import * as $$$39 from "./loaders/crm/searchContacts.ts";
+import * as $$$40 from "./loaders/crm/searchDeals.ts";
+import * as $$$41 from "./loaders/events/getEventDefinitions.ts";
+import * as $$$42 from "./loaders/files/getFile.ts";
+import * as $$$43 from "./loaders/files/getFiles.ts";
+import * as $$$44 from "./loaders/marketing/getCampaigns.ts";
+import * as $$$45 from "./loaders/marketing/getCommunicationPreferences.ts";
+import * as $$$46 from "./loaders/marketing/getForm.ts";
+import * as $$$47 from "./loaders/marketing/getForms.ts";
+import * as $$$48 from "./loaders/marketing/getMarketingEmails.ts";
+import * as $$$49 from "./loaders/oauth/getTokenInfo.ts";
+import * as $$$50 from "./loaders/settings/getAccount.ts";
+import * as $$$51 from "./loaders/settings/getBusinessUnits.ts";
+import * as $$$52 from "./loaders/settings/getUsers.ts";
+import * as $$$53 from "./loaders/webhooks/getWebhooks.ts";
 
 const manifest = {
   "loaders": {
@@ -97,52 +100,54 @@ const manifest = {
     "hubspot/loaders/crm/getAssociations.ts": $$$3,
     "hubspot/loaders/crm/getCall.ts": $$$4,
     "hubspot/loaders/crm/getCarts.ts": $$$5,
-    "hubspot/loaders/crm/getCompanies.ts": $$$6,
-    "hubspot/loaders/crm/getCompany.ts": $$$7,
-    "hubspot/loaders/crm/getContact.ts": $$$8,
-    "hubspot/loaders/crm/getContacts.ts": $$$9,
-    "hubspot/loaders/crm/getCustomObject.ts": $$$10,
-    "hubspot/loaders/crm/getCustomObjects.ts": $$$11,
-    "hubspot/loaders/crm/getDeal.ts": $$$12,
-    "hubspot/loaders/crm/getDeals.ts": $$$13,
-    "hubspot/loaders/crm/getInvoice.ts": $$$14,
-    "hubspot/loaders/crm/getInvoices.ts": $$$15,
-    "hubspot/loaders/crm/getLead.ts": $$$16,
-    "hubspot/loaders/crm/getLeads.ts": $$$17,
-    "hubspot/loaders/crm/getLineItems.ts": $$$18,
-    "hubspot/loaders/crm/getLists.ts": $$$19,
-    "hubspot/loaders/crm/getMeeting.ts": $$$20,
-    "hubspot/loaders/crm/getNote.ts": $$$21,
-    "hubspot/loaders/crm/getOrder.ts": $$$22,
-    "hubspot/loaders/crm/getOrders.ts": $$$23,
-    "hubspot/loaders/crm/getOwner.ts": $$$24,
-    "hubspot/loaders/crm/getOwners.ts": $$$25,
-    "hubspot/loaders/crm/getPayments.ts": $$$26,
-    "hubspot/loaders/crm/getPipelines.ts": $$$27,
-    "hubspot/loaders/crm/getProduct.ts": $$$28,
-    "hubspot/loaders/crm/getProperties.ts": $$$29,
-    "hubspot/loaders/crm/getQuote.ts": $$$30,
-    "hubspot/loaders/crm/getSchema.ts": $$$31,
-    "hubspot/loaders/crm/getSchemaProperties.ts": $$$32,
-    "hubspot/loaders/crm/getSchemas.ts": $$$33,
-    "hubspot/loaders/crm/getTask.ts": $$$34,
-    "hubspot/loaders/crm/getTicket.ts": $$$35,
-    "hubspot/loaders/crm/getTickets.ts": $$$36,
-    "hubspot/loaders/crm/searchContacts.ts": $$$37,
-    "hubspot/loaders/crm/searchDeals.ts": $$$38,
-    "hubspot/loaders/events/getEventDefinitions.ts": $$$39,
-    "hubspot/loaders/files/getFile.ts": $$$40,
-    "hubspot/loaders/files/getFiles.ts": $$$41,
-    "hubspot/loaders/marketing/getCampaigns.ts": $$$42,
-    "hubspot/loaders/marketing/getCommunicationPreferences.ts": $$$43,
-    "hubspot/loaders/marketing/getForm.ts": $$$44,
-    "hubspot/loaders/marketing/getForms.ts": $$$45,
-    "hubspot/loaders/marketing/getMarketingEmails.ts": $$$46,
-    "hubspot/loaders/oauth/getTokenInfo.ts": $$$47,
-    "hubspot/loaders/settings/getAccount.ts": $$$48,
-    "hubspot/loaders/settings/getBusinessUnits.ts": $$$49,
-    "hubspot/loaders/settings/getUsers.ts": $$$50,
-    "hubspot/loaders/webhooks/getWebhooks.ts": $$$51,
+    "hubspot/loaders/crm/getCommunication.ts": $$$6,
+    "hubspot/loaders/crm/getCommunications.ts": $$$7,
+    "hubspot/loaders/crm/getCompanies.ts": $$$8,
+    "hubspot/loaders/crm/getCompany.ts": $$$9,
+    "hubspot/loaders/crm/getContact.ts": $$$10,
+    "hubspot/loaders/crm/getContacts.ts": $$$11,
+    "hubspot/loaders/crm/getCustomObject.ts": $$$12,
+    "hubspot/loaders/crm/getCustomObjects.ts": $$$13,
+    "hubspot/loaders/crm/getDeal.ts": $$$14,
+    "hubspot/loaders/crm/getDeals.ts": $$$15,
+    "hubspot/loaders/crm/getInvoice.ts": $$$16,
+    "hubspot/loaders/crm/getInvoices.ts": $$$17,
+    "hubspot/loaders/crm/getLead.ts": $$$18,
+    "hubspot/loaders/crm/getLeads.ts": $$$19,
+    "hubspot/loaders/crm/getLineItems.ts": $$$20,
+    "hubspot/loaders/crm/getLists.ts": $$$21,
+    "hubspot/loaders/crm/getMeeting.ts": $$$22,
+    "hubspot/loaders/crm/getNote.ts": $$$23,
+    "hubspot/loaders/crm/getOrder.ts": $$$24,
+    "hubspot/loaders/crm/getOrders.ts": $$$25,
+    "hubspot/loaders/crm/getOwner.ts": $$$26,
+    "hubspot/loaders/crm/getOwners.ts": $$$27,
+    "hubspot/loaders/crm/getPayments.ts": $$$28,
+    "hubspot/loaders/crm/getPipelines.ts": $$$29,
+    "hubspot/loaders/crm/getProduct.ts": $$$30,
+    "hubspot/loaders/crm/getProperties.ts": $$$31,
+    "hubspot/loaders/crm/getQuote.ts": $$$32,
+    "hubspot/loaders/crm/getSchema.ts": $$$33,
+    "hubspot/loaders/crm/getSchemaProperties.ts": $$$34,
+    "hubspot/loaders/crm/getSchemas.ts": $$$35,
+    "hubspot/loaders/crm/getTask.ts": $$$36,
+    "hubspot/loaders/crm/getTicket.ts": $$$37,
+    "hubspot/loaders/crm/getTickets.ts": $$$38,
+    "hubspot/loaders/crm/searchContacts.ts": $$$39,
+    "hubspot/loaders/crm/searchDeals.ts": $$$40,
+    "hubspot/loaders/events/getEventDefinitions.ts": $$$41,
+    "hubspot/loaders/files/getFile.ts": $$$42,
+    "hubspot/loaders/files/getFiles.ts": $$$43,
+    "hubspot/loaders/marketing/getCampaigns.ts": $$$44,
+    "hubspot/loaders/marketing/getCommunicationPreferences.ts": $$$45,
+    "hubspot/loaders/marketing/getForm.ts": $$$46,
+    "hubspot/loaders/marketing/getForms.ts": $$$47,
+    "hubspot/loaders/marketing/getMarketingEmails.ts": $$$48,
+    "hubspot/loaders/oauth/getTokenInfo.ts": $$$49,
+    "hubspot/loaders/settings/getAccount.ts": $$$50,
+    "hubspot/loaders/settings/getBusinessUnits.ts": $$$51,
+    "hubspot/loaders/settings/getUsers.ts": $$$52,
+    "hubspot/loaders/webhooks/getWebhooks.ts": $$$53,
   },
   "actions": {
     "hubspot/actions/automation/enrollInWorkflow.ts": $$$$$$$$$0,
@@ -153,32 +158,33 @@ const manifest = {
     "hubspot/actions/crm/createAssociation.ts": $$$$$$$$$5,
     "hubspot/actions/crm/createCall.ts": $$$$$$$$$6,
     "hubspot/actions/crm/createCart.ts": $$$$$$$$$7,
-    "hubspot/actions/crm/createCompany.ts": $$$$$$$$$8,
-    "hubspot/actions/crm/createContact.ts": $$$$$$$$$9,
-    "hubspot/actions/crm/createCustomObject.ts": $$$$$$$$$10,
-    "hubspot/actions/crm/createDeal.ts": $$$$$$$$$11,
-    "hubspot/actions/crm/createInvoice.ts": $$$$$$$$$12,
-    "hubspot/actions/crm/createLead.ts": $$$$$$$$$13,
-    "hubspot/actions/crm/createLineItem.ts": $$$$$$$$$14,
-    "hubspot/actions/crm/createMeeting.ts": $$$$$$$$$15,
-    "hubspot/actions/crm/createNote.ts": $$$$$$$$$16,
-    "hubspot/actions/crm/createOrder.ts": $$$$$$$$$17,
-    "hubspot/actions/crm/createProduct.ts": $$$$$$$$$18,
-    "hubspot/actions/crm/createSchema.ts": $$$$$$$$$19,
-    "hubspot/actions/crm/createTask.ts": $$$$$$$$$20,
-    "hubspot/actions/crm/createTicket.ts": $$$$$$$$$21,
-    "hubspot/actions/crm/deleteContact.ts": $$$$$$$$$22,
-    "hubspot/actions/crm/updateContact.ts": $$$$$$$$$23,
-    "hubspot/actions/crm/updateCustomObject.ts": $$$$$$$$$24,
-    "hubspot/actions/crm/updateDeal.ts": $$$$$$$$$25,
-    "hubspot/actions/events/sendCustomEvent.ts": $$$$$$$$$26,
-    "hubspot/actions/files/uploadFile.ts": $$$$$$$$$27,
-    "hubspot/actions/marketing/sendTransactionalEmail.ts": $$$$$$$$$28,
-    "hubspot/actions/marketing/updateCommunicationPreferences.ts": $$$$$$$$$29,
-    "hubspot/actions/oauth/refreshToken.ts": $$$$$$$$$30,
-    "hubspot/actions/settings/createUser.ts": $$$$$$$$$31,
-    "hubspot/actions/webhooks/createWebhook.ts": $$$$$$$$$32,
-    "hubspot/actions/webhooks/deleteWebhook.ts": $$$$$$$$$33,
+    "hubspot/actions/crm/createCommunication.ts": $$$$$$$$$8,
+    "hubspot/actions/crm/createCompany.ts": $$$$$$$$$9,
+    "hubspot/actions/crm/createContact.ts": $$$$$$$$$10,
+    "hubspot/actions/crm/createCustomObject.ts": $$$$$$$$$11,
+    "hubspot/actions/crm/createDeal.ts": $$$$$$$$$12,
+    "hubspot/actions/crm/createInvoice.ts": $$$$$$$$$13,
+    "hubspot/actions/crm/createLead.ts": $$$$$$$$$14,
+    "hubspot/actions/crm/createLineItem.ts": $$$$$$$$$15,
+    "hubspot/actions/crm/createMeeting.ts": $$$$$$$$$16,
+    "hubspot/actions/crm/createNote.ts": $$$$$$$$$17,
+    "hubspot/actions/crm/createOrder.ts": $$$$$$$$$18,
+    "hubspot/actions/crm/createProduct.ts": $$$$$$$$$19,
+    "hubspot/actions/crm/createSchema.ts": $$$$$$$$$20,
+    "hubspot/actions/crm/createTask.ts": $$$$$$$$$21,
+    "hubspot/actions/crm/createTicket.ts": $$$$$$$$$22,
+    "hubspot/actions/crm/deleteContact.ts": $$$$$$$$$23,
+    "hubspot/actions/crm/updateContact.ts": $$$$$$$$$24,
+    "hubspot/actions/crm/updateCustomObject.ts": $$$$$$$$$25,
+    "hubspot/actions/crm/updateDeal.ts": $$$$$$$$$26,
+    "hubspot/actions/events/sendCustomEvent.ts": $$$$$$$$$27,
+    "hubspot/actions/files/uploadFile.ts": $$$$$$$$$28,
+    "hubspot/actions/marketing/sendTransactionalEmail.ts": $$$$$$$$$29,
+    "hubspot/actions/marketing/updateCommunicationPreferences.ts": $$$$$$$$$30,
+    "hubspot/actions/oauth/refreshToken.ts": $$$$$$$$$31,
+    "hubspot/actions/settings/createUser.ts": $$$$$$$$$32,
+    "hubspot/actions/webhooks/createWebhook.ts": $$$$$$$$$33,
+    "hubspot/actions/webhooks/deleteWebhook.ts": $$$$$$$$$34,
   },
   "name": "hubspot",
   "baseUrl": import.meta.url,
