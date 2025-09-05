@@ -31,7 +31,7 @@ export default async function completeLogin(
           value: vidRtCookie.value,
           httpOnly: true,
           maxAge: maxAge,
-          path: "/",
+          path: "/api/vtexid/refreshtoken/webstore",
           secure: true,
         });
       }

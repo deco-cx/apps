@@ -67,7 +67,7 @@ export default async function refreshToken(
     value: vidRtCookie.value,
     httpOnly: true,
     maxAge: maxAge,
-    path: "/",
+    path: "/api/vtexid/refreshtoken/webstore",
     secure: true,
   });
 
