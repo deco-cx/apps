@@ -4,7 +4,7 @@
 **Date:** September 2025  
 **Target Audience:** AI Coding Agents & Developers
 
-This comprehensive guide outlines the migration patterns and fixes required to upgrade older deco.cx stores based on analysis of recent fixes applied to jasmine, brandili, tools-dna, and apps repositories.
+This comprehensive guide outlines the migration patterns and fixes required to upgrade older deco.cx stores based on analysis of recent fixes applied to production e-commerce stores and framework repositories.
 
 ## 🎯 Overview
 
@@ -271,7 +271,7 @@ User-agent: Googlebot
 Allow: /
 Disallow: /live/
 Disallow: /live/*
-Sitemap: https://yourdomain.com/sitemap.xml
+Sitemap: https://example-store.com/sitemap.xml
 ```
 
 #### 7.2 Middleware for Bot Detection
@@ -329,6 +329,21 @@ const ClientOnlyComponent = lazy(() => import("../islands/ClientComponent.tsx"))
 
 ## 🔍 Common Issues & Solutions
 
+### Issue: Data URI Injection in Search Parameters
+**Cause:** Deco live inspector scripts getting embedded in search queries
+**Solution:** Sanitize URL segments to block `data:` and `javascript:` schemes
+**Frequency:** Very High - Multiple times per day in production
+
+### Issue: Component Crashes from Undefined Image Sources  
+**Cause:** BannerWithTitle and similar components receiving undefined src values
+**Solution:** Add null checks and safe defaults before rendering Picture components
+**Frequency:** High - Several times per hour in production
+
+### Issue: VTEX API 500 Errors with Poor Error Context
+**Cause:** External API failures without sufficient debugging information
+**Solution:** Implement structured error logging with all request parameters
+**Frequency:** Medium - Multiple times per day
+
 ### Issue: "Module not found" errors
 **Cause:** Outdated import paths or missing dependencies
 **Solution:** Update import maps in deno.json and regenerate manifest
@@ -347,7 +362,7 @@ const ClientOnlyComponent = lazy(() => import("../islands/ClientComponent.tsx"))
 
 ## 📚 Lessons Learned from Real Migration Work
 
-Based on analyzing the miess-01 repository and applying fixes:
+Based on analyzing production e-commerce repositories and applying fixes from September 2025 production deployments:
 
 ### ✅ **What Works Well in Existing Stores**
 - **Apps structure already migrated**: Many stores have already been updated to use `apps/deco/` namespacing
@@ -356,11 +371,13 @@ Based on analyzing the miess-01 repository and applying fixes:
 - **Proper image handling**: Many components already use explicit dimensions and Picture components
 
 ### 🔧 **Critical Fixes Often Needed**
-1. **Dependency versions**: Always update deco.cx core to latest stable (1.120.11+)
-2. **Window object guards**: Analytics and client-side code needs `typeof window !== 'undefined'` checks
-3. **Search parameter encoding**: Use `encodeURIComponent()` instead of manual string replacement
-4. **Image dimensions**: Add explicit `width` and `height` attributes to prevent layout shifts
-5. **Fresh config plugins**: Ensure `tailwind` is passed to plugins configuration
+1. **Input sanitization**: Sanitize search parameters to block data URIs and JavaScript injection
+2. **Component safety guards**: Add null checks for image sources and undefined props
+3. **Structured error logging**: Include context in error messages for monitoring (HyperDX)
+4. **Loading state cleanup**: Use try/finally blocks to ensure UI states are cleaned up
+5. **Dependency versions**: Always update deco.cx core to latest stable (1.120.11+)
+6. **Duplicate loader elimination**: Remove redundant API calls in category pages
+7. **Image dimensions**: Add explicit `width` and `height` attributes to prevent optimization warnings
 
 ### 🎯 **Common Patterns for Window Guards**
 ```typescript
@@ -380,11 +397,13 @@ After dependency updates, you DON'T need to run `deno task gen` - this was a mis
 When you run `deno task update`, Deno automatically handles the migration of `std/` imports to JSR `@std/` imports. **DO NOT** manually change import statements in your code files - let Deno handle this automatically through its dependency resolution.
 
 ### ⚡ **Priority Order for Fixes**
-1. **SSR compatibility** (window guards) - prevents runtime errors
-2. **Dependency updates** - ensures compatibility and security
-3. **Performance optimizations** - image dimensions, async render
-4. **Search functionality** - parameter encoding affects UX
-5. **Build configuration** - nodeModulesDir, excludes
+1. **Security & Input Validation** - prevents data URI injection and XSS
+2. **Component Safety** - prevents undefined property crashes
+3. **Error Handling** - structured logging for debugging production issues
+4. **Performance** - eliminate duplicate loaders, add SWR caching
+5. **Image Optimization** - explicit dimensions prevent warnings
+6. **SSR compatibility** (window guards) - prevents runtime errors
+7. **Dependency updates** - ensures compatibility and security
 
 ## 🤖 Evolution Agent Workflow Menu
 
@@ -456,9 +475,25 @@ After migration, verify:
 - [ ] Performance metrics improved
 - [ ] Cache headers present for bot traffic
 
+## 📖 Supplementary Documentation
+
+For detailed examples and advanced patterns, see these companion guides:
+
+### [🛡️ Error Handling & Security Patterns](./deco-cx-error-handling-patterns.md)
+- Real-world security fixes for search parameter sanitization
+- Component safety patterns for undefined props
+- Structured error logging for external APIs
+- Image optimization and loading patterns
+
+### [🔥 Production Issues & Stack Traces](./deco-cx-production-issues-stacktraces.md)
+- Actual stack traces from production environments
+- Data URI injection attacks and fixes
+- VTEX API error handling patterns
+- Performance optimization case studies
+
 ---
 
 **Note:** Always test migrations in a staging environment before applying to production. Keep backups of working configurations.
 
-**Last Updated:** September 2025  
+**Last Updated:** September 2025 (Enhanced with production learnings)  
 **Framework Version:** Deco.cx 1.120.11+
