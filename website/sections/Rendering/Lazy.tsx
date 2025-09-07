@@ -63,7 +63,10 @@ const defaultFallbackFor = (section: string) => () => (
   </div>
 );
 export const loader = async (props: Props, req: Request, ctx: AppContext) => {
-  const { section, loading } = props;
+  const { section, loading } = props as {
+    loading?: "eager" | "lazy";
+    section: Section | null;
+  };
   const url = new URL(req.url);
   const shouldRender = loading === "eager" || shouldForceRender({
     ctx,
@@ -95,15 +98,19 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
   return {
     loading: shouldRender ? "eager" : "lazy",
     section: {
-      Component: resolvedSection.LoadingFallback ??
-        defaultFallbackFor(resolvedSection.metadata?.component ?? "unknown"),
-      metadata: resolvedSection.metadata,
+      Component: resolvedSection?.LoadingFallback ??
+        defaultFallbackFor(resolvedSection?.metadata?.component ?? "unknown"),
+      metadata: resolvedSection?.metadata,
       props: {},
     },
   };
 };
 type SectionProps = Awaited<ReturnType<typeof loader>>;
 function Lazy({ section, loading }: SectionProps) {
+  if (!section) {
+    return null;
+  }
+
   const ctx = useSectionContext();
   if (!ctx) {
     throw new Error("Missing SectionContext");
