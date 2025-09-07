@@ -1,9 +1,7 @@
 import { logger } from "@deco/deco/o11y";
 import type { AppContext } from "../../mod.ts";
 import { HubSpotClient } from "../../utils/client.ts";
-import type {
-  SimplePublicObject,
-} from "../../utils/types.ts";
+import type { SimplePublicObject } from "../../utils/types.ts";
 
 export interface Props {
   /**
