@@ -113,6 +113,11 @@ function Page(
   const deco = useDeco();
   return (
     <>
+      {unindexedDomain && (
+        <Head>
+          <meta name="robots" content="noindex, nofollow" />
+        </Head>
+      )}
       <ErrorBoundary
         fallback={(error: unknown) =>
           error instanceof HttpError &&
@@ -128,6 +133,19 @@ function Page(
               />
             )}
       >
+        {seo && renderSection(seo)}
+        <LiveControls
+          avoidRedirectingToEditor={avoidRedirectingToEditor}
+          site={site}
+          {...deco}
+        />
+        <Events deco={deco} />
+        {ONEDOLLAR_ENABLED && (
+          <OneDollarStats
+            collectorAddress={ONEDOLLAR_COLLECTOR}
+            staticScriptUrl={ONEDOLLAR_STATIC_SCRIPT}
+          />
+        )}
         {sections?.map(renderSection)}
       </ErrorBoundary>
     </>
