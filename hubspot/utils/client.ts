@@ -342,7 +342,10 @@ export class HubSpotClient {
       };
     },
   ): Promise<any> {
-    return this.patch(`/crm/v3/objects/communications/${communicationId}`, data);
+    return this.patch(
+      `/crm/v3/objects/communications/${communicationId}`,
+      data,
+    );
   }
 
   // Delete a communication
@@ -381,15 +384,24 @@ export class HubSpotClient {
   }
 
   async batchCreateCommunications(batchRequest: any): Promise<any> {
-    return this.post("/crm/v3/objects/communications/batch/create", batchRequest);
+    return this.post(
+      "/crm/v3/objects/communications/batch/create",
+      batchRequest,
+    );
   }
 
   async batchUpdateCommunications(batchRequest: any): Promise<any> {
-    return this.post("/crm/v3/objects/communications/batch/update", batchRequest);
+    return this.post(
+      "/crm/v3/objects/communications/batch/update",
+      batchRequest,
+    );
   }
 
   async batchArchiveCommunications(batchRequest: any): Promise<any> {
-    return this.post("/crm/v3/objects/communications/batch/archive", batchRequest);
+    return this.post(
+      "/crm/v3/objects/communications/batch/archive",
+      batchRequest,
+    );
   }
 
   // Search communications
