@@ -86,6 +86,7 @@ const ALLOWED_PARAMS = new Set([
   "q",
   "fuzzy",
   "map",
+  "zip-code",
 ]);
 export interface Props {
   /**
@@ -391,6 +392,7 @@ const loader = async (
   const paramsToPersist = new URLSearchParams();
   searchArgs.query && paramsToPersist.set("q", searchArgs.query);
   searchArgs.sort && paramsToPersist.set("sort", searchArgs.sort);
+  searchArgs.zipCode && paramsToPersist.set("zip-code", searchArgs.zipCode);
   const filters = facets
     .filter((f) => !f.hidden)
     .map(toFilter(selectedFacets, paramsToPersist));
