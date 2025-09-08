@@ -106,6 +106,7 @@ export interface VTEXCommerceStable {
       fuzzy?: string;
       locale?: string;
       hideUnavailableItems: boolean;
+      "zip-code"?: string;
     };
   };
   "GET /api/io/_v/api/intelligent-search/facets/*facets": {
@@ -118,6 +119,7 @@ export interface VTEXCommerceStable {
       fuzzy?: string;
       locale?: string;
       hideUnavailableItems: boolean;
+      "zip-code"?: string;
     };
   };
 

@@ -47,6 +47,7 @@ interface Params {
   locale: string;
   hideUnavailableItems: boolean;
   simulationBehavior: "default" | "skip" | "only1P";
+  zipCode?: string;
 }
 
 export const withDefaultParams = ({
@@ -58,6 +59,7 @@ export const withDefaultParams = ({
   locale = "pt-BR",
   hideUnavailableItems,
   simulationBehavior = "default",
+  zipCode,
 }: Partial<Params>) => ({
   page: page + 1,
   count,
@@ -68,6 +70,7 @@ export const withDefaultParams = ({
   // locale: locale ?? ctx.configVTEX!.defaultLocale,
   hideUnavailableItems: hideUnavailableItems ?? false,
   simulationBehavior,
+  "zip-code": zipCode,
 });
 
 const IS_ANONYMOUS = Symbol("segment");
