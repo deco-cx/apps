@@ -181,6 +181,7 @@ const searchArgsOf = (props: Props, url: URL) => {
   );
   const fuzzy = mapLabelledFuzzyToFuzzy(props.fuzzy) ??
     (url.searchParams.get("fuzzy") as Fuzzy);
+  const zipCode = url.searchParams.get("zip-code") ?? undefined;
   return {
     query,
     fuzzy,
@@ -190,6 +191,7 @@ const searchArgsOf = (props: Props, url: URL) => {
     hideUnavailableItems,
     selectedFacets,
     simulationBehavior,
+    zipCode,
   };
 };
 const PAGE_TYPE_TO_MAP_PARAM = {
