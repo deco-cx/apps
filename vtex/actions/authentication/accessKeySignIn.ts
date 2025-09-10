@@ -25,7 +25,7 @@ export default async function action(
 
   const cookies = getCookies(req.headers);
   const VtexSessionToken = cookies?.["VtexSessionToken"] ?? null;
-  console.log("accessKeySignIn cookies", cookies);
+  // console.log("accessKeySignIn cookies", cookies);
 
   if (!VtexSessionToken) {
     throw new Error('"VtexSessionToken" cookie is missing');
@@ -55,9 +55,9 @@ export default async function action(
   }
 
   const data: AuthResponse = await response.json();
-  console.log("accessKeySignIn data", data);
+  // console.log("accessKeySignIn data", data);
   const setCookies = getSetCookies(response.headers);
-  console.log("accessKeySignIn setCookies", setCookies);
+  // console.log("accessKeySignIn setCookies", setCookies);
   await setLoginCookies(data, ctx, setCookies);
 
   return data;

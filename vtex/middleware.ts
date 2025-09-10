@@ -21,14 +21,14 @@ export const middleware = (
     ? parse(cookies.vtex_segment)
     : null;
   // console.log("middleware isCookies", isCookies);
-  console.log(
-    `middleware segment no storegBag do ctx existe nesse momento %c${!!segment}`,
-    "color:rgb(84, 255, 27);",
-  );
-  console.log(
-    `middleware segmentFromCookie priceTables %c${segmentFromCookie?.priceTables}`,
-    "color:rgb(84, 255, 27);",
-  );
+  // console.log(
+  //   `middleware segment no storegBag do ctx existe nesse momento %c${!!segment}`,
+  //   "color:rgb(84, 255, 27);",
+  // );
+  // console.log(
+  //   `middleware segmentFromCookie priceTables %c${segmentFromCookie?.priceTables}`,
+  //   "color:rgb(84, 255, 27);",
+  // );
 
   // const { payload: userPayload } = parseCookie(req.headers, ctx.account);
 

@@ -26,7 +26,7 @@ export default async function action(
   const { vcsDeprecated, account } = ctx;
   const cookies = getCookies(req.headers);
   const segment = getSegmentFromBag(ctx);
-  console.log("startAuthentication cookies", cookies);
+  // ("startAuthentication cookies", cookies);
 
   const response = await vcsDeprecated
     ["GET /api/vtexid/pub/authentication/start"]({

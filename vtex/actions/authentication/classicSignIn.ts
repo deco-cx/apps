@@ -20,7 +20,7 @@ export default async function action(
 ): Promise<AuthResponse> {
   const { vcsDeprecated } = ctx;
   const cookies = getCookies(req.headers);
-  console.log("classicSignIn cookies antes", cookies);
+  // console.log("classicSignIn cookies antes", cookies);
 
   if (!props.email || !props.password) {
     throw new Error("Email and/or password is missing");
@@ -28,7 +28,7 @@ export default async function action(
 
   const startAuthentication = await ctx.invoke.vtex.actions.authentication
     .startAuthentication({});
-  console.log("classicSignIn cookies depois", getCookies(ctx.response.headers));
+  // console.log("classicSignIn cookies depois", getCookies(ctx.response.headers));
 
   const startSetCookies = getSetCookies(ctx.response.headers);
   const { header: cookieHeader } = buildCookieJar(req.headers, startSetCookies);
@@ -59,9 +59,9 @@ export default async function action(
       },
     );
   const responseCookies = getCookies(response.headers);
-  console.log("classicSignIn responseCookies", responseCookies);
+  // console.log("classicSignIn responseCookies", responseCookies);
   const cookiesSet = getSetCookies(response.headers);
-  console.log("classicSignIn getSetCookies", cookiesSet);
+  // console.log("classicSignIn getSetCookies", cookiesSet);
 
   if (!response.ok) {
     throw new Error(
@@ -80,7 +80,7 @@ export default async function action(
   // await setLoginCookies(data, ctx, setCookies);
 
   const classicToClient = getSetCookies(ctx.response.headers);
-  console.log("classicSignIn classicToClient setCookies", classicToClient);
+  // console.log("classicSignIn classicToClient setCookies", classicToClient);
 
   return data;
 }

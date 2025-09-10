@@ -167,14 +167,14 @@ export const setSegmentBag = (
   const vtex_segment = cookies[SEGMENT_COOKIE_NAME];
   // console.log("setSegmentBag vtex_segment", vtex_segment);
   const segmentFromCookie = vtex_segment ? parse(vtex_segment) : null;
-  console.log("setSegmentBag  priceTables", segmentFromCookie?.priceTables);
+  console.log("setSegmentBag current priceTables", segmentFromCookie?.priceTables);
 
   // IMPORTANTE: Verificar se o usuário está autenticado
   const { payload: userPayload } = parseCookie(req.headers, ctx.account);
 
   const isAuthenticated = !!userPayload;
   // console.log("setSegmentBag vtex_segment", !!vtex_segment);
-  console.log("setSegmentBag isAuthenticated", isAuthenticated);
+  // console.log("setSegmentBag isAuthenticated", isAuthenticated);
   // // Se o usuário NÃO está autenticado E existe um segment com priceTables
   // // precisamos limpar o priceTables (e potencialmente campaigns)
   // if (!isAuthenticated) {
