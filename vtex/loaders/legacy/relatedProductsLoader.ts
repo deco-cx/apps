@@ -172,6 +172,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const segment = ctx.advancedConfigs?.removeUTMFromCacheKey
     ? getSegmentCacheKeyWithoutUTM(ctx)
     : getSegmentFromBag(ctx)?.token;
+
   const params = new URLSearchParams([
     ["slug", props.slug ?? ""],
     ["id", props.id ?? ""],

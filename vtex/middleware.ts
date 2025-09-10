@@ -17,6 +17,7 @@ export const middleware = (
   req: Request,
   ctx: AppMiddlewareContext,
 ) => {
+  // console.log("middleware req", req.url);
   const segment = getSegmentFromBag(ctx);
   const isCookies = getISCookiesFromBag(ctx);
   const cookies = getCookies(req.headers);
