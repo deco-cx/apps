@@ -1,5 +1,6 @@
 import { setCookie } from "std/http/mod.ts";
 import type { AppContext } from "../../mod.ts";
+import { getCookies } from "std/http/cookie.ts";
 
 export interface Props {
   email: string;
@@ -15,7 +16,7 @@ export type SendEmailVerificationResult = boolean;
  */
 export default async function action(
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<SendEmailVerificationResult> {
   const { vcsDeprecated } = ctx;
@@ -23,6 +24,9 @@ export default async function action(
   if (!props.email) {
     throw new Error("Email is missing");
   }
+
+  const cookies = getCookies(req.headers);
+  console.log("sendEmailVerification cookies", cookies);
 
   const startAuthentication = await ctx.invoke.vtex.actions.authentication
     .startAuthentication({});
@@ -62,6 +66,9 @@ export default async function action(
         `Authentication request failed: ${response.status} ${response.statusText}`,
       );
     }
+
+    const responseCookies = getCookies(response.headers);
+    console.log("sendEmailVerification responseCookies", responseCookies);
 
     const data = await response.json();
     if (data?.authStatus === "InvalidToken") {

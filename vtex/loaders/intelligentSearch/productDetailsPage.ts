@@ -164,6 +164,10 @@ export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const segment = getSegmentFromBag(ctx)?.token;
+  console.log(
+    "cacheKey segment productDetailsPage",
+    JSON.parse(atob(segment))?.priceTables,
+  );
   const url = new URL(req.url);
   const skuId = url.searchParams.get("skuId") ?? "";
 

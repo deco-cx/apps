@@ -1,7 +1,8 @@
 import { AppContext } from "../../mod.ts";
 import { AuthResponse } from "../../utils/types.ts";
-import setLoginCookies from "../../utils/login/setLoginCookies.ts";
-import { getSetCookies } from "std/http/cookie.ts";
+// import setLoginCookies from "../../utils/login/setLoginCookies.ts";
+import { getCookies, getSetCookies } from "std/http/cookie.ts";
+import { buildCookieJar, proxySetCookie } from "../../utils/cookies.ts";
 
 export interface Props {
   email: string;
@@ -14,10 +15,12 @@ export interface Props {
  */
 export default async function action(
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<AuthResponse> {
   const { vcsDeprecated } = ctx;
+  const cookies = getCookies(req.headers);
+  console.log("classicSignIn cookies antes", cookies);
 
   if (!props.email || !props.password) {
     throw new Error("Email and/or password is missing");
@@ -25,7 +28,11 @@ export default async function action(
 
   const startAuthentication = await ctx.invoke.vtex.actions.authentication
     .startAuthentication({});
+  console.log("classicSignIn cookies depois", getCookies(ctx.response.headers));
 
+  const startSetCookies = getSetCookies(ctx.response.headers);
+  const { header: cookieHeader } = buildCookieJar(req.headers, startSetCookies);
+  console.log("classicSignIn cookieHeader", cookieHeader);
   const authenticationToken = startAuthentication?.authenticationToken;
 
   if (!authenticationToken) {
@@ -47,9 +54,14 @@ export default async function action(
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
           "Accept": "application/json",
+          "cookie": cookieHeader,
         },
       },
     );
+  const responseCookies = getCookies(response.headers);
+  console.log("classicSignIn responseCookies", responseCookies);
+  const cookiesSet = getSetCookies(response.headers);
+  console.log("classicSignIn getSetCookies", cookiesSet);
 
   if (!response.ok) {
     throw new Error(
@@ -58,8 +70,17 @@ export default async function action(
   }
 
   const data: AuthResponse = await response.json();
-  const setCookies = getSetCookies(response.headers);
-  await setLoginCookies(data, ctx, setCookies);
+  proxySetCookie(response.headers, ctx.response.headers, req.url);
+  await ctx.invoke.vtex.actions.session.validateSession();
+  // const setCookies = getSetCookies(response.headers);
+  // console.log("classicSignIn setCookies", setCookies);
+
+  // console.log("classicSignIn validateSession", validateSession);
+
+  // await setLoginCookies(data, ctx, setCookies);
+
+  const classicToClient = getSetCookies(ctx.response.headers);
+  console.log("classicSignIn classicToClient setCookies", classicToClient);
 
   return data;
 }

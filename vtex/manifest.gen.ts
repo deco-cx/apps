@@ -42,9 +42,10 @@ import * as $$$$$$$$$36 from "./actions/review/submit.ts";
 import * as $$$$$$$$$37 from "./actions/session/createSession.ts";
 import * as $$$$$$$$$38 from "./actions/session/deleteSession.ts";
 import * as $$$$$$$$$39 from "./actions/session/editSession.ts";
-import * as $$$$$$$$$40 from "./actions/trigger.ts";
-import * as $$$$$$$$$41 from "./actions/wishlist/addItem.ts";
-import * as $$$$$$$$$42 from "./actions/wishlist/removeItem.ts";
+import * as $$$$$$$$$40 from "./actions/session/validateSession.ts";
+import * as $$$$$$$$$41 from "./actions/trigger.ts";
+import * as $$$$$$$$$42 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$43 from "./actions/wishlist/removeItem.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/address/getAddressByPostalCode.ts";
 import * as $$$1 from "./loaders/address/getUserAddresses.ts";
@@ -97,6 +98,7 @@ import * as $$$47 from "./loaders/wishlist.ts";
 import * as $$$48 from "./loaders/workflow/product.ts";
 import * as $$$49 from "./loaders/workflow/products.ts";
 import * as $$$$$$0 from "./sections/Analytics/Vtex.tsx";
+import * as $$$$$$1 from "./sections/Authentication/Logout.tsx";
 import * as $$$$$$$$$$0 from "./workflows/events.ts";
 import * as $$$$$$$$$$1 from "./workflows/product/index.ts";
 
@@ -158,6 +160,7 @@ const manifest = {
   },
   "sections": {
     "vtex/sections/Analytics/Vtex.tsx": $$$$$$0,
+    "vtex/sections/Authentication/Logout.tsx": $$$$$$1,
   },
   "actions": {
     "vtex/actions/address/create.ts": $$$$$$$$$0,
@@ -200,9 +203,10 @@ const manifest = {
     "vtex/actions/session/createSession.ts": $$$$$$$$$37,
     "vtex/actions/session/deleteSession.ts": $$$$$$$$$38,
     "vtex/actions/session/editSession.ts": $$$$$$$$$39,
-    "vtex/actions/trigger.ts": $$$$$$$$$40,
-    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$41,
-    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$42,
+    "vtex/actions/session/validateSession.ts": $$$$$$$$$40,
+    "vtex/actions/trigger.ts": $$$$$$$$$41,
+    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$42,
+    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$43,
   },
   "workflows": {
     "vtex/workflows/events.ts": $$$$$$$$$$0,

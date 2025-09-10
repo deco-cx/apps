@@ -119,6 +119,10 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     return null;
   }
   const segment = getSegmentFromBag(ctx)?.token ?? "";
+  console.log(
+    "cacheKey segment productDetailsPage",
+    getSegmentFromBag(ctx)?.payload?.priceTables,
+  );
   const skuId = url.searchParams.get("skuId") ?? "";
 
   const params = new URLSearchParams([
