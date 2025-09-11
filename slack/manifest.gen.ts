@@ -5,38 +5,48 @@
 import * as $$$$$$$$$0 from "./actions/deco-chat/channels/invoke.ts";
 import * as $$$$$$$$$1 from "./actions/deco-chat/channels/join.ts";
 import * as $$$$$$$$$2 from "./actions/deco-chat/channels/leave.ts";
-import * as $$$$$$$$$3 from "./actions/messages/post.ts";
-import * as $$$$$$$$$4 from "./actions/messages/react.ts";
-import * as $$$$$$$$$5 from "./actions/messages/threads/reply.ts";
-import * as $$$$$$$$$6 from "./actions/oauth/callback.ts";
-import * as $$$$$$$$$7 from "./actions/webhook/broker.ts";
+import * as $$$$$$$$$3 from "./actions/dms/send.ts";
+import * as $$$$$$$$$4 from "./actions/files/download.ts";
+import * as $$$$$$$$$5 from "./actions/files/info.ts";
+import * as $$$$$$$$$6 from "./actions/messages/post.ts";
+import * as $$$$$$$$$7 from "./actions/messages/react.ts";
+import * as $$$$$$$$$8 from "./actions/messages/threads/reply.ts";
+import * as $$$$$$$$$9 from "./actions/oauth/callback.ts";
+import * as $$$$$$$$$10 from "./actions/webhook/broker.ts";
 import * as $$$0 from "./loaders/channels.ts";
 import * as $$$1 from "./loaders/channels/history.ts";
 import * as $$$2 from "./loaders/deco-chat/channels/list.ts";
-import * as $$$3 from "./loaders/oauth/start.ts";
-import * as $$$4 from "./loaders/thread/replies.ts";
-import * as $$$5 from "./loaders/user/profile.ts";
-import * as $$$6 from "./loaders/users.ts";
+import * as $$$3 from "./loaders/dms/history.ts";
+import * as $$$4 from "./loaders/dms/list.ts";
+import * as $$$5 from "./loaders/oauth/start.ts";
+import * as $$$6 from "./loaders/thread/replies.ts";
+import * as $$$7 from "./loaders/user/profile.ts";
+import * as $$$8 from "./loaders/users.ts";
 
 const manifest = {
   "loaders": {
     "slack/loaders/channels.ts": $$$0,
     "slack/loaders/channels/history.ts": $$$1,
     "slack/loaders/deco-chat/channels/list.ts": $$$2,
-    "slack/loaders/oauth/start.ts": $$$3,
-    "slack/loaders/thread/replies.ts": $$$4,
-    "slack/loaders/user/profile.ts": $$$5,
-    "slack/loaders/users.ts": $$$6,
+    "slack/loaders/dms/history.ts": $$$3,
+    "slack/loaders/dms/list.ts": $$$4,
+    "slack/loaders/oauth/start.ts": $$$5,
+    "slack/loaders/thread/replies.ts": $$$6,
+    "slack/loaders/user/profile.ts": $$$7,
+    "slack/loaders/users.ts": $$$8,
   },
   "actions": {
     "slack/actions/deco-chat/channels/invoke.ts": $$$$$$$$$0,
     "slack/actions/deco-chat/channels/join.ts": $$$$$$$$$1,
     "slack/actions/deco-chat/channels/leave.ts": $$$$$$$$$2,
-    "slack/actions/messages/post.ts": $$$$$$$$$3,
-    "slack/actions/messages/react.ts": $$$$$$$$$4,
-    "slack/actions/messages/threads/reply.ts": $$$$$$$$$5,
-    "slack/actions/oauth/callback.ts": $$$$$$$$$6,
-    "slack/actions/webhook/broker.ts": $$$$$$$$$7,
+    "slack/actions/dms/send.ts": $$$$$$$$$3,
+    "slack/actions/files/download.ts": $$$$$$$$$4,
+    "slack/actions/files/info.ts": $$$$$$$$$5,
+    "slack/actions/messages/post.ts": $$$$$$$$$6,
+    "slack/actions/messages/react.ts": $$$$$$$$$7,
+    "slack/actions/messages/threads/reply.ts": $$$$$$$$$8,
+    "slack/actions/oauth/callback.ts": $$$$$$$$$9,
+    "slack/actions/webhook/broker.ts": $$$$$$$$$10,
   },
   "name": "slack",
   "baseUrl": import.meta.url,
