@@ -7,12 +7,12 @@ function getReturnUrl(url: string, defaultUrl: string = "/") {
 
 export async function loader(_: unknown, req: Request, ctx: AppContext) {
   const returnUrl = getReturnUrl(req.url);
-  console.log("SECTION LOGOUT returnUrl", returnUrl);
-  const teste = await ctx.invoke.vtex.actions.authentication.logout({
+
+  await ctx.invoke.vtex.actions.authentication.logout({
     returnUrl,
   });
-  console.log("SECTION LOGOUT teste", teste);
-  return teste;
+
+  return null;
 }
 
 export default function Logout() {

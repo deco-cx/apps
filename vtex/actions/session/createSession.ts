@@ -1,7 +1,7 @@
-import { getCookies, getSetCookies } from "std/http/cookie.ts";
+import { getSetCookies } from "std/http/cookie.ts";
 import type { AppContext } from "../../mod.ts";
-import { proxySetCookie } from "../../utils/cookies.ts";
-import type { CreateEditSessionResponse } from "../../utils/openapi/vcs.openapi.gen.ts";
+import { buildCookieJar, proxySetCookie } from "../../utils/cookies.ts";
+import type { GetSessionResponse } from "../../utils/openapi/vcs.openapi.gen.ts";
 import { items } from "../../utils/session.ts";
 
 interface Props {
@@ -12,10 +12,10 @@ async function action(
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<CreateEditSessionResponse> {
+): Promise<GetSessionResponse> {
   const { vcs } = ctx;
-  const cookies = getCookies(req.headers);
-  console.log("createSession cookies", cookies);
+  const setCookiesSoFar = getSetCookies(ctx.response.headers);
+  const { header: cookie } = buildCookieJar(req.headers, setCookiesSoFar);
 
   const response = await vcs["POST /api/sessions"]({
     items: items.join(","),
@@ -25,13 +25,8 @@ async function action(
         ...props.publicProperties,
       },
     },
-    headers: { cookie: req.headers.get("cookie") || "" },
+    headers: { cookie },
   });
-
-  const cookiesResponse = getCookies(response.headers);
-  console.log("createSession cookiesResponse", cookiesResponse);
-  const cookiesSet = getSetCookies(response.headers);
-  console.log("createSession getSetCookies", cookiesSet);
 
   if (!response.ok) {
     throw new Error(`Failed to create session: ${response.status}`);
@@ -39,7 +34,7 @@ async function action(
 
   proxySetCookie(response.headers, ctx.response.headers, req.url);
 
-  return await response.json();
+  return await response.json() as GetSessionResponse;
 }
 
 export default action;

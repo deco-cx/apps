@@ -2,9 +2,9 @@ import { setCookie } from "std/http/mod.ts";
 import { AppContext } from "../mod.ts";
 import type { Segment } from "./types.ts";
 import { removeNonLatin1Chars } from "../../utils/normalize.ts";
-import { parseCookie } from "./vtexId.ts";
+// import { parseCookie } from "./vtexId.ts";
 
-const SEGMENT_COOKIE_NAME = "vtex_segment";
+export const SEGMENT_COOKIE_NAME = "vtex_segment";
 const SALES_CHANNEL_COOKIE = "VTEXSC";
 const SEGMENT = Symbol("segment");
 
@@ -165,26 +165,7 @@ export const setSegmentBag = (
   ctx: AppContext,
 ) => {
   const vtex_segment = cookies[SEGMENT_COOKIE_NAME];
-  // console.log("setSegmentBag vtex_segment", vtex_segment);
   const segmentFromCookie = vtex_segment ? parse(vtex_segment) : null;
-  console.log("setSegmentBag current priceTables", segmentFromCookie?.priceTables);
-
-  // IMPORTANTE: Verificar se o usuário está autenticado
-  const { payload: userPayload } = parseCookie(req.headers, ctx.account);
-
-  const isAuthenticated = !!userPayload;
-  // console.log("setSegmentBag vtex_segment", !!vtex_segment);
-  // console.log("setSegmentBag isAuthenticated", isAuthenticated);
-  // // Se o usuário NÃO está autenticado E existe um segment com priceTables
-  // // precisamos limpar o priceTables (e potencialmente campaigns)
-  // if (!isAuthenticated) {
-  //   console.log("setSegmentBag: User is not authenticated, removing priceTables");
-  //   segmentFromCookie = {
-  //     ...segmentFromCookie,
-  //     priceTables: null,
-  //   };
-
-  // }
 
   const segmentFromSalesChannelCookie = cookies[SALES_CHANNEL_COOKIE]
     ? {
@@ -216,8 +197,6 @@ export const setSegmentBag = (
 
   // Avoid setting cookie when segment from request matches the one generated
   if (vtex_segment !== token) {
-    console.log("setSegmentBag vtex_segment !== token");
-    console.log("setSegmentBag segment", segment);
     setCookie(ctx.response.headers, {
       value: token,
       name: SEGMENT_COOKIE_NAME,

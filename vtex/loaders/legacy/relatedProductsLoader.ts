@@ -164,10 +164,6 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   }
 
   const segment = getSegmentFromBag(ctx)?.token || "";
-  console.log(
-    "cacheKey segment relatedProductsLoader",
-    JSON.parse(atob(segment))?.priceTables,
-  );
   const params = new URLSearchParams([
     ["slug", props.slug ?? ""],
     ["id", props.id ?? ""],

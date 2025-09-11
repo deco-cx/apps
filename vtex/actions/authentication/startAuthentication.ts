@@ -1,4 +1,3 @@
-import { getCookies, getSetCookies } from "std/http/cookie.ts";
 import { AppContext } from "../../mod.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
 import { StartAuthentication } from "../../utils/types.ts";
@@ -24,9 +23,7 @@ export default async function action(
   ctx: AppContext,
 ): Promise<StartAuthentication> {
   const { vcsDeprecated, account } = ctx;
-  const cookies = getCookies(req.headers);
   const segment = getSegmentFromBag(ctx);
-  // ("startAuthentication cookies", cookies);
 
   const response = await vcsDeprecated
     ["GET /api/vtexid/pub/authentication/start"]({
@@ -44,11 +41,6 @@ export default async function action(
       `Failed to start authentication. ${response.status} ${response.statusText}`,
     );
   }
-
-  const responseCookies = getCookies(response.headers);
-  console.log("startAuthentication responseCookies", responseCookies);
-  const cookiesSet = getSetCookies(response.headers);
-  console.log("startAuthentication getSetCookies", cookiesSet);
 
   proxySetCookie(response.headers, ctx.response.headers, req.url);
 

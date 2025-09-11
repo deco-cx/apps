@@ -1,9 +1,10 @@
 import { getSetCookies } from "std/http/cookie.ts";
 import type { AppContext } from "../../mod.ts";
 import { buildCookieJar, proxySetCookie } from "../../utils/cookies.ts";
-import type { CreateEditSessionResponse } from "../../utils/openapi/vcs.openapi.gen.ts";
+import type { GetSessionResponse } from "../../utils/openapi/vcs.openapi.gen.ts";
 // import { parseCookie } from "../../utils/vtexId.ts";
 import { items } from "../../utils/session.ts";
+// import { SEGMENT_COOKIE_NAME } from "../../utils/segment.ts";
 // import { setSegmentBag } from "../../utils/segment.ts";
 
 interface Props {
@@ -14,36 +15,36 @@ async function action(
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<CreateEditSessionResponse> {
+): Promise<GetSessionResponse> {
   const { vcs } = ctx;
-  // const { cookie } = parseCookie(req.headers, ctx.account); ERRADO NAO REPASSA OS COOKIES CERTOS DE SESSION E SEGMENT
   const setCookiesSoFar = getSetCookies(ctx.response.headers);
-  const { header: cookieHeader } = buildCookieJar(req.headers, setCookiesSoFar);
-  // console.log("editSession cookieHeader", cookieHeader);
+  const { header: cookie } = buildCookieJar(req.headers, setCookiesSoFar);
+
+  const url = new URL(req.url);
+  const searchParams = new URLSearchParams(url.search);
+  searchParams.set("items", items.join(","));
 
   const response = await vcs["PATCH /api/sessions"](
-    { items: items.join(",") },
+    Object.fromEntries(searchParams.entries()),
     {
       body: {
         public: {
           ...props.publicProperties,
         },
       },
-      headers: { cookie: cookieHeader },
+      headers: { cookie },
     },
   );
 
   if (!response.ok) {
     throw new Error(`Failed to edit session: ${response.status}`);
   }
-  proxySetCookie(response.headers, ctx.response.headers, req.url);
 
-  // const upstreamSetCookies = getSetCookies(response.headers);
-  // const { record } = buildCookieJar(req.headers, upstreamSetCookies);
-  // console.log("editSession cookiesResponse", record);
+  proxySetCookie(response.headers, ctx.response.headers, req.url);
+  // TODO: REMOVE THIS AFTER TESTING
   // setSegmentBag(record, req, ctx);
 
-  return await response.json();
+  return await response.json() as GetSessionResponse;
 }
 
 export default action;
