@@ -122,10 +122,14 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   if (url.searchParams.has("ft")) {
     return null;
   }
+<<<<<<< HEAD
 
   const segment = ctx.advancedConfigs?.removeUTMFromCacheKey
     ? getSegmentCacheKeyWithoutUTM(ctx)
     : getSegmentFromBag(ctx)?.token;
+=======
+  const segment = getSegmentFromBag(ctx)?.token ?? "";
+>>>>>>> b55ac963 (refactor: remove unused cookie handling and logging in authentication actions; streamline session management)
   const skuId = url.searchParams.get("skuId") ?? "";
 
   const params = new URLSearchParams([

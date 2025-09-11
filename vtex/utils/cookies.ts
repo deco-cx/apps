@@ -71,3 +71,4 @@ export function buildCookieJar(
 
 export const CHECKOUT_DATA_ACCESS_COOKIE = "CheckoutDataAccess";
 export const VTEX_CHKO_AUTH = "Vtex_CHKO_Auth";
+export const REFRESH_TOKEN_COOKIE = "vid_rt";

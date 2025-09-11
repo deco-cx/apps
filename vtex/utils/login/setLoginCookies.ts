@@ -1,3 +1,4 @@
+// TODO: REMOVE THIS AFTER TESTING
 import { Cookie, setCookie } from "std/http/cookie.ts";
 import { AuthResponse } from "../types.ts";
 import { AppContext } from "../../mod.ts";

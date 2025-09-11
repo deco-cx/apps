@@ -1882,3 +1882,8 @@ export interface OrderFormOrder {
   orderFormCreationDate?: string;
   marketplaceRequestedCancellationWindow?: unknown;
 }
+
+export interface LogoutResponse {
+  cookieName: string | null;
+  accountCookieName: string | null;
+}

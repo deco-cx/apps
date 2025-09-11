@@ -1,8 +1,7 @@
-import { getCookies, setCookie } from "std/http/cookie.ts";
+import { getCookies, getSetCookies } from "std/http/cookie.ts";
 import { AppContext } from "../../mod.ts";
-import getLoginCookies from "../../utils/login/getLoginCookies.ts";
-import { getSetCookies } from "std/http/mod.ts";
-import { VID_RT_COOKIE_NAME } from "../../utils/login/setLoginCookies.ts";
+import { REFRESH_TOKEN_COOKIE } from "../../utils/cookies.ts";
+import { proxySetCookie } from "../../utils/cookies.ts";
 
 interface Props {
   fingerprint?: string;
@@ -19,9 +18,9 @@ export default async function refreshToken(
 ) {
   const { fingerprint } = props;
   const { vcsDeprecated } = ctx;
-  const cookies = getLoginCookies({ cookies: getCookies(req.headers) });
+  const cookies = getCookies(req.headers);
 
-  if (!cookies.vid_rt) {
+  if (!cookies[REFRESH_TOKEN_COOKIE]) {
     throw new Error("Refresh token cookie is missing");
   }
 
@@ -31,9 +30,7 @@ export default async function refreshToken(
         fingerprint,
       },
       headers: {
-        cookie: Object.entries(cookies)
-          .map(([name, value]) => `${name}=${value}`)
-          .join("; "),
+        cookie: req.headers.get("cookie") || "",
       },
     });
 
@@ -44,43 +41,12 @@ export default async function refreshToken(
   }
 
   const data = await response.json();
-  const setCookies = getSetCookies(response.headers);
-  const vidRtCookie = setCookies?.find((cookie) =>
-    cookie.name === VID_RT_COOKIE_NAME
-  );
-  const authCookies = setCookies?.filter((cookie) =>
-    cookie.name.startsWith("VtexIdclientAutCookie")
-  ).filter((cookie) => cookie !== undefined);
+  proxySetCookie(response.headers, ctx.response.headers, req.url);
 
-  if (!vidRtCookie) {
-    return;
-  }
-
-  const expiresDate = new Date(vidRtCookie.expires ?? 0);
-  const maxAge = Math.max(
-    0,
-    Math.floor((expiresDate.getTime() - Date.now()) / 1000),
-  );
-
-  setCookie(ctx.response.headers, {
-    name: VID_RT_COOKIE_NAME,
-    value: vidRtCookie.value,
-    httpOnly: true,
-    maxAge: maxAge,
-    path: "/api/vtexid/refreshtoken/webstore",
-    secure: true,
-  });
-
-  for (const cookie of authCookies) {
-    setCookie(ctx.response.headers, {
-      name: cookie.name,
-      value: cookie.value,
-      httpOnly: true,
-      maxAge: maxAge,
-      path: "/",
-      secure: true,
-    });
-  }
+  // TODO: REMOVE THIS AFTER TESTING
+  console.log("refreshToken data", data);
+  const setCookies = getSetCookies(ctx.response.headers);
+  console.log("refreshToken setCookies", setCookies);
 
   return data;
 }
