@@ -1,9 +1,10 @@
 // import { getCookies, getSetCookies } from "std/http/cookie.ts";
 import type { AppContext } from "../../mod.ts";
-import { proxySetCookie } from "../../utils/cookies.ts";
+import { proxySetCookie, REFRESH_TOKEN_COOKIE } from "../../utils/cookies.ts";
 // import { setSegmentBag } from "../../utils/segment.ts";
 import { redirect } from "@deco/deco";
 import { LogoutResponse } from "../../utils/types.ts";
+import { deleteCookie } from "std/http/cookie.ts";
 
 export interface Props {
   /**
@@ -40,6 +41,7 @@ export default async function action(
 
   const data = await response.json();
   proxySetCookie(response.headers, ctx.response.headers, req.url);
+  deleteCookie(ctx.response.headers, REFRESH_TOKEN_COOKIE); // TODO: REMOVE THIS AFTER TESTING AND VALIDATE IF NEEDED
 
   await ctx.invoke.vtex.actions.session
     .validateSession();

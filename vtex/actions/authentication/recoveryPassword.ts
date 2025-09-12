@@ -1,8 +1,12 @@
-import { getCookies, getSetCookies } from "std/http/cookie.ts";
+import { getCookies, getSetCookies, setCookie } from "std/http/cookie.ts";
 import { AppContext } from "../../mod.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
 import { AuthResponse } from "../../utils/types.ts";
-import { buildCookieJar, proxySetCookie } from "../../utils/cookies.ts";
+import {
+  buildCookieJar,
+  proxySetCookie,
+  REFRESH_TOKEN_COOKIE,
+} from "../../utils/cookies.ts";
 
 export interface Props {
   email: string;
@@ -66,6 +70,17 @@ export default async function action(
   const data: AuthResponse = await response.json();
   proxySetCookie(response.headers, ctx.response.headers, req.url);
   await ctx.invoke.vtex.actions.session.validateSession();
+
+  // TODO: REMOVE THIS AFTER TESTING AND VALIDATE IF NEEDED
+  const setCookies = getSetCookies(ctx.response.headers);
+  for (const cookie of setCookies) {
+    if (cookie.name === REFRESH_TOKEN_COOKIE) {
+      setCookie(ctx.response.headers, {
+        ...cookie,
+        path: "/", // default path is /api/vtexid/refreshtoken/webstore, but browser dont send to backend headers
+      });
+    }
+  }
 
   return data;
 }
