@@ -29,5 +29,8 @@ export default async function getFileImageSpecificNode(
   }>
 > {
   const { fileKey, nodeIds } = props;
+  if (!ctx.figma) {
+    throw new Error("Figma client not found");
+  }
   return await ctx.figma.getImageFromNode(fileKey, nodeIds);
 }

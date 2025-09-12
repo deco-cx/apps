@@ -61,7 +61,10 @@ export default async function getFileSimplifiedNodes(
   ctx: AppContext,
 ): Promise<FigmaResponse<FileNodesResponse>> {
   const { fileKey, nodeIds, version, depth, geometry } = props;
-  const client = new FigmaClient(ctx.accessToken.toString());
+  if (!ctx.figma) {
+    throw new Error("Figma client not found");
+  }
+  const client = ctx.figma;
   const response = await client.getFileNodes(fileKey, nodeIds, {
     version,
     depth,
