@@ -27,7 +27,7 @@ export default async function getFileImageFills(
     throw new Error("Figma client not found");
   }
   const images = (await ctx.figma.getImageFills(fileKey))?.meta?.images;
-  
+
   let imagesToReturn: Record<string, string> = {};
   if (props.imageRef) {
     props.imageRef.forEach((ref) => {

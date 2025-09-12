@@ -89,11 +89,11 @@ export default async function getFileImages(
     use_absolute_bounds,
     version,
   } = props;
-  
+
   if (!ctx.figma) {
     throw new Error("Figma client not found");
   }
-  
+
   return await ctx.figma.getImages(fileKey, nodeIds, {
     scale,
     format,

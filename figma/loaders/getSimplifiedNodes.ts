@@ -1,7 +1,6 @@
 import type { AppContext } from "../mod.ts";
 import type { FigmaResponse } from "../client.ts";
 import { simplifyNode } from "../utils/simplifier.ts";
-import { FigmaClient } from "../client.ts";
 import type {
   FigmaComponent,
   FigmaComponentSet,

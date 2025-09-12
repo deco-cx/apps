@@ -23,11 +23,13 @@ export type AppContext = FnContext<State, Manifest>;
  * @logo https://assets.decocache.com/mcp/eb714f8a-404b-4b8e-bfc4-f3ce5bde6f51/Figma.svg
  */
 export default function App(props: Props): App<Manifest, State> {
-  const figma = props.accessToken ? new FigmaClient(
-    typeof props.accessToken === "string"
-      ? props.accessToken
-      : props.accessToken.get()!,
-  ) : null;
+  const figma = props.accessToken
+    ? new FigmaClient(
+      typeof props.accessToken === "string"
+        ? props.accessToken
+        : props.accessToken.get()!,
+    )
+    : null;
 
   return {
     state: {
