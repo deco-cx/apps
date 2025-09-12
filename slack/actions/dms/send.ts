@@ -25,7 +25,9 @@ export default async function sendDm(
   props: SendDmProps,
   _req: Request,
   ctx: AppContext,
-): Promise<{ success: boolean; message: string; channelId?: string; ts?: string }> {
+): Promise<
+  { success: boolean; message: string; channelId?: string; ts?: string }
+> {
   try {
     // Open a DM channel with the user
     const channelResponse = await ctx.slack.openDmChannel(props.userId);
@@ -33,7 +35,9 @@ export default async function sendDm(
     if (!channelResponse.ok) {
       return {
         success: false,
-        message: `Failed to open DM channel: ${channelResponse.error || "Unknown error"}`,
+        message: `Failed to open DM channel: ${
+          channelResponse.error || "Unknown error"
+        }`,
       };
     }
 

@@ -99,7 +99,8 @@ export default function VTEX(
   { appKey, appToken, account, publicUrl: _publicUrl, salesChannel, ...props }:
     Props,
 ) {
-  const publicUrl = _publicUrl.startsWith("https://")
+  console.log("props", props);
+  const publicUrl = _publicUrl?.startsWith("https://")
     ? _publicUrl
     : `https://${_publicUrl}`;
   const headers = new Headers();

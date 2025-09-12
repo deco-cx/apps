@@ -90,6 +90,10 @@ export default async function getFileImages(
     version,
   } = props;
 
+  if (!ctx.figma) {
+    throw new Error("Figma client not found");
+  }
+
   return await ctx.figma.getImages(fileKey, nodeIds, {
     scale,
     format,

@@ -22,7 +22,9 @@ export default async function fileInfo(
     if (!fileResponse.ok) {
       return {
         success: false,
-        message: `Failed to get file info: ${fileResponse.error || "Unknown error"}`,
+        message: `Failed to get file info: ${
+          fileResponse.error || "Unknown error"
+        }`,
       };
     }
 

@@ -60,6 +60,9 @@ export default async function getFileSimplified(
   ctx: AppContext,
 ): Promise<FigmaResponse<SimplifiedResponse>> {
   const { fileKey, version, depth, branch_data } = props;
+  if (!ctx.figma) {
+    throw new Error("Figma client not found");
+  }
   const response = await ctx.figma.getFile(fileKey, {
     version,
     depth,

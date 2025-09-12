@@ -433,7 +433,9 @@ export class SlackClient {
    * @description Opens a direct message channel with a user
    * @param userId The user ID to open a DM with
    */
-  async openDmChannel(userId: string): Promise<SlackResponse<{ channel: { id: string } }>> {
+  async openDmChannel(
+    userId: string,
+  ): Promise<SlackResponse<{ channel: { id: string } }>> {
     const response = await fetch("https://slack.com/api/conversations.open", {
       method: "POST",
       headers: this.botHeaders,
@@ -444,7 +446,7 @@ export class SlackClient {
 
     return response.json();
   }
-  
+
   /**
    * @description Lists all direct message channels for the bot
    * @param limit Maximum number of DMs to return
@@ -470,12 +472,14 @@ export class SlackClient {
 
     return response.json();
   }
-  
+
   /**
    * @description Gets information about a file
    * @param fileId The ID of the file
    */
-  async getFileInfo(fileId: string): Promise<SlackResponse<{ file: SlackFile }>> {
+  async getFileInfo(
+    fileId: string,
+  ): Promise<SlackResponse<{ file: SlackFile }>> {
     const params = new URLSearchParams({
       file: fileId,
     });
@@ -487,7 +491,7 @@ export class SlackClient {
 
     return response.json();
   }
-  
+
   /**
    * @description Downloads a file from Slack
    * @param fileUrl The URL of the file to download

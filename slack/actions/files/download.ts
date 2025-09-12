@@ -14,7 +14,9 @@ export default async function downloadFile(
   props: DownloadFileProps,
   _req: Request,
   ctx: AppContext,
-): Promise<{ success: boolean; data?: string; contentType?: string; message?: string }> {
+): Promise<
+  { success: boolean; data?: string; contentType?: string; message?: string }
+> {
   try {
     // Host allowlist to prevent SSRF: only allow Slack-hosted URLs
     const url = new URL(props.fileUrl);
@@ -26,26 +28,32 @@ export default async function downloadFile(
       h.endsWith(".slack-files.com") ||
       h.endsWith(".slack-edge.com");
     if (url.protocol !== "https:" || !allowed(host)) {
-      return { success: false, message: "Only Slack-hosted HTTPS file URLs are allowed." };
+      return {
+        success: false,
+        message: "Only Slack-hosted HTTPS file URLs are allowed.",
+      };
     }
     const fileResponse = await ctx.slack.downloadFile(props.fileUrl);
     if (!fileResponse.ok) {
       return {
         success: false,
-        message: `Failed to download file: ${fileResponse.statusText || "Unknown error"}`,
+        message: `Failed to download file: ${
+          fileResponse.statusText || "Unknown error"
+        }`,
       };
     }
 
-    const contentType = fileResponse.headers.get("content-type") || "application/octet-stream";
+    const contentType = fileResponse.headers.get("content-type") ||
+      "application/octet-stream";
     const arrayBuffer = await fileResponse.arrayBuffer();
     const bytes = new Uint8Array(arrayBuffer);
-    
+
     // Convert to base64
     const base64 = btoa(
       Array(bytes.length)
         .fill("")
         .map((_, i) => String.fromCharCode(bytes[i]))
-        .join("")
+        .join(""),
     );
 
     return {
