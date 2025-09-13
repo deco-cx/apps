@@ -15,6 +15,8 @@ export interface Props {
 }
 
 /**
+ * @name DMS_LIST
+ * @title List DM Channels
  * @description Lists all direct message channels for the bot
  */
 export default async function listDms(

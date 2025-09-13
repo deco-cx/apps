@@ -20,6 +20,8 @@ export interface Props {
 }
 
 /**
+ * @name DMS_HISTORY
+ * @title DM Conversation History
  * @description Lists messages in a direct message conversation with a user
  */
 export default async function dmHistory(

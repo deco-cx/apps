@@ -39,6 +39,8 @@ export interface FilesListResponse {
 }
 
 /**
+ * @name FILES_LIST
+ * @title List User Files
  * @description Lists files uploaded by a specific user
  */
 export default async function listUserFiles(

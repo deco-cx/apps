@@ -44,6 +44,8 @@ export interface UploadFileResponse {
 }
 
 /**
+ * @name FILES_UPLOAD
+ * @title Upload File
  * @description Uploads a file to Slack
  * @action upload-file
  */

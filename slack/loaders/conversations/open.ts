@@ -22,6 +22,8 @@ export interface ConversationOpenResponse {
 }
 
 /**
+ * @name CONVERSATIONS_OPEN
+ * @title Open DM Conversation
  * @description Opens a direct message conversation with a user
  */
 export default async function openConversation(

@@ -34,6 +34,8 @@ export interface SendDmResponse {
 }
 
 /**
+ * @name DMS_SEND
+ * @title Send DM
  * @description Sends a direct message to a user
  * @action send-dm
  */
