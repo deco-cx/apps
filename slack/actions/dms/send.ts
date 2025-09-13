@@ -17,6 +17,22 @@ export interface SendDmProps {
   blocks?: unknown[];
 }
 
+export interface SendDmResponse {
+  success: boolean;
+  message: string;
+  channelId?: string;
+  ts?: string;
+  messageData?: {
+    ok: boolean;
+    channel: string;
+    ts: string;
+    warning?: string;
+    response_metadata?: {
+      warnings?: string[];
+    };
+  };
+}
+
 /**
  * @description Sends a direct message to a user
  * @action send-dm
@@ -25,37 +41,32 @@ export default async function sendDm(
   props: SendDmProps,
   _req: Request,
   ctx: AppContext,
-): Promise<{ success: boolean; message: string; channelId?: string; ts?: string }> {
+): Promise<SendDmResponse> {
   try {
-    // Open a DM channel with the user
-    const channelResponse = await ctx.slack.openDmChannel(props.userId);
-
-    if (!channelResponse.ok) {
-      return {
-        success: false,
-        message: `Failed to open DM channel: ${channelResponse.error || "Unknown error"}`,
-      };
-    }
-
-    const channelId = channelResponse.data.channel.id;
-
-    // Send the message to the DM channel
-    const messageResponse = await ctx.slack.postMessage(channelId, props.text, {
+    // Send message directly to the user ID (Slack automatically opens DM channel)
+    const messageResponse = await ctx.slack.postMessage(props.userId, props.text, {
       blocks: props.blocks,
     });
 
     if (!messageResponse.ok) {
       return {
         success: false,
-        message: "Failed to send DM: Unknown error",
+        message: `Failed to send DM: ${messageResponse.error || "Unknown error"}`,
       };
     }
 
     return {
       success: true,
       message: "DM sent successfully",
-      channelId,
+      channelId: messageResponse.channel,
       ts: messageResponse.ts,
+      messageData: {
+        ok: messageResponse.ok,
+        channel: messageResponse.channel,
+        ts: messageResponse.ts,
+        warning: messageResponse.warning,
+        response_metadata: messageResponse.response_metadata,
+      },
     };
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
