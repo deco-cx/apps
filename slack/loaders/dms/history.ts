@@ -30,12 +30,12 @@ export default async function dmHistory(
       return [];
     }
 
-    const channelId = channelResponse.channel?.id;
+    const channelId =
+      channelResponse.data?.channel?.id ?? channelResponse.channel?.id;
     if (!channelId) {
       console.error("No channel ID returned for user", props.userId);
       return [];
     }
-
     const limit = props.limit || 10;
 
     const historyResponse = await ctx.slack.getChannelHistory(channelId, limit);
