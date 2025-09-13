@@ -19,9 +19,6 @@ export interface SlackApiClient {
     };
     response: SlackResponse<{ 
       channels: SlackChannel[];
-      response_metadata?: {
-        next_cursor?: string;
-      };
     }>;
   };
   "POST /chat.postMessage": {
@@ -53,6 +50,7 @@ export interface SlackApiClient {
     searchParams: {
       channel: string;
       limit?: string;
+      cursor?: string;
     };
     response: SlackResponse<{ 
       messages: SlackMessage[];
@@ -61,9 +59,6 @@ export interface SlackApiClient {
       channel_actions_ts?: string | null;
       channel_actions_count?: number;
       warning?: string;
-      response_metadata?: {
-        warnings?: string[];
-      };
     }>;
   };
   "GET /conversations.replies": {

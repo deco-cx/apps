@@ -394,10 +394,12 @@ export class SlackClient {
    * @description Gets message history from a channel
    * @param channelId The channel ID
    * @param limit Maximum number of messages to return
+   * @param cursor Pagination cursor for next page
    */
   async getChannelHistory(
     channelId: string,
     limit: number = 10,
+    cursor?: string,
   ): Promise<SlackResponse<{ 
     messages: SlackMessage[];
     has_more?: boolean;
@@ -405,14 +407,15 @@ export class SlackClient {
     channel_actions_ts?: string | null;
     channel_actions_count?: number;
     warning?: string;
-    response_metadata?: {
-      warnings?: string[];
-    };
   }>> {
     const params = new URLSearchParams({
       channel: channelId,
       limit: limit.toString(),
     });
+
+    if (cursor) {
+      params.append("cursor", cursor);
+    }
 
     const response = await fetch(
       `https://slack.com/api/conversations.history?${params}`,
@@ -431,7 +434,6 @@ export class SlackClient {
         channel_actions_ts: result.channel_actions_ts,
         channel_actions_count: result.channel_actions_count,
         warning: result.warning,
-        response_metadata: result.response_metadata,
       },
     };
   }
@@ -581,7 +583,7 @@ export class SlackClient {
   async listDmChannels(
     limit: number = 100,
     cursor?: string,
-  ): Promise<SlackResponse<{ channels: SlackChannel[]; response_metadata?: { next_cursor?: string } }>> {
+  ): Promise<SlackResponse<{ channels: SlackChannel[] }>> {
     const params = new URLSearchParams({
       types: "im",
       limit: Math.min(limit, 100).toString(),
@@ -603,7 +605,6 @@ export class SlackClient {
       response_metadata: result.response_metadata,
       data: {
         channels: result.channels || [],
-        response_metadata: result.response_metadata,
       },
     };
   }

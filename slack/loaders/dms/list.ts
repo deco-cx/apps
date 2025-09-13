@@ -33,7 +33,7 @@ export default async function listDms(
 
     return {
       channels: dmResponse.data.channels,
-      next_cursor: dmResponse.data.response_metadata?.next_cursor,
+      next_cursor: dmResponse.response_metadata?.next_cursor,
     };
   } catch (error) {
     console.error("Error listing DM channels:", error);

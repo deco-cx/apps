@@ -30,8 +30,7 @@ export default async function dmHistory(
       return [];
     }
 
-    const channelId =
-      channelResponse.data?.channel?.id ?? channelResponse.channel?.id;
+    const channelId = channelResponse.channel?.id;
     if (!channelId) {
       console.error("No channel ID returned for user", props.userId);
       return [];
