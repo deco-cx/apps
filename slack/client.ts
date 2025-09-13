@@ -18,24 +18,32 @@ export interface SlackResponse<T = unknown> {
  */
 export interface SlackChannel {
   id: string;
-  name: string;
-  is_channel: boolean;
-  is_private: boolean;
+  name?: string;
+  is_channel?: boolean;
+  is_private?: boolean;
   created: number;
-  creator: string;
+  creator?: string;
   is_archived: boolean;
-  is_general: boolean;
-  members: string[];
-  topic: {
+  is_general?: boolean;
+  members?: string[];
+  topic?: {
     value: string;
     creator: string;
     last_set: number;
   };
-  purpose: {
+  purpose?: {
     value: string;
     creator: string;
     last_set: number;
   };
+  // DM specific fields
+  is_im?: boolean;
+  is_org_shared?: boolean;
+  context_team_id?: string;
+  updated?: number;
+  user?: string;
+  is_user_deleted?: boolean;
+  priority?: number;
 }
 
 /**
@@ -43,17 +51,77 @@ export interface SlackChannel {
  */
 export interface SlackMessage {
   type: string;
-  user: string;
+  user?: string;
   text: string;
   ts: string;
   thread_ts?: string;
   reply_count?: number;
+  reply_users_count?: number;
+  latest_reply?: string;
+  reply_users?: string[];
+  is_locked?: boolean;
+  subscribed?: boolean;
   files?: SlackFile[];
   reactions?: Array<{
     name: string;
     count: number;
     users: string[];
   }>;
+  blocks?: Array<{
+    type: string;
+    block_id: string;
+    elements: Array<{
+      type: string;
+      elements?: Array<{
+        type: string;
+        text: string;
+      }>;
+    }>;
+  }>;
+  subtype?: string;
+  edited?: {
+    user: string;
+    ts: string;
+  };
+  team?: string;
+  bot_id?: string;
+  app_id?: string;
+  bot_profile?: SlackBotProfile;
+  assistant_app_thread?: {
+    title: string;
+    title_blocks: Array<{
+      type: string;
+      block_id: string;
+      elements: Array<{
+        type: string;
+        elements: Array<{
+          type: string;
+          text: string;
+        }>;
+      }>;
+    }>;
+    artifacts: unknown[];
+    context: Record<string, unknown>;
+  };
+  [key: string]: unknown;
+}
+
+/**
+ * @description A bot profile in Slack
+ */
+export interface SlackBotProfile {
+  id: string;
+  app_id: string;
+  user_id: string;
+  name: string;
+  icons: {
+    image_36: string;
+    image_48: string;
+    image_72: string;
+  };
+  deleted: boolean;
+  updated: number;
+  team_id: string;
 }
 
 /**
@@ -69,6 +137,7 @@ export interface SlackFile {
   filetype: string;
   pretty_type: string;
   user: string;
+  user_team?: string;
   editable: boolean;
   size: number;
   mode: string;
@@ -80,6 +149,7 @@ export interface SlackFile {
   username: string;
   url_private: string;
   url_private_download: string;
+  media_display_type?: string;
   thumb_64?: string;
   thumb_80?: string;
   thumb_360?: string;
@@ -89,11 +159,29 @@ export interface SlackFile {
   thumb_480_w?: number;
   thumb_480_h?: number;
   thumb_160?: string;
+  thumb_720?: string;
+  thumb_720_w?: number;
+  thumb_720_h?: number;
+  thumb_800?: string;
+  thumb_800_w?: number;
+  thumb_800_h?: number;
+  thumb_960?: string;
+  thumb_960_w?: number;
+  thumb_960_h?: number;
+  thumb_1024?: string;
+  thumb_1024_w?: number;
+  thumb_1024_h?: number;
+  thumb_tiny?: string;
   image_exif_rotation?: number;
   original_w?: number;
   original_h?: number;
   permalink: string;
-  permalink_public: string;
+  permalink_public?: string;
+  channels: string[];
+  groups: string[];
+  ims: string[];
+  comments_count: number;
+  is_starred?: boolean;
 }
 
 /**
@@ -223,9 +311,17 @@ export class SlackClient {
     channelId: string,
     text: string,
     opts: { thread_ts?: string; blocks?: unknown[] } = {},
-  ): Promise<
-    { channel: string; ts: string; message: SlackMessage; ok: boolean }
-  > {
+  ): Promise<{
+    ok: boolean;
+    channel: string;
+    ts: string;
+    message: SlackMessage;
+    warning?: string;
+    response_metadata?: {
+      warnings?: string[];
+    };
+    error?: string;
+  }> {
     const payload: Record<string, unknown> = {
       channel: channelId,
       text: text,
@@ -302,7 +398,17 @@ export class SlackClient {
   async getChannelHistory(
     channelId: string,
     limit: number = 10,
-  ): Promise<SlackResponse<{ messages: SlackMessage[] }>> {
+  ): Promise<SlackResponse<{ 
+    messages: SlackMessage[];
+    has_more?: boolean;
+    pin_count?: number;
+    channel_actions_ts?: string | null;
+    channel_actions_count?: number;
+    warning?: string;
+    response_metadata?: {
+      warnings?: string[];
+    };
+  }>> {
     const params = new URLSearchParams({
       channel: channelId,
       limit: limit.toString(),
@@ -313,7 +419,21 @@ export class SlackClient {
       { headers: this.botHeaders },
     );
 
-    return response.json();
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        messages: result.messages || [],
+        has_more: result.has_more,
+        pin_count: result.pin_count,
+        channel_actions_ts: result.channel_actions_ts,
+        channel_actions_count: result.channel_actions_count,
+        warning: result.warning,
+        response_metadata: result.response_metadata,
+      },
+    };
   }
 
   /**
@@ -433,20 +553,26 @@ export class SlackClient {
    * @description Opens a direct message channel with a user
    * @param userId The user ID to open a DM with
    */
-  async openDmChannel(
-    userId: string,
-  ): Promise<SlackResponse<{ channel: { id: string } }>> {
+  async openDmChannel(userId: string): Promise<{ 
+    ok: boolean; 
+    channel?: { id: string }; 
+    error?: string;
+    no_op?: boolean;
+    already_open?: boolean;
+    warning?: string;
+    response_metadata?: {
+      warnings?: string[];
+    };
+  }> {
     const response = await fetch("https://slack.com/api/conversations.open", {
       method: "POST",
       headers: this.botHeaders,
-      body: JSON.stringify({
-        users: userId,
-      }),
+      body: JSON.stringify({ users: userId }),
     });
 
     return response.json();
   }
-
+  
   /**
    * @description Lists all direct message channels for the bot
    * @param limit Maximum number of DMs to return
@@ -455,7 +581,7 @@ export class SlackClient {
   async listDmChannels(
     limit: number = 100,
     cursor?: string,
-  ): Promise<SlackResponse<{ channels: SlackChannel[] }>> {
+  ): Promise<SlackResponse<{ channels: SlackChannel[]; response_metadata?: { next_cursor?: string } }>> {
     const params = new URLSearchParams({
       types: "im",
       limit: Math.min(limit, 100).toString(),
@@ -470,22 +596,50 @@ export class SlackClient {
       { headers: this.botHeaders },
     );
 
-    return response.json();
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        channels: result.channels || [],
+        response_metadata: result.response_metadata,
+      },
+    };
   }
-
+  
   /**
-   * @description Gets information about a file
-   * @param fileId The ID of the file
+   * @description Lists files uploaded by a specific user
+   * @param userId The user ID whose files to list
+   * @param count Maximum number of files to return
+   * @param page Page number for pagination
+   * @param types Filter by file type
    */
-  async getFileInfo(
-    fileId: string,
-  ): Promise<SlackResponse<{ file: SlackFile }>> {
+  async listUserFiles(
+    userId: string,
+    count: number = 20,
+    page: number = 1,
+    types: string = 'all'
+  ): Promise<{
+    ok: boolean;
+    files: SlackFile[];
+    paging: {
+      count: number;
+      total: number;
+      page: number;
+      pages: number;
+    };
+    error?: string;
+  }> {
     const params = new URLSearchParams({
-      file: fileId,
+      user: userId,
+      count: count.toString(),
+      page: page.toString(),
+      types: types,
     });
 
     const response = await fetch(
-      `https://slack.com/api/files.info?${params}`,
+      `https://slack.com/api/files.list?${params}`,
       { headers: this.botHeaders },
     );
 
@@ -493,10 +647,64 @@ export class SlackClient {
   }
 
   /**
-   * @description Downloads a file from Slack
-   * @param fileUrl The URL of the file to download
+   * @description Uploads a file to Slack
+   * @param options Upload options including channels, file, filename, etc.
    */
-  downloadFile(fileUrl: string): Promise<Response> {
-    return fetch(fileUrl, { headers: this.botHeaders });
+  async uploadFile(options: {
+    channels: string;
+    file: string | File;
+    filename: string;
+    title?: string;
+    initial_comment?: string;
+    filetype?: string;
+  }): Promise<{
+    ok: boolean;
+    file?: SlackFile;
+    error?: string;
+    warning?: string;
+    response_metadata?: {
+      warnings?: string[];
+    };
+  }> {
+    const formData = new FormData();
+    formData.append("channels", options.channels);
+    formData.append("filename", options.filename);
+    
+    if (options.title) {
+      formData.append("title", options.title);
+    }
+    
+    if (options.initial_comment) {
+      formData.append("initial_comment", options.initial_comment);
+    }
+    
+    if (options.filetype) {
+      formData.append("filetype", options.filetype);
+    }
+
+    // Handle file content
+    if (typeof options.file === "string") {
+      // Assume base64 string, convert to Blob
+      const byteCharacters = atob(options.file);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray]);
+      formData.append("file", blob, options.filename);
+    } else {
+      formData.append("file", options.file, options.filename);
+    }
+
+    const response = await fetch("https://slack.com/api/files.upload", {
+      method: "POST",
+      headers: {
+        Authorization: this.botHeaders.Authorization,
+      },
+      body: formData,
+    });
+
+    return response.json();
   }
 }

@@ -17,17 +17,29 @@ export interface SlackApiClient {
       team_id?: string;
       cursor?: string;
     };
-    response: SlackResponse<{ channels: SlackChannel[] }>;
+    response: SlackResponse<{ 
+      channels: SlackChannel[];
+      response_metadata?: {
+        next_cursor?: string;
+      };
+    }>;
   };
   "POST /chat.postMessage": {
     json: {
       channel: string;
       text: string;
       thread_ts?: string;
+      blocks?: unknown[];
     };
-    response: SlackResponse<
-      { channel: string; ts: string; message: SlackMessage }
-    >;
+    response: SlackResponse<{
+      channel: string;
+      ts: string;
+      message: SlackMessage;
+      warning?: string;
+      response_metadata?: {
+        warnings?: string[];
+      };
+    }>;
   };
   "POST /reactions.add": {
     json: {
@@ -42,7 +54,17 @@ export interface SlackApiClient {
       channel: string;
       limit?: string;
     };
-    response: SlackResponse<{ messages: SlackMessage[] }>;
+    response: SlackResponse<{ 
+      messages: SlackMessage[];
+      has_more?: boolean;
+      pin_count?: number;
+      channel_actions_ts?: string | null;
+      channel_actions_count?: number;
+      warning?: string;
+      response_metadata?: {
+        warnings?: string[];
+      };
+    }>;
   };
   "GET /conversations.replies": {
     searchParams: {
@@ -69,13 +91,42 @@ export interface SlackApiClient {
     json: {
       users: string;
     };
-    response: SlackResponse<{ channel: { id: string } }>;
+    response: SlackResponse<{ 
+      channel: { id: string };
+      no_op?: boolean;
+      already_open?: boolean;
+      warning?: string;
+      response_metadata?: {
+        warnings?: string[];
+      };
+    }>;
   };
-  "GET /files.info": {
+  "GET /files.list": {
     searchParams: {
-      file: string;
+      user: string;
+      count?: string;
+      page?: string;
+      types?: string;
     };
-    response: SlackResponse<{ file: SlackFile }>;
+    response: SlackResponse<{
+      files: SlackFile[];
+      paging: {
+        count: number;
+        total: number;
+        page: number;
+        pages: number;
+      };
+    }>;
+  };
+  "POST /files.upload": {
+    body: FormData;
+    response: SlackResponse<{
+      file: SlackFile;
+      warning?: string;
+      response_metadata?: {
+        warnings?: string[];
+      };
+    }>;
   };
 }
 
