@@ -1,4 +1,5 @@
 import type { AppContext } from "../../mod.ts";
+import { SlackFile } from "../../client.ts";
 
 export interface UploadFileProps {
   /**
@@ -34,35 +35,7 @@ export interface UploadFileProps {
 
 export interface UploadFileResponse {
   ok: boolean;
-  file?: {
-    id: string;
-    created: number;
-    timestamp: number;
-    name: string;
-    title: string;
-    mimetype: string;
-    filetype: string;
-    pretty_type: string;
-    user: string;
-    editable: boolean;
-    size: number;
-    mode: string;
-    is_external: boolean;
-    external_type: string;
-    is_public: boolean;
-    public_url_shared: boolean;
-    display_as_bot: boolean;
-    username: string;
-    url_private: string;
-    url_private_download: string;
-    permalink: string;
-    permalink_public?: string;
-    channels: string[];
-    groups: string[];
-    ims: string[];
-    comments_count: number;
-    is_starred?: boolean;
-  };
+  file?: SlackFile;
   error?: string;
   warning?: string;
   response_metadata?: {
