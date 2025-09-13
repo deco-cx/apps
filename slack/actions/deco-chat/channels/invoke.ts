@@ -4,6 +4,7 @@ import type { AppContext, SlackWebhookPayload } from "../../../mod.ts";
 
 /**
  * @name DECO_CHAT_CHANNELS_INVOKE
+ * @title Deco Chat Channel Invoke
  * @description This action is triggered when slack sends a webhook event
  */
 export default async function invoke(

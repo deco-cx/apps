@@ -3,6 +3,7 @@ import type { AppContext } from "../../../mod.ts";
 
 /**
  * @name DECO_CHAT_CHANNELS_JOIN
+ * @title Deco Chat Channel Join
  * @description This action is triggered when channel is selected
  */
 export default async function join(
