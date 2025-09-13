@@ -311,17 +311,26 @@ export class SlackClient {
     channelId: string,
     text: string,
     opts: { thread_ts?: string; blocks?: unknown[] } = {},
-  ): Promise<{
-    ok: boolean;
+  ): Promise<SlackResponse<{
     channel: string;
     ts: string;
     message: SlackMessage;
     warning?: string;
-    response_metadata?: {
-      warnings?: string[];
+  }>> {
+    // ... existing logic that makes the HTTP request and sets `response` ...
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        channel: result.channel,
+        ts: result.ts,
+        message: result.message,
+        warning: result.warning,
+      },
     };
-    error?: string;
-  }> {
+  }
     const payload: Record<string, unknown> = {
       channel: channelId,
       text: text,
