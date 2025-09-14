@@ -7,11 +7,12 @@ import * as $$$$$$$$$1 from "./actions/deco-chat/channels/join.ts";
 import * as $$$$$$$$$2 from "./actions/deco-chat/channels/leave.ts";
 import * as $$$$$$$$$3 from "./actions/dms/send.ts";
 import * as $$$$$$$$$4 from "./actions/files/upload.ts";
-import * as $$$$$$$$$5 from "./actions/messages/post.ts";
-import * as $$$$$$$$$6 from "./actions/messages/react.ts";
-import * as $$$$$$$$$7 from "./actions/messages/threads/reply.ts";
-import * as $$$$$$$$$8 from "./actions/oauth/callback.ts";
-import * as $$$$$$$$$9 from "./actions/webhook/broker.ts";
+import * as $$$$$$$$$5 from "./actions/files/uploadV2.ts";
+import * as $$$$$$$$$6 from "./actions/messages/post.ts";
+import * as $$$$$$$$$7 from "./actions/messages/react.ts";
+import * as $$$$$$$$$8 from "./actions/messages/threads/reply.ts";
+import * as $$$$$$$$$9 from "./actions/oauth/callback.ts";
+import * as $$$$$$$$$10 from "./actions/webhook/broker.ts";
 import * as $$$0 from "./loaders/channels.ts";
 import * as $$$1 from "./loaders/channels/history.ts";
 import * as $$$2 from "./loaders/conversations/open.ts";
@@ -44,11 +45,12 @@ const manifest = {
     "slack/actions/deco-chat/channels/leave.ts": $$$$$$$$$2,
     "slack/actions/dms/send.ts": $$$$$$$$$3,
     "slack/actions/files/upload.ts": $$$$$$$$$4,
-    "slack/actions/messages/post.ts": $$$$$$$$$5,
-    "slack/actions/messages/react.ts": $$$$$$$$$6,
-    "slack/actions/messages/threads/reply.ts": $$$$$$$$$7,
-    "slack/actions/oauth/callback.ts": $$$$$$$$$8,
-    "slack/actions/webhook/broker.ts": $$$$$$$$$9,
+    "slack/actions/files/uploadV2.ts": $$$$$$$$$5,
+    "slack/actions/messages/post.ts": $$$$$$$$$6,
+    "slack/actions/messages/react.ts": $$$$$$$$$7,
+    "slack/actions/messages/threads/reply.ts": $$$$$$$$$8,
+    "slack/actions/oauth/callback.ts": $$$$$$$$$9,
+    "slack/actions/webhook/broker.ts": $$$$$$$$$10,
   },
   "name": "slack",
   "baseUrl": import.meta.url,

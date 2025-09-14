@@ -234,6 +234,36 @@ export interface SlackAuthTestResponse {
 export type ChannelType = "public_channel" | "private_channel" | "mpim" | "im";
 
 /**
+ * @description Response from files.getUploadURLExternal endpoint
+ */
+export interface SlackUploadURLResponse {
+  ok: boolean;
+  error?: string;
+  upload_url?: string;
+  file_id?: string;
+}
+
+/**
+ * @description Response from files.completeUploadExternal endpoint
+ */
+export interface SlackCompleteUploadResponse {
+  ok: boolean;
+  error?: string;
+  files?: Array<{
+    id: string;
+    title?: string;
+    name?: string;
+    mimetype?: string;
+    filetype?: string;
+    permalink?: string;
+    url_private?: string;
+  }>;
+  response_metadata?: {
+    warnings?: string[];
+  };
+}
+
+/**
  * @description Client for interacting with Slack APIs
  */
 export class SlackClient {
@@ -741,9 +771,136 @@ export class SlackClient {
       },
     };
   }
+  
+  /**
+   * @description Uploads a file to Slack using the new v2 API (files.getUploadURLExternal + files.completeUploadExternal)
+   * @param options Upload options including channel, file, filename, etc.
+   */
+  async uploadFileV2(options: {
+    channels?: string;
+    file: Uint8Array | Blob | string | File;
+    filename: string;
+    title?: string;
+    thread_ts?: string;
+    initial_comment?: string;
+  }): Promise<SlackResponse<{ 
+    files: Array<{
+      id: string;
+      title?: string;
+      name?: string;
+      mimetype?: string;
+      filetype?: string;
+      permalink?: string;
+      url_private?: string;
+    }>;
+  }>> {
+    // Convert file to Blob/Uint8Array for size calculation
+    let fileBlob: Blob;
+    let fileSize: number;
+    
+    if (typeof options.file === "string") {
+      // Handle base64 or data URL
+      let input = options.file;
+      let mime: string | undefined;
+      const m = /^data:([^;]+);base64,/.exec(input);
+      if (m) {
+        mime = m[1];
+        input = input.slice(m[0].length);
+      }
+      const bytes = Uint8Array.from(atob(input), (c) => c.charCodeAt(0));
+      fileBlob = new Blob([bytes], mime ? { type: mime } : undefined);
+      fileSize = bytes.byteLength;
+    } else if (options.file instanceof Uint8Array) {
+      fileBlob = new Blob([options.file]);
+      fileSize = options.file.byteLength;
+    } else {
+      // Assume it's a Blob or File
+      fileBlob = options.file as Blob;
+      fileSize = (options.file as Blob).size;
+    }
+
+    // Step 1: Get upload URL
+    const getUrlResponse = await fetch("https://slack.com/api/files.getUploadURLExternal", {
+      method: "POST",
+      headers: this.botHeaders,
+      body: JSON.stringify({
+        filename: options.filename,
+        length: fileSize,
+      }),
+    });
+
+    const getUrlResult: SlackUploadURLResponse = await getUrlResponse.json();
+    if (!getUrlResult.ok) {
+      return {
+        ok: false,
+        error: getUrlResult.error || "Failed to get upload URL",
+        data: { files: [] },
+      };
+    }
+
+    if (!getUrlResult.upload_url || !getUrlResult.file_id) {
+      return {
+        ok: false,
+        error: "Invalid response from files.getUploadURLExternal",
+        data: { files: [] },
+      };
+    }
+
+    // Step 2: Upload file to the provided URL (no authorization header)
+    const uploadResponse = await fetch(getUrlResult.upload_url, {
+      method: "POST",
+      body: fileBlob,
+    });
+
+    if (!uploadResponse.ok) {
+      return {
+        ok: false,
+        error: `File upload failed: ${uploadResponse.statusText}`,
+        data: { files: [] },
+      };
+    }
+
+    // Step 3: Complete the upload
+    const completePayload: Record<string, unknown> = {
+      files: [{
+        id: getUrlResult.file_id,
+        title: options.title || options.filename,
+      }],
+    };
+
+    if (options.channels) {
+      completePayload.channel_id = options.channels;
+    }
+
+    if (options.thread_ts) {
+      completePayload.thread_ts = options.thread_ts;
+    }
+
+    if (options.initial_comment) {
+      completePayload.initial_comment = options.initial_comment;
+    }
+
+    const completeResponse = await fetch("https://slack.com/api/files.completeUploadExternal", {
+      method: "POST",
+      headers: this.botHeaders,
+      body: JSON.stringify(completePayload),
+    });
+
+    const completeResult: SlackCompleteUploadResponse = await completeResponse.json();
+    
+    return {
+      ok: completeResult.ok,
+      error: completeResult.error,
+      response_metadata: completeResult.response_metadata,
+      data: {
+        files: completeResult.files || [],
+      },
+    };
+  }
 
   /**
-   * @description Uploads a file to Slack
+   * @description Uploads a file to Slack using the legacy files.upload API
+   * @deprecated This method uses files.upload which will be sunset on November 12, 2025. Use uploadFileV2 instead.
    * @param options Upload options including channels, file, filename, etc.
    */
   async uploadFile(options: {
@@ -757,6 +914,13 @@ export class SlackClient {
     file?: SlackFile;
     warning?: string;
   }>> {
+    // Deprecation warning
+    console.warn(
+      "⚠️  DEPRECATION WARNING: files.upload API will be sunset on November 12, 2025. " +
+      "Please migrate to uploadFileV2() which uses the new files.getUploadURLExternal + files.completeUploadExternal flow. " +
+      "See: https://docs.slack.dev/reference/methods/files.getUploadURLExternal"
+    );
+
     const formData = new FormData();
     formData.append("channels", options.channels);
     formData.append("filename", options.filename);

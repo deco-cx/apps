@@ -9,7 +9,18 @@ A Deco app for integrating with Slack using OAuth 2.0 authentication. This app a
 - 📋 **Channel Operations** - List and interact with workspace channels
 - 👥 **User Management** - Get user information and profiles
 - 🎯 **Reactions** - Add emoji reactions to messages
-- 🔄 **Automatic Token Refresh** - Handles token expiration automatically
+- � **File Upload V2** - Upload files using the new Slack API (files.upload sunset Nov 12, 2025)
+- �🔄 **Automatic Token Refresh** - Handles token expiration automatically
+
+## ⚠️ IMPORTANT: File Upload API Migration
+
+**The Slack `files.upload` API will be sunset on November 12, 2025.** This app now includes:
+
+- ✅ **New V2 Upload API** - Using `files.getUploadURLExternal` + `files.completeUploadExternal`
+- ⚠️ **Legacy API Support** - With deprecation warnings (will be removed)
+- 📖 **Migration Guide** - See [UPLOAD_MIGRATION.md](./UPLOAD_MIGRATION.md) for details
+
+**Action Required**: Update your file upload code to use `uploadFileV2()` method before November 12, 2025.
 
 ## Setup Instructions
 
@@ -77,6 +88,22 @@ After OAuth setup, the app will automatically:
 
 ### Reactions
 - `addReaction(channelId, timestamp, reaction)` - Add emoji reaction
+
+### File Upload
+- `uploadFileV2(options)` - Upload files using new V2 API (recommended)
+- `uploadFile(options)` - Upload files using legacy API (deprecated, shows warning)
+
+**New V2 Upload Example:**
+```typescript
+const response = await slack.uploadFileV2({
+  channels: "C1234567890", // Optional
+  file: fileBlob, // Supports Uint8Array, Blob, File, base64, data URL
+  filename: "document.pdf",
+  title: "Important Document",
+  thread_ts: "1234567890.123456", // Optional - upload to thread
+  initial_comment: "Here's the document"
+});
+```
 
 ## Migration from Bot Token
 
