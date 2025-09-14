@@ -9,6 +9,7 @@ export interface SlackResponse<T = unknown> {
   error?: string;
   response_metadata?: {
     next_cursor?: string;
+    warnings?: string[];
   };
   data: T;
 }
@@ -177,10 +178,10 @@ export interface SlackFile {
   original_h?: number;
   permalink: string;
   permalink_public?: string;
-  channels: string[];
-  groups: string[];
-  ims: string[];
-  comments_count: number;
+  channels?: string[];
+  groups?: string[];
+  ims?: string[];
+  comments_count?: number;
   is_starred?: boolean;
 }
 
@@ -280,7 +281,7 @@ export class SlackClient {
       { headers: this.botHeaders },
     );
 
-    return response.json();
+    return await response.json();
   }
 
   /**
@@ -298,7 +299,15 @@ export class SlackClient {
       }),
     });
 
-    return response.json();
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        channel: result.channel,
+      },
+    };
   }
 
   /**
@@ -317,20 +326,6 @@ export class SlackClient {
     message: SlackMessage;
     warning?: string;
   }>> {
-    // ... existing logic that makes the HTTP request and sets `response` ...
-    const result = await response.json();
-    return {
-      ok: result.ok,
-      error: result.error,
-      response_metadata: result.response_metadata,
-      data: {
-        channel: result.channel,
-        ts: result.ts,
-        message: result.message,
-        warning: result.warning,
-      },
-    };
-  }
     const payload: Record<string, unknown> = {
       channel: channelId,
       text: text,
@@ -346,7 +341,18 @@ export class SlackClient {
       body: JSON.stringify(payload),
     });
 
-    return response.json();
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        channel: result.channel,
+        ts: result.ts,
+        message: result.message,
+        warning: result.warning,
+      },
+    };
   }
 
   /**
@@ -372,7 +378,17 @@ export class SlackClient {
       }),
     });
 
-    return response.json();
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        channel: result.channel,
+        ts: result.ts,
+        message: result.message,
+      },
+    };
   }
 
   /**
@@ -396,7 +412,16 @@ export class SlackClient {
       }),
     });
 
-    return response.json();
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        channel: result.channel || channelId,
+        ts: result.ts || timestamp,
+      },
+    };
   }
 
   /**
@@ -466,7 +491,15 @@ export class SlackClient {
       { headers: this.botHeaders },
     );
 
-    return response.json();
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        messages: result.messages || [],
+      },
+    };
   }
 
   /**
@@ -493,7 +526,15 @@ export class SlackClient {
       headers: this.botHeaders,
     });
 
-    return response.json();
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        members: result.members || [],
+      },
+    };
   }
 
   /**
@@ -513,7 +554,15 @@ export class SlackClient {
       { headers: this.botHeaders },
     );
 
-    return response.json();
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        profile: result.profile || {},
+      },
+    };
   }
 
   /**
@@ -524,7 +573,13 @@ export class SlackClient {
       headers: this.botHeaders,
     });
 
-    return response.json();
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: result,
+    };
   }
 
   /**
@@ -539,9 +594,11 @@ export class SlackClient {
     ts: string,
     text: string,
     opts: { thread_ts?: string; blocks?: unknown[] } = {},
-  ): Promise<
-    { channel: string; ts: string; message: SlackMessage; ok: boolean }
-  > {
+  ): Promise<SlackResponse<{
+    channel: string;
+    ts: string;
+    message: SlackMessage;
+  }>> {
     const payload: Record<string, unknown> = {
       channel: channelId,
       ts: ts,
@@ -557,31 +614,48 @@ export class SlackClient {
       headers: this.botHeaders,
       body: JSON.stringify(payload),
     });
-    return response.json();
+    
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        channel: result.channel,
+        ts: result.ts,
+        message: result.message,
+      },
+    };
   }
 
   /**
    * @description Opens a direct message channel with a user
    * @param userId The user ID to open a DM with
    */
-  async openDmChannel(userId: string): Promise<{ 
-    ok: boolean; 
+  async openDmChannel(userId: string): Promise<SlackResponse<{ 
     channel?: { id: string }; 
-    error?: string;
     no_op?: boolean;
     already_open?: boolean;
     warning?: string;
-    response_metadata?: {
-      warnings?: string[];
-    };
-  }> {
+  }>> {
     const response = await fetch("https://slack.com/api/conversations.open", {
       method: "POST",
       headers: this.botHeaders,
       body: JSON.stringify({ users: userId }),
     });
 
-    return response.json();
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        channel: result.channel,
+        no_op: result.no_op,
+        already_open: result.already_open,
+        warning: result.warning,
+      },
+    };
   }
   
   /**
@@ -630,8 +704,7 @@ export class SlackClient {
     count: number = 20,
     page: number = 1,
     types: string = 'all'
-  ): Promise<{
-    ok: boolean;
+  ): Promise<SlackResponse<{
     files: SlackFile[];
     paging: {
       count: number;
@@ -639,8 +712,7 @@ export class SlackClient {
       page: number;
       pages: number;
     };
-    error?: string;
-  }> {
+  }>> {
     const params = new URLSearchParams({
       user: userId,
       count: count.toString(),
@@ -653,7 +725,21 @@ export class SlackClient {
       { headers: this.botHeaders },
     );
 
-    return response.json();
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        files: result.files || [],
+        paging: result.paging || {
+          count: 0,
+          total: 0,
+          page: 1,
+          pages: 0,
+        },
+      },
+    };
   }
 
   /**
@@ -667,15 +753,10 @@ export class SlackClient {
     title?: string;
     initial_comment?: string;
     filetype?: string;
-  }): Promise<{
-    ok: boolean;
+  }): Promise<SlackResponse<{
     file?: SlackFile;
-    error?: string;
     warning?: string;
-    response_metadata?: {
-      warnings?: string[];
-    };
-  }> {
+  }>> {
     const formData = new FormData();
     formData.append("channels", options.channels);
     formData.append("filename", options.filename);
@@ -694,14 +775,16 @@ export class SlackClient {
 
     // Handle file content
     if (typeof options.file === "string") {
-      // Assume base64 string, convert to Blob
-      const byteCharacters = atob(options.file);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      // Accept raw base64 or data URL: data:<mime>;base64,<data>
+      let input = options.file;
+      let mime: string | undefined;
+      const m = /^data:([^;]+);base64,/.exec(input);
+      if (m) {
+        mime = m[1];
+        input = input.slice(m[0].length);
       }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray]);
+      const bytes = Uint8Array.from(atob(input), (c) => c.charCodeAt(0));
+      const blob = new Blob([bytes], mime ? { type: mime } : undefined);
       formData.append("file", blob, options.filename);
     } else {
       formData.append("file", options.file, options.filename);
@@ -715,6 +798,15 @@ export class SlackClient {
       body: formData,
     });
 
-    return response.json();
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        file: result.file,
+        warning: result.warning,
+      },
+    };
   }
 }
