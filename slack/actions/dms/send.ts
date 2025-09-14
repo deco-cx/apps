@@ -60,13 +60,13 @@ export default async function sendDm(
     return {
       success: true,
       message: "DM sent successfully",
-      channelId: messageResponse.channel,
-      ts: messageResponse.ts,
+      channelId: messageResponse.data.channel,
+      ts: messageResponse.data.ts,
       messageData: {
         ok: messageResponse.ok,
-        channel: messageResponse.channel,
-        ts: messageResponse.ts,
-        warning: messageResponse.warning,
+        channel: messageResponse.data.channel,
+        ts: messageResponse.data.ts,
+        warning: messageResponse.data.warning,
         response_metadata: messageResponse.response_metadata,
       },
     };

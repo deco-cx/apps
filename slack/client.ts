@@ -292,9 +292,9 @@ export class SlackClient {
     limit: number = 1000,
     cursor?: string,
     types: ChannelType[] = ["public_channel", "private_channel"],
-  ): Promise<
-    { channels: SlackChannel[]; response_metadata?: { next_cursor?: string } }
-  > {
+  ): Promise<SlackResponse<{
+    channels: SlackChannel[];
+  }>> {
     const params = new URLSearchParams({
       types: types.join(","),
       exclude_archived: "false",
@@ -311,7 +311,15 @@ export class SlackClient {
       { headers: this.botHeaders },
     );
 
-    return await response.json();
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        channels: result.channels || [],
+      },
+    };
   }
 
   /**
@@ -904,7 +912,7 @@ export class SlackClient {
    * @param options Upload options including channels, file, filename, etc.
    */
   async uploadFile(options: {
-    channels?: string;
+    channels: string;
     file: string | File;
     filename: string;
     title?: string;
@@ -923,7 +931,7 @@ export class SlackClient {
     );
 
     const formData = new FormData();
-    if (options.channels) formData.append("channels", options.channels);
+    formData.append("channels", options.channels);
     formData.append("filename", options.filename);
     
     if (options.title) {
@@ -950,11 +958,7 @@ export class SlackClient {
         mime = m[1];
         input = input.slice(m[0].length);
       }
-      const bin = (typeof atob === "function")
-        ? atob(input)
-        // @ts-ignore Node fallback
-        : Buffer.from(input, "base64").toString("binary");
-      const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+      const bytes = Uint8Array.from(atob(input), (c) => c.charCodeAt(0));
       const blob = new Blob([bytes], mime ? { type: mime } : undefined);
       formData.append("file", blob, options.filename);
     } else {

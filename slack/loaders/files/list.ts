@@ -67,8 +67,8 @@ export default async function listUserFiles(
 
     return {
       ok: response.ok,
-      files: response.files || [],
-      paging: response.paging || { count: 0, total: 0, page: 1, pages: 0 },
+      files: response.data.files || [],
+      paging: response.data.paging || { count: 0, total: 0, page: 1, pages: 0 },
     };
   } catch (error) {
     console.error("Error listing user files:", error);
