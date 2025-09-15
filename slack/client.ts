@@ -289,7 +289,7 @@ export class SlackClient {
    */
   async getChannels(
     teamId: string,
-    limit: number = 1000,
+    limit: number = 100,
     cursor?: string,
     types: ChannelType[] = ["public_channel", "private_channel"],
   ): Promise<SlackResponse<{

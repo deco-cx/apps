@@ -28,7 +28,7 @@ export default async function listChannels(
   _req: Request,
   ctx: AppContext,
 ): Promise<SlackResponse<{ channels: SlackChannel[] }>> {
-  const { limit, cursor, types } = props;
+  const { limit = 100, cursor, types } = props;
   const teamId = ctx.teamId;
 
   if (!teamId) {
@@ -45,7 +45,7 @@ export default async function listChannels(
       try {
         const response = await ctx.slack.getChannels(
           teamId,
-          1000, // Use max limit for pagination
+          limit,
           nextCursor,
           types,
         );
