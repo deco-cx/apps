@@ -125,8 +125,7 @@ export default async function uploadFile(
           : undefined,
         response_metadata: response.response_metadata,
       };
-      };
-    }
+  }
 
     // Legacy API fallback
     if (
