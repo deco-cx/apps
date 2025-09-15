@@ -98,22 +98,33 @@ export default async function uploadFile(
         };
       }
 
+      const first = response.data?.files?.[0];
       return {
         ok: response.ok,
-        files: response.data.files,
+        files:
+          response.data?.files?.map((f) => ({
+            id: f.id,
+            name: f.name ?? props.filename,
+            title: f.title ?? props.title ?? props.filename,
+            mimetype: f.mimetype ?? "",
+            filetype: f.filetype ?? "",
+            permalink: f.permalink ?? "",
+            url_private: f.url_private ?? "",
+          })) ?? [],
         // For backwards compatibility, expose only safe subset of SlackFile
-        file: response.data.files[0]
+        file: first
           ? {
-              id: response.data.files[0].id,
-              name: response.data.files[0].name || props.filename,
-              title: response.data.files[0].title || props.title || props.filename,
-              mimetype: response.data.files[0].mimetype || "",
-              filetype: response.data.files[0].filetype || "",
-              permalink: response.data.files[0].permalink || "",
-              url_private: response.data.files[0].url_private || "",
+              id: first.id,
+              name: first.name ?? props.filename,
+              title: first.title ?? props.title ?? props.filename,
+              mimetype: first.mimetype ?? "",
+              filetype: first.filetype ?? "",
+              permalink: first.permalink ?? "",
+              url_private: first.url_private ?? "",
             }
           : undefined,
         response_metadata: response.response_metadata,
+      };
       };
     }
 
