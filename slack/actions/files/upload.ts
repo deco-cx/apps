@@ -129,7 +129,10 @@ export default async function uploadFile(
     }
 
     // Legacy API fallback
-    if (typeof props.file !== "string" && !(props.file instanceof File)) {
+    if (
+      typeof props.file !== "string" &&
+      !(typeof File !== "undefined" && props.file instanceof File)
+    ) {
       return {
         ok: false,
         error: "Legacy API only supports string (base64) or File objects. Use V2 API for other file types.",
