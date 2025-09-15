@@ -126,6 +126,7 @@ export default async function uploadFile(
       title: props.title,
       initial_comment: props.initial_comment,
       filetype: props.filetype,
+      thread_ts: props.thread_ts,
     });
 
     if (!response.ok) {
