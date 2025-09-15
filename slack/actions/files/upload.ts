@@ -55,7 +55,11 @@ export interface UploadFileResponse {
     permalink?: string;
     url_private?: string;
   }>;
-  file?: SlackFile; // Legacy field for backwards compatibility
+  // For compatibility, expose a safe subset of SlackFile
+  file?: Pick<
+    SlackFile,
+    "id" | "name" | "title" | "mimetype" | "filetype" | "permalink" | "url_private"
+  >;
   error?: string;
   warning?: string;
   response_metadata?: {
@@ -97,16 +101,18 @@ export default async function uploadFile(
       return {
         ok: response.ok,
         files: response.data.files,
-        // For backwards compatibility, set file to first uploaded file
-        file: response.data.files[0] ? {
-          id: response.data.files[0].id,
-          name: response.data.files[0].name || props.filename,
-          title: response.data.files[0].title || props.title || props.filename,
-          mimetype: response.data.files[0].mimetype || "",
-          filetype: response.data.files[0].filetype || "",
-          permalink: response.data.files[0].permalink || "",
-          url_private: response.data.files[0].url_private || "",
-        } as SlackFile : undefined,
+        // For backwards compatibility, expose only safe subset of SlackFile
+        file: response.data.files[0]
+          ? {
+              id: response.data.files[0].id,
+              name: response.data.files[0].name || props.filename,
+              title: response.data.files[0].title || props.title || props.filename,
+              mimetype: response.data.files[0].mimetype || "",
+              filetype: response.data.files[0].filetype || "",
+              permalink: response.data.files[0].permalink || "",
+              url_private: response.data.files[0].url_private || "",
+            }
+          : undefined,
         response_metadata: response.response_metadata,
       };
     }
