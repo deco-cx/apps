@@ -20,6 +20,10 @@ const query = `query getUserSessions {
   }
 }`;
 
+/**
+ * @title Get User Sessions
+ * @description Get the sessions of the user logged in
+ */
 async function loader(
   _props: unknown,
   req: Request,

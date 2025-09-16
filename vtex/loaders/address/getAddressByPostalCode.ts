@@ -12,6 +12,10 @@ interface Props {
   postalCode: string;
 }
 
+/**
+ * @title Get Address by Postal Code
+ * @description Get an address by postal code
+ */
 export default async function loader(
   props: Props,
   _req: Request,

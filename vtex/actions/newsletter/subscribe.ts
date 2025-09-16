@@ -8,6 +8,10 @@ export interface Props {
   campaing?: string;
 }
 
+/**
+ * @title Subscribe to Newsletter
+ * @description Subscribe to the newsletter
+ */
 const action = async (
   props: Props,
   _req: Request,

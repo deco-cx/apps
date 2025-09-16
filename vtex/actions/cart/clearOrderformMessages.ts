@@ -3,6 +3,10 @@ import { proxySetCookie } from "../../utils/cookies.ts";
 import { parseCookie } from "../../utils/orderForm.ts";
 import type { OrderForm } from "../../utils/types.ts";
 
+/**
+ * @title Clear OrderForm Messages
+ * @description Clear the messages from the orderForm
+ */
 const action = async (
   _props: unknown,
   req: Request,

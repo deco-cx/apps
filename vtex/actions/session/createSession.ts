@@ -6,6 +6,10 @@ interface Props {
   publicProperties: Record<string, { value: string }>;
 }
 
+/**
+ * @title Create Session
+ * @description Create a new session
+ */
 async function action(
   props: Props,
   req: Request,

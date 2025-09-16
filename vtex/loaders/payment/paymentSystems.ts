@@ -29,6 +29,10 @@ export interface PaymentSystem {
   };
 }
 
+/**
+ * @title Payment Systems
+ * @description List payment systems
+ */
 async function loader(
   _props: unknown,
   req: Request,

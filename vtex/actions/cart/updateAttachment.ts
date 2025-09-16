@@ -12,6 +12,10 @@ export interface Props {
   body: any;
 }
 
+/**
+ * @title Update Attachment
+ * @description Update an attachment in the cart
+ */
 const action = async (
   props: Props,
   req: Request,

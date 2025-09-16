@@ -3,6 +3,10 @@ import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { Suggestion } from "../../../commerce/types.ts";
 
+/**
+ * @title Top Searches
+ * @description List the top searches.
+ */
 export default async function (
   _props: unknown,
   _req: Request,

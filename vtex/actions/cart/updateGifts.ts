@@ -8,6 +8,10 @@ export interface Props extends SelectableGifts {
   expectedOrderFormSections?: string[];
 }
 
+/**
+ * @title Update Gifts
+ * @description Update the gifts in the cart
+ */
 const action = async (
   props: Props,
   req: Request,

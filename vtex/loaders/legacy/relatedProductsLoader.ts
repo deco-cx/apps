@@ -34,8 +34,8 @@ export interface Props {
 }
 
 /**
- * @title VTEX Integration - Related Products
- * @description Related Products loader
+ * @title Related Products
+ * @description List related products, commonly used for additional shelves, features like: show similars or buy together.
  */
 async function loader(
   props: Props,

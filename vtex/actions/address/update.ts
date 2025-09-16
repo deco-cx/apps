@@ -86,6 +86,10 @@ interface Props {
   geoCoordinates?: number[];
 }
 
+/**
+ * @title Update Address
+ * @description Update an address
+ */
 async function action(
   { addressId, ...props }: Props,
   req: Request,

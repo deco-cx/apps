@@ -3,7 +3,8 @@ import { FacetsProps, Props } from "./productList.ts";
 import type { Product } from "../../../commerce/types.ts";
 
 /**
- * @title VTEX Integration - Product Search Validator
+ * @title Product Search Validator
+ * @description Validate a product search
  */
 const loader = async (
   expandedProps: Props,

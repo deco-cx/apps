@@ -2,6 +2,10 @@ import { getCookies, setCookie } from "std/http/mod.ts";
 import { AppContext } from "../../mod.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
 
+/**
+ * @title Logout
+ * @description Logout the user
+ */
 export default async function action(
   _: unknown,
   req: Request,

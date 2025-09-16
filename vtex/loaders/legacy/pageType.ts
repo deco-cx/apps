@@ -5,6 +5,10 @@ interface Props {
   term?: string;
 }
 
+/**
+ * @title Page Type
+ * @description List a page type, used to pass a slug and get the page type. Like product, category, brand, collection, etc.
+ */
 export default async function loader(
   props: Props,
   req: Request,

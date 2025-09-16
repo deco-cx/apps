@@ -11,8 +11,8 @@ export interface Props {
 }
 
 /**
- * @title VTEX Integration - Recovery password
- * @description
+ * @title Recovery Password
+ * @description Recovery password
  */
 export default async function action(
   props: Props,

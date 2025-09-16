@@ -165,6 +165,7 @@ export interface Props {
 
 /**
  * @title VTEX Proxy Routes
+ * @description Proxy routes to VTEX, commonly used for my account, checkout, etc.
  */
 function loader(
   {

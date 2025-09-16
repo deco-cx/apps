@@ -16,6 +16,10 @@ export type Config = {
   vpay: ReturnType<typeof createHttpClient<VPAY>>;
 };
 
+/**
+ * @title Get Clients
+ * @description Get the clients to use in the storefront
+ */
 const loader = (_props: unknown, _req: Request, ctx: AppContext): Config => ({
   sp: ctx.sp,
   io: ctx.io,

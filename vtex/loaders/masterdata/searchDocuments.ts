@@ -37,7 +37,8 @@ interface Props {
 }
 
 /**
- * @title Search documents - VTEX
+ * @title Search MasterData Documents
+ * @description Search MasterData documents
  * @docs https://developers.vtex.com/docs/api-reference/masterdata-api#get-/api/dataentities/-acronym-/search
  */
 export default async function loader(
