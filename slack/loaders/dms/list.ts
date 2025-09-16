@@ -1,9 +1,9 @@
 import type { AppContext } from "../../mod.ts";
-import { SlackChannel } from "../../client.ts";
+import { SlackChannel, SlackResponse } from "../../client.ts";
 
 export interface Props {
   /**
-   * @description Maximum number of DM channels to return
+   * @description Maximum number of channels to return
    * @default 100
    */
   limit?: number;
@@ -23,22 +23,16 @@ export default async function listDms(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<{ channels: SlackChannel[]; next_cursor?: string }> {
+): Promise<SlackResponse<{ channels: SlackChannel[] }>> {
   try {
     const limit = props.limit || 100;
-    const dmResponse = await ctx.slack.listDmChannels(limit, props.cursor);
-
-    if (!dmResponse.ok) {
-      console.error("Failed to list DM channels:", dmResponse.error);
-      return { channels: [] };
-    }
-
-    return {
-      channels: dmResponse.data.channels,
-      next_cursor: dmResponse.response_metadata?.next_cursor,
-    };
+    return await ctx.slack.listDmChannels(limit, props.cursor);
   } catch (error) {
     console.error("Error listing DM channels:", error);
-    return { channels: [] };
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      data: { channels: [] },
+    };
   }
 }

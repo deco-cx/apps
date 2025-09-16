@@ -1,4 +1,5 @@
 import type { AppContext } from "../../mod.ts";
+import { SlackMessage, SlackResponse } from "../../client.ts";
 
 export interface SendDmProps {
   /**
@@ -17,22 +18,6 @@ export interface SendDmProps {
   blocks?: unknown[];
 }
 
-export interface SendDmResponse {
-  success: boolean;
-  message: string;
-  channelId?: string;
-  ts?: string;
-  messageData?: {
-    ok: boolean;
-    channel: string;
-    ts: string;
-    warning?: string;
-    response_metadata?: {
-      warnings?: string[];
-    };
-  };
-}
-
 /**
  * @name DMS_SEND
  * @title Send DM
@@ -43,45 +28,57 @@ export default async function sendDm(
   props: SendDmProps,
   _req: Request,
   ctx: AppContext,
-): Promise<SendDmResponse> {
+): Promise<
+  SlackResponse<{
+    channel: string;
+    ts: string;
+    message: SlackMessage;
+    warning?: string;
+  }>
+> {
   try {
-    // Send message directly to the user ID (Slack automatically opens DM channel)
-    const messageResponse = await ctx.slack.postMessage(
-      props.userId,
-      props.text,
-      {
-        blocks: props.blocks,
-      },
-    );
-
-    if (!messageResponse.ok) {
+    // First, open/get the DM channel with the user
+    const channelResponse = await ctx.slack.openDmChannel(props.userId);
+    
+    if (!channelResponse.ok) {
       return {
-        success: false,
-        message: `Failed to send DM: ${
-          messageResponse.error || "Unknown error"
-        }`,
+        ok: false,
+        error: channelResponse.error || "Failed to open DM channel",
+        data: {
+          channel: "",
+          ts: "",
+          message: {} as SlackMessage,
+        },
       };
     }
 
-    return {
-      success: true,
-      message: "DM sent successfully",
-      channelId: messageResponse.data.channel,
-      ts: messageResponse.data.ts,
-      messageData: {
-        ok: messageResponse.ok,
-        channel: messageResponse.data.channel,
-        ts: messageResponse.data.ts,
-        warning: messageResponse.data.warning,
-        response_metadata: messageResponse.response_metadata,
-      },
-    };
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
+    const channelId = channelResponse.data.channel?.id;
+    if (!channelId) {
+      return {
+        ok: false,
+        error: "No channel ID returned from conversations.open",
+        data: {
+          channel: "",
+          ts: "",
+          message: {} as SlackMessage,
+        },
+      };
+    }
+
+    // Now send the message to the DM channel
+    return await ctx.slack.postMessage(channelId, props.text, {
+      blocks: props.blocks,
+    });
+  } catch (error) {
     console.error("Error sending DM:", error);
     return {
-      success: false,
-      message: `Error sending DM: ${message}`,
+      ok: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      data: {
+        channel: "",
+        ts: "",
+        message: {} as SlackMessage,
+      },
     };
   }
 }
