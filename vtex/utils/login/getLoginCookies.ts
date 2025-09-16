@@ -1,3 +1,4 @@
+// TODO: REMOVE THIS AFTER TESTING
 function getLoginCookies({ cookies }: { cookies: Record<string, string> }) {
   const vid_rt = cookies.vid_rt;
 
