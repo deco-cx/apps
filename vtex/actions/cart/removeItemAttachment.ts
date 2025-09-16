@@ -32,6 +32,10 @@ export const DEFAULT_EXPECTED_SECTIONS = [
   "customData",
 ];
 
+/**
+ * @title Remove Item Attachment
+ * @description Remove an attachment from an item in the cart
+ */
 const action = async (
   props: Props,
   req: Request,

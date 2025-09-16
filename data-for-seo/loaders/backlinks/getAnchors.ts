@@ -1,5 +1,5 @@
 import { AppContext } from "../../mod.ts";
-import { DataForSeoTaskResponse, AnchorText } from "../../client.ts";
+import { AnchorText, DataForSeoTaskResponse } from "../../client.ts";
 
 export interface Props {
   /**

@@ -96,28 +96,34 @@ const loader = async (
   const taskId = taskData.tasks[0].id;
 
   // Wait a bit for processing
-  await new Promise(resolve => setTimeout(resolve, 3000));
+  await new Promise((resolve) => setTimeout(resolve, 3000));
 
   // Get results (simplified polling)
-  const resultResponse = await ctx.api[`GET /serp/google/organic/task_get/:id`]({
-    "id": taskId
-  });
-  
+  const resultResponse = await ctx.api[`GET /serp/google/organic/task_get/:id`](
+    {
+      "id": taskId,
+    },
+  );
+
   const resultData = await resultResponse.json() as DataForSeoTaskResponse;
 
   if (resultData.status_code === 20000 && resultData.tasks?.[0]?.result) {
-    const taskResult = resultData.tasks[0].result[0] as { items?: MapsResult[] };
-    
+    const taskResult = resultData.tasks[0].result[0] as {
+      items?: MapsResult[];
+    };
+
     if (taskResult?.items) {
-      return taskResult.items.filter(item => 
-        item.type === "maps_search" || 
-        item.type === "local_pack" || 
+      return taskResult.items.filter((item) =>
+        item.type === "maps_search" ||
+        item.type === "local_pack" ||
         item.type === "maps_paid_item"
       );
     }
   }
 
-  throw new Error(`DataForSEO API Error: ${resultData.status_message || 'No results found'}`);
+  throw new Error(
+    `DataForSEO API Error: ${resultData.status_message || "No results found"}`,
+  );
 };
 
 export default loader;

@@ -10,7 +10,8 @@ interface Props {
 }
 
 /**
- * @title VTEX Brand List - Legacy
+ * @title Brand List
+ * @description List a brand list
  */
 const loaders = async (
   props: Props,

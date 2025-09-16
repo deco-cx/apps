@@ -179,8 +179,8 @@ const fromProps = ({ props }: Props) => {
 };
 
 /**
- * @title VTEX Integration - Legacy Search
- * @description Product List loader
+ * @title Product List Legacy
+ * @description List a product list, commonly used for product shelves
  */
 const loader = async (
   expandedProps: Props,

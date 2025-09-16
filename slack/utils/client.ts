@@ -17,7 +17,7 @@ export interface SlackApiClient {
       team_id?: string;
       cursor?: string;
     };
-    response: SlackResponse<{ 
+    response: SlackResponse<{
       channels: SlackChannel[];
     }>;
   };
@@ -52,7 +52,7 @@ export interface SlackApiClient {
       limit?: string;
       cursor?: string;
     };
-    response: SlackResponse<{ 
+    response: SlackResponse<{
       messages: SlackMessage[];
       has_more?: boolean;
       pin_count?: number;
@@ -86,7 +86,7 @@ export interface SlackApiClient {
     json: {
       users: string;
     };
-    response: SlackResponse<{ 
+    response: SlackResponse<{
       channel: { id: string };
       no_op?: boolean;
       already_open?: boolean;

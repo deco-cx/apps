@@ -1,5 +1,5 @@
 import { AppContext } from "../../mod.ts";
-import type { RelatedKeyword, DataForSeoTaskResponse } from "../../client.ts";
+import type { DataForSeoTaskResponse, RelatedKeyword } from "../../client.ts";
 
 interface Props {
   /**
@@ -46,12 +46,12 @@ export default async function loader(
   _req: Request,
   ctx: AppContext,
 ): Promise<RelatedKeyword[]> {
-  const { 
-    keywords, 
-    language_name = "English", 
+  const {
+    keywords,
+    language_name = "English",
     location_name = "United States",
     limit = 100,
-    include_seed_keyword = false
+    include_seed_keyword = false,
   } = props;
 
   if (!keywords || keywords.length === 0) {
@@ -59,19 +59,20 @@ export default async function loader(
   }
 
   // Post the task
-  const taskResponse = await ctx.api["POST /keywords_data/google/related_keywords/task_post"](
-    {},
-    {
-      body: [{
-        keywords,
-        language_name,
-        location_name,
-        limit,
-        include_seed_keyword,
-        depth: 1,
-      }]
-    }
-  );
+  const taskResponse = await ctx.api
+    ["POST /keywords_data/google/related_keywords/task_post"](
+      {},
+      {
+        body: [{
+          keywords,
+          language_name,
+          location_name,
+          limit,
+          include_seed_keyword,
+          depth: 1,
+        }],
+      },
+    );
 
   const taskData = await taskResponse.json() as DataForSeoTaskResponse;
 
@@ -87,11 +88,12 @@ export default async function loader(
   const delay = 2000;
 
   while (attempts < maxAttempts) {
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
 
-    const resultResponse = await ctx.api[`GET /keywords_data/google/related_keywords/task_get/:id`]({
-      id: taskId,
-    });
+    const resultResponse = await ctx.api
+      [`GET /keywords_data/google/related_keywords/task_get/:id`]({
+        id: taskId,
+      });
 
     const resultData = await resultResponse.json() as DataForSeoTaskResponse;
 
@@ -106,10 +108,10 @@ export default async function loader(
           relevance?: number;
         }>;
       }>;
-      
+
       // Flatten and transform results
       const relatedKeywords: RelatedKeyword[] = [];
-      
+
       for (const item of results) {
         if (item.items) {
           for (const keyword of item.items) {
@@ -124,7 +126,7 @@ export default async function loader(
           }
         }
       }
-      
+
       return relatedKeywords;
     }
 

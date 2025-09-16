@@ -1,5 +1,5 @@
 import { AppContext } from "../../mod.ts";
-import type { SerpItem, DataForSeoTaskResponse } from "../../client.ts";
+import type { DataForSeoTaskResponse, SerpItem } from "../../client.ts";
 
 interface Props {
   /**
@@ -47,12 +47,12 @@ export default async function loader(
   _req: Request,
   ctx: AppContext,
 ): Promise<SerpItem[]> {
-  const { 
-    keyword, 
-    language_name = "English", 
+  const {
+    keyword,
+    language_name = "English",
     location_name = "United States",
     device = "desktop",
-    depth = 100
+    depth = 100,
   } = props;
 
   if (!keyword) {
@@ -69,8 +69,8 @@ export default async function loader(
         location_name,
         device,
         depth,
-      }]
-    }
+      }],
+    },
   );
 
   const taskData = await taskResponse.json() as DataForSeoTaskResponse;
@@ -87,11 +87,12 @@ export default async function loader(
   const delay = 2000;
 
   while (attempts < maxAttempts) {
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
 
-    const resultResponse = await ctx.api[`GET /serp/google/organic/task_get/:id`]({
-      id: taskId,
-    });
+    const resultResponse = await ctx.api
+      [`GET /serp/google/organic/task_get/:id`]({
+        id: taskId,
+      });
 
     const resultData = await resultResponse.json() as DataForSeoTaskResponse;
 
@@ -110,7 +111,7 @@ export default async function loader(
           rating?: { value: number; votes_count: number };
         }>;
       };
-      
+
       if (result && result.items) {
         // Filter only organic results
         return result.items
@@ -140,7 +141,7 @@ export default async function loader(
             rating: item.rating,
           }));
       }
-      
+
       return [];
     }
 

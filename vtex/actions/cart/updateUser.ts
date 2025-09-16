@@ -6,6 +6,8 @@ import { getSegmentFromBag } from "../../utils/segment.ts";
 
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#get-/checkout/changeToAnonymousUser/-orderFormId-
+ * @title Update User
+ * @description Update the user
  */
 const action = async (
   _props: unknown,

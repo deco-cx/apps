@@ -32,8 +32,8 @@ export interface Props {
 }
 
 /**
- * @title VTEX Integration - Intelligent Search
- * @description Product Suggestion loader
+ * @title Suggestions Intelligent Search
+ * @description List a product suggestion, with products and SEO data. commonly used for search suggestions and autocomplete.
  */
 const loaders = async (
   props: Props,

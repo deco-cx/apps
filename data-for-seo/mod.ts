@@ -33,9 +33,11 @@ export interface State extends Props {
  */
 export default function App(props: Props): App<Manifest, State> {
   const { login, password } = props;
-  
+
   const stringLogin = typeof login === "string" ? login : login?.get?.() ?? "";
-  const stringPassword = typeof password === "string" ? password : password?.get?.() ?? "";
+  const stringPassword = typeof password === "string"
+    ? password
+    : password?.get?.() ?? "";
 
   // Create Basic Auth header
   const basicAuth = btoa(`${stringLogin}:${stringPassword}`);

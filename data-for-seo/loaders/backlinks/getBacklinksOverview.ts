@@ -1,5 +1,8 @@
 import { AppContext } from "../../mod.ts";
-import type { BacklinksOverview, DataForSeoTaskResponse } from "../../client.ts";
+import type {
+  BacklinksOverview,
+  DataForSeoTaskResponse,
+} from "../../client.ts";
 
 interface Props {
   /**
@@ -29,14 +32,16 @@ export default async function loader(
     {
       body: {
         target,
-      }
-    }
+      },
+    },
   );
 
   const data = await response.json() as DataForSeoTaskResponse;
 
   if (data.status_code !== 20000 || !data.tasks?.[0]?.result?.[0]) {
-    throw new Error(data.status_message || "Failed to fetch backlinks overview");
+    throw new Error(
+      data.status_message || "Failed to fetch backlinks overview",
+    );
   }
 
   const result = data.tasks[0].result[0] as {

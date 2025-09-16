@@ -39,11 +39,11 @@ export default async function loader(
   _req: Request,
   ctx: AppContext,
 ): Promise<Backlink[]> {
-  const { 
-    target, 
+  const {
+    target,
     limit = 100,
     offset = 0,
-    order_by = "rank desc"
+    order_by = "rank desc",
   } = props;
 
   if (!target) {
@@ -58,8 +58,8 @@ export default async function loader(
         limit,
         offset,
         order_by: [order_by],
-      }
-    }
+      },
+    },
   );
 
   const data = await response.json() as DataForSeoTaskResponse;

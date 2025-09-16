@@ -50,8 +50,8 @@ const getProductID = (page: PageType) => {
 };
 
 /**
- * @title VTEX Integration - Intelligent Search
- * @description Product Details Page loader
+ * @title Product Details Page - Intelligent Search
+ * @description List a product details page, with product and SEO data. commonly used for product pages.
  */
 const loader = async (
   props: Props,

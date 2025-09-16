@@ -6,6 +6,10 @@ export interface Props {
   count: number;
 }
 
+/**
+ * @title PDP Default Path
+ * @description Get paths for product details page
+ */
 const loader = async (
   props: unknown,
   req: Request,

@@ -59,6 +59,10 @@ interface Props {
   customFields?: string[];
 }
 
+/**
+ * @title Get Current Profile
+ * @description Get the current profile
+ */
 async function loader(
   props: Props,
   req: Request,

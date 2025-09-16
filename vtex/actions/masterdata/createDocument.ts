@@ -10,6 +10,8 @@ export interface Props {
 
 /**
  * @docs https://developers.vtex.com/docs/api-reference/masterdata-api#post-/api/dataentities/-acronym-/documents
+ * @title Create Document in MasterData
+ * @description Create a new document in MasterData
  */
 const action = async (
   props: Props,

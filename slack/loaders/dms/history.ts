@@ -44,7 +44,11 @@ export default async function dmHistory(
     }
     const limit = props.limit || 10;
 
-    const historyResponse = await ctx.slack.getChannelHistory(channelId, limit, props.cursor);
+    const historyResponse = await ctx.slack.getChannelHistory(
+      channelId,
+      limit,
+      props.cursor,
+    );
 
     if (!historyResponse.ok) {
       console.error("Failed to get DM history:", historyResponse.error);

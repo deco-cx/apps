@@ -58,7 +58,13 @@ export interface UploadFileResponse {
   // For compatibility, expose a safe subset of SlackFile
   file?: Pick<
     SlackFile,
-    "id" | "name" | "title" | "mimetype" | "filetype" | "permalink" | "url_private"
+    | "id"
+    | "name"
+    | "title"
+    | "mimetype"
+    | "filetype"
+    | "permalink"
+    | "url_private"
   >;
   error?: string;
   warning?: string;
@@ -101,31 +107,30 @@ export default async function uploadFile(
       const first = response.data?.files?.[0];
       return {
         ok: response.ok,
-        files:
-          response.data?.files?.map((f) => ({
-            id: f.id,
-            name: f.name ?? props.filename,
-            title: f.title ?? props.title ?? props.filename,
-            mimetype: f.mimetype ?? "",
-            filetype: f.filetype ?? "",
-            permalink: f.permalink ?? "",
-            url_private: f.url_private ?? "",
-          })) ?? [],
+        files: response.data?.files?.map((f) => ({
+          id: f.id,
+          name: f.name ?? props.filename,
+          title: f.title ?? props.title ?? props.filename,
+          mimetype: f.mimetype ?? "",
+          filetype: f.filetype ?? "",
+          permalink: f.permalink ?? "",
+          url_private: f.url_private ?? "",
+        })) ?? [],
         // For backwards compatibility, expose only safe subset of SlackFile
         file: first
           ? {
-              id: first.id,
-              name: first.name ?? props.filename,
-              title: first.title ?? props.title ?? props.filename,
-              mimetype: first.mimetype ?? "",
-              filetype: first.filetype ?? "",
-              permalink: first.permalink ?? "",
-              url_private: first.url_private ?? "",
-            }
+            id: first.id,
+            name: first.name ?? props.filename,
+            title: first.title ?? props.title ?? props.filename,
+            mimetype: first.mimetype ?? "",
+            filetype: first.filetype ?? "",
+            permalink: first.permalink ?? "",
+            url_private: first.url_private ?? "",
+          }
           : undefined,
         response_metadata: response.response_metadata,
       };
-  }
+    }
 
     // Legacy API fallback
     if (
@@ -134,7 +139,8 @@ export default async function uploadFile(
     ) {
       return {
         ok: false,
-        error: "Legacy API only supports string (base64) or File objects. Use V2 API for other file types.",
+        error:
+          "Legacy API only supports string (base64) or File objects. Use V2 API for other file types.",
       };
     }
 
@@ -158,15 +164,17 @@ export default async function uploadFile(
     return {
       ok: response.ok,
       file: response.data.file,
-      files: response.data.file ? [{
-        id: response.data.file.id,
-        name: response.data.file.name,
-        title: response.data.file.title,
-        mimetype: response.data.file.mimetype,
-        filetype: response.data.file.filetype,
-        permalink: response.data.file.permalink,
-        url_private: response.data.file.url_private,
-      }] : [],
+      files: response.data.file
+        ? [{
+          id: response.data.file.id,
+          name: response.data.file.name,
+          title: response.data.file.title,
+          mimetype: response.data.file.mimetype,
+          filetype: response.data.file.filetype,
+          permalink: response.data.file.permalink,
+          url_private: response.data.file.url_private,
+        }]
+        : [],
       warning: response.data.warning,
       response_metadata: response.response_metadata,
     };

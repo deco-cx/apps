@@ -9,7 +9,7 @@ export interface Props {
 }
 
 /**
- * @title VTEX Integration - Authenticate with Email and Password
+ * @title Authenticate with Email and Password
  * @description This function authenticates a user using their email and password.
  */
 export default async function action(

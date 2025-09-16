@@ -1,5 +1,5 @@
 import { AppContext } from "../../mod.ts";
-import type { KeywordData, DataForSeoTaskResponse } from "../../client.ts";
+import type { DataForSeoTaskResponse, KeywordData } from "../../client.ts";
 
 interface Props {
   /**
@@ -32,7 +32,11 @@ export default async function loader(
   _req: Request,
   ctx: AppContext,
 ): Promise<KeywordData[]> {
-  const { keywords, language_name = "English", location_name = "United States" } = props;
+  const {
+    keywords,
+    language_name = "English",
+    location_name = "United States",
+  } = props;
 
   if (!keywords || keywords.length === 0) {
     throw new Error("Please provide at least one keyword");
@@ -43,16 +47,17 @@ export default async function loader(
   }
 
   // Post the task
-  const taskResponse = await ctx.api["POST /keywords_data/google/search_volume/task_post"](
-    {},
-    {
-      body: [{
-        keywords,
-        language_name,
-        location_name,
-      }]
-    }
-  );
+  const taskResponse = await ctx.api
+    ["POST /keywords_data/google/search_volume/task_post"](
+      {},
+      {
+        body: [{
+          keywords,
+          language_name,
+          location_name,
+        }],
+      },
+    );
 
   const taskData = await taskResponse.json() as DataForSeoTaskResponse;
 
@@ -68,11 +73,12 @@ export default async function loader(
   const delay = 2000; // 2 seconds
 
   while (attempts < maxAttempts) {
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
 
-    const resultResponse = await ctx.api[`GET /keywords_data/google/search_volume/task_get/:id`]({
-      id: taskId,
-    });
+    const resultResponse = await ctx.api
+      [`GET /keywords_data/google/search_volume/task_get/:id`]({
+        id: taskId,
+      });
 
     const resultData = await resultResponse.json() as DataForSeoTaskResponse;
 
@@ -83,9 +89,11 @@ export default async function loader(
         cpc?: number;
         competition?: number;
         competition_level?: string;
-        monthly_searches?: Array<{ year: number; month: number; search_volume: number }>;
+        monthly_searches?: Array<
+          { year: number; month: number; search_volume: number }
+        >;
       }>;
-      
+
       // Transform the results to match our KeywordData interface
       return results.map((item) => ({
         keyword: item.keyword,
