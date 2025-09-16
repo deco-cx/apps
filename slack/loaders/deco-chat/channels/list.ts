@@ -18,7 +18,7 @@ export default async function list(
   const channels = await ctx.invoke.slack.loaders.channels({});
   return {
     channels: [
-      ...channels.channels.map((ch) => {
+      ...channels.data.channels.map((ch: { name?: string; id: string }) => {
         return {
           label: ch.name ?? "",
           value: ch.id,

@@ -833,7 +833,7 @@ export class SlackClient {
       fileBlob = new Blob([bytes], mime ? { type: mime } : undefined);
       fileSize = bytes.byteLength;
     } else if (options.file instanceof Uint8Array) {
-      fileBlob = new Blob([options.file]);
+      fileBlob = new Blob([new Uint8Array(options.file)]);
       fileSize = options.file.byteLength;
     } else {
       // Assume it's a Blob or File
