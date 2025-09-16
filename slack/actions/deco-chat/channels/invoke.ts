@@ -104,7 +104,7 @@ export default async function invoke(
       });
       if (response.ok) {
         toolCallMessageTs[toolCall.toolCallId] = {
-          ts: response.ts,
+          ts: response.data.ts,
           name: toolCall.toolName,
           arguments: toolCall.args,
         };
