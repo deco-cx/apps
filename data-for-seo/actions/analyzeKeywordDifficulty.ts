@@ -1,5 +1,5 @@
 import { AppContext } from "../mod.ts";
-import type { KeywordData, DataForSeoTaskResponse } from "../client.ts";
+import type { DataForSeoTaskResponse, KeywordData } from "../client.ts";
 
 interface Props {
   /**
@@ -49,7 +49,11 @@ export default async function action(
   _req: Request,
   ctx: AppContext,
 ): Promise<KeywordDifficultyAnalysis[]> {
-  const { keywords, language_name = "English", location_name = "United States" } = props;
+  const {
+    keywords,
+    language_name = "English",
+    location_name = "United States",
+  } = props;
 
   if (!keywords || keywords.length === 0) {
     throw new Error("Please provide at least one keyword");
@@ -60,18 +64,20 @@ export default async function action(
   }
 
   // Get search volume data
-  const volumeTaskResponse = await ctx.api["POST /keywords_data/google/search_volume/task_post"](
-    {},
-    {
-      body: [{
-        keywords,
-        language_name,
-        location_name,
-      }]
-    }
-  );
+  const volumeTaskResponse = await ctx.api
+    ["POST /keywords_data/google/search_volume/task_post"](
+      {},
+      {
+        body: [{
+          keywords,
+          language_name,
+          location_name,
+        }],
+      },
+    );
 
-  const volumeTaskData = await volumeTaskResponse.json() as DataForSeoTaskResponse;
+  const volumeTaskData = await volumeTaskResponse
+    .json() as DataForSeoTaskResponse;
   const volumeTaskId = volumeTaskData.tasks?.[0]?.id;
 
   if (!volumeTaskId) {
@@ -82,19 +88,21 @@ export default async function action(
   const serpTaskIds: { keyword: string; taskId: string }[] = [];
 
   for (const keyword of keywords) {
-    const serpTaskResponse = await ctx.api["POST /serp/google/organic/task_post"](
-      {},
-      {
-        body: [{
-          keyword,
-          language_name,
-          location_name,
-          depth: 10,
-        }]
-      }
-    );
+    const serpTaskResponse = await ctx.api
+      ["POST /serp/google/organic/task_post"](
+        {},
+        {
+          body: [{
+            keyword,
+            language_name,
+            location_name,
+            depth: 10,
+          }],
+        },
+      );
 
-    const serpTaskData = await serpTaskResponse.json() as DataForSeoTaskResponse;
+    const serpTaskData = await serpTaskResponse
+      .json() as DataForSeoTaskResponse;
     const serpTaskId = serpTaskData.tasks?.[0]?.id;
 
     if (serpTaskId) {
@@ -109,15 +117,20 @@ export default async function action(
   const delay = 2000;
 
   while (attempts < maxAttempts) {
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
 
-    const volumeResultResponse = await ctx.api[`GET /keywords_data/google/search_volume/task_get/:id`]({
-      id: volumeTaskId,
-    });
+    const volumeResultResponse = await ctx.api
+      [`GET /keywords_data/google/search_volume/task_get/:id`]({
+        id: volumeTaskId,
+      });
 
-    const volumeResultData = await volumeResultResponse.json() as DataForSeoTaskResponse;
+    const volumeResultData = await volumeResultResponse
+      .json() as DataForSeoTaskResponse;
 
-    if (volumeResultData.status_code === 20000 && volumeResultData.tasks?.[0]?.result) {
+    if (
+      volumeResultData.status_code === 20000 &&
+      volumeResultData.tasks?.[0]?.result
+    ) {
       const volumeResults = volumeResultData.tasks[0].result as Array<{
         keyword: string;
         search_volume?: number;
@@ -139,21 +152,29 @@ export default async function action(
   }
 
   // Get SERP results for each keyword
-  const serpResults: Map<string, Array<{ domain: string; position: number; title: string }>> = new Map();
+  const serpResults: Map<
+    string,
+    Array<{ domain: string; position: number; title: string }>
+  > = new Map();
 
   for (const { keyword, taskId } of serpTaskIds) {
     attempts = 0;
-    
+
     while (attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
 
-      const serpResultResponse = await ctx.api[`GET /serp/google/organic/task_get/:id`]({
-        id: taskId,
-      });
+      const serpResultResponse = await ctx.api
+        [`GET /serp/google/organic/task_get/:id`]({
+          id: taskId,
+        });
 
-      const serpResultData = await serpResultResponse.json() as DataForSeoTaskResponse;
+      const serpResultData = await serpResultResponse
+        .json() as DataForSeoTaskResponse;
 
-      if (serpResultData.status_code === 20000 && serpResultData.tasks?.[0]?.result?.[0]) {
+      if (
+        serpResultData.status_code === 20000 &&
+        serpResultData.tasks?.[0]?.result?.[0]
+      ) {
         const result = serpResultData.tasks[0].result[0] as {
           items?: Array<{
             type: string;
@@ -162,7 +183,7 @@ export default async function action(
             title: string;
           }>;
         };
-        
+
         if (result.items) {
           const items = result.items
             .filter((item) => item.type === "organic")
@@ -172,7 +193,7 @@ export default async function action(
               position: item.rank_absolute,
               title: item.title,
             }));
-          
+
           serpResults.set(keyword, items);
         }
         break;
@@ -183,15 +204,15 @@ export default async function action(
   }
 
   // Analyze difficulty for each keyword
-  return keywords.map(keyword => {
-    const metricsData = volumeData.find(v => v.keyword === keyword);
+  return keywords.map((keyword) => {
+    const metricsData = volumeData.find((v) => v.keyword === keyword);
     const metrics = metricsData || {
       search_volume: 0,
       cpc: 0,
       competition: 0,
     } as { search_volume: number; cpc: number; competition: number };
 
-    const topCompetitors = (serpResults.get(keyword) || []).map(item => ({
+    const topCompetitors = (serpResults.get(keyword) || []).map((item) => ({
       domain: item.domain,
       position: item.position,
       title: item.title,
@@ -204,7 +225,7 @@ export default async function action(
     difficultyScore += metrics.competition * 30;
 
     // Factor 2: Top 10 domain authority approximation = 40%
-    const bigDomains = topCompetitors.filter(c => 
+    const bigDomains = topCompetitors.filter((c) =>
       c.domain.includes("wikipedia") ||
       c.domain.includes("amazon") ||
       c.domain.includes("youtube") ||
@@ -249,9 +270,13 @@ export default async function action(
 
     if (difficultyLevel === "easy") {
       recommendations.push("Low competition - good opportunity for quick wins");
-      recommendations.push("Focus on creating comprehensive, high-quality content");
+      recommendations.push(
+        "Focus on creating comprehensive, high-quality content",
+      );
     } else if (difficultyLevel === "medium") {
-      recommendations.push("Moderate competition - requires solid SEO strategy");
+      recommendations.push(
+        "Moderate competition - requires solid SEO strategy",
+      );
       recommendations.push("Build topic authority with related content");
       recommendations.push("Focus on earning quality backlinks");
     } else if (difficultyLevel === "hard") {
@@ -259,13 +284,17 @@ export default async function action(
       recommendations.push("Requires significant link building efforts");
       recommendations.push("Create exceptional, unique content to stand out");
     } else {
-      recommendations.push("Very high competition - extremely challenging to rank");
+      recommendations.push(
+        "Very high competition - extremely challenging to rank",
+      );
       recommendations.push("Consider targeting less competitive variations");
       recommendations.push("Focus on building domain authority first");
     }
 
     if (metrics.search_volume < 100) {
-      recommendations.push("Low search volume - validate demand before investing heavily");
+      recommendations.push(
+        "Low search volume - validate demand before investing heavily",
+      );
     }
 
     return {

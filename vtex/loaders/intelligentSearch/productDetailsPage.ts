@@ -50,7 +50,7 @@ const getProductID = (page: PageType) => {
 };
 
 /**
- * @title Product Details Page - Intelligent Search 
+ * @title Product Details Page - Intelligent Search
  * @description List a product details page, with product and SEO data. commonly used for product pages.
  */
 const loader = async (

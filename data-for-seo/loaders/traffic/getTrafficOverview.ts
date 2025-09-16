@@ -1,5 +1,5 @@
 import { AppContext } from "../../mod.ts";
-import type { TrafficOverview, DataForSeoTaskResponse } from "../../client.ts";
+import type { DataForSeoTaskResponse, TrafficOverview } from "../../client.ts";
 
 interface Props {
   /**
@@ -29,8 +29,8 @@ export default async function loader(
     {
       body: {
         target,
-      }
-    }
+      },
+    },
   );
 
   const data = await response.json() as DataForSeoTaskResponse;

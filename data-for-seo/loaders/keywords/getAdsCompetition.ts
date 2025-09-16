@@ -46,16 +46,17 @@ const loader = async (
   const { keywords, language_name, location_name } = props;
 
   // Post the task
-  const taskResponse = await ctx.api["POST /keywords_data/google/ads_competition/task_post"](
-    {},
-    {
-      body: [{
-        keywords,
-        language_name,
-        location_name,
-      }],
-    },
-  );
+  const taskResponse = await ctx.api
+    ["POST /keywords_data/google/ads_competition/task_post"](
+      {},
+      {
+        body: [{
+          keywords,
+          language_name,
+          location_name,
+        }],
+      },
+    );
 
   const taskData = await taskResponse.json() as DataForSeoTaskResponse;
 
@@ -66,13 +67,14 @@ const loader = async (
   const taskId = taskData.tasks[0].id;
 
   // Wait a bit for processing
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   // Get results (simplified polling)
-  const resultResponse = await ctx.api[`GET /keywords_data/google/search_volume/task_get/:id`]({
-    "id": taskId
-  });
-  
+  const resultResponse = await ctx.api
+    [`GET /keywords_data/google/search_volume/task_get/:id`]({
+      "id": taskId,
+    });
+
   const resultData = await resultResponse.json() as DataForSeoTaskResponse;
 
   if (resultData.status_code === 20000 && resultData.tasks?.[0]?.result) {
@@ -92,7 +94,10 @@ const loader = async (
     return results.map((item) => ({
       keyword: item.keyword,
       competition: item.competition || 0,
-      competition_level: (item.competition_level || "low") as "low" | "medium" | "high",
+      competition_level: (item.competition_level || "low") as
+        | "low"
+        | "medium"
+        | "high",
       cpc: item.cpc || 0,
       search_volume: item.search_volume || 0,
       advertisers_count: item.advertisers_count || 0,

@@ -49,7 +49,7 @@ export default async function listChannels(
           nextCursor,
           types,
         );
-        
+
         if (!response.ok) {
           return {
             ok: false,
@@ -57,7 +57,7 @@ export default async function listChannels(
             data: { channels: [] },
           };
         }
-        
+
         allChannels.push(...response.data.channels);
         nextCursor = response.response_metadata?.next_cursor;
         if (!nextCursor || response.data.channels.length === 0) {

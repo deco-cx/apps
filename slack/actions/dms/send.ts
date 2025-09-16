@@ -46,14 +46,20 @@ export default async function sendDm(
 ): Promise<SendDmResponse> {
   try {
     // Send message directly to the user ID (Slack automatically opens DM channel)
-    const messageResponse = await ctx.slack.postMessage(props.userId, props.text, {
-      blocks: props.blocks,
-    });
+    const messageResponse = await ctx.slack.postMessage(
+      props.userId,
+      props.text,
+      {
+        blocks: props.blocks,
+      },
+    );
 
     if (!messageResponse.ok) {
       return {
         success: false,
-        message: `Failed to send DM: ${messageResponse.error || "Unknown error"}`,
+        message: `Failed to send DM: ${
+          messageResponse.error || "Unknown error"
+        }`,
       };
     }
 

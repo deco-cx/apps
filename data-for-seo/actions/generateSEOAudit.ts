@@ -1,5 +1,9 @@
 import { AppContext } from "../mod.ts";
-import type { BacklinksOverview, TrafficOverview, SerpItem } from "../client.ts";
+import type {
+  BacklinksOverview,
+  SerpItem,
+  TrafficOverview,
+} from "../client.ts";
 
 export interface Props {
   /**
@@ -109,23 +113,34 @@ export default async function action(
   _req: Request,
   ctx: AppContext,
 ): Promise<SEOAuditReport> {
-  const { domain, keywords, competitors = [], language_name = "English", location_name = "United States" } = props;
+  const {
+    domain,
+    keywords,
+    competitors = [],
+    language_name = "English",
+    location_name = "United States",
+  } = props;
 
   // Fetch traffic overview
-  const trafficResponse = await ctx.api["POST /traffic_analytics/overview/live"](
-    {},
-    { body: { target: domain } }
-  );
+  const trafficResponse = await ctx.api
+    ["POST /traffic_analytics/overview/live"](
+      {},
+      { body: { target: domain } },
+    );
   const trafficData = await trafficResponse.json();
-  const traffic = trafficData.tasks?.[0]?.result?.[0] as TrafficOverview | undefined;
+  const traffic = trafficData.tasks?.[0]?.result?.[0] as
+    | TrafficOverview
+    | undefined;
 
   // Fetch backlinks overview
   const backlinksResponse = await ctx.api["POST /backlinks/domain_info/live"](
     {},
-    { body: { target: domain } }
+    { body: { target: domain } },
   );
   const backlinksData = await backlinksResponse.json();
-  const backlinks = backlinksData.tasks?.[0]?.result?.[0] as BacklinksOverview | undefined;
+  const backlinks = backlinksData.tasks?.[0]?.result?.[0] as
+    | BacklinksOverview
+    | undefined;
 
   // Analyze keyword positions
   const keywordPositions: Record<string, number> = {};
@@ -142,26 +157,31 @@ export default async function action(
             language_name,
             location_name,
           }],
-        }
+        },
       );
-      
+
       const serpData = await serpResponse.json();
       const taskId = serpData.tasks?.[0]?.id;
-      
+
       if (taskId) {
         // Wait for processing
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        const resultResponse = await ctx.api[`GET /serp/google/organic/task_get/:id`]({
-          "id": taskId
-        });
-        
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        const resultResponse = await ctx.api
+          [`GET /serp/google/organic/task_get/:id`]({
+            "id": taskId,
+          });
+
         const resultData = await resultResponse.json();
-        const result = resultData.tasks?.[0]?.result?.[0] as { items?: SerpItem[] } | undefined;
+        const result = resultData.tasks?.[0]?.result?.[0] as {
+          items?: SerpItem[];
+        } | undefined;
         const items = result?.items;
-        
+
         if (items) {
-          const position = items.findIndex(item => item.domain.includes(domain)) + 1;
+          const position = items.findIndex((item) =>
+            item.domain.includes(domain)
+          ) + 1;
           if (position > 0) {
             keywordPositions[keyword] = position;
             totalPosition += position;
@@ -176,16 +196,25 @@ export default async function action(
 
   // Calculate metrics
   const avgPosition = trackedCount > 0 ? totalPosition / trackedCount : 0;
-  const top3Count = Object.values(keywordPositions).filter(p => p <= 3).length;
-  const top10Count = Object.values(keywordPositions).filter(p => p <= 10).length;
+  const top3Count =
+    Object.values(keywordPositions).filter((p) => p <= 3).length;
+  const top10Count =
+    Object.values(keywordPositions).filter((p) => p <= 10).length;
 
   // Generate issues and recommendations
   const issues = analyzeIssues(traffic, backlinks, keywordPositions);
-  
+
   // Competitor analysis
   let competitorAnalysis;
   if (competitors.length > 0) {
-    competitorAnalysis = await analyzeCompetitors(domain, competitors, keywords, ctx, language_name, location_name);
+    competitorAnalysis = await analyzeCompetitors(
+      domain,
+      competitors,
+      keywords,
+      ctx,
+      language_name,
+      location_name,
+    );
   }
 
   // Calculate overall score
@@ -209,8 +238,8 @@ export default async function action(
         total_backlinks: backlinks?.total_backlinks || 0,
         referring_domains: backlinks?.referring_domains || 0,
         domain_rank: backlinks?.rank || 0,
-        dofollow_ratio: backlinks && backlinks.total_backlinks > 0 
-          ? (backlinks.dofollow / backlinks.total_backlinks) * 100 
+        dofollow_ratio: backlinks && backlinks.total_backlinks > 0
+          ? (backlinks.dofollow / backlinks.total_backlinks) * 100
           : 0,
       },
       keyword_visibility: {
@@ -229,7 +258,7 @@ export default async function action(
 function analyzeIssues(
   traffic: TrafficOverview | undefined,
   backlinks: BacklinksOverview | undefined,
-  keywordPositions: Record<string, number>
+  keywordPositions: Record<string, number>,
 ): SEOAuditReport["issues"] {
   const critical = [];
   const warnings = [];
@@ -294,7 +323,9 @@ function analyzeIssues(
     });
   }
 
-  const notRankingKeywords = Object.entries(keywordPositions).filter(([_, pos]) => pos > 10);
+  const notRankingKeywords = Object.entries(keywordPositions).filter((
+    [_, pos],
+  ) => pos > 10);
   if (notRankingKeywords.length > 0) {
     opportunities.push({
       type: "Quick Win Keywords",
@@ -313,27 +344,34 @@ async function analyzeCompetitors(
   keywords: string[],
   ctx: AppContext,
   _language_name: string,
-  _location_name: string
+  _location_name: string,
 ): Promise<SEOAuditReport["competitor_analysis"]> {
   const domainComparison = [];
-  const keywordGaps: NonNullable<SEOAuditReport["competitor_analysis"]>["keyword_gaps"] = [];
+  const keywordGaps: NonNullable<
+    SEOAuditReport["competitor_analysis"]
+  >["keyword_gaps"] = [];
 
   // Get competitor metrics
   for (const competitor of competitors.slice(0, 3)) {
     try {
-      const trafficResp = await ctx.api["POST /traffic_analytics/overview/live"](
-        {},
-        { body: { target: competitor } }
-      );
+      const trafficResp = await ctx.api
+        ["POST /traffic_analytics/overview/live"](
+          {},
+          { body: { target: competitor } },
+        );
       const trafficData = await trafficResp.json();
-      const traffic = trafficData.tasks?.[0]?.result?.[0] as TrafficOverview | undefined;
+      const traffic = trafficData.tasks?.[0]?.result?.[0] as
+        | TrafficOverview
+        | undefined;
 
       const backlinksResp = await ctx.api["POST /backlinks/domain_info/live"](
         {},
-        { body: { target: competitor } }
+        { body: { target: competitor } },
       );
       const backlinksData = await backlinksResp.json();
-      const backlinks = backlinksData.tasks?.[0]?.result?.[0] as BacklinksOverview | undefined;
+      const backlinks = backlinksData.tasks?.[0]?.result?.[0] as
+        | BacklinksOverview
+        | undefined;
 
       domainComparison.push({
         domain: competitor,
@@ -349,9 +387,9 @@ async function analyzeCompetitors(
   // Analyze keyword gaps (simplified)
   for (const keyword of keywords.slice(0, 10)) {
     const positions: Record<string, number> = {};
-    
+
     // Add placeholder data - in real implementation would check each competitor's position
-    competitors.forEach(comp => {
+    competitors.forEach((comp) => {
       positions[comp] = Math.floor(Math.random() * 20) + 1;
     });
 
@@ -371,7 +409,7 @@ async function analyzeCompetitors(
 function calculateSEOScore(
   traffic: TrafficOverview | undefined,
   backlinks: BacklinksOverview | undefined,
-  avgPosition: number
+  avgPosition: number,
 ): number {
   let score = 0;
 
@@ -380,7 +418,7 @@ function calculateSEOScore(
     if (traffic.visits > 10000) score += 30;
     else if (traffic.visits > 5000) score += 20;
     else if (traffic.visits > 1000) score += 10;
-    
+
     if (traffic.bounce_rate < 50) score += 10;
     else if (traffic.bounce_rate < 70) score += 5;
   }
@@ -390,7 +428,7 @@ function calculateSEOScore(
     if (backlinks.referring_domains > 500) score += 20;
     else if (backlinks.referring_domains > 100) score += 15;
     else if (backlinks.referring_domains > 50) score += 10;
-    
+
     if (backlinks.rank > 70) score += 10;
     else if (backlinks.rank > 50) score += 5;
   }
@@ -405,24 +443,24 @@ function calculateSEOScore(
 
 function generateActionPlan(
   issues: SEOAuditReport["issues"],
-  competitorAnalysis?: SEOAuditReport["competitor_analysis"]
+  competitorAnalysis?: SEOAuditReport["competitor_analysis"],
 ): SEOAuditReport["action_plan"] {
   const immediate: string[] = [];
   const shortTerm: string[] = [];
   const longTerm: string[] = [];
 
   // Based on critical issues
-  issues.critical.forEach(issue => {
+  issues.critical.forEach((issue) => {
     immediate.push(issue.recommendation);
   });
 
   // Based on warnings
-  issues.warnings.forEach(issue => {
+  issues.warnings.forEach((issue) => {
     shortTerm.push(issue.recommendation);
   });
 
   // Based on opportunities
-  issues.opportunities.forEach(opp => {
+  issues.opportunities.forEach((opp) => {
     if (opp.effort === "low") {
       immediate.push(opp.description);
     } else if (opp.effort === "medium") {

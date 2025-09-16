@@ -1,5 +1,5 @@
 import { AppContext } from "../../mod.ts";
-import type { GoogleAd, DataForSeoTaskResponse } from "../../client.ts";
+import type { DataForSeoTaskResponse, GoogleAd } from "../../client.ts";
 
 interface Props {
   /**
@@ -40,11 +40,11 @@ export default async function loader(
   _req: Request,
   ctx: AppContext,
 ): Promise<GoogleAd[]> {
-  const { 
-    keyword, 
-    language_name = "English", 
+  const {
+    keyword,
+    language_name = "English",
     location_name = "United States",
-    device = "desktop"
+    device = "desktop",
   } = props;
 
   if (!keyword) {
@@ -60,8 +60,8 @@ export default async function loader(
         language_name,
         location_name,
         device,
-      }]
-    }
+      }],
+    },
   );
 
   const taskData = await taskResponse.json() as DataForSeoTaskResponse;
@@ -78,7 +78,7 @@ export default async function loader(
   const delay = 2000;
 
   while (attempts < maxAttempts) {
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
 
     const resultResponse = await ctx.api[`GET /serp/google/ads/task_get/:id`]({
       id: taskId,
@@ -102,11 +102,13 @@ export default async function loader(
           phone?: string;
         }>;
       };
-      
+
       if (result && result.items) {
         // Filter only paid ads
         return result.items
-          .filter((item: { type: string }) => item.type === "paid" || item.type === "shopping")
+          .filter((item: { type: string }) =>
+            item.type === "paid" || item.type === "shopping"
+          )
           .map((item: {
             type: string;
             rank_group: number;
@@ -134,7 +136,7 @@ export default async function loader(
             phone: item.phone,
           }));
       }
-      
+
       return [];
     }
 

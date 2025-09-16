@@ -1,5 +1,5 @@
 import { AppContext } from "../../mod.ts";
-import type { TrafficBySource, DataForSeoTaskResponse } from "../../client.ts";
+import type { DataForSeoTaskResponse, TrafficBySource } from "../../client.ts";
 
 interface Props {
   /**
@@ -29,14 +29,16 @@ export default async function loader(
     {
       body: {
         target,
-      }
-    }
+      },
+    },
   );
 
   const data = await response.json() as DataForSeoTaskResponse;
 
   if (data.status_code !== 20000 || !data.tasks?.[0]?.result?.[0]) {
-    throw new Error(data.status_message || "Failed to fetch traffic by sources");
+    throw new Error(
+      data.status_message || "Failed to fetch traffic by sources",
+    );
   }
 
   const result = data.tasks[0].result[0] as {
