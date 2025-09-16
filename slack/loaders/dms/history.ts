@@ -12,9 +12,16 @@ export interface Props {
    * @default 10
    */
   limit?: number;
+
+  /**
+   * @description Pagination cursor for next page
+   */
+  cursor?: string;
 }
 
 /**
+ * @name DMS_HISTORY
+ * @title DM Conversation History
  * @description Lists messages in a direct message conversation with a user
  */
 export default async function dmHistory(
@@ -23,7 +30,6 @@ export default async function dmHistory(
   ctx: AppContext,
 ): Promise<SlackMessage[]> {
   try {
-    // First open or get the DM channel with the user
     const channelResponse = await ctx.slack.openDmChannel(props.userId);
 
     if (!channelResponse.ok) {
@@ -31,18 +37,21 @@ export default async function dmHistory(
       return [];
     }
 
-    const channelId = channelResponse.data.channel.id;
+    const channelId = channelResponse.channel?.id;
+    if (!channelId) {
+      console.error("No channel ID returned for user", props.userId);
+      return [];
+    }
     const limit = props.limit || 10;
 
-    // Get the history of this DM channel
-    const historyResponse = await ctx.slack.getChannelHistory(channelId, limit);
+    const historyResponse = await ctx.slack.getChannelHistory(channelId, limit, props.cursor);
 
     if (!historyResponse.ok) {
       console.error("Failed to get DM history:", historyResponse.error);
       return [];
     }
 
-    return historyResponse.data.messages;
+    return historyResponse.data.messages || [];
   } catch (error) {
     console.error("Error getting DM history:", error);
     return [];

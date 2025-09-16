@@ -7,6 +7,7 @@ import type { AppContext } from "../../../mod.ts";
 export const DECO_CHAT_CHANNEL_ID = "@deco.chat";
 /**
  * @name DECO_CHAT_CHANNELS_LIST
+ * @title Deco Chat Channels List
  * @description This action is triggered when slack channels are needed
  */
 export default async function list(
@@ -19,7 +20,7 @@ export default async function list(
     channels: [
       ...channels.channels.map((ch) => {
         return {
-          label: ch.name,
+          label: ch.name ?? "",
           value: ch.id,
         };
       }),
