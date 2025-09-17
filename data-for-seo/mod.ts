@@ -27,6 +27,8 @@ export type AppContext = FnContext<State, Manifest>;
 
 /**
  * @name DataForSEO
+ * @title DataForSEO
+ * @appName dataforseo
  * @description Access DataForSEO data including keywords, SERP analysis, backlinks, and traffic analytics.
  * @category Analytics
  * @logo https://dataforseo.com/wp-content/uploads/2023/11/dataforseo_logo_new_white.svg
