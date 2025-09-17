@@ -45,8 +45,8 @@ export default async function loader(
         limit: props.limit,
         offset: props.offset,
         order_by: props.order_by ? [props.order_by] : undefined,
-      }]
-    }
+      }],
+    },
   );
   return await handleDataForSeoResponse(response, "Referring Domains");
 }

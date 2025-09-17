@@ -22,13 +22,13 @@ export default async function loader(
 ) {
   try {
     const response = await ctx.client["GET /serp/google/maps/task_get/:id"]({
-      id: props.task_id
+      id: props.task_id,
     });
     return await handleDataForSeoResponse(response, "Maps Results Result");
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Erro desconhecido"
+      message: error instanceof Error ? error.message : "Erro desconhecido",
     };
   }
 }

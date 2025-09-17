@@ -66,9 +66,9 @@ export default async function loader(
         device: props.device || "desktop",
         os: props.os || "windows",
         depth: props.depth || 100,
-        load_serp_features: props.load_serp_features !== false
-      }]
-    }
+        load_serp_features: props.load_serp_features !== false,
+      }],
+    },
   );
   return await handleDataForSeoResponse(response, "Organic SERP Live Advanced");
 }

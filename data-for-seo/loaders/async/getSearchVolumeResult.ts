@@ -21,14 +21,15 @@ export default async function loader(
   ctx: AppContext,
 ) {
   try {
-    const response = await ctx.client["GET /keywords_data/google/search_volume/task_get/:id"]({
-      id: props.task_id
-    });
+    const response = await ctx.client
+      ["GET /keywords_data/google/search_volume/task_get/:id"]({
+        id: props.task_id,
+      });
     return await handleDataForSeoResponse(response, "Search Volume Result");
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Erro desconhecido"
+      message: error instanceof Error ? error.message : "Erro desconhecido",
     };
   }
 }

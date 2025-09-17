@@ -2,49 +2,49 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/analyzeKeywordDifficulty.ts";
-import * as $$$$$$$$$1 from "./actions/analyzeLocalSEO.ts";
-import * as $$$$$$$$$2 from "./actions/compareDomainMetrics.ts";
-import * as $$$$$$$$$3 from "./actions/generateSEOAudit.ts";
-import * as $$$$$$$$$4 from "./actions/trackSERPFeatures.ts";
-import * as $$$0 from "./loaders/backlinks/getAnchors.ts";
-import * as $$$1 from "./loaders/backlinks/getBacklinks.ts";
-import * as $$$2 from "./loaders/backlinks/getBacklinksOverview.ts";
-import * as $$$3 from "./loaders/backlinks/getReferringDomains.ts";
-import * as $$$4 from "./loaders/keywords/getAdsCompetition.ts";
-import * as $$$5 from "./loaders/keywords/getRelatedKeywords.ts";
-import * as $$$6 from "./loaders/keywords/getSearchVolume.ts";
-import * as $$$7 from "./loaders/serp/getAdResults.ts";
-import * as $$$8 from "./loaders/serp/getMapsResults.ts";
-import * as $$$9 from "./loaders/serp/getOrganicResults.ts";
-import * as $$$10 from "./loaders/traffic/getTrafficByCountry.ts";
-import * as $$$11 from "./loaders/traffic/getTrafficByPages.ts";
-import * as $$$12 from "./loaders/traffic/getTrafficBySources.ts";
-import * as $$$13 from "./loaders/traffic/getTrafficOverview.ts";
+import * as $$$$$$$$$0 from "./actions/async/createAdsCompetitionTask.ts";
+import * as $$$$$$$$$1 from "./actions/async/createAdsSerpTask.ts";
+import * as $$$$$$$$$2 from "./actions/async/createMapsSerpTask.ts";
+import * as $$$$$$$$$3 from "./actions/async/createOrganicSerpTask.ts";
+import * as $$$$$$$$$4 from "./actions/async/createRelatedKeywordsTask.ts";
+import * as $$$$$$$$$5 from "./actions/async/createSearchVolumeTask.ts";
+import * as $$$$$$$$$6 from "./actions/createAdsCompetitionTask.ts";
+import * as $$$0 from "./loaders/async/getAdsCompetitionResult.ts";
+import * as $$$1 from "./loaders/async/getMapsResultsResult.ts";
+import * as $$$2 from "./loaders/async/getRelatedKeywordsResult.ts";
+import * as $$$3 from "./loaders/async/getSearchVolumeResult.ts";
+import * as $$$4 from "./loaders/live/getBacklinks.ts";
+import * as $$$5 from "./loaders/live/getBacklinksOverview.ts";
+import * as $$$6 from "./loaders/live/getOrganicSerpLiveAdvanced.ts";
+import * as $$$7 from "./loaders/live/getReferringDomains.ts";
+import * as $$$8 from "./loaders/live/getTrafficByCountry.ts";
+import * as $$$9 from "./loaders/live/getTrafficByPages.ts";
+import * as $$$10 from "./loaders/live/getTrafficBySources.ts";
+import * as $$$11 from "./loaders/live/getTrafficOverview.ts";
 
 const manifest = {
   "loaders": {
-    "data-for-seo/loaders/backlinks/getAnchors.ts": $$$0,
-    "data-for-seo/loaders/backlinks/getBacklinks.ts": $$$1,
-    "data-for-seo/loaders/backlinks/getBacklinksOverview.ts": $$$2,
-    "data-for-seo/loaders/backlinks/getReferringDomains.ts": $$$3,
-    "data-for-seo/loaders/keywords/getAdsCompetition.ts": $$$4,
-    "data-for-seo/loaders/keywords/getRelatedKeywords.ts": $$$5,
-    "data-for-seo/loaders/keywords/getSearchVolume.ts": $$$6,
-    "data-for-seo/loaders/serp/getAdResults.ts": $$$7,
-    "data-for-seo/loaders/serp/getMapsResults.ts": $$$8,
-    "data-for-seo/loaders/serp/getOrganicResults.ts": $$$9,
-    "data-for-seo/loaders/traffic/getTrafficByCountry.ts": $$$10,
-    "data-for-seo/loaders/traffic/getTrafficByPages.ts": $$$11,
-    "data-for-seo/loaders/traffic/getTrafficBySources.ts": $$$12,
-    "data-for-seo/loaders/traffic/getTrafficOverview.ts": $$$13,
+    "data-for-seo/loaders/async/getAdsCompetitionResult.ts": $$$0,
+    "data-for-seo/loaders/async/getMapsResultsResult.ts": $$$1,
+    "data-for-seo/loaders/async/getRelatedKeywordsResult.ts": $$$2,
+    "data-for-seo/loaders/async/getSearchVolumeResult.ts": $$$3,
+    "data-for-seo/loaders/live/getBacklinks.ts": $$$4,
+    "data-for-seo/loaders/live/getBacklinksOverview.ts": $$$5,
+    "data-for-seo/loaders/live/getOrganicSerpLiveAdvanced.ts": $$$6,
+    "data-for-seo/loaders/live/getReferringDomains.ts": $$$7,
+    "data-for-seo/loaders/live/getTrafficByCountry.ts": $$$8,
+    "data-for-seo/loaders/live/getTrafficByPages.ts": $$$9,
+    "data-for-seo/loaders/live/getTrafficBySources.ts": $$$10,
+    "data-for-seo/loaders/live/getTrafficOverview.ts": $$$11,
   },
   "actions": {
-    "data-for-seo/actions/analyzeKeywordDifficulty.ts": $$$$$$$$$0,
-    "data-for-seo/actions/analyzeLocalSEO.ts": $$$$$$$$$1,
-    "data-for-seo/actions/compareDomainMetrics.ts": $$$$$$$$$2,
-    "data-for-seo/actions/generateSEOAudit.ts": $$$$$$$$$3,
-    "data-for-seo/actions/trackSERPFeatures.ts": $$$$$$$$$4,
+    "data-for-seo/actions/async/createAdsCompetitionTask.ts": $$$$$$$$$0,
+    "data-for-seo/actions/async/createAdsSerpTask.ts": $$$$$$$$$1,
+    "data-for-seo/actions/async/createMapsSerpTask.ts": $$$$$$$$$2,
+    "data-for-seo/actions/async/createOrganicSerpTask.ts": $$$$$$$$$3,
+    "data-for-seo/actions/async/createRelatedKeywordsTask.ts": $$$$$$$$$4,
+    "data-for-seo/actions/async/createSearchVolumeTask.ts": $$$$$$$$$5,
+    "data-for-seo/actions/createAdsCompetitionTask.ts": $$$$$$$$$6,
   },
   "name": "data-for-seo",
   "baseUrl": import.meta.url,

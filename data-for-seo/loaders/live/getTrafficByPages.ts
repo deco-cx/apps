@@ -38,8 +38,8 @@ export default async function loader(
         target: props.target,
         limit: props.limit,
         offset: props.offset,
-      }]
-    }
+      }],
+    },
   );
   return await handleDataForSeoResponse(response, "Traffic By Pages");
 }

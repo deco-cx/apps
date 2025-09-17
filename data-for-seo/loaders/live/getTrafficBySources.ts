@@ -24,8 +24,8 @@ export default async function loader(
     {
       body: [{
         target: props.target,
-      }]
-    }
+      }],
+    },
   );
   return await handleDataForSeoResponse(response, "Traffic By Sources");
 }
