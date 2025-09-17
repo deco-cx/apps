@@ -30,7 +30,7 @@ export type AppContext = FnContext<State, Manifest>;
  * @appName dataforseo
  * @description Access DataForSEO data including keywords, SERP analysis, backlinks, and traffic analytics.
  * @category Analytics
- * @logo https://dataforseo.com/wp-content/uploads/2023/11/dataforseo_logo_new_white.svg
+ * @logo https://dataforseo.com/wp-content/uploads/2022/04/cropped-favicon_512.png
  */
 export default function App(props: Props): App<Manifest, State> {
   const { login, password } = props;
