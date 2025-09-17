@@ -202,6 +202,111 @@ export interface TrafficOverview {
   users_expected_visits_rate: number;
 }
 
+// Task Management Types
+export interface TaskInfo {
+  id: string;
+  status_code: number;
+  status_message: string;
+  time: string;
+  cost: number;
+  result_count: number;
+  path: string[];
+  data: unknown;
+  tag?: string;
+}
+
+export interface TasksReadyResponse {
+  version: string;
+  status_code: number;
+  status_message: string;
+  time: string;
+  cost: number;
+  tasks_count: number;
+  tasks_error: number;
+  tasks: TaskInfo[];
+}
+
+// News Result Types
+export interface NewsResult {
+  type: string;
+  rank_group: number;
+  rank_absolute: number;
+  position: string;
+  title: string;
+  url: string;
+  source: string;
+  domain: string;
+  snippet: string;
+  timestamp: string;
+  time_ago?: string;
+  amp_version?: boolean;
+  rating?: {
+    value: number;
+    votes_count: number;
+  };
+  highlighted?: string[];
+}
+
+// Events Result Types
+export interface EventResult {
+  type: string;
+  rank_group: number;
+  rank_absolute: number;
+  position: string;
+  title: string;
+  description: string;
+  url: string;
+  image_url?: string;
+  event_dates?: {
+    start_datetime?: string;
+    end_datetime?: string;
+    displayed_dates?: string;
+  };
+  location_info?: {
+    name?: string;
+    address?: string;
+    url?: string;
+    cid?: string;
+    latitude?: number;
+    longitude?: number;
+  };
+  ticket_info?: {
+    price?: string;
+    price_range?: string;
+    price_currency?: string;
+    source?: string;
+    url?: string;
+  };
+}
+
+// Dataset Search Result Types
+export interface DatasetResult {
+  type: string;
+  rank_group: number;
+  rank_absolute: number;
+  position: string;
+  dataset_id: string;
+  title: string;
+  snippet: string;
+  provider_name: string;
+  formats?: string[];
+  authors?: string[];
+  licenses?: string[];
+  updated_date?: string;
+  area_covered?: string[];
+  dataset_description?: {
+    text?: string;
+    links?: Array<{
+      text: string;
+      url: string;
+    }>;
+  };
+  links?: Array<{
+    text: string;
+    url: string;
+  }>;
+}
+
 export interface TrafficBySource {
   direct: number;
   search_organic: number;
@@ -475,5 +580,86 @@ export interface DataForSeoClient {
   "GET /serp/google/maps/task_get/:id": {
     response: DataForSeoTaskResponse;
     "id": string;
+  };
+
+  // Task Management Endpoints
+  "GET /serp/google/organic/tasks_ready": {
+    response: TasksReadyResponse;
+  };
+
+  "GET /serp/google/organic/tasks_fixed": {
+    response: TasksReadyResponse;
+  };
+
+  "GET /serp/google/organic/task_get/regular/:id": {
+    response: DataForSeoTaskResponse;
+    "id": string;
+  };
+
+  "GET /serp/google/organic/task_get/advanced/:id": {
+    response: DataForSeoTaskResponse;
+    "id": string;
+  };
+
+  "GET /serp/google/organic/task_get/html/:id": {
+    response: DataForSeoTaskResponse;
+    "id": string;
+  };
+
+  // News, Events and Dataset Search Endpoints
+  "POST /serp/google/news/live/advanced": {
+    body: Array<{
+      keyword: string;
+      language_code?: string;
+      location_code?: number;
+      device?: "desktop" | "mobile";
+      os?: "windows" | "macos";
+      depth?: number;
+      sort_by?: "relevance" | "date";
+      time_range?: "all" | "1h" | "1d" | "1w" | "1m" | "1y";
+      load_serp_features?: boolean;
+      calculate_rectangles?: boolean;
+      browser_screen_width?: number;
+      browser_screen_height?: number;
+      browser_screen_resolution_ratio?: number;
+    }>;
+    response: DataForSeoTaskResponse;
+  };
+
+  "POST /serp/google/events/live/advanced": {
+    body: Array<{
+      keyword: string;
+      location_name?: string;
+      location_coordinate?: string;
+      language_code?: string;
+      date_range?: string;
+      os?: "windows" | "macos";
+      depth?: number;
+      load_serp_features?: boolean;
+      calculate_rectangles?: boolean;
+      browser_screen_width?: number;
+      browser_screen_height?: number;
+      browser_screen_resolution_ratio?: number;
+    }>;
+    response: DataForSeoTaskResponse;
+  };
+
+  "POST /serp/google/dataset_search/live/advanced": {
+    body: Array<{
+      keyword: string;
+      last_updated?: string;
+      file_formats?: string[];
+      usage_rights?: string;
+      is_free?: boolean;
+      topics?: string[];
+      language_code?: string;
+      depth?: number;
+      load_serp_features?: boolean;
+      calculate_rectangles?: boolean;
+      browser_screen_width?: number;
+      browser_screen_height?: number;
+      browser_screen_resolution_ratio?: number;
+    }>;
+    response: DataForSeoTaskResponse;
   };
 }
