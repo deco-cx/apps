@@ -52,8 +52,8 @@ export default async function action(
         location_name: props.location_name,
         device: props.device,
         depth: props.depth,
-      }]
-    }
+      }],
+    },
   );
   return await handleTaskCreationResponse(response, "Resultados Orgânicos");
 }

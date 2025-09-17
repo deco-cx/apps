@@ -15,7 +15,7 @@ interface Props {
   language_name?: string;
 
   /**
-   * @title Location Name  
+   * @title Location Name
    * @description Location for the search (e.g., "United States", "Brazil")
    */
   location_name?: string;
@@ -31,15 +31,16 @@ export default async function action(
   _req: Request,
   ctx: AppContext,
 ) {
-  const response = await ctx.client["POST /keywords_data/google/search_volume/task_post"](
-    {},
-    {
-      body: [{
-        keywords: props.keywords,
-        language_name: props.language_name,
-        location_name: props.location_name,
-      }]
-    }
-  );
+  const response = await ctx.client
+    ["POST /keywords_data/google/search_volume/task_post"](
+      {},
+      {
+        body: [{
+          keywords: props.keywords,
+          language_name: props.language_name,
+          location_name: props.location_name,
+        }],
+      },
+    );
   return await handleTaskCreationResponse(response, "Volume de Busca");
 }

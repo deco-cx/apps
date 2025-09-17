@@ -31,15 +31,16 @@ export default async function action(
   _req: Request,
   ctx: AppContext,
 ) {
-  const response = await ctx.client["POST /keywords_data/google/ads_competition/task_post"](
-    {},
-    {
-      body: [{
-        keywords: props.keywords,
-        language_name: props.language_name,
-        location_name: props.location_name,
-      }]
-    }
-  );
+  const response = await ctx.client
+    ["POST /keywords_data/google/ads_competition/task_post"](
+      {},
+      {
+        body: [{
+          keywords: props.keywords,
+          language_name: props.language_name,
+          location_name: props.location_name,
+        }],
+      },
+    );
   return await handleTaskCreationResponse(response, "Competição de Anúncios");
 }

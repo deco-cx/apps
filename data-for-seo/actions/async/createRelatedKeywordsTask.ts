@@ -43,17 +43,18 @@ export default async function action(
   _req: Request,
   ctx: AppContext,
 ) {
-  const response = await ctx.client["POST /keywords_data/google/related_keywords/task_post"](
-    {},
-    {
-      body: [{
-        keywords: props.keywords,
-        language_name: props.language_name,
-        location_name: props.location_name,
-        limit: props.limit,
-        include_seed_keyword: props.include_seed_keyword,
-      }]
-    }
-  );
+  const response = await ctx.client
+    ["POST /keywords_data/google/related_keywords/task_post"](
+      {},
+      {
+        body: [{
+          keywords: props.keywords,
+          language_name: props.language_name,
+          location_name: props.location_name,
+          limit: props.limit,
+          include_seed_keyword: props.include_seed_keyword,
+        }],
+      },
+    );
   return await handleTaskCreationResponse(response, "Palavras Relacionadas");
 }

@@ -45,8 +45,8 @@ export default async function action(
         language_name: props.language_name,
         location_name: props.location_name,
         device: props.device,
-      }]
-    }
+      }],
+    },
   );
   return await handleTaskCreationResponse(response, "Anúncios do Google");
 }
