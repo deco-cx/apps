@@ -103,14 +103,14 @@ const action = async (
     requests.push({
       insertText: {
         location: {
-          index: endIndex,
+          index: endIndex - 1,
         },
         text: textToInsert,
       },
     });
 
     if (textStyle) {
-      const startIndex = endIndex + (addLineBreak ? 1 : 0);
+      const startIndex = endIndex + (addLineBreak ? 1 : 0) - 1;
       const endTextIndex = startIndex + sanitizedContent.length;
 
       requests.push({
@@ -140,13 +140,13 @@ const action = async (
       requests,
     };
 
-    // TODO: Our HTTP client doesn't support Google endpoints that use colon notation like :batchUpdate
-    // deno-lint-ignore no-explicit-any
-    const response = await (ctx.client as any)
-      ["POST /v1/documents/:documentId:batchUpdate"]({
-        documentId,
+    const response = await ctx.client
+      ["POST /v1/documents/$documentId:batchUpdate"]({
+        "documentId:batchUpdate": `${documentId}:batchUpdate`,
       }, {
         body: updateRequest,
+        excludeFromSearchParams: ["documentId:batchUpdate"], // Exclude documentId from search params
+        templateMarker: "$",
       });
 
     if (!response.ok) {

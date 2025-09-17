@@ -14,12 +14,6 @@ export interface Props {
    * @title Initial Content
    */
   initialContent?: string;
-
-  /**
-   * @description Whether to share the document publicly
-   * @title Make Public
-   */
-  makePublic?: boolean;
 }
 
 /**
@@ -35,7 +29,6 @@ const action = async (
   const {
     title,
     initialContent,
-    makePublic = false,
   } = props;
 
   if (!title || title.trim().length === 0) {
@@ -78,13 +71,13 @@ const action = async (
           }],
         };
 
-        // TODO: Our HTTP client doesn't support Google endpoints that use colon notation like :batchUpdate
-        // deno-lint-ignore no-explicit-any
-        const updateResponse = await (ctx.client as any)
-          ["POST /v1/documents/:documentId:batchUpdate"]({
-            documentId: document.documentId,
+        const updateResponse = await ctx.client
+          ["POST /v1/documents/$documentId:batchUpdate"]({
+            "documentId:batchUpdate": `${document.documentId}:batchUpdate`,
           }, {
             body: insertRequest,
+            templateMarker: "$",
+            excludeFromSearchParams: ["documentId:batchUpdate"],
           });
 
         if (!updateResponse.ok) {
@@ -94,30 +87,6 @@ const action = async (
         }
       } catch (contentError) {
         console.warn("Failed to add initial content:", contentError);
-      }
-    }
-
-    if (makePublic) {
-      try {
-        const shareRequest = {
-          role: "reader",
-          type: "anyone",
-        };
-
-        const shareResponse = await ctx.client
-          ["POST /v1/documents/:documentId/permissions"]({
-            documentId: document.documentId,
-          }, {
-            body: shareRequest,
-          });
-
-        if (!shareResponse.ok) {
-          console.warn(
-            "Failed to make document public, but document was created",
-          );
-        }
-      } catch (shareError) {
-        console.warn("Failed to make document public:", shareError);
       }
     }
 

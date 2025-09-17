@@ -9,7 +9,7 @@ export interface Props {
    * @title Login (Email)
    * @description Your DataForSEO account email
    * @minValue 1
-   */
+  */
   login: string;
 
   /**

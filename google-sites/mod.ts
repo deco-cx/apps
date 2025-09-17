@@ -40,6 +40,11 @@ export interface Props {
   tokens?: OAuthTokens;
   clientSecret?: string;
   clientId?: string;
+  /**
+   * @title Search Application ID (opcional)
+   * @description ID do aplicativo de pesquisa do Google Cloud Search da sua organização. Caso não seja informado, será exibida uma mensagem explicando como obtê-lo com o TI.
+   */
+  searchApplicationId?: string;
 }
 
 export interface State extends Props {
