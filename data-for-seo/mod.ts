@@ -5,8 +5,6 @@ import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import type { DataForSeoClient } from "./client.ts";
 
-export type AppContext = FnContext<State, Manifest>;
-
 export interface Props {
   /**
    * @title Login (Email)
@@ -22,8 +20,10 @@ export interface Props {
 }
 
 export interface State extends Props {
-  api: ReturnType<typeof createHttpClient<DataForSeoClient>>;
+  client: ReturnType<typeof createHttpClient<DataForSeoClient>>;
 }
+
+export type AppContext = FnContext<State, Manifest>;
 
 /**
  * @name DataForSEO
@@ -42,7 +42,7 @@ export default function App(props: Props): App<Manifest, State> {
   // Create Basic Auth header
   const basicAuth = btoa(`${stringLogin}:${stringPassword}`);
 
-  const api = createHttpClient<DataForSeoClient>({
+  const client = createHttpClient<DataForSeoClient>({
     base: "https://api.dataforseo.com/v3",
     headers: new Headers({
       "Authorization": `Basic ${basicAuth}`,
@@ -51,7 +51,7 @@ export default function App(props: Props): App<Manifest, State> {
     fetcher: fetchSafe,
   });
 
-  const state = { ...props, api };
+  const state = { ...props, client };
 
   return {
     state,

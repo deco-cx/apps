@@ -319,6 +319,23 @@ export interface DataForSeoClient {
     response: DataForSeoTaskResponse;
   };
 
+  "POST /serp/google/organic/live/advanced": {
+    body: Array<{
+      keyword: string;
+      language_code?: string;
+      location_code?: number;
+      device?: "desktop" | "mobile";
+      os?: "windows" | "macos";
+      depth?: number;
+      load_serp_features?: boolean;
+      calculate_rectangles?: boolean;
+      browser_screen_width?: number;
+      browser_screen_height?: number;
+      browser_screen_resolution_ratio?: number;
+    }>;
+    response: DataForSeoTaskResponse;
+  };
+
   "POST /serp/google/ads/task_post": {
     body: Array<{
       keyword: string;
@@ -347,102 +364,116 @@ export interface DataForSeoClient {
 
   // Backlinks API
   "POST /backlinks/domain_info/live": {
-    body: {
+    body: Array<{
       target: string;
       limit?: number;
       offset?: number;
       tag?: string;
-    };
+    }>;
     response: DataForSeoTaskResponse;
   };
 
   "POST /backlinks/backlinks/live": {
-    body: {
+    body: Array<{
       target: string;
       limit?: number;
       offset?: number;
       filters?: string[];
       order_by?: string[];
       tag?: string;
-    };
+    }>;
     response: DataForSeoTaskResponse;
   };
 
   "POST /backlinks/anchors/live": {
-    body: {
+    body: Array<{
       target: string;
       limit?: number;
       offset?: number;
       tag?: string;
-    };
+    }>;
     response: DataForSeoTaskResponse;
   };
 
   "POST /backlinks/referring_domains/live": {
-    body: {
+    body: Array<{
       target: string;
       limit?: number;
       offset?: number;
       filters?: string[];
       order_by?: string[];
       tag?: string;
-    };
+    }>;
     response: DataForSeoTaskResponse;
   };
 
   // Traffic Analytics API
   "POST /traffic_analytics/overview/live": {
-    body: {
+    body: Array<{
       target: string;
       tag?: string;
-    };
+    }>;
     response: DataForSeoTaskResponse;
   };
 
   "POST /traffic_analytics/by_source/live": {
-    body: {
+    body: Array<{
       target: string;
       tag?: string;
-    };
+    }>;
     response: DataForSeoTaskResponse;
   };
 
   "POST /traffic_analytics/by_country/live": {
-    body: {
+    body: Array<{
       target: string;
       limit?: number;
       offset?: number;
       tag?: string;
-    };
+    }>;
     response: DataForSeoTaskResponse;
   };
 
   "POST /traffic_analytics/by_pages/live": {
-    body: {
+    body: Array<{
       target: string;
       limit?: number;
       offset?: number;
       filters?: string[];
       order_by?: string[];
       tag?: string;
-    };
+    }>;
     response: DataForSeoTaskResponse;
   };
 
   // Task Result Endpoints
   "GET /keywords_data/google/search_volume/task_get/:id": {
     response: DataForSeoTaskResponse;
+    "id": string;
   };
 
   "GET /keywords_data/google/related_keywords/task_get/:id": {
     response: DataForSeoTaskResponse;
+    "id": string;
+  };
+
+  "GET /keywords_data/google/ads_competition/task_get/:id": {
+    response: DataForSeoTaskResponse;
+    "id": string;
   };
 
   "GET /serp/google/organic/task_get/:id": {
     response: DataForSeoTaskResponse;
+    "id": string;
   };
 
   "GET /serp/google/ads/task_get/:id": {
     response: DataForSeoTaskResponse;
+    "id": string;
+  };
+
+  "GET /serp/google/maps/task_get/:id": {
+    response: DataForSeoTaskResponse;
+    "id": string;
   };
 }
