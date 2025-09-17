@@ -25,6 +25,10 @@ const query = `query Addresses @context(scope: "private") {
   }
 }`;
 
+/**
+ * @title Get User Addresses
+ * @description Get the addresses of the user logged in
+ */
 async function loader(
   _props: unknown,
   req: Request,

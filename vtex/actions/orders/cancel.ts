@@ -6,6 +6,10 @@ interface Props {
   reason: string;
 }
 
+/**
+ * @title Cancel Order
+ * @description Cancel an order
+ */
 async function action(
   props: Props,
   req: Request,

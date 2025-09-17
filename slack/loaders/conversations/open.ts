@@ -36,10 +36,10 @@ export default async function openConversation(
 
     return {
       ok: response.ok,
-      no_op: response.no_op,
-      already_open: response.already_open,
-      channel: response.channel,
-      warning: response.warning,
+      no_op: response.data.no_op,
+      already_open: response.data.already_open,
+      channel: response.data.channel,
+      warning: response.data.warning,
       response_metadata: response.response_metadata,
       error: response.error,
     };

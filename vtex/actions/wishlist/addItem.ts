@@ -7,6 +7,10 @@ export interface Props {
   sku: string;
 }
 
+/**
+ * @title Add Item to Wishlist
+ * @description Add an item to the wishlist
+ */
 const action = async (
   props: Props,
   req: Request,

@@ -14,6 +14,10 @@ export interface Props {
   allRecords?: boolean;
 }
 
+/**
+ * @title Get Wishlist
+ * @description Get the wishlist from the user logged in
+ */
 const loader = async (
   props: Props,
   req: Request,

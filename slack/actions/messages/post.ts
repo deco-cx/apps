@@ -29,12 +29,14 @@ export default async function postMessage(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<SlackResponse<{
-  channel: string;
-  ts: string;
-  message: SlackMessage;
-  warning?: string;
-}>> {
+): Promise<
+  SlackResponse<{
+    channel: string;
+    ts: string;
+    message: SlackMessage;
+    warning?: string;
+  }>
+> {
   const { channelId, text, thread_ts, blocks } = props;
   return await ctx.slack.postMessage(channelId, text, { thread_ts, blocks });
 }

@@ -18,7 +18,7 @@ export type Props = {
 };
 
 /**
- * @title VTEX Integration - Product Loader
+ * @title Product Loader Workflow
  * @description DO NOT USE this on the storefront
  */
 const loader = async (

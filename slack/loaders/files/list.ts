@@ -53,7 +53,7 @@ export default async function listUserFiles(
       props.userId,
       props.count || 20,
       props.page || 1,
-      props.types || 'all'
+      props.types || "all",
     );
 
     if (!response.ok) {

@@ -21,6 +21,10 @@ const mutation = `mutation UpdateProfile($input: ProfileInput!) {
   }
 }`;
 
+/**
+ * @title Update Profile
+ * @description Update the profile
+ */
 async function action(
   props: Omit<ProfileInput, "email">,
   req: Request,

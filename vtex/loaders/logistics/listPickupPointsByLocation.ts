@@ -18,6 +18,10 @@ interface Props {
   countryCode?: string;
 }
 
+/**
+ * @title List Pickup Points by Location
+ * @description List pickup points by location
+ */
 export default async function loader(
   props: Props,
   _req: Request,

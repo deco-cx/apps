@@ -47,6 +47,10 @@ interface Props {
   addressId: string;
 }
 
+/**
+ * @title Delete Address
+ * @description Delete an address
+ */
 async function action({ addressId }: Props, req: Request, ctx: AppContext) {
   const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);

@@ -10,6 +10,8 @@ export interface Props {
 
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/coupons
+ * @title Update Coupons
+ * @description Update the coupons in the cart
  */
 const action = async (
   props: Props,

@@ -9,7 +9,7 @@ interface Props {
 }
 
 /**
- * @title VTEX Integration - Refresh Authentication Token
+ * @title Refresh Authentication Token
  * @description This function refreshes the VTEX authentication token using current session cookies.
  */
 export default async function refreshToken(

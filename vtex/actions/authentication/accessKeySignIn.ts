@@ -9,7 +9,7 @@ export interface Props {
 }
 
 /**
- * @title VTEX Integration - Authenticate with Email and AcessKey
+ * @title Authenticate with Email and AcessKey
  * @description Return authStatus that show if user is logged or something wrong happens.
  */
 export default async function action(

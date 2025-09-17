@@ -292,9 +292,11 @@ export class SlackClient {
     limit: number = 100,
     cursor?: string,
     types: ChannelType[] = ["public_channel", "private_channel"],
-  ): Promise<SlackResponse<{
-    channels: SlackChannel[];
-  }>> {
+  ): Promise<
+    SlackResponse<{
+      channels: SlackChannel[];
+    }>
+  > {
     const params = new URLSearchParams({
       types: types.join(","),
       exclude_archived: "false",
@@ -358,12 +360,14 @@ export class SlackClient {
     channelId: string,
     text: string,
     opts: { thread_ts?: string; blocks?: unknown[] } = {},
-  ): Promise<SlackResponse<{
-    channel: string;
-    ts: string;
-    message: SlackMessage;
-    warning?: string;
-  }>> {
+  ): Promise<
+    SlackResponse<{
+      channel: string;
+      ts: string;
+      message: SlackMessage;
+      warning?: string;
+    }>
+  > {
     const payload: Record<string, unknown> = {
       channel: channelId,
       text: text,
@@ -472,14 +476,16 @@ export class SlackClient {
     channelId: string,
     limit: number = 10,
     cursor?: string,
-  ): Promise<SlackResponse<{ 
-    messages: SlackMessage[];
-    has_more?: boolean;
-    pin_count?: number;
-    channel_actions_ts?: string | null;
-    channel_actions_count?: number;
-    warning?: string;
-  }>> {
+  ): Promise<
+    SlackResponse<{
+      messages: SlackMessage[];
+      has_more?: boolean;
+      pin_count?: number;
+      channel_actions_ts?: string | null;
+      channel_actions_count?: number;
+      warning?: string;
+    }>
+  > {
     const params = new URLSearchParams({
       channel: channelId,
       limit: limit.toString(),
@@ -632,11 +638,13 @@ export class SlackClient {
     ts: string,
     text: string,
     opts: { thread_ts?: string; blocks?: unknown[] } = {},
-  ): Promise<SlackResponse<{
-    channel: string;
-    ts: string;
-    message: SlackMessage;
-  }>> {
+  ): Promise<
+    SlackResponse<{
+      channel: string;
+      ts: string;
+      message: SlackMessage;
+    }>
+  > {
     const payload: Record<string, unknown> = {
       channel: channelId,
       ts: ts,
@@ -652,7 +660,7 @@ export class SlackClient {
       headers: this.botHeaders,
       body: JSON.stringify(payload),
     });
-    
+
     const result = await response.json();
     return {
       ok: result.ok,
@@ -670,12 +678,14 @@ export class SlackClient {
    * @description Opens a direct message channel with a user
    * @param userId The user ID to open a DM with
    */
-  async openDmChannel(userId: string): Promise<SlackResponse<{ 
-    channel?: { id: string }; 
-    no_op?: boolean;
-    already_open?: boolean;
-    warning?: string;
-  }>> {
+  async openDmChannel(userId: string): Promise<
+    SlackResponse<{
+      channel?: { id: string };
+      no_op?: boolean;
+      already_open?: boolean;
+      warning?: string;
+    }>
+  > {
     const response = await fetch("https://slack.com/api/conversations.open", {
       method: "POST",
       headers: this.botHeaders,
@@ -695,7 +705,7 @@ export class SlackClient {
       },
     };
   }
-  
+
   /**
    * @description Lists all direct message channels for the bot
    * @param limit Maximum number of DMs to return
@@ -729,7 +739,7 @@ export class SlackClient {
       },
     };
   }
-  
+
   /**
    * @description Lists files uploaded by a specific user
    * @param userId The user ID whose files to list
@@ -741,16 +751,18 @@ export class SlackClient {
     userId: string,
     count: number = 20,
     page: number = 1,
-    types: string = 'all'
-  ): Promise<SlackResponse<{
-    files: SlackFile[];
-    paging: {
-      count: number;
-      total: number;
-      page: number;
-      pages: number;
-    };
-  }>> {
+    types: string = "all",
+  ): Promise<
+    SlackResponse<{
+      files: SlackFile[];
+      paging: {
+        count: number;
+        total: number;
+        page: number;
+        pages: number;
+      };
+    }>
+  > {
     const params = new URLSearchParams({
       user: userId,
       count: count.toString(),
@@ -779,7 +791,7 @@ export class SlackClient {
       },
     };
   }
-  
+
   /**
    * @description Uploads a file to Slack using the new v2 API (files.getUploadURLExternal + files.completeUploadExternal)
    * @param options Upload options including channel, file, filename, etc.
@@ -791,21 +803,23 @@ export class SlackClient {
     title?: string;
     thread_ts?: string;
     initial_comment?: string;
-  }): Promise<SlackResponse<{ 
-    files: Array<{
-      id: string;
-      title?: string;
-      name?: string;
-      mimetype?: string;
-      filetype?: string;
-      permalink?: string;
-      url_private?: string;
-    }>;
-  }>> {
+  }): Promise<
+    SlackResponse<{
+      files: Array<{
+        id: string;
+        title?: string;
+        name?: string;
+        mimetype?: string;
+        filetype?: string;
+        permalink?: string;
+        url_private?: string;
+      }>;
+    }>
+  > {
     // Convert file to Blob/Uint8Array for size calculation
     let fileBlob: Blob;
     let fileSize: number;
-    
+
     if (typeof options.file === "string") {
       // Handle base64 or data URL
       let input = options.file;
@@ -819,7 +833,7 @@ export class SlackClient {
       fileBlob = new Blob([bytes], mime ? { type: mime } : undefined);
       fileSize = bytes.byteLength;
     } else if (options.file instanceof Uint8Array) {
-      fileBlob = new Blob([options.file]);
+      fileBlob = new Blob([new Uint8Array(options.file)]);
       fileSize = options.file.byteLength;
     } else {
       // Assume it's a Blob or File
@@ -828,14 +842,17 @@ export class SlackClient {
     }
 
     // Step 1: Get upload URL
-    const getUrlResponse = await fetch("https://slack.com/api/files.getUploadURLExternal", {
-      method: "POST",
-      headers: this.botHeaders,
-      body: JSON.stringify({
-        filename: options.filename,
-        length: fileSize,
-      }),
-    });
+    const getUrlResponse = await fetch(
+      "https://slack.com/api/files.getUploadURLExternal",
+      {
+        method: "POST",
+        headers: this.botHeaders,
+        body: JSON.stringify({
+          filename: options.filename,
+          length: fileSize,
+        }),
+      },
+    );
 
     const getUrlResult: SlackUploadURLResponse = await getUrlResponse.json();
     if (!getUrlResult.ok) {
@@ -888,14 +905,18 @@ export class SlackClient {
       completePayload.initial_comment = options.initial_comment;
     }
 
-    const completeResponse = await fetch("https://slack.com/api/files.completeUploadExternal", {
-      method: "POST",
-      headers: this.botHeaders,
-      body: JSON.stringify(completePayload),
-    });
+    const completeResponse = await fetch(
+      "https://slack.com/api/files.completeUploadExternal",
+      {
+        method: "POST",
+        headers: this.botHeaders,
+        body: JSON.stringify(completePayload),
+      },
+    );
 
-    const completeResult: SlackCompleteUploadResponse = await completeResponse.json();
-    
+    const completeResult: SlackCompleteUploadResponse = await completeResponse
+      .json();
+
     return {
       ok: completeResult.ok,
       error: completeResult.error,
@@ -919,29 +940,31 @@ export class SlackClient {
     initial_comment?: string;
     filetype?: string;
     thread_ts?: string;
-  }): Promise<SlackResponse<{
-    file?: SlackFile;
-    warning?: string;
-  }>> {
+  }): Promise<
+    SlackResponse<{
+      file?: SlackFile;
+      warning?: string;
+    }>
+  > {
     // Deprecation warning
     console.warn(
       "⚠️  DEPRECATION WARNING: files.upload API will be sunset on November 12, 2025. " +
-      "Please migrate to uploadFileV2() which uses the new files.getUploadURLExternal + files.completeUploadExternal flow. " +
-      "See: https://docs.slack.dev/reference/methods/files.getUploadURLExternal"
+        "Please migrate to uploadFileV2() which uses the new files.getUploadURLExternal + files.completeUploadExternal flow. " +
+        "See: https://docs.slack.dev/reference/methods/files.getUploadURLExternal",
     );
 
     const formData = new FormData();
     formData.append("channels", options.channels);
     formData.append("filename", options.filename);
-    
+
     if (options.title) {
       formData.append("title", options.title);
     }
-    
+
     if (options.initial_comment) {
       formData.append("initial_comment", options.initial_comment);
     }
-    
+
     if (options.filetype) {
       formData.append("filetype", options.filetype);
     }
