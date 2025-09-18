@@ -77,7 +77,7 @@ export default async function action(
   proxySetCookie(response.headers, ctx.response.headers, req.url);
   await ctx.invoke.vtex.actions.session.validateSession();
 
-  // TODO: REMOVE THIS AFTER TESTING AND VALIDATE IF NEEDED
+  // TODO: REMOVE THIS AFTER TESTING AND VALIDATE IF NEEDED REWRITE REFRESH_TOKEN_COOKIE
   const setCookies = getSetCookies(ctx.response.headers);
   for (const cookie of setCookies) {
     if (cookie.name === REFRESH_TOKEN_COOKIE) {

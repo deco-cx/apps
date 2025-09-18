@@ -4,6 +4,7 @@ import {
   getSetCookies,
   setCookie,
 } from "std/http/cookie.ts";
+import { SEGMENT_COOKIE_NAME } from "./segment.ts";
 
 export const stringify = (cookies: Record<string, string>) =>
   Object.entries(cookies)
@@ -24,6 +25,31 @@ export const proxySetCookie = (
         domain: newDomain.hostname,
       }
       : cookie;
+
+    setCookie(to, newCookie);
+  }
+};
+
+export const setCookiesFromSession = (
+  from: Headers,
+  to: Headers,
+  domain: URL | string,
+) => {
+  const newDomain = new URL(domain);
+
+  for (const cookie of getSetCookies(from)) {
+    const newCookie = cookie.name === SEGMENT_COOKIE_NAME
+      ? {
+        value: cookie.value,
+        name: cookie.name,
+        path: "/",
+        secure: true,
+        httpOnly: true,
+      }
+      : {
+        ...cookie,
+        domain: newDomain.hostname,
+      };
 
     setCookie(to, newCookie);
   }
