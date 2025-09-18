@@ -1,5 +1,6 @@
 import {
   SlackChannel,
+  SlackFile,
   SlackMessage,
   SlackResponse,
   SlackUser,
@@ -63,6 +64,68 @@ export interface SlackApiClient {
       user: string;
     };
     response: SlackResponse<{ profile: SlackUserProfile }>;
+  };
+  "POST /conversations.open": {
+    json: {
+      users: string;
+    };
+    response: SlackResponse<{
+      channel?: { id: string };
+      no_op?: boolean;
+      already_open?: boolean;
+      warning?: string;
+    }>;
+  };
+  "GET /files.list": {
+    searchParams: {
+      user: string;
+      count?: string;
+      page?: string;
+      types?: string;
+    };
+    response: SlackResponse<{
+      files: SlackFile[];
+      paging: {
+        count: number;
+        total: number;
+        page: number;
+        pages: number;
+      };
+    }>;
+  };
+  "POST /files.getUploadURLExternal": {
+    json: {
+      filename: string;
+      length: number;
+    };
+    response: {
+      ok: boolean;
+      upload_url: string;
+      file_id: string;
+      error?: string;
+    };
+  };
+  "POST /files.completeUploadExternal": {
+    json: {
+      files: Array<{
+        id: string;
+        title?: string;
+      }>;
+      channel_id: string;
+      initial_comment?: string;
+      thread_ts?: string;
+    };
+    response: SlackResponse<{
+      files: Array<{
+        id: string;
+        title?: string;
+        name?: string;
+        mimetype?: string;
+        filetype?: string;
+        permalink?: string;
+        url_private?: string;
+      }>;
+    }>;
   };
 }
 

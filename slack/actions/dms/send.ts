@@ -39,7 +39,7 @@ export default async function sendDm(
   try {
     // First, open/get the DM channel with the user
     const channelResponse = await ctx.slack.openDmChannel(props.userId);
-    
+
     if (!channelResponse.ok) {
       return {
         ok: false,
@@ -66,9 +66,20 @@ export default async function sendDm(
     }
 
     // Now send the message to the DM channel
-    return await ctx.slack.postMessage(channelId, props.text, {
+    const messageResponse = await ctx.slack.postMessage(channelId, props.text, {
       blocks: props.blocks,
     });
+
+    return {
+      ok: messageResponse.ok,
+      error: messageResponse.ok ? undefined : "Failed to send message",
+      data: {
+        channel: messageResponse.channel,
+        ts: messageResponse.ts,
+        message: messageResponse.message,
+        warning: channelResponse.data.warning,
+      },
+    };
   } catch (error) {
     console.error("Error sending DM:", error);
     return {

@@ -87,6 +87,57 @@ export interface SlackUser {
 }
 
 /**
+ * @description A file in Slack workspace
+ */
+export interface SlackFile {
+  id: string;
+  created: number;
+  timestamp: number;
+  name: string;
+  title: string;
+  mimetype: string;
+  filetype: string;
+  pretty_type: string;
+  user: string;
+  mode: string;
+  editable: boolean;
+  is_external: boolean;
+  external_type: string;
+  size: number;
+  url_private: string;
+  url_private_download: string;
+  permalink: string;
+  permalink_public?: string;
+  edit_link?: string;
+  preview?: string;
+  preview_highlight?: string;
+  lines?: number;
+  lines_more?: number;
+  is_public: boolean;
+  public_url_shared: boolean;
+  display_as_bot: boolean;
+  username?: string;
+  url?: string;
+  thumb_64?: string;
+  thumb_80?: string;
+  thumb_360?: string;
+  thumb_360_gif?: string;
+  thumb_360_w?: number;
+  thumb_360_h?: number;
+  thumb_480?: string;
+  thumb_480_w?: number;
+  thumb_480_h?: number;
+  thumb_160?: string;
+  image_exif_rotation?: number;
+  original_w?: number;
+  original_h?: number;
+  channels?: string[];
+  groups?: string[];
+  ims?: string[];
+  comments_count?: number;
+}
+
+/**
  * @description Response from Slack auth.test endpoint
  */
 export interface SlackAuthTestResponse {
@@ -201,6 +252,41 @@ export class SlackClient {
     });
 
     return response.json();
+  }
+
+  /**
+   * @description Opens a direct message conversation with a user
+   * @param userId The ID of the user to open a DM conversation with
+   */
+  async openDmChannel(
+    userId: string,
+  ): Promise<
+    SlackResponse<{
+      channel?: { id: string };
+      no_op?: boolean;
+      already_open?: boolean;
+      warning?: string;
+    }>
+  > {
+    const response = await fetch("https://slack.com/api/conversations.open", {
+      method: "POST",
+      headers: this.botHeaders,
+      body: JSON.stringify({
+        users: userId,
+      }),
+    });
+
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      data: {
+        channel: result.channel,
+        no_op: result.no_op,
+        already_open: result.already_open,
+        warning: result.warning,
+      },
+    };
   }
 
   /**
@@ -386,5 +472,242 @@ export class SlackClient {
       body: JSON.stringify(payload),
     });
     return response.json();
+  }
+
+  /**
+   * @description Lists files uploaded by a specific user
+   * @param userId The ID of the user whose files to list
+   * @param count Maximum number of files to return (default: 20, max: 1000)
+   * @param page Page number for pagination (default: 1)
+   * @param types Filter by file type (default: 'all')
+   */
+  async listUserFiles(
+    userId: string,
+    count: number = 20,
+    page: number = 1,
+    types: string = "all",
+  ): Promise<
+    SlackResponse<{
+      files: SlackFile[];
+      paging: {
+        count: number;
+        total: number;
+        page: number;
+        pages: number;
+      };
+    }>
+  > {
+    const params = new URLSearchParams({
+      user: userId,
+      count: Math.min(count, 1000).toString(),
+      page: page.toString(),
+      types: types,
+    });
+
+    const response = await fetch(
+      `https://slack.com/api/files.list?${params}`,
+      { headers: this.botHeaders },
+    );
+
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      data: {
+        files: result.files || [],
+        paging: result.paging || { count: 0, total: 0, page: 1, pages: 0 },
+      },
+    };
+  }
+
+  /**
+   * @description Lists all direct message channels
+   * @param limit Maximum number of channels to return (default: 100)
+   * @param cursor Pagination cursor for next page
+   */
+  async listDmChannels(
+    limit: number = 100,
+    cursor?: string,
+  ): Promise<SlackResponse<{ channels: SlackChannel[] }>> {
+    const params = new URLSearchParams({
+      types: "im",
+      exclude_archived: "false",
+      limit: Math.min(limit, 1000).toString(),
+    });
+
+    if (cursor) {
+      params.append("cursor", cursor);
+    }
+
+    const response = await fetch(
+      `https://slack.com/api/conversations.list?${params}`,
+      { headers: this.botHeaders },
+    );
+
+    const result = await response.json();
+    return {
+      ok: result.ok,
+      error: result.error,
+      response_metadata: result.response_metadata,
+      data: {
+        channels: result.channels || [],
+      },
+    };
+  }
+
+  /**
+   * @description Uploads a file using the new V2 API (files.getUploadURLExternal + files.completeUploadExternal)
+   * @param options Upload options including file, filename, channels, etc.
+   */
+  async uploadFileV2(options: {
+    channels: string;
+    file: string | Uint8Array | Blob | File;
+    filename: string;
+    title?: string;
+    initial_comment?: string;
+    thread_ts?: string;
+  }): Promise<
+    SlackResponse<{
+      files: Array<{
+        id: string;
+        title?: string;
+        name?: string;
+        mimetype?: string;
+        filetype?: string;
+        permalink?: string;
+        url_private?: string;
+      }>;
+    }>
+  > {
+    try {
+      // Step 1: Get upload URL
+      const uploadUrlResponse = await fetch(
+        "https://slack.com/api/files.getUploadURLExternal",
+        {
+          method: "POST",
+          headers: this.botHeaders,
+          body: JSON.stringify({
+            filename: options.filename,
+            length: await this.getFileSize(options.file),
+          }),
+        },
+      );
+
+      const uploadUrlResult = await uploadUrlResponse.json();
+      if (!uploadUrlResult.ok) {
+        return {
+          ok: false,
+          error: uploadUrlResult.error || "Failed to get upload URL",
+          data: { files: [] },
+        };
+      }
+
+      // Step 2: Upload file to the obtained URL
+      const formData = new FormData();
+      let fileBlob: Blob;
+
+      if (typeof options.file === "string") {
+        // Handle base64 or data URL
+        if (options.file.startsWith("data:")) {
+          const response = await fetch(options.file);
+          fileBlob = await response.blob();
+        } else {
+          // Assume base64
+          const binaryString = atob(options.file);
+          const bytes = new Uint8Array(binaryString.length);
+          for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+          fileBlob = new Blob([bytes]);
+        }
+      } else if (options.file instanceof Uint8Array) {
+        fileBlob = new Blob([new Uint8Array(options.file)]);
+      } else {
+        fileBlob = options.file as Blob;
+      }
+
+      formData.append("file", fileBlob, options.filename);
+
+      const uploadResponse = await fetch(uploadUrlResult.upload_url, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        return {
+          ok: false,
+          error: "Failed to upload file to external URL",
+          data: { files: [] },
+        };
+      }
+
+      // Step 3: Complete the upload
+      const completePayload: Record<string, unknown> = {
+        files: [
+          {
+            id: uploadUrlResult.file_id,
+            title: options.title || options.filename,
+          },
+        ],
+        channel_id: options.channels,
+      };
+
+      if (options.initial_comment) {
+        completePayload.initial_comment = options.initial_comment;
+      }
+
+      if (options.thread_ts) {
+        completePayload.thread_ts = options.thread_ts;
+      }
+
+      const completeResponse = await fetch(
+        "https://slack.com/api/files.completeUploadExternal",
+        {
+          method: "POST",
+          headers: this.botHeaders,
+          body: JSON.stringify(completePayload),
+        },
+      );
+
+      const completeResult = await completeResponse.json();
+
+      return {
+        ok: completeResult.ok,
+        error: completeResult.error,
+        data: {
+          files: completeResult.files || [],
+        },
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+        data: { files: [] },
+      };
+    }
+  }
+
+  /**
+   * @description Helper method to get file size
+   * @private
+   */
+  private async getFileSize(
+    file: string | Uint8Array | Blob | File,
+  ): Promise<number> {
+    if (typeof file === "string") {
+      if (file.startsWith("data:")) {
+        const response = await fetch(file);
+        const blob = await response.blob();
+        return blob.size;
+      } else {
+        // Assume base64
+        const binaryString = atob(file);
+        return binaryString.length;
+      }
+    } else if (file instanceof Uint8Array) {
+      return file.length;
+    } else {
+      return (file as Blob).size;
+    }
   }
 }

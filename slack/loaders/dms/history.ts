@@ -64,7 +64,6 @@ export default async function dmHistory(
     return await ctx.slack.getChannelHistory(
       channelId,
       limit,
-      props.cursor,
     );
   } catch (error) {
     console.error("Error getting DM history:", error);
