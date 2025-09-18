@@ -161,7 +161,10 @@ function cleanHtmlAndGetText(html: string): string {
           const parent = (el as unknown as Element).parentNode;
           try {
             if (parent && (doc as unknown as Document).createTextNode) {
-              parent.insertBefore((doc as unknown as Document).createTextNode(" "), el as unknown as Node);
+              parent.insertBefore(
+                (doc as unknown as Document).createTextNode(" "),
+                el as unknown as Node,
+              );
             }
           } catch { /* ignore */ }
           ((el as unknown) as Element).remove?.();
@@ -239,7 +242,7 @@ async function fetchWithTimeout(
   const startedAt = Date.now();
   try {
     const res = await fetch(url, { ...opts, signal: controller.signal });
- 
+
     return res;
   } catch (err) {
     const duration = Date.now() - startedAt;
@@ -600,7 +603,14 @@ async function searchWithCloudSearch(
   pageSize: number = 10,
   // Novo: permitir override vindo do prompt do loader
   overrideSearchApplicationId?: string,
-): Promise<{ results: SearchResult[]; total: number; unavailable?: boolean; info?: string }> {
+): Promise<
+  {
+    results: SearchResult[];
+    total: number;
+    unavailable?: boolean;
+    info?: string;
+  }
+> {
   try {
     const body: {
       query: string;
@@ -684,12 +694,10 @@ async function searchWithCloudSearch(
 
       // Tratar erros de ID faltando/ inválido / não encontrado
       const msg = (err.message || "").toLowerCase();
-      const isMissingId =
-        err.code === 400 &&
+      const isMissingId = err.code === 400 &&
         (msg.includes("search application id is required") ||
           msg.includes("required for the request"));
-      const isInvalidOrNotFound =
-        (err.code === 400 || err.code === 404) &&
+      const isInvalidOrNotFound = (err.code === 400 || err.code === 404) &&
         (msg.includes("invalid") ||
           msg.includes("not found") ||
           msg.includes("search application"));
@@ -732,7 +740,8 @@ const loader = async (
   pageSize: number;
   info?: string;
 }> => {
-  const { siteUrl, query, page = 1, pageSize = 10, searchApplicationId } = props;
+  const { siteUrl, query, page = 1, pageSize = 10, searchApplicationId } =
+    props;
 
   const siteUrlNorm = normalize(siteUrl);
 
@@ -750,7 +759,7 @@ const loader = async (
   }
 
   const start = (page - 1) * pageSize;
-  
+
   let searchResults: {
     results: SearchResult[];
     total: number;
@@ -758,14 +767,14 @@ const loader = async (
   };
   let info: string | undefined;
 
-  if (siteUrlNorm=== ""){
+  if (siteUrlNorm === "") {
     searchResults = {
       results: [],
       total: 0,
-      isPrivate: true
+      isPrivate: true,
     };
-  }else{
-      // Tentar primeiro com Custom Search API
+  } else {
+    // Tentar primeiro com Custom Search API
     searchResults = await searchWithCustomSearch(
       query,
       siteUrlNorm || "",
@@ -783,8 +792,6 @@ const loader = async (
       };
     }
   }
-
-  
 
   // Se Custom Search indicar site privado ou não retornar resultados, tentar Cloud Search
   if (
@@ -806,8 +813,7 @@ const loader = async (
     };
 
     if (cloudSearchResults.unavailable) {
-      info =
-        cloudSearchResults.info ??
+      info = cloudSearchResults.info ??
         "Cloud Search API não está disponível para contas pessoais. É necessário usar uma conta Google Workspace com o serviço Cloud Search habilitado e permissões de consulta.";
     } else if (cloudSearchResults.results.length > 0) {
       info = "Resultados obtidos via Cloud Search API (site privado)";

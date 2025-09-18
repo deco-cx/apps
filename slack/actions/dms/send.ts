@@ -39,7 +39,7 @@ export default async function sendDm(
   try {
     // First, open/get the DM channel with the user
     const channelResponse = await ctx.slack.openDmChannel(props.userId);
-    
+
     if (!channelResponse.ok) {
       return {
         ok: false,
