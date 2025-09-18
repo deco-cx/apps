@@ -59,7 +59,7 @@ export default async function runActorAsync(
     let parsedInput: unknown;
     try {
       parsedInput = JSON.parse(inputString);
-    } catch (parseError) {
+    } catch {
       return { error: "Invalid JSON input", data: null };
     }
 

@@ -1,4 +1,10 @@
-import { Actor, ActorRun, ActorRunsResponse, ActorsResponse, DatasetItemsQueryParams } from "./types.ts";
+import {
+  Actor,
+  ActorRun,
+  ActorRunsResponse,
+  ActorsResponse,
+  DatasetItemsQueryParams,
+} from "./types.ts";
 
 // Apify API client interface - simplified for Deco compatibility
 export interface ApifyClient {
@@ -40,6 +46,7 @@ export interface ApifyClient {
   // Get dataset items - GET /v2/datasets/:datasetId/items
   "GET /v2/datasets/:datasetId/items": {
     searchParams: DatasetItemsQueryParams;
+    // deno-lint-ignore no-explicit-any
     response: any;
   };
 }

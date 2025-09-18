@@ -1,6 +1,7 @@
 // Apify API types based on official v2 documentation
 export interface ActorRun {
   id: string;
+  // deno-lint-ignore no-explicit-any
   data?: any;
   actId: string;
   userId: string;
@@ -122,7 +123,14 @@ export interface KeyValueStore {
 }
 
 // Dataset Items API types
-export type DatasetItemFormat = "json" | "jsonl" | "xml" | "html" | "csv" | "xlsx" | "rss";
+export type DatasetItemFormat =
+  | "json"
+  | "jsonl"
+  | "xml"
+  | "html"
+  | "csv"
+  | "xlsx"
+  | "rss";
 
 export interface DatasetItemsQueryParams {
   /** Response format - determines how data is structured and returned */
