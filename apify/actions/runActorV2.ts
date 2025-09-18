@@ -33,21 +33,25 @@ export interface Props {
 }
 
 /**
- * @name RUN_ACTOR
- * @title Run Actor
+ * @name RUN_ACTOR_V2
+ * @title Run Actor V2
  * @description Run an Apify actor synchronously and return dataset items
- * @deprecated Use RUN_ACTOR_V2 instead
  */
-export default async function runActor(
+export default async function runActorV2(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<Array<Record<string, unknown>> | { error: string }> {
+): Promise<
+  { data: Array<Record<string, unknown>>; error: null } | {
+    error: string;
+    data: null;
+  }
+> {
   try {
     const { actorId, input: inputString, timeout, memory, build } = props;
 
     if (!actorId) {
-      return { error: "Actor ID is required" };
+      return { error: "Actor ID is required", data: null };
     }
 
     const response = await ctx.api
@@ -65,11 +69,13 @@ export default async function runActor(
       throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
 
-    // Este endpoint retorna diretamente os itens do dataset
     const result = await response.json();
-    return result;
+    return { data: result, error: null };
   } catch (error) {
     console.error("Error running actor:", error);
-    return ctx.errorHandler.toHttpError(error, "Error running actor");
+    return {
+      error: ctx.errorHandler.toHttpError(error, "Error running actor"),
+      data: null,
+    };
   }
 }
