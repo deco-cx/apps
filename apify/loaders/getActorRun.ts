@@ -13,6 +13,12 @@ export interface Props {
    * @description The ID of the actor run
    */
   runId: string;
+
+  /**
+   * @title Include Dataset Items
+   * @description If true, include dataset items in the response
+   */
+  includeDatasetItems?: boolean;
 }
 
 /**
@@ -37,7 +43,17 @@ export default async function getActorRun(
       runId,
     });
 
-    return response.json();
+    const result = await response.json();
+
+    if (props.includeDatasetItems && result.defaultDatasetId) {
+      const datasetItemsResponse = await ctx.api["GET /v2/datasets/:datasetId/items"]({
+        datasetId: result.defaultDatasetId,
+        format: "json",
+      });
+      result.data = await datasetItemsResponse.json();
+    }
+
+    return result;
   } catch (error) {
     console.error("Error getting actor run:", error);
     return ctx.errorHandler.toHttpError(error, "Error getting actor run");
