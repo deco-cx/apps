@@ -41,7 +41,12 @@ export default async function runActorV2(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<{ data: Array<Record<string, unknown>>, error: null } | { error: string, data: null }> {
+): Promise<
+  { data: Array<Record<string, unknown>>; error: null } | {
+    error: string;
+    data: null;
+  }
+> {
   try {
     const { actorId, input: inputString, timeout, memory, build } = props;
 
@@ -68,6 +73,9 @@ export default async function runActorV2(
     return { data: result, error: null };
   } catch (error) {
     console.error("Error running actor:", error);
-    return { error: ctx.errorHandler.toHttpError(error, "Error running actor"), data: null };
+    return {
+      error: ctx.errorHandler.toHttpError(error, "Error running actor"),
+      data: null,
+    };
   }
 }
