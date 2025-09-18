@@ -1,24 +1,11 @@
 import type { AppContext } from "../../mod.ts";
+import type { SlackResponse } from "../../client.ts";
 
 export interface Props {
   /**
    * @description The ID of the user to open a DM conversation with
    */
   userId: string;
-}
-
-export interface ConversationOpenResponse {
-  ok: boolean;
-  no_op?: boolean;
-  already_open?: boolean;
-  channel?: {
-    id: string;
-  };
-  warning?: string;
-  response_metadata?: {
-    warnings?: string[];
-  };
-  error?: string;
 }
 
 /**
@@ -30,24 +17,22 @@ export default async function openConversation(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<ConversationOpenResponse> {
+): Promise<
+  SlackResponse<{
+    channel?: { id: string };
+    no_op?: boolean;
+    already_open?: boolean;
+    warning?: string;
+  }>
+> {
   try {
-    const response = await ctx.slack.openDmChannel(props.userId);
-
-    return {
-      ok: response.ok,
-      no_op: response.data.no_op,
-      already_open: response.data.already_open,
-      channel: response.data.channel,
-      warning: response.data.warning,
-      response_metadata: response.response_metadata,
-      error: response.error,
-    };
+    return await ctx.slack.openDmChannel(props.userId);
   } catch (error) {
     console.error("Error opening conversation:", error);
     return {
       ok: false,
       error: error instanceof Error ? error.message : "Unknown error",
+      data: {},
     };
   }
 }

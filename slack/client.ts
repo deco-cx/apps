@@ -449,7 +449,7 @@ export class SlackClient {
       headers: this.botHeaders,
       body: JSON.stringify({
         channel: channelId,
-        timestamp: timestamp,
+        timestamp,
         name: reaction,
       }),
     });

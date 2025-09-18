@@ -41,7 +41,7 @@ export interface SlackApiClient {
   "POST /reactions.add": {
     json: {
       channel: string;
-      timestamp: string;
+      ts: string;
       name: string;
     };
     response: SlackResponse<{ channel: string; ts: string }>;

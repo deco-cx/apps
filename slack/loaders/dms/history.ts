@@ -1,5 +1,5 @@
 import type { AppContext } from "../../mod.ts";
-import { SlackMessage } from "../../client.ts";
+import { SlackMessage, SlackResponse } from "../../client.ts";
 
 export interface Props {
   /**
@@ -28,36 +28,50 @@ export default async function dmHistory(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<SlackMessage[]> {
+): Promise<
+  SlackResponse<{
+    messages: SlackMessage[];
+    has_more?: boolean;
+    pin_count?: number;
+    channel_actions_ts?: string | null;
+    channel_actions_count?: number;
+    warning?: string;
+  }>
+> {
   try {
     const channelResponse = await ctx.slack.openDmChannel(props.userId);
 
     if (!channelResponse.ok) {
       console.error("Failed to open DM channel:", channelResponse.error);
-      return [];
+      return {
+        ok: false,
+        error: channelResponse.error || "Failed to open DM channel",
+        data: { messages: [] },
+      };
     }
 
     const channelId = channelResponse.data.channel?.id;
     if (!channelId) {
       console.error("No channel ID returned for user", props.userId);
-      return [];
+      return {
+        ok: false,
+        error: "No channel ID returned",
+        data: { messages: [] },
+      };
     }
     const limit = props.limit || 10;
 
-    const historyResponse = await ctx.slack.getChannelHistory(
+    return await ctx.slack.getChannelHistory(
       channelId,
       limit,
       props.cursor,
     );
-
-    if (!historyResponse.ok) {
-      console.error("Failed to get DM history:", historyResponse.error);
-      return [];
-    }
-
-    return historyResponse.data.messages || [];
   } catch (error) {
     console.error("Error getting DM history:", error);
-    return [];
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      data: { messages: [] },
+    };
   }
 }
