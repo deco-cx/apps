@@ -1,4 +1,4 @@
-import { getCookies, getSetCookies } from "std/http/cookie.ts";
+import { deleteCookie, getCookies } from "std/http/cookie.ts";
 import { AppContext } from "../../mod.ts";
 import { REFRESH_TOKEN_COOKIE } from "../../utils/cookies.ts";
 import { proxySetCookie } from "../../utils/cookies.ts";
@@ -6,6 +6,15 @@ import { proxySetCookie } from "../../utils/cookies.ts";
 interface Props {
   fingerprint?: string;
 }
+
+const STATUS = {
+  SUCCESS: "Success",
+  INVALID_SESSION: "InvalidSession",
+  INVALID_TOKEN: "InvalidToken",
+  INVALID_EMAIL: "InvalidEmail",
+  INVALID_SCOPE: "InvalidScope",
+  ERROR: "Error",
+};
 
 /**
  * @title VTEX Integration - Refresh Authentication Token
@@ -41,12 +50,15 @@ export default async function refreshToken(
   }
 
   const data = await response.json();
-  proxySetCookie(response.headers, ctx.response.headers, req.url);
 
-  // TODO: REMOVE THIS AFTER TESTING
-  console.log("refreshToken data", data);
-  const setCookies = getSetCookies(ctx.response.headers);
-  console.log("refreshToken setCookies", setCookies);
+  if (data?.status !== STATUS.SUCCESS) {
+    deleteCookie(ctx.response.headers, REFRESH_TOKEN_COOKIE, {
+      path: "/",
+      domain: new URL(req.url).hostname,
+    });
+  }
+
+  proxySetCookie(response.headers, ctx.response.headers, req.url);
 
   return data;
 }

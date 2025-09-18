@@ -1,11 +1,8 @@
 import { getSetCookies } from "std/http/cookie.ts";
 import type { AppContext } from "../../mod.ts";
-import { buildCookieJar, proxySetCookie } from "../../utils/cookies.ts";
+import { buildCookieJar, setCookiesFromSession } from "../../utils/cookies.ts";
 import type { GetSessionResponse } from "../../utils/openapi/vcs.openapi.gen.ts";
-// import { parseCookie } from "../../utils/vtexId.ts";
 import { items } from "../../utils/session.ts";
-// import { SEGMENT_COOKIE_NAME } from "../../utils/segment.ts";
-// import { setSegmentBag } from "../../utils/segment.ts";
 
 interface Props {
   publicProperties: Record<string, { value: string }>;
@@ -40,11 +37,9 @@ async function action(
     throw new Error(`Failed to edit session: ${response.status}`);
   }
 
-  proxySetCookie(response.headers, ctx.response.headers, req.url);
-  // TODO: REMOVE THIS AFTER TESTING
-  // setSegmentBag(record, req, ctx);
+  setCookiesFromSession(response.headers, ctx.response.headers, req.url);
 
-  return await response.json() as GetSessionResponse;
+  return (await response.json()) as GetSessionResponse;
 }
 
 export default action;

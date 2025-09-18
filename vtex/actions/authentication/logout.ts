@@ -40,8 +40,13 @@ export default async function action(
   }
 
   const data = await response.json();
+
+  deleteCookie(ctx.response.headers, REFRESH_TOKEN_COOKIE, {
+    path: "/",
+    domain: new URL(req.url).hostname,
+  });
+
   proxySetCookie(response.headers, ctx.response.headers, req.url);
-  deleteCookie(ctx.response.headers, REFRESH_TOKEN_COOKIE); // TODO: REMOVE THIS AFTER TESTING AND VALIDATE IF NEEDED
 
   await ctx.invoke.vtex.actions.session
     .validateSession();

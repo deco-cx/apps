@@ -1,6 +1,6 @@
 import { getSetCookies } from "std/http/cookie.ts";
 import type { AppContext } from "../../mod.ts";
-import { buildCookieJar, proxySetCookie } from "../../utils/cookies.ts";
+import { buildCookieJar, setCookiesFromSession } from "../../utils/cookies.ts";
 import type { GetSessionResponse } from "../../utils/openapi/vcs.openapi.gen.ts";
 import { items } from "../../utils/session.ts";
 
@@ -32,7 +32,7 @@ async function action(
     throw new Error(`Failed to create session: ${response.status}`);
   }
 
-  proxySetCookie(response.headers, ctx.response.headers, req.url);
+  setCookiesFromSession(response.headers, ctx.response.headers, req.url);
 
   return await response.json() as GetSessionResponse;
 }
