@@ -1,6 +1,5 @@
 import {
   SlackChannel,
-  SlackFile,
   SlackMessage,
   SlackResponse,
   SlackUser,
@@ -17,31 +16,22 @@ export interface SlackApiClient {
       team_id?: string;
       cursor?: string;
     };
-    response: SlackResponse<{
-      channels: SlackChannel[];
-    }>;
+    response: SlackResponse<{ channels: SlackChannel[] }>;
   };
   "POST /chat.postMessage": {
     json: {
       channel: string;
       text: string;
       thread_ts?: string;
-      blocks?: unknown[];
     };
-    response: SlackResponse<{
-      channel: string;
-      ts: string;
-      message: SlackMessage;
-      warning?: string;
-      response_metadata?: {
-        warnings?: string[];
-      };
-    }>;
+    response: SlackResponse<
+      { channel: string; ts: string; message: SlackMessage }
+    >;
   };
   "POST /reactions.add": {
     json: {
       channel: string;
-      ts: string;
+      timestamp: string;
       name: string;
     };
     response: SlackResponse<{ channel: string; ts: string }>;
@@ -50,16 +40,8 @@ export interface SlackApiClient {
     searchParams: {
       channel: string;
       limit?: string;
-      cursor?: string;
     };
-    response: SlackResponse<{
-      messages: SlackMessage[];
-      has_more?: boolean;
-      pin_count?: number;
-      channel_actions_ts?: string | null;
-      channel_actions_count?: number;
-      warning?: string;
-    }>;
+    response: SlackResponse<{ messages: SlackMessage[] }>;
   };
   "GET /conversations.replies": {
     searchParams: {
@@ -81,47 +63,6 @@ export interface SlackApiClient {
       user: string;
     };
     response: SlackResponse<{ profile: SlackUserProfile }>;
-  };
-  "POST /conversations.open": {
-    json: {
-      users: string;
-    };
-    response: SlackResponse<{
-      channel: { id: string };
-      no_op?: boolean;
-      already_open?: boolean;
-      warning?: string;
-      response_metadata?: {
-        warnings?: string[];
-      };
-    }>;
-  };
-  "GET /files.list": {
-    searchParams: {
-      user: string;
-      count?: string;
-      page?: string;
-      types?: string;
-    };
-    response: SlackResponse<{
-      files: SlackFile[];
-      paging: {
-        count: number;
-        total: number;
-        page: number;
-        pages: number;
-      };
-    }>;
-  };
-  "POST /files.upload": {
-    body: FormData;
-    response: SlackResponse<{
-      file: SlackFile;
-      warning?: string;
-      response_metadata?: {
-        warnings?: string[];
-      };
-    }>;
   };
 }
 

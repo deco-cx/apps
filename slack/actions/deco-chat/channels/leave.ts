@@ -3,7 +3,6 @@ import type { AppContext } from "../../../mod.ts";
 
 /**
  * @name DECO_CHAT_CHANNELS_LEAVE
- * @title Deco Chat Channel Leave
  * @description This action is triggered when slack integration is left
  */
 export default async function leave(

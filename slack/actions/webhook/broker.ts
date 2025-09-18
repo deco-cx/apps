@@ -33,7 +33,7 @@ export default function webhookPayload(
     method: "POST",
     body: JSON.stringify(props),
     headers: {
-      "Content-Type": "application/json",
+      "content-type": "application/json",
     },
   });
   return response;
