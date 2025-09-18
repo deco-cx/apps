@@ -1,6 +1,8 @@
 // Apify API types based on official v2 documentation
 export interface ActorRun {
   id: string;
+  // deno-lint-ignore no-explicit-any
+  data?: any;
   actId: string;
   userId: string;
   status: string;
@@ -118,4 +120,45 @@ export interface KeyValueStore {
   accessedAt: string;
   actId?: string;
   actRunId?: string;
+}
+
+// Dataset Items API types
+export type DatasetItemFormat =
+  | "json"
+  | "jsonl"
+  | "xml"
+  | "html"
+  | "csv"
+  | "xlsx"
+  | "rss";
+
+export interface DatasetItemsQueryParams {
+  /** Response format - determines how data is structured and returned */
+  format?: DatasetItemFormat;
+  /** Skip hidden fields (starting with #) from output */
+  skipHidden?: boolean | 0 | 1;
+  /** Clean output by omitting hidden fields (alias for skipHidden) */
+  clean?: boolean | 0 | 1;
+  /** Unwind array fields to separate items */
+  unwind?: string;
+  /** Flatten nested objects using dot notation */
+  flatten?: string[];
+  /** Select only specific fields */
+  fields?: string[];
+  /** Omit specific fields */
+  omit?: string[];
+  /** Return results in descending order (newest first) */
+  desc?: boolean | 0 | 1;
+  /** Pagination offset */
+  offset?: number;
+  /** Maximum number of items to return */
+  limit?: number;
+  /** Custom XML root element name (for XML/RSS formats) */
+  xmlRoot?: string;
+  /** Custom XML row element name (for XML/RSS formats) */
+  xmlRow?: string;
+  /** Skip empty items */
+  skipEmpty?: boolean | 0 | 1;
+  /** Simplified format for easier processing */
+  simplified?: boolean | 0 | 1;
 }
