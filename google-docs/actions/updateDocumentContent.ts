@@ -80,12 +80,12 @@ const action = async (
     }
 
     const document = await documentResponse.json();
-    
+
     // Calculate the actual end index of the document
     // Find the last element in the document body
     const bodyContent = document.body?.content || [];
     let documentLength = 1; // Default to 1 if no content
-    
+
     if (bodyContent.length > 0) {
       const lastElement = bodyContent[bodyContent.length - 1];
       if (lastElement.endIndex) {
