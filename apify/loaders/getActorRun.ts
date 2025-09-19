@@ -1,5 +1,5 @@
 import { AppContext } from "../mod.ts";
-import { ActorRun } from "../utils/types.ts";
+import { ActorRunResponse } from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -30,7 +30,7 @@ export default async function getActorRun(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<ActorRun | { error: string }> {
+): Promise<ActorRunResponse | { error: string }> {
   try {
     const { actorId, runId } = props;
 
@@ -43,7 +43,7 @@ export default async function getActorRun(
       runId,
     });
 
-    const result = await response.json();
+    const result = await response.json() as ActorRunResponse;
 
     if (props.includeDatasetItems && result.data.defaultDatasetId) {
       const datasetItemsResponse = await ctx.api

@@ -45,6 +45,14 @@ export interface ActorRun {
   };
 }
 
+// Enhanced ActorRun response that may include dataset results
+export interface ActorRunResponse {
+  data: ActorRun & {
+    // Dataset items included when includeDatasetItems is true
+    results?: Array<Record<string, unknown>>;
+  };
+}
+
 export interface Actor {
   id: string;
   userId: string;
