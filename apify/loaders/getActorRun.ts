@@ -51,7 +51,7 @@ export default async function getActorRun(
           datasetId: result.data.defaultDatasetId,
           format: "json",
         });
-      result.results = await datasetItemsResponse.json();
+      result.data.results = await datasetItemsResponse.json();
     }
 
     return result;
