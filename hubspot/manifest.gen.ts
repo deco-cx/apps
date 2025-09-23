@@ -72,28 +72,29 @@ import * as $$$30 from "./loaders/crm/getPayments.ts";
 import * as $$$31 from "./loaders/crm/getPipelines.ts";
 import * as $$$32 from "./loaders/crm/getProduct.ts";
 import * as $$$33 from "./loaders/crm/getProperties.ts";
-import * as $$$34 from "./loaders/crm/getQuote.ts";
-import * as $$$35 from "./loaders/crm/getSchema.ts";
-import * as $$$36 from "./loaders/crm/getSchemaProperties.ts";
-import * as $$$37 from "./loaders/crm/getSchemas.ts";
-import * as $$$38 from "./loaders/crm/getTask.ts";
-import * as $$$39 from "./loaders/crm/getTicket.ts";
-import * as $$$40 from "./loaders/crm/getTickets.ts";
-import * as $$$41 from "./loaders/crm/searchContacts.ts";
-import * as $$$42 from "./loaders/crm/searchDeals.ts";
-import * as $$$43 from "./loaders/events/getEventDefinitions.ts";
-import * as $$$44 from "./loaders/files/getFile.ts";
-import * as $$$45 from "./loaders/files/getFiles.ts";
-import * as $$$46 from "./loaders/marketing/getCampaigns.ts";
-import * as $$$47 from "./loaders/marketing/getCommunicationPreferences.ts";
-import * as $$$48 from "./loaders/marketing/getForm.ts";
-import * as $$$49 from "./loaders/marketing/getForms.ts";
-import * as $$$50 from "./loaders/marketing/getMarketingEmails.ts";
-import * as $$$51 from "./loaders/oauth/getTokenInfo.ts";
-import * as $$$52 from "./loaders/settings/getAccount.ts";
-import * as $$$53 from "./loaders/settings/getBusinessUnits.ts";
-import * as $$$54 from "./loaders/settings/getUsers.ts";
-import * as $$$55 from "./loaders/webhooks/getWebhooks.ts";
+import * as $$$34 from "./loaders/crm/getPropertyDetails.ts";
+import * as $$$35 from "./loaders/crm/getQuote.ts";
+import * as $$$36 from "./loaders/crm/getSchema.ts";
+import * as $$$37 from "./loaders/crm/getSchemaProperties.ts";
+import * as $$$38 from "./loaders/crm/getSchemas.ts";
+import * as $$$39 from "./loaders/crm/getTask.ts";
+import * as $$$40 from "./loaders/crm/getTicket.ts";
+import * as $$$41 from "./loaders/crm/getTickets.ts";
+import * as $$$42 from "./loaders/crm/searchContacts.ts";
+import * as $$$43 from "./loaders/crm/searchDeals.ts";
+import * as $$$44 from "./loaders/events/getEventDefinitions.ts";
+import * as $$$45 from "./loaders/files/getFile.ts";
+import * as $$$46 from "./loaders/files/getFiles.ts";
+import * as $$$47 from "./loaders/marketing/getCampaigns.ts";
+import * as $$$48 from "./loaders/marketing/getCommunicationPreferences.ts";
+import * as $$$49 from "./loaders/marketing/getForm.ts";
+import * as $$$50 from "./loaders/marketing/getForms.ts";
+import * as $$$51 from "./loaders/marketing/getMarketingEmails.ts";
+import * as $$$52 from "./loaders/oauth/getTokenInfo.ts";
+import * as $$$53 from "./loaders/settings/getAccount.ts";
+import * as $$$54 from "./loaders/settings/getBusinessUnits.ts";
+import * as $$$55 from "./loaders/settings/getUsers.ts";
+import * as $$$56 from "./loaders/webhooks/getWebhooks.ts";
 
 const manifest = {
   "loaders": {
@@ -131,28 +132,29 @@ const manifest = {
     "hubspot/loaders/crm/getPipelines.ts": $$$31,
     "hubspot/loaders/crm/getProduct.ts": $$$32,
     "hubspot/loaders/crm/getProperties.ts": $$$33,
-    "hubspot/loaders/crm/getQuote.ts": $$$34,
-    "hubspot/loaders/crm/getSchema.ts": $$$35,
-    "hubspot/loaders/crm/getSchemaProperties.ts": $$$36,
-    "hubspot/loaders/crm/getSchemas.ts": $$$37,
-    "hubspot/loaders/crm/getTask.ts": $$$38,
-    "hubspot/loaders/crm/getTicket.ts": $$$39,
-    "hubspot/loaders/crm/getTickets.ts": $$$40,
-    "hubspot/loaders/crm/searchContacts.ts": $$$41,
-    "hubspot/loaders/crm/searchDeals.ts": $$$42,
-    "hubspot/loaders/events/getEventDefinitions.ts": $$$43,
-    "hubspot/loaders/files/getFile.ts": $$$44,
-    "hubspot/loaders/files/getFiles.ts": $$$45,
-    "hubspot/loaders/marketing/getCampaigns.ts": $$$46,
-    "hubspot/loaders/marketing/getCommunicationPreferences.ts": $$$47,
-    "hubspot/loaders/marketing/getForm.ts": $$$48,
-    "hubspot/loaders/marketing/getForms.ts": $$$49,
-    "hubspot/loaders/marketing/getMarketingEmails.ts": $$$50,
-    "hubspot/loaders/oauth/getTokenInfo.ts": $$$51,
-    "hubspot/loaders/settings/getAccount.ts": $$$52,
-    "hubspot/loaders/settings/getBusinessUnits.ts": $$$53,
-    "hubspot/loaders/settings/getUsers.ts": $$$54,
-    "hubspot/loaders/webhooks/getWebhooks.ts": $$$55,
+    "hubspot/loaders/crm/getPropertyDetails.ts": $$$34,
+    "hubspot/loaders/crm/getQuote.ts": $$$35,
+    "hubspot/loaders/crm/getSchema.ts": $$$36,
+    "hubspot/loaders/crm/getSchemaProperties.ts": $$$37,
+    "hubspot/loaders/crm/getSchemas.ts": $$$38,
+    "hubspot/loaders/crm/getTask.ts": $$$39,
+    "hubspot/loaders/crm/getTicket.ts": $$$40,
+    "hubspot/loaders/crm/getTickets.ts": $$$41,
+    "hubspot/loaders/crm/searchContacts.ts": $$$42,
+    "hubspot/loaders/crm/searchDeals.ts": $$$43,
+    "hubspot/loaders/events/getEventDefinitions.ts": $$$44,
+    "hubspot/loaders/files/getFile.ts": $$$45,
+    "hubspot/loaders/files/getFiles.ts": $$$46,
+    "hubspot/loaders/marketing/getCampaigns.ts": $$$47,
+    "hubspot/loaders/marketing/getCommunicationPreferences.ts": $$$48,
+    "hubspot/loaders/marketing/getForm.ts": $$$49,
+    "hubspot/loaders/marketing/getForms.ts": $$$50,
+    "hubspot/loaders/marketing/getMarketingEmails.ts": $$$51,
+    "hubspot/loaders/oauth/getTokenInfo.ts": $$$52,
+    "hubspot/loaders/settings/getAccount.ts": $$$53,
+    "hubspot/loaders/settings/getBusinessUnits.ts": $$$54,
+    "hubspot/loaders/settings/getUsers.ts": $$$55,
+    "hubspot/loaders/webhooks/getWebhooks.ts": $$$56,
   },
   "actions": {
     "hubspot/actions/automation/enrollInWorkflow.ts": $$$$$$$$$0,
