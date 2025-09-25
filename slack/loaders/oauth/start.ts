@@ -4,6 +4,11 @@ export interface Props {
   clientId: string;
   redirectUri: URL | string;
   state: string;
+  /**
+   * @title Bot Name
+   * @description Name identifier for custom bot (used for identification)
+   */
+  botName?: string;
 }
 
 export default function start(props: Props) {

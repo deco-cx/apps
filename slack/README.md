@@ -5,12 +5,13 @@ A Deco app for integrating with Slack using OAuth 2.0 authentication. This app a
 ## Features
 
 - 🔐 **OAuth 2.0 Authentication** - Secure token-based authentication
+- 🤖 **Custom Bot Support** - Support for private/custom Slack apps instead of just deco.chat
 - 💬 **Message Management** - Send messages and replies to channels
 - 📋 **Channel Operations** - List and interact with workspace channels
 - 👥 **User Management** - Get user information and profiles
 - 🎯 **Reactions** - Add emoji reactions to messages
-- � **File Upload V2** - Upload files using the new Slack API (files.upload sunset Nov 12, 2025)
-- �🔄 **Automatic Token Refresh** - Handles token expiration automatically
+- 📁 **File Upload V2** - Upload files using the new Slack API (files.upload sunset Nov 12, 2025)
+- 🔄 **Automatic Token Refresh** - Handles token expiration automatically
 
 ## ⚠️ IMPORTANT: File Upload API Migration
 
@@ -63,6 +64,25 @@ The app provides two endpoints for OAuth:
 - **Start OAuth**: `/loaders/oauth/start` - Redirects users to Slack for authorization
 - **OAuth Callback**: `/actions/oauth/callback` - Handles the authorization response
 
+#### Custom Bot Configuration
+
+The app supports custom/private Slack bots. You can configure:
+
+- **Bot Name**: Set a custom identifier for your bot (used in channel messages)
+
+**Example OAuth Start with Custom Bot:**
+```typescript
+// Start OAuth with custom bot configuration
+const startProps = {
+  clientId: "your_custom_bot_client_id",
+  redirectUri: "https://your-domain.com/oauth/callback",
+  state: "your_state_parameter",
+  botName: "my-custom-bot" // Custom bot name
+};
+```
+
+The app uses the standard set of scopes defined in `SCOPES` for all bots, ensuring consistent functionality across different bot configurations.
+
 ### 5. Usage
 
 After OAuth setup, the app will automatically:
@@ -105,6 +125,28 @@ const response = await slack.uploadFileV2({
 });
 ```
 
+## Custom Bot Configuration
+
+### Setting Up a Custom Bot
+
+1. **Create Your Custom Slack App** following steps 1-3 above
+2. **Use Custom Scopes** - Choose appropriate scopes for your bot's functionality
+3. **Configure Bot Name** - Set a unique identifier for your bot
+
+### Bot Name Usage
+
+The bot name is used in:
+- Channel welcome messages: `"To interact with me, just mention @your-bot-name in your messages!"`
+- Channel listings: Shows `@your-bot-name` instead of `@deco.chat`
+- App configuration: Stored as `customBotName` for future reference
+
+### Multiple Bot Support
+
+The system now supports multiple custom bots by:
+- Storing bot-specific information in app configuration
+- Dynamic bot name resolution in channel operations
+- Custom scope management per bot
+
 ## Migration from Bot Token
 
 If you're migrating from the previous bot token approach:
@@ -113,6 +155,7 @@ If you're migrating from the previous bot token approach:
 2. OAuth tokens take precedence over bot tokens when both are present
 3. Update your app configuration to use OAuth instead of direct bot tokens
 4. The `teamId` is now automatically obtained during OAuth flow
+5. **New**: Custom bot information is preserved across OAuth flows
 
 ## Security
 
