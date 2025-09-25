@@ -13,6 +13,10 @@ interface Props {
   sessionId: string;
 }
 
+/**
+ * @title Delete Session
+ * @description Delete a session
+ */
 async function action(
   { sessionId }: Props,
   req: Request,

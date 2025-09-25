@@ -11,6 +11,10 @@ export interface Props {
   levels?: number;
 }
 
+/**
+ * @title Get Navbar
+ * @description Get the navbar, return the categories formatted as SiteNavigationElement
+ */
 const loader = async (
   props: Props,
   _req: Request,

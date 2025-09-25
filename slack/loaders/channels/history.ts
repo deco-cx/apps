@@ -11,6 +11,10 @@ export interface Props {
    * @default 10
    */
   limit?: number;
+  /**
+   * @description Pagination cursor for next page
+   */
+  cursor?: string;
 }
 
 /**
@@ -22,7 +26,16 @@ export default async function getChannelHistory(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<SlackResponse<{ messages: SlackMessage[] }>> {
-  const { channelId, limit } = props;
-  return await ctx.slack.getChannelHistory(channelId, limit);
+): Promise<
+  SlackResponse<{
+    messages: SlackMessage[];
+    has_more?: boolean;
+    pin_count?: number;
+    channel_actions_ts?: string | null;
+    channel_actions_count?: number;
+    warning?: string;
+  }>
+> {
+  const { channelId, limit, cursor } = props;
+  return await ctx.slack.getChannelHistory(channelId, limit, cursor);
 }

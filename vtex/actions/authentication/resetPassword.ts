@@ -15,8 +15,8 @@ export interface Props {
 }
 
 /**
- * @title VTEX Integration - Redefine password
- * @description
+ * @title Redefine Password
+ * @description Redefine password
  */
 export default async function action(
   props: Props,

@@ -15,6 +15,8 @@ export interface Props {
 /**
  * @docs https://developers.vtex.com/docs/api-reference/masterdata-api#patch-/api/dataentities/-acronym-/documents?endpoint=patch-/api/dataentities/-acronym-/documents
  * @docs https://developers.vtex.com/docs/api-reference/masterdata-api#patch-/api/dataentities/-acronym-/documents/-id-?endpoint=patch-/api/dataentities/-acronym-/documents/-id-
+ * @title Update Document in MasterData
+ * @description Update a document in MasterData
  */
 const action = async (
   props: Props,

@@ -10,6 +10,10 @@ interface DynamicOptionsReturn {
   image?: string;
 }
 
+/**
+ * @title Product ID by Term
+ * @description List a product ID by term
+ */
 const loader = async (props: Props, req: Request, ctx: AppContext) => {
   Object.entries(allowCorsFor(req)).map(([name, value]) => {
     ctx.response.headers.set(name, value);

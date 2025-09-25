@@ -11,6 +11,10 @@ interface Props {
 
 export const defaultVisibility = "private";
 
+/**
+ * @title Get Promotion By ID
+ * @description Get a promotion by its ID
+ */
 export default async function loader(
   props: Props,
   req: Request,

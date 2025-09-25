@@ -13,6 +13,10 @@ interface Props {
   id: string;
 }
 
+/**
+ * @title Delete Payment Token
+ * @description Delete a payment token
+ */
 async function loader(
   { id }: Props,
   req: Request,

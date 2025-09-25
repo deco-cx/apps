@@ -543,7 +543,15 @@ export interface SearchArgs {
 }
 
 export interface SelectedFacet {
+  /**
+   * @title Key
+   * @description The key of the facet (e.g. "brand", "category-1", "productClusterIds")
+   */
   key: string;
+  /**
+   * @title Value
+   * @description The value of the facet
+   */
   value: string;
 }
 

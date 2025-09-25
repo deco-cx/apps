@@ -7,6 +7,10 @@ export interface Props {
   level: number;
 }
 
+/**
+ * @title PLP Default Path
+ * @description Get paths for product listing page
+ */
 const loader = async (
   props: Props,
   req: Request,

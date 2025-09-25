@@ -8,6 +8,10 @@ interface Props {
   publicProperties: Record<string, { value: string }>;
 }
 
+/**
+ * @title Edit Session
+ * @description Edit a session
+ */
 async function action(
   props: Props,
   req: Request,

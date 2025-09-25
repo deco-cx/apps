@@ -8,6 +8,10 @@ interface Props {
   skuId: number;
 }
 
+/**
+ * @title List Stock
+ * @description List stock by SKU
+ */
 export default async function loader(
   props: Props,
   _req: Request,

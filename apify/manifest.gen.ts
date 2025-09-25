@@ -3,6 +3,8 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$$$$0 from "./actions/runActor.ts";
+import * as $$$$$$$$$1 from "./actions/runActorAsync.ts";
+import * as $$$$$$$$$2 from "./actions/runActorV2.ts";
 import * as $$$0 from "./loaders/getActor.ts";
 import * as $$$1 from "./loaders/getActorRun.ts";
 import * as $$$2 from "./loaders/listActorRuns.ts";
@@ -17,6 +19,8 @@ const manifest = {
   },
   "actions": {
     "apify/actions/runActor.ts": $$$$$$$$$0,
+    "apify/actions/runActorAsync.ts": $$$$$$$$$1,
+    "apify/actions/runActorV2.ts": $$$$$$$$$2,
   },
   "name": "apify",
   "baseUrl": import.meta.url,

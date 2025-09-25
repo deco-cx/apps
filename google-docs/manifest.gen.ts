@@ -4,11 +4,8 @@
 
 import * as $$$$$$$$$0 from "./actions/appendToDocument.ts";
 import * as $$$$$$$$$1 from "./actions/createDocument.ts";
-import * as $$$$$$$$$2 from "./actions/deleteDocument.ts";
-import * as $$$$$$$$$3 from "./actions/duplicateDocument.ts";
-import * as $$$$$$$$$4 from "./actions/oauth/callback.ts";
-import * as $$$$$$$$$5 from "./actions/shareDocument.ts";
-import * as $$$$$$$$$6 from "./actions/updateDocumentContent.ts";
+import * as $$$$$$$$$2 from "./actions/oauth/callback.ts";
+import * as $$$$$$$$$3 from "./actions/updateDocumentContent.ts";
 import * as $$$0 from "./loaders/getDocument.ts";
 import * as $$$1 from "./loaders/getDocumentMetadata.ts";
 import * as $$$2 from "./loaders/listDocuments.ts";
@@ -28,11 +25,8 @@ const manifest = {
   "actions": {
     "google-docs/actions/appendToDocument.ts": $$$$$$$$$0,
     "google-docs/actions/createDocument.ts": $$$$$$$$$1,
-    "google-docs/actions/deleteDocument.ts": $$$$$$$$$2,
-    "google-docs/actions/duplicateDocument.ts": $$$$$$$$$3,
-    "google-docs/actions/oauth/callback.ts": $$$$$$$$$4,
-    "google-docs/actions/shareDocument.ts": $$$$$$$$$5,
-    "google-docs/actions/updateDocumentContent.ts": $$$$$$$$$6,
+    "google-docs/actions/oauth/callback.ts": $$$$$$$$$2,
+    "google-docs/actions/updateDocumentContent.ts": $$$$$$$$$3,
   },
   "name": "google-docs",
   "baseUrl": import.meta.url,

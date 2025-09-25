@@ -12,6 +12,10 @@ interface Props {
   items: string[];
 }
 
+/**
+ * @title Get Session
+ * @description Get a session
+ */
 async function loader(
   props: Props,
   req: Request,

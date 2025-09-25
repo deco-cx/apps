@@ -25,6 +25,10 @@ export interface Payment {
   paymentSystemName: string;
 }
 
+/**
+ * @title User Payments
+ * @description List user payments
+ */
 async function loader(
   _props: unknown,
   req: Request,

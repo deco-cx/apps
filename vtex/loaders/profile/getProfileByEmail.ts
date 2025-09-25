@@ -6,6 +6,10 @@ interface Props {
   ensureComplete?: boolean;
 }
 
+/**
+ * @title Get Profile By Email
+ * @description Get a profile by email
+ */
 export async function loader(
   { email, ensureComplete }: Props,
   req: Request,

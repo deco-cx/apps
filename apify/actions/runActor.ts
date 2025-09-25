@@ -36,6 +36,7 @@ export interface Props {
  * @name RUN_ACTOR
  * @title Run Actor
  * @description Run an Apify actor synchronously and return dataset items
+ * @deprecated Use RUN_ACTOR_V2 instead
  */
 export default async function runActor(
   props: Props,

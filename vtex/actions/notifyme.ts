@@ -8,6 +8,8 @@ export interface Props {
 
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/items
+ * @title Notify Me
+ * @description Notify me when the product is back in stock
  */
 const action = async (
   props: Props,

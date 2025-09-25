@@ -40,17 +40,23 @@ function Theme({ fonts = [], variables = [], colorScheme }: Props) {
 
   return (
     <Head>
-      {fonts.map(({ styleSheet }) => (
+      {fonts?.map(({ styleSheet }) => (
+        styleSheet
+          ? (
+            <style
+              type="text/css"
+              dangerouslySetInnerHTML={{ __html: styleSheet }}
+            />
+          )
+          : null
+      ))}
+      {html && (
         <style
           type="text/css"
-          dangerouslySetInnerHTML={{ __html: styleSheet }}
+          id={`__DESIGN_SYSTEM_VARS-${id}`}
+          dangerouslySetInnerHTML={{ __html: html }}
         />
-      ))}
-      <style
-        type="text/css"
-        id={`__DESIGN_SYSTEM_VARS-${id}`}
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+      )}
     </Head>
   );
 }

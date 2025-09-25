@@ -32,6 +32,10 @@ export const DEFAULT_EXPECTED_SECTIONS = [
   "customData",
 ];
 
+/**
+ * @title Update Item Attachment
+ * @description Update an attachment in an item in the cart
+ */
 const action = async (
   props: Props,
   req: Request,

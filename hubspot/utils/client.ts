@@ -259,4 +259,153 @@ export class HubSpotClient {
       batchRequest,
     );
   }
+
+  // Communications API Methods
+
+  // Create a communication (WhatsApp, LinkedIn, or SMS message)
+  async createCommunication(data: {
+    properties: {
+      hs_communication_channel_type: "WHATS_APP" | "LINKEDIN_MESSAGE" | "SMS";
+      hs_communication_logged_from: "CRM";
+      hs_communication_body: string;
+      hubspot_owner_id?: number;
+      hs_timestamp?: string | number;
+    };
+    associations?: Array<{
+      to: { id: string | number };
+      types: Array<{
+        associationCategory: string;
+        associationTypeId: number;
+      }>;
+    }>;
+  }): Promise<any> {
+    return this.post("/crm/v3/objects/communications", data);
+  }
+
+  // Get a communication by ID
+  async getCommunication(
+    communicationId: string,
+    options?: {
+      properties?: string[];
+      associations?: string[];
+    },
+  ): Promise<any> {
+    const searchParams: Record<string, any> = {};
+
+    if (options?.properties) {
+      searchParams.properties = options.properties.join(",");
+    }
+    if (options?.associations) {
+      searchParams.associations = options.associations.join(",");
+    }
+
+    return this.get(
+      `/crm/v3/objects/communications/${communicationId}`,
+      searchParams,
+    );
+  }
+
+  // List communications with pagination
+  async listCommunications(options?: {
+    limit?: number;
+    after?: string;
+    properties?: string[];
+    associations?: string[];
+    archived?: boolean;
+  }): Promise<any> {
+    const searchParams: Record<string, any> = {};
+
+    if (options?.limit) searchParams.limit = options.limit;
+    if (options?.after) searchParams.after = options.after;
+    if (options?.properties) {
+      searchParams.properties = options.properties.join(",");
+    }
+    if (options?.associations) {
+      searchParams.associations = options.associations.join(",");
+    }
+    if (options?.archived !== undefined) {
+      searchParams.archived = options.archived;
+    }
+
+    return this.get("/crm/v3/objects/communications", searchParams);
+  }
+
+  // Update a communication
+  async updateCommunication(
+    communicationId: string,
+    data: {
+      properties: {
+        hs_communication_body?: string;
+        hubspot_owner_id?: number;
+        hs_timestamp?: string | number;
+        [key: string]: any;
+      };
+    },
+  ): Promise<any> {
+    return this.patch(
+      `/crm/v3/objects/communications/${communicationId}`,
+      data,
+    );
+  }
+
+  // Delete a communication
+  async deleteCommunication(communicationId: string): Promise<void> {
+    return this.delete(`/crm/v3/objects/communications/${communicationId}`);
+  }
+
+  // Associate a communication with a record
+  async associateCommunication(
+    communicationId: string,
+    toObjectType: string,
+    toObjectId: string | number,
+    associationTypeId: string | number,
+  ): Promise<any> {
+    return this.put(
+      `/crm/v3/objects/communications/${communicationId}/associations/${toObjectType}/${toObjectId}/${associationTypeId}`,
+      {},
+    );
+  }
+
+  // Remove association between communication and record
+  async removeCommunicationAssociation(
+    communicationId: string,
+    toObjectType: string,
+    toObjectId: string | number,
+    associationTypeId: string | number,
+  ): Promise<void> {
+    return this.delete(
+      `/crm/v3/objects/communications/${communicationId}/associations/${toObjectType}/${toObjectId}/${associationTypeId}`,
+    );
+  }
+
+  // Batch operations for communications
+  async batchReadCommunications(batchRequest: any): Promise<any> {
+    return this.post("/crm/v3/objects/communications/batch/read", batchRequest);
+  }
+
+  async batchCreateCommunications(batchRequest: any): Promise<any> {
+    return this.post(
+      "/crm/v3/objects/communications/batch/create",
+      batchRequest,
+    );
+  }
+
+  async batchUpdateCommunications(batchRequest: any): Promise<any> {
+    return this.post(
+      "/crm/v3/objects/communications/batch/update",
+      batchRequest,
+    );
+  }
+
+  async batchArchiveCommunications(batchRequest: any): Promise<any> {
+    return this.post(
+      "/crm/v3/objects/communications/batch/archive",
+      batchRequest,
+    );
+  }
+
+  // Search communications
+  async searchCommunications(searchRequest: any): Promise<any> {
+    return this.post("/crm/v3/objects/communications/search", searchRequest);
+  }
 }

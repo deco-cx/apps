@@ -1,4 +1,7 @@
+import { GOOGLE_USER_INFO_SCOPES } from "../../mcp/utils/google/userInfo.ts";
+
 export const SCOPES = [
+  ...GOOGLE_USER_INFO_SCOPES,
   "https://www.googleapis.com/auth/documents",
   "https://www.googleapis.com/auth/drive.file",
 ];

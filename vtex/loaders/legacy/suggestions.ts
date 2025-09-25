@@ -18,7 +18,8 @@ export interface Props {
 }
 
 /**
- * @title VTEX Integration - Legacy
+ * @title Suggestions Legacy
+ * @description List suggestions, commonly used for search suggestions and autocomplete.
  */
 const loaders = async (
   props: Props,

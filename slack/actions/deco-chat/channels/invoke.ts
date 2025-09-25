@@ -4,6 +4,7 @@ import type { AppContext, SlackWebhookPayload } from "../../../mod.ts";
 
 /**
  * @name DECO_CHAT_CHANNELS_INVOKE
+ * @title Deco Chat Channel Invoke
  * @description This action is triggered when slack sends a webhook event
  */
 export default async function invoke(
@@ -103,7 +104,7 @@ export default async function invoke(
       });
       if (response.ok) {
         toolCallMessageTs[toolCall.toolCallId] = {
-          ts: response.ts,
+          ts: response.data.ts,
           name: toolCall.toolName,
           arguments: toolCall.args,
         };

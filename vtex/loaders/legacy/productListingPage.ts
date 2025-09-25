@@ -171,8 +171,8 @@ const getTermFallback = (url: URL, isPage: boolean, hasFilters: boolean) => {
 };
 
 /**
- * @title VTEX Integration - Legacy Search
- * @description Product Listing Page loader
+ * @title Product Listing Page Legacy
+ * @description List a product listing page, with products, filters, sort and SEO data. commonly used for category, search, brand and collection pages.
  */
 const loader = async (
   props: Props,
