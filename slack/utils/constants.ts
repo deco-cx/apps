@@ -1,6 +1,5 @@
 export const SCOPES = [
   "app_mentions:read",
-  "assistant:write",
   "channels:history",
   "channels:join",
   "channels:read",
@@ -11,7 +10,6 @@ export const SCOPES = [
   "im:history",
   "im:read",
   "im:write",
-  "incoming-webhook",
   "mpim:read",
   "reactions:write",
   "users:read",
