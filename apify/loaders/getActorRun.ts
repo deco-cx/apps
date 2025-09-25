@@ -47,10 +47,10 @@ export default async function getActorRun(
 
     if (props.includeDatasetItems && result.data.defaultDatasetId) {
       const datasetItemsResponse = await ctx.api
-      ["GET /v2/datasets/:datasetId/items"]({
-        datasetId: result.data.defaultDatasetId,
-        format: "json",
-      });
+        ["GET /v2/datasets/:datasetId/items"]({
+          datasetId: result.data.defaultDatasetId,
+          format: "json",
+        });
       result.data.results = await datasetItemsResponse.json(); // Place dataset items in the response.
     }
 
