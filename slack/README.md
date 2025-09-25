@@ -140,12 +140,23 @@ The bot name is used in:
 - Channel listings: Shows `@your-bot-name` instead of `@deco.chat`
 - App configuration: Stored as `customBotName` for future reference
 
+**Bot Name Preservation**: During re-authentication or token refresh, the system preserves the previously configured custom bot name. A new `botName` parameter will override the existing configuration, while omitting it maintains the current setting.
+
 ### Multiple Bot Support
 
 The system now supports multiple custom bots by:
 - Storing bot-specific information in app configuration
 - Dynamic bot name resolution in channel operations
-- Custom scope management per bot
+- Preserving custom bot names across re-authentications
+
+### Re-authentication Behavior
+
+When OAuth runs again (token refresh, re-install):
+- **With botName parameter**: Updates to the new custom name
+- **Without botName parameter**: Preserves the existing custom bot name
+- **First install**: Uses "deco.chat" as default if no botName provided
+
+This prevents accidental loss of custom bot branding during routine re-authorizations.
 
 ## Migration from Bot Token
 

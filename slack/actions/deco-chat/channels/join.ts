@@ -25,7 +25,9 @@ export default async function join(
       console.error("error joining channel", error);
     });
     if (props.agentName && props.agentLink) {
-      const botMention = config.customBotName ? `@${config.customBotName}` : "@deco.chat";
+      const botMention = config.customBotName
+        ? `@${config.customBotName}`
+        : "@deco.chat";
       await ctx.slack.postMessage(
         props.discriminator,
         `<${props.agentLink}|${props.agentName}> has joined the channel! To interact with me, just mention ${botMention} in your messages!`,

@@ -16,10 +16,12 @@ export default async function list(
   ctx: AppContext,
 ): Promise<ListChannelsResponse> {
   const channels = await ctx.invoke.slack.loaders.channels({});
-  
+
   // Use custom bot name or fallback to default
-  const botIdentifier = ctx.customBotName ? `@${ctx.customBotName}` : DECO_CHAT_CHANNEL_ID;
-  
+  const botIdentifier = ctx.customBotName
+    ? `@${ctx.customBotName}`
+    : DECO_CHAT_CHANNEL_ID;
+
   return {
     channels: [
       ...channels.data.channels.map((ch: { name?: string; id: string }) => {

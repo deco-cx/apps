@@ -23,7 +23,13 @@ export default async function callback(
   { code, installId, clientId, clientSecret, redirectUri, botName }: Props,
   req: Request,
   ctx: AppContext,
-): Promise<{ installId: string; name: string; botInfo?: { id: string; appId: string; name: string } }> {
+): Promise<
+  {
+    installId: string;
+    name: string;
+    botInfo?: { id: string; appId: string; name: string };
+  }
+> {
   const finalRedirectUri = redirectUri ||
     new URL("/oauth/callback", req.url).href;
 
@@ -52,6 +58,8 @@ export default async function callback(
 
   // Get current configuration and update with new tokens
   const currentCtx = await ctx.getConfiguration();
+  const effectiveBotName = botName ?? currentCtx?.customBotName;
+
   await ctx.configure({
     ...currentCtx,
     botUserId: tokenData.bot_user_id,
@@ -61,10 +69,11 @@ export default async function callback(
     clientSecret: clientSecret,
     clientId: clientId,
     // Add custom bot info
-    customBotName: botName || "deco.chat",
+    customBotName: effectiveBotName ?? "deco.chat",
     appInfo: {
       id: tokenData.app_id,
-      name: botName || tokenData.team.name,
+      name: effectiveBotName ?? currentCtx?.appInfo?.name ??
+        tokenData.team.name,
     },
     tokens: {
       access_token: tokenData.access_token,
@@ -74,13 +83,13 @@ export default async function callback(
     },
   });
 
-  return { 
-    installId, 
-    name: `${botName || "Slack"} | ${tokenData.team.name}`,
+  return {
+    installId,
+    name: `${effectiveBotName || "Slack"} | ${tokenData.team.name}`,
     botInfo: {
       id: tokenData.bot_user_id,
       appId: tokenData.app_id,
-      name: botName || "deco.chat"
-    }
+      name: effectiveBotName || "deco.chat",
+    },
   };
 }
