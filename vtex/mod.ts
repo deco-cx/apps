@@ -100,7 +100,6 @@ export default function VTEX(
   { appKey, appToken, account, publicUrl: _publicUrl, salesChannel, ...props }:
     Props,
 ) {
-  console.log("props", props);
   const publicUrl = _publicUrl?.startsWith("https://")
     ? _publicUrl
     : `https://${_publicUrl}`;
@@ -157,7 +156,7 @@ export default function VTEX(
     headers: headers,
   });
   const sub = createHttpClient<SUB>({
-    base: publicUrl,
+    base: `https://${account}.vtexcommercestable.com.br`,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
     headers: headers,
