@@ -1,4 +1,5 @@
 import { JoinChannelProps } from "../../../../mcp/bindings.ts";
+import { DECO_CHAT_CHANNEL_ID } from "../../../loaders/deco-chat/channels/list.ts";
 import type { AppContext } from "../../../mod.ts";
 
 /**
@@ -25,12 +26,12 @@ export default async function join(
       console.error("error joining channel", error);
     });
     if (props.agentName && props.agentLink) {
-      const botMention = config.customBotName
+      const botIdentifier = config.customBotName
         ? `@${config.customBotName}`
-        : "@deco.chat";
+        : DECO_CHAT_CHANNEL_ID;
       await ctx.slack.postMessage(
         props.discriminator,
-        `<${props.agentLink}|${props.agentName}> has joined the channel! To interact with me, just mention ${botMention} in your messages!`,
+        `<${props.agentLink}|${props.agentName}> has joined the channel! To interact with me, just mention ${botIdentifier} in your messages!`,
       ).catch((err) => {
         console.error("error posting welcome", err);
       });

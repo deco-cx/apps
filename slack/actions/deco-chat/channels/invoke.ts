@@ -16,8 +16,11 @@ export default async function invoke(
   if (challenge) {
     return { challenge };
   }
+  
+  const botIdentifier = ctx.customBotName ? `@${ctx.customBotName}` : DECO_CHAT_CHANNEL_ID;
+  
   const [joinChannel, channel, thread] = props.event.channel_type === "im"
-    ? [DECO_CHAT_CHANNEL_ID, props.event.channel, props.event.user]
+    ? [botIdentifier, props.event.channel, props.event.user]
     : [props.event.channel, props.event.channel, props.event.channel];
   const linkProps =
     await ctx.appStorage.getItem<JoinChannelProps & { installId: string }>(
