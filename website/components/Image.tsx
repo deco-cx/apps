@@ -35,6 +35,8 @@ const isImageOptmizationEnabled = () =>
     ? (globalThis as any).DECO?.featureFlags?.enableImageOptimization
     : Deno.env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
 
+const canShowWarning = () => IS_BROWSER ? false : !Deno.env.get("DENO_DEPLOYMENT_ID");
+
 interface OptimizationOptions {
   originalSrc: string;
   width: number;
@@ -108,6 +110,7 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     }
 
     if (
+      canShowWarning() &&
       !originalSrc.startsWith(
         "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage",
       )
