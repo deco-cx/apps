@@ -47,6 +47,14 @@ const getStapeConfig = async (
     } else {
       // Get all containers and return the first one
       const response = await api["GET /api/v2/containers"]({});
+      if (!response.ok) {
+        console.error(
+          "Stape containers list failed:",
+          response.status,
+          await response.text(),
+        );
+        return null;
+      }
       const containers = await response.json();
       return containers.length > 0 ? containers[0] : null;
     }
