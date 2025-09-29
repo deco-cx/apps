@@ -1,5 +1,16 @@
 import { AppContext } from "../mod.ts";
 import { type SectionProps } from "@deco/deco";
+import { extractRequestInfo } from "../utils/fetch.ts";
+import {
+  logDebugError,
+  logDebugMessage,
+  type TrackingContext,
+} from "../utils/events.ts";
+import {
+  buildTrackingContext,
+  createPageViewEvent,
+  sendEventSafely,
+} from "../utils/tracking.ts";
 
 // Request timeout configuration
 const REQUEST_TIMEOUT_MS = 5000; // 5 seconds
@@ -98,164 +109,102 @@ export default function StapeServerTracker(
 }
 
 export const loader = async (props: Props, req: Request, ctx: AppContext) => {
-  const {
-    containerUrl,
-    gtmContainerId,
-    enableGdprCompliance = true,
-    consentCookieName = "cookie_consent",
-  } = ctx;
+  const { containerUrl, gtmContainerId } = ctx;
+  const { userAgent, clientIp } = extractRequestInfo(req);
 
-  // Extract request information for server-side tracking
-  const pageUrl = req.url;
-  const userAgent = req.headers.get("user-agent") || "";
-  const clientIp = req.headers.get("x-forwarded-for") ||
-    req.headers.get("x-real-ip") ||
-    "127.0.0.1";
-
-  // Automatically track page view if enabled
-  if (props.enableAutoPageTracking !== false && containerUrl) {
-    try {
-      // Check GDPR consent from cookies if enabled
-      let hasConsent = true;
-      if (enableGdprCompliance) {
-        const cookieHeader = req.headers.get("cookie") || "";
-        const consentCookie = cookieHeader
-          .split("; ")
-          .find((row) => row.startsWith(`${consentCookieName}=`))
-          ?.split("=")[1];
-
-        hasConsent = consentCookie === "true" || consentCookie === "granted";
-      }
-
-      if (hasConsent) {
-        // Generate stable client ID from existing cookies or create new one
-        let clientId: string;
-
-        // Get cookie header for client ID extraction
-        const cookieHeader = req.headers.get("cookie") || "";
-
-        // Try to extract from existing _ga cookie first
-        const gaCookie = cookieHeader
-          .split("; ")
-          .find((row: string) => row.startsWith("_ga="))
-          ?.split("=")[1];
-
-        if (gaCookie) {
-          // Extract client ID from GA cookie format: GA1.1.clientId.timestamp
-          const gaParts = gaCookie.split(".");
-          if (gaParts.length >= 3) {
-            clientId = `${gaParts[2]}.${gaParts[3] || Date.now()}`;
-          } else {
-            clientId = crypto.randomUUID();
-          }
-        } else {
-          // Try to find existing Stape client ID cookie
-          const stapeClientCookie = cookieHeader
-            .split("; ")
-            .find((row: string) => row.startsWith("_stape_client_id="))
-            ?.split("=")[1];
-
-          if (stapeClientCookie) {
-            clientId = stapeClientCookie;
-          } else {
-            // Generate new stable ID and it should be set as cookie client-side
-            clientId = crypto.randomUUID();
-          }
-        }
-
-        // Prepare page view event data
-        const eventData = {
-          events: [{
-            name: "page_view",
-            params: {
-              page_location: pageUrl,
-              page_title: "Server-Side Page View",
-              page_referrer: req.headers.get("referer") || "",
-              client_id: clientId,
-              user_id: props.userId || undefined,
-              timestamp_micros: Date.now() * 1000,
-              ...props.customParameters,
-            },
-          }],
-          gtm_container_id: gtmContainerId,
-          client_id: clientId,
-          user_id: props.userId || undefined,
-          consent: {
-            ad_storage: "granted",
-            analytics_storage: "granted",
-            ad_user_data: "granted",
-            ad_personalization: "granted",
-          },
-        };
-
-        // Send to Stape container
-        const stapeUrl = new URL("/gtm", containerUrl);
-
-        // Setup timeout controller
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          controller.abort();
-        }, REQUEST_TIMEOUT_MS);
-
-        try {
-          const response = await fetch(stapeUrl.toString(), {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "User-Agent": userAgent || "Deco-Stape-Server/1.0",
-              "X-Forwarded-For": clientIp,
-            },
-            body: JSON.stringify(eventData),
-            signal: controller.signal,
-          });
-
-          // Clear timeout on successful response
-          clearTimeout(timeoutId);
-
-          if (props.debugMode) {
-            console.log(
-              `Stape: Auto page view tracked - ${
-                response.ok ? "Success" : "Failed"
-              } (${response.status})`,
-            );
-          }
-        } catch (fetchError) {
-          // Clear timeout on error
-          clearTimeout(timeoutId);
-
-          if (fetchError instanceof Error && fetchError.name === "AbortError") {
-            if (props.debugMode) {
-              console.error(
-                `Stape: Request timeout after ${REQUEST_TIMEOUT_MS}ms`,
-              );
-            }
-          } else {
-            if (props.debugMode) {
-              console.error(
-                "Stape: Failed to send auto page view:",
-                fetchError,
-              );
-            }
-          }
-        }
-      } else if (props.debugMode) {
-        console.log("Stape: Page view blocked due to GDPR consent");
-      }
-    } catch (error) {
-      if (props.debugMode) {
-        console.error("Stape: Failed to auto-track page view:", error);
-      }
-    }
+  // Early return if auto tracking is disabled or no container URL
+  if (props.enableAutoPageTracking === false || !containerUrl) {
+    return createLoaderResult(props, ctx, req.url, userAgent, clientIp);
   }
 
-  return {
-    ...props,
-    containerUrl,
-    gtmContainerId,
-    enableGdprCompliance,
-    consentCookieName,
-    pageUrl,
-    userAgent,
-    clientIp,
-  };
+  try {
+    const {
+      enableGdprCompliance = true,
+      consentCookieName = "cookie_consent",
+    } = ctx;
+    const trackingContext = buildTrackingContext(
+      req,
+      enableGdprCompliance,
+      consentCookieName,
+    );
+
+    // Early return if no consent
+    if (!trackingContext.hasConsent) {
+      logDebugMessage(
+        props.debugMode,
+        "Stape: Page view blocked due to GDPR consent",
+      );
+      return createLoaderResult(props, ctx, req.url, userAgent, clientIp);
+    }
+
+    await sendPageViewEvent(
+      trackingContext,
+      props,
+      containerUrl,
+      gtmContainerId,
+      req,
+    );
+  } catch (error) {
+    logDebugError(
+      props.debugMode,
+      "Stape: Failed to auto-track page view:",
+      error,
+    );
+  }
+
+  return createLoaderResult(props, ctx, req.url, userAgent, clientIp);
 };
+
+const sendPageViewEvent = async (
+  context: TrackingContext,
+  props: Props,
+  containerUrl: string,
+  gtmContainerId: string | undefined,
+  req: Request,
+) => {
+  const eventData = createPageViewEvent(
+    context,
+    props.customParameters,
+    gtmContainerId,
+    props.userId,
+  );
+
+  // Add referrer from request headers safely
+  if (eventData.events[0]?.params) {
+    eventData.events[0].params.page_referrer = req.headers.get("referer") || "";
+  }
+
+  const result = await sendEventSafely(
+    containerUrl,
+    eventData,
+    context,
+    REQUEST_TIMEOUT_MS,
+  );
+
+  if (result.success) {
+    logDebugMessage(props.debugMode, "Stape: Auto page view tracked - Success");
+  } else {
+    logDebugError(
+      props.debugMode,
+      "Stape: Auto page view tracking failed:",
+      result.error,
+    );
+  }
+};
+
+const createLoaderResult = (
+  props: Props,
+  ctx: AppContext,
+  pageUrl: string,
+  userAgent: string,
+  clientIp: string,
+) => ({
+  ...props,
+  containerUrl: ctx.containerUrl,
+  gtmContainerId: ctx.gtmContainerId,
+  enableGdprCompliance: ctx.enableGdprCompliance,
+  consentCookieName: ctx.consentCookieName,
+  pageUrl,
+  userAgent,
+  clientIp,
+});

@@ -1,22 +1,80 @@
 import { AppContext } from "../mod.ts";
+import { extractRequestInfo, fetchStapeAPI } from "../utils/fetch.ts";
 
 // Request timeout configuration
 const REQUEST_TIMEOUT_MS = 5000; // 5 seconds
 
 export interface Props {
   /**
-   * @title Test Event Name
+   * @title Event Name
    * @description Name of the test event to send
-   * @default test_event
+   * @default "test_event"
    */
   eventName?: string;
 
   /**
-   * @title Test Parameters
-   * @description Test parameters to send with the event
+   * @title Additional Test Parameters
+   * @description Extra parameters to include in the test event
    */
-  testParams?: Record<string, string>;
+  testParams?: Record<string, unknown>;
 }
+
+// Type definitions
+interface TestResult {
+  success: boolean;
+  message: string;
+  testEvent?: Record<string, unknown>;
+}
+
+interface TestEventPayload {
+  events: Array<{
+    name: string;
+    params: Record<string, unknown>;
+  }>;
+  client_id: string;
+  timestamp_micros: number;
+}
+
+// Utility functions
+const createTestEvent = (props: Props): TestEventPayload => ({
+  events: [{
+    name: props.eventName || "test_event",
+    params: {
+      event_category: "test",
+      event_label: "connection_test",
+      test_source: "deco_stape_integration",
+      ...props.testParams,
+    },
+  }],
+  client_id: "test-client-" + crypto.randomUUID(),
+  timestamp_micros: Date.now() * 1000,
+});
+
+const createSuccessResult = (
+  props: Props,
+  testEvent: Record<string, unknown>,
+): TestResult => ({
+  success: true,
+  message: `Test event sent successfully to Stape container. Event: ${
+    props.eventName || "test_event"
+  }`,
+  testEvent,
+});
+
+const createTimeoutResult = (): TestResult => ({
+  success: false,
+  message: `Test timeout after ${REQUEST_TIMEOUT_MS}ms`,
+});
+
+const createErrorResult = (error: unknown): TestResult => ({
+  success: false,
+  message: `Test failed: ${
+    error instanceof Error ? error.message : "Unknown error"
+  }`,
+});
+
+const isTimeoutError = (error: unknown): boolean =>
+  error instanceof Error && error.name === "AbortError";
 
 /**
  * @title Test Stape Connection
@@ -26,95 +84,34 @@ export default async function testStapeConnection(
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<{
-  success: boolean;
-  message: string;
-  testEvent?: Record<string, unknown>;
-}> {
+): Promise<TestResult> {
   const { containerUrl } = ctx;
 
-  if (!containerUrl) {
-    return {
-      success: false,
-      message:
-        "Container URL not configured. Please set the containerUrl in the app configuration.",
-    };
-  }
-
   try {
-    const testEvent = {
-      events: [{
-        name: props.eventName || "test_event",
-        params: {
-          test_timestamp: new Date().toISOString(),
-          test_source: "deco_stape_integration",
-          ...props.testParams,
-        },
-      }],
-      client_id: "test-client-" + crypto.randomUUID(),
-      timestamp_micros: Date.now() * 1000,
-    };
+    const testEvent = createTestEvent(props);
+    const { userAgent, clientIp } = extractRequestInfo(req);
 
-    const stapeUrl = new URL("/gtm", containerUrl);
-    const userAgent = req.headers.get("user-agent") || "Deco-Stape-Test/1.0";
+    console.log(`Testing Stape connection to: ${containerUrl}/gtm`);
 
-    console.log(`Testing Stape connection to: ${stapeUrl.toString()}`);
+    const result = await fetchStapeAPI(
+      containerUrl,
+      testEvent,
+      userAgent,
+      clientIp,
+      REQUEST_TIMEOUT_MS,
+    );
 
-    // Setup timeout controller
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      controller.abort();
-    }, REQUEST_TIMEOUT_MS);
-
-    try {
-      const response = await fetch(stapeUrl.toString(), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": userAgent,
-        },
-        body: JSON.stringify(testEvent),
-        signal: controller.signal,
-      });
-
-      // Clear timeout on successful response
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const errorText = await response.text().catch(() => "Unknown error");
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-
-      return {
-        success: true,
-        message: `Test event sent successfully to Stape container. Event: ${
-          props.eventName || "test_event"
-        }`,
-        testEvent,
-      };
-    } catch (error) {
-      // Clear timeout on error
-      clearTimeout(timeoutId);
-
-      if (error instanceof Error && error.name === "AbortError") {
-        console.error(
-          `Stape connection test timeout after ${REQUEST_TIMEOUT_MS}ms`,
-        );
-        return {
-          success: false,
-          message: `Test timeout after ${REQUEST_TIMEOUT_MS}ms`,
-        };
-      }
-
-      throw error;
-    }
+    return result.success
+      ? createSuccessResult(
+        props,
+        testEvent as unknown as Record<string, unknown>,
+      )
+      : createErrorResult(result.error);
   } catch (error) {
     console.error("Stape connection test failed:", error);
-    return {
-      success: false,
-      message: `Test failed: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`,
-    };
+
+    return isTimeoutError(error)
+      ? createTimeoutResult()
+      : createErrorResult(error);
   }
 }

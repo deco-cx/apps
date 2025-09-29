@@ -4,9 +4,104 @@ import {
   extractConsentFromHeaders,
   isAnyTrackingAllowed,
 } from "../../utils/gdpr.ts";
+import { extractRequestInfo, fetchStapeAPI } from "../../utils/fetch.ts";
 
 // Request timeout configuration
 const REQUEST_TIMEOUT_MS = 5000; // 5 seconds
+
+// Type definitions for cleaner code
+interface PageViewEventData {
+  eventName: "page_view";
+  eventParams: {
+    page_location: string;
+    page_title: string;
+    timestamp_micros: number;
+    [key: string]: unknown;
+  };
+}
+
+interface StapeEventPayload {
+  events: Array<{
+    name: string;
+    params: Record<string, unknown>;
+  }>;
+  client_id: string;
+  timestamp_micros: number;
+}
+
+// Utility functions
+const shouldTrackPageView = (props: Props, containerUrl?: string): boolean =>
+  props.trackPageViews !== false &&
+  props.enableServerSideTracking !== false &&
+  !!containerUrl;
+
+const hasTrackingConsent = (
+  req: Request,
+  enableGdprCompliance: boolean,
+  consentCookieName: string,
+): boolean => {
+  if (!enableGdprCompliance) return true;
+
+  const cookieHeader = req.headers.get("cookie") || "";
+  const consentData = extractConsentFromHeaders(
+    cookieHeader,
+    consentCookieName,
+  );
+  return isAnyTrackingAllowed(consentData);
+};
+
+const createPageViewEventData = (
+  req: Request,
+  customParameters?: Record<string, string>,
+): PageViewEventData => ({
+  eventName: "page_view",
+  eventParams: {
+    page_location: req.url,
+    page_title: "Page View",
+    timestamp_micros: Date.now() * 1000,
+    ...customParameters,
+  },
+});
+
+const buildStapePayload = (
+  eventData: PageViewEventData,
+): StapeEventPayload => ({
+  events: [{
+    name: eventData.eventName,
+    params: eventData.eventParams,
+  }],
+  client_id: crypto.randomUUID(),
+  timestamp_micros: Date.now() * 1000,
+});
+
+const logTrackingResult = (
+  debugMode: boolean | undefined,
+  eventName: string,
+  success: boolean,
+) => {
+  if (debugMode) {
+    console.log(`Stape: ${eventName} dispatch:`, { success });
+  }
+};
+
+const logTrackingError = (
+  debugMode: boolean | undefined,
+  eventName: string,
+  error: unknown,
+) => {
+  if (debugMode) {
+    console.error(`Stape: Failed to send ${eventName} event:`, error);
+  }
+};
+
+const logConsentBlocked = (
+  debugMode: boolean | undefined,
+  eventName: string,
+) => {
+  if (debugMode) {
+    console.log(`Stape: ${eventName} blocked by GDPR consent`);
+  }
+};
 
 export interface Props {
   /**
@@ -80,122 +175,58 @@ export default function StapeConfiguration(
 export const loader = async (props: Props, req: Request, ctx: AppContext) => {
   const {
     containerUrl,
-    gtmContainerId,
     enableGdprCompliance = true,
     consentCookieName = "cookie_consent",
   } = ctx;
 
-  // Send page view event server-side if enabled
-  if (
-    props.trackPageViews !== false &&
-    props.enableServerSideTracking !== false &&
-    containerUrl
-  ) {
-    // GDPR consent gate
-    let hasConsent = true;
-    if (enableGdprCompliance) {
-      const cookieHeader = req.headers.get("cookie") || "";
-      const consentData = extractConsentFromHeaders(
-        cookieHeader,
-        consentCookieName,
-      );
-      hasConsent = isAnyTrackingAllowed(consentData);
-    }
-
-    if (hasConsent) {
-      // Use sendBasicEvent action via context to track page view server-side
-      const pageViewData = {
-        eventName: "page_view" as const,
-        eventParams: {
-          page_location: req.url,
-          page_title: "Page View",
-          timestamp_micros: Date.now() * 1000,
-          ...props.customParameters,
-        },
-      };
-
-      try {
-        // Send basic event directly using Stape API
-        const eventData = {
-          events: [{
-            name: pageViewData.eventName,
-            params: pageViewData.eventParams,
-          }],
-          client_id: crypto.randomUUID(),
-          timestamp_micros: Date.now() * 1000,
-        };
-
-        const stapeUrl = new URL("/gtm", containerUrl);
-        const userAgent = req.headers.get("user-agent") ||
-          "Deco-Stape-Section/1.0";
-        const forwarded = req.headers.get("x-forwarded-for");
-        const clientIp = forwarded
-          ? forwarded.split(",")[0].trim()
-          : "127.0.0.1";
-
-        // Setup timeout controller
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          controller.abort();
-        }, REQUEST_TIMEOUT_MS);
-
-        try {
-          const response = await fetch(stapeUrl.toString(), {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "User-Agent": userAgent,
-              "X-Forwarded-For": clientIp,
-            },
-            body: JSON.stringify(eventData),
-            signal: controller.signal,
-          });
-
-          // Clear timeout on successful response
-          clearTimeout(timeoutId);
-
-          const success = response.ok;
-          if (props.debugMode) {
-            console.log("Stape: page_view dispatch:", {
-              success,
-              status: response.status,
-              event: pageViewData.eventName,
-            });
-          }
-        } catch (fetchError) {
-          // Clear timeout on error
-          clearTimeout(timeoutId);
-
-          if (fetchError instanceof Error && fetchError.name === "AbortError") {
-            if (props.debugMode) {
-              console.error(
-                `Stape: Request timeout after ${REQUEST_TIMEOUT_MS}ms`,
-              );
-            }
-          } else {
-            if (props.debugMode) {
-              console.error(
-                "Stape: Failed to send page_view event:",
-                fetchError,
-              );
-            }
-          }
-        }
-      } catch (error) {
-        if (props.debugMode) {
-          console.error("Stape: Failed to setup page_view event:", error);
-        }
-      }
-    } else if (props.debugMode) {
-      console.log("Stape: page_view blocked by GDPR consent");
-    }
+  // Early return if tracking is disabled or no container URL
+  if (!shouldTrackPageView(props, containerUrl)) {
+    return createLoaderResult(props, ctx);
   }
 
-  return {
-    ...props,
-    containerUrl,
-    gtmContainerId,
-    enableGdprCompliance,
-    consentCookieName,
-  };
+  // Early return if no consent
+  if (!hasTrackingConsent(req, enableGdprCompliance, consentCookieName)) {
+    logConsentBlocked(props.debugMode, "page_view");
+    return createLoaderResult(props, ctx);
+  }
+
+  try {
+    await sendPageViewToStape(req, props, containerUrl);
+  } catch (error) {
+    logTrackingError(props.debugMode, "page_view setup", error);
+  }
+
+  return createLoaderResult(props, ctx);
 };
+
+const sendPageViewToStape = async (
+  req: Request,
+  props: Props,
+  containerUrl: string,
+) => {
+  const pageViewData = createPageViewEventData(req, props.customParameters);
+  const eventPayload = buildStapePayload(pageViewData);
+  const { userAgent, clientIp } = extractRequestInfo(req);
+
+  const result = await fetchStapeAPI(
+    containerUrl,
+    eventPayload,
+    userAgent,
+    clientIp,
+    REQUEST_TIMEOUT_MS,
+  );
+
+  logTrackingResult(props.debugMode, pageViewData.eventName, result.success);
+
+  if (!result.success) {
+    logTrackingError(props.debugMode, pageViewData.eventName, result.error);
+  }
+};
+
+const createLoaderResult = (props: Props, ctx: AppContext) => ({
+  ...props,
+  containerUrl: ctx.containerUrl,
+  gtmContainerId: ctx.gtmContainerId,
+  enableGdprCompliance: ctx.enableGdprCompliance,
+  consentCookieName: ctx.consentCookieName,
+});

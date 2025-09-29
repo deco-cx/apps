@@ -1,4 +1,19 @@
 import { AppContext } from "../mod.ts";
+import { fetchStapeAPI } from "../utils/fetch.ts";
+import {
+  createErrorResult,
+  createSuccessResult,
+  createTimeoutResult,
+  type EventResult,
+  isTimeoutError,
+  sanitizeEventName,
+  sanitizeEventParams,
+} from "../utils/events.ts";
+import { isRateLimited, validateStapeConfig } from "../utils/security.ts";
+import {
+  buildTrackingContext,
+  createBasicEventPayload,
+} from "../utils/tracking.ts";
 
 // Request timeout configuration
 const REQUEST_TIMEOUT_MS = 5000; // 5 seconds
@@ -31,112 +46,85 @@ export interface Props {
 
 /**
  * @title Send Basic Event to Stape
- * @description Sends basic analytics events to Stape server-side container
+ * @description Sends basic analytics events to Stape server-side container with security validation
  */
 const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<{ success: boolean; message: string }> => {
+): Promise<EventResult> => {
   const { containerUrl } = ctx;
 
-  if (!containerUrl) {
-    return {
-      success: false,
-      message: "Container URL not configured",
-    };
+  // Security validation
+  const configValidation = validateStapeConfig({ containerUrl });
+  if (!configValidation.valid) {
+    return createErrorResult(
+      new Error(
+        `Security validation failed: ${configValidation.errors.join(", ")}`,
+      ),
+    );
   }
 
+  // Sanitize and validate inputs
+  const safeEventName = sanitizeEventName(props.eventName);
+  if (!safeEventName || safeEventName !== props.eventName) {
+    return createErrorResult(new Error("Invalid event name format"));
+  }
+
+  const safeEventParams = sanitizeEventParams(props.eventParams || {});
+
   try {
+    // Build tracking context with privacy protection
     const {
       enableGdprCompliance = true,
       consentCookieName = "cookie_consent",
     } = ctx;
-    let hasConsent = true;
-    if (enableGdprCompliance) {
-      const cookieHeader = req.headers.get("cookie") || "";
-      const consentCookie = cookieHeader
-        .split("; ")
-        .find((row) => row.startsWith(`${consentCookieName}=`))
-        ?.split("=")[1];
-      hasConsent = consentCookie === "true" || consentCookie === "granted";
-    }
-    if (!hasConsent) {
-      return { success: false, message: "GDPR consent not granted" };
+    const trackingContext = buildTrackingContext(
+      req,
+      enableGdprCompliance,
+      consentCookieName,
+    );
+
+    // Early return if no consent
+    if (!trackingContext.hasConsent) {
+      return createErrorResult(new Error("GDPR consent not granted"));
     }
 
-    const eventData = {
-      events: [{
-        name: props.eventName,
-        params: props.eventParams || {},
-      }],
-      client_id: props.clientId || crypto.randomUUID(),
-      user_id: props.userId,
-      timestamp_micros: Date.now() * 1000,
-    };
-
-    const stapeUrl = new URL("/gtm", containerUrl);
-    const userAgent = req.headers.get("user-agent") || "";
-
-    // Setup timeout controller
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      controller.abort();
-    }, REQUEST_TIMEOUT_MS);
-
-    try {
-      const response = await fetch(stapeUrl.toString(), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": userAgent,
-        },
-        body: JSON.stringify(eventData),
-        signal: controller.signal,
-      });
-
-      // Clear timeout on successful response
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(
-          `Stape request failed: ${response.status} ${response.statusText}. Response: ${errorBody}`,
-        );
-      }
-
-      return {
-        success: true,
-        message: `Event "${props.eventName}" sent successfully to Stape`,
-      };
-    } catch (error) {
-      // Clear timeout on error
-      clearTimeout(timeoutId);
-
-      if (error instanceof Error && error.name === "AbortError") {
-        console.error(`Stape request timeout after ${REQUEST_TIMEOUT_MS}ms`);
-        return {
-          success: false,
-          message: `Request timeout after ${REQUEST_TIMEOUT_MS}ms`,
-        };
-      }
-
-      console.error("Failed to send event to Stape:", error);
-      return {
-        success: false,
-        message: error instanceof Error
-          ? error.message
-          : "Unknown error occurred",
-      };
+    // Rate limiting check
+    if (isRateLimited(trackingContext.clientId)) {
+      return createErrorResult(new Error("Rate limit exceeded"));
     }
+
+    // Create safe event payload
+    const eventPayload = createBasicEventPayload(
+      safeEventName,
+      safeEventParams,
+      props.clientId || trackingContext.clientId,
+      props.userId,
+    );
+
+    // Send to Stape with timeout
+    const result = await fetchStapeAPI(
+      containerUrl!,
+      eventPayload,
+      trackingContext.userAgent,
+      trackingContext.clientIp,
+      REQUEST_TIMEOUT_MS,
+    );
+
+    return result.success
+      ? createSuccessResult(safeEventName)
+      : createErrorResult(result.error);
   } catch (error) {
-    console.error("Failed to send event to Stape:", error);
-    return {
-      success: false,
-      message: error instanceof Error
-        ? error.message
-        : "Unknown error occurred",
-    };
+    console.error("Failed to send event to Stape:", {
+      error: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString(),
+      // Don't log sensitive data
+    });
+
+    return isTimeoutError(error)
+      ? createTimeoutResult()
+      : createErrorResult(error);
   }
 };
 

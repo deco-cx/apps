@@ -5,6 +5,7 @@ import { PreviewContainer } from "../utils/preview.tsx";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { StapeClient } from "./utils/client.ts";
+import { sanitizeUrl, validateStapeConfig } from "./utils/security.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -57,11 +58,26 @@ export interface State extends Omit<Props, "apiKey"> {
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/stape/logo.png
  */
 export default function App(props: Props): DecoApp<Manifest, State> {
-  const { apiKey, containerUrl: _containerUrl } = props;
+  const { apiKey, containerUrl } = props;
 
+  // Security validation on app initialization
   const stringApiKey = typeof apiKey === "string"
     ? apiKey
     : apiKey?.get?.() ?? "";
+
+  // Validate configuration for security
+  const validation = validateStapeConfig({
+    containerUrl,
+    apiKey: stringApiKey,
+  });
+
+  if (!validation.valid) {
+    console.warn("Stape configuration validation failed:", validation.errors);
+    // Still continue but log warning for development
+  }
+
+  // Sanitize container URL to prevent injection
+  const safeContainerUrl = sanitizeUrl(containerUrl);
 
   const api = createHttpClient<StapeClient>({
     base: "https://api.app.stape.io",
@@ -74,6 +90,7 @@ export default function App(props: Props): DecoApp<Manifest, State> {
 
   const state: State = {
     ...props,
+    containerUrl: safeContainerUrl, // Use sanitized URL
     apiKey: stringApiKey,
     api,
   };
