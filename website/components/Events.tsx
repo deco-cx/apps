@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head } from "fresh/runtime";
 import { type AnalyticsEvent, type Deco } from "../../commerce/types.ts";
 import { useScriptAsDataURI } from "@deco/deco/hooks";
 import { DECO_SEGMENT, type Flag } from "@deco/deco";

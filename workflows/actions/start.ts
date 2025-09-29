@@ -2,7 +2,7 @@
 import { start } from "../initializer.ts"; // side-effect initialize
 import { toExecution, WorkflowExecution, WorkflowMetadata } from "../types.ts";
 import { Workflow, WorkflowFn } from "@deco/deco/blocks";
-import { Arg, RuntimeParameters, WorkflowExecutionBase } from "@deco/durable";
+// import type { Arg, RuntimeParameters, WorkflowExecutionBase } from "@deco/durable";
 import {
   type AppManifest,
   type BlockFromKey,

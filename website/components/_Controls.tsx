@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head } from "fresh/runtime";
 import { DomInspectorActivators } from "https://deno.land/x/inspect_vscode@0.2.1/inspector.ts";
 import { DomInspector } from "https://deno.land/x/inspect_vscode@0.2.1/mod.ts";
 import { Page } from "../../commerce/types.ts";

@@ -1,6 +1,6 @@
 {
   "imports": {
-    "$fresh/": "https://cdn.jsdelivr.net/gh/denoland/fresh@1.6.8/",
+    "fresh": "jsr:@fresh/core@^2.1.1",
     "preact": "npm:preact@10.23.1",
     "preact-render-to-string": "npm:preact-render-to-string@6.4.2",
     "@preact/signals": "https://esm.sh/*@preact/signals@1.1.3",

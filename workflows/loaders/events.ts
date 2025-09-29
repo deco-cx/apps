@@ -1,5 +1,5 @@
 import { history } from "../initializer.ts";
-import { HistoryEvent, Pagination } from "@deco/durable";
+// import type { HistoryEvent, Pagination } from "@deco/durable";
 import { StreamProps } from "@deco/deco";
 export interface Props extends StreamProps {
   id: string;

@@ -1,6 +1,6 @@
-import { HandlerContext } from "$fresh/server.ts";
+import { Context } from "fresh";
 import { type Handler, Workflow, WorkflowContext } from "@deco/deco/blocks";
-import { workflowHTTPHandler } from "@deco/durable";
+// import { workflowHTTPHandler } from "@deco/durable";
 import {
   type AppManifest,
   type DecoSiteState,
@@ -11,16 +11,15 @@ export interface Config {
 }
 export default function WorkflowHandler({ workflow }: Config): Handler {
   return (req: Request, conn: Deno.ServeHandlerInfo) => {
-    const ctx = conn as unknown as HandlerContext<
-      unknown,
+    const ctx = conn as unknown as Context<
       DecoState<unknown, DecoSiteState, AppManifest>
     >;
     if (ctx?.state) {
-      const handler = workflowHTTPHandler(
-        workflow,
-        (exec) => new WorkflowContext(ctx.state, exec),
-      );
-      return handler(req, conn);
+      // const handler = workflowHTTPHandler(
+      //   workflow,
+      //   (exec) => new WorkflowContext(ctx.state, exec),
+      // );
+      // return handler(req, conn);
     }
     return new Response(null, { status: 501 });
   };

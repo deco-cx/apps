@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head } from "fresh/runtime";
 import type { ImageWidget } from "../../admin/widgets.ts";
 import { stripHTML } from "../utils/html.ts";
 import { JSX } from "preact";
