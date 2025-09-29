@@ -47,7 +47,12 @@ const trackPageView = async (
   req: Request,
   ctx: AppContext,
 ): Promise<{ success: boolean; eventId?: string; error?: string }> => {
-  const { containerUrl, gtmContainerId, enableGdprCompliance } = ctx;
+  const {
+    containerUrl,
+    gtmContainerId,
+    enableGdprCompliance = true,
+    consentCookieName = "cookie_consent",
+  } = ctx;
 
   if (!containerUrl) {
     return {
@@ -73,8 +78,9 @@ const trackPageView = async (
     if (enableGdprCompliance) {
       const cookieHeader = req.headers.get("cookie") || "";
       const consentCookie = cookieHeader
-        .split("; ")
-        .find(row => row.startsWith("cookie_consent="))
+        .split(";")
+        .map((row) => row.trim())
+        .find((row) => row.startsWith(`${consentCookieName}=`))
         ?.split("=")[1];
       
       hasConsent = consentCookie === "true" || consentCookie === "granted";
