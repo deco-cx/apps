@@ -143,6 +143,7 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
       containerUrl,
       gtmContainerId,
       req,
+      trackingContext.hasConsent,
     );
   } catch (error) {
     logDebugError(
@@ -161,12 +162,14 @@ const sendPageViewEvent = async (
   containerUrl: string,
   gtmContainerId: string | undefined,
   req: Request,
+  hasConsent: boolean,
 ) => {
   const eventData = createPageViewEvent(
     context,
     props.customParameters,
     gtmContainerId,
     props.userId,
+    hasConsent,
   );
 
   // Add referrer from request headers safely

@@ -41,6 +41,7 @@ export const createPageViewEvent = (
   customParameters?: Record<string, string>,
   gtmContainerId?: string,
   userId?: string,
+  hasConsent?: boolean,
 ) => {
   // Parse URL to remove sensitive query parameters
   const url = new URL(context.pageUrl);
@@ -57,7 +58,9 @@ export const createPageViewEvent = (
   ];
   sensitiveParams.forEach((param) => url.searchParams.delete(param));
 
-  const consentState = context.hasConsent ? "granted" : "denied";
+  const consentState = (hasConsent ?? context.hasConsent)
+    ? "granted"
+    : "denied";
 
   return {
     events: [{

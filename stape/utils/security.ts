@@ -1,4 +1,5 @@
 // Security validation utilities for Stape integration
+import { isIP } from "npm:node:net@22.9.0";
 
 // Input validation functions
 export const isValidContainerUrl = (url: string): boolean => {
@@ -32,7 +33,9 @@ export const isValidEventName = (eventName: string): boolean => {
 };
 
 // Data sanitization functions
-export const sanitizeHeaders = (headers: globalThis.Headers): Record<string, string> => {
+export const sanitizeHeaders = (
+  headers: globalThis.Headers,
+): Record<string, string> => {
   const safe: Record<string, string> = {};
 
   // Only allow specific safe headers
@@ -103,23 +106,41 @@ export const sanitizeUserInput = (
 // IP address validation and anonymization
 export const anonymizeIp = (ip: string): string => {
   try {
-    // For IPv4, zero out the last octet
-    if (ip.includes(".")) {
+    const ipVersion = isIP(ip);
+
+    if (ipVersion === 4) {
+      // IPv4: zero out the last octet
       const parts = ip.split(".");
       if (parts.length === 4) {
         return `${parts[0]}.${parts[1]}.${parts[2]}.0`;
       }
-    }
+    } else if (ipVersion === 6) {
+      // IPv6: proper handling of compressed addresses
+      let expandedIp = ip;
 
-    // For IPv6, zero out the last 4 groups
-    if (ip.includes(":")) {
-      const parts = ip.split(":");
-      if (parts.length >= 4) {
-        return parts.slice(0, 4).join(":") + "::";
+      // Expand compressed IPv6 addresses (those with '::')
+      if (ip.includes("::")) {
+        const [left, right] = ip.split("::");
+        const leftGroups = left ? left.split(":") : [];
+        const rightGroups = right ? right.split(":") : [];
+        const missingGroups = 8 - leftGroups.length - rightGroups.length;
+
+        // Fill missing groups with '0'
+        const middleGroups = Array(missingGroups).fill("0");
+        const allGroups = [...leftGroups, ...middleGroups, ...rightGroups];
+        expandedIp = allGroups.join(":");
+      }
+
+      // Split into 8 hextets and zero out the last 4
+      const hextets = expandedIp.split(":");
+      if (hextets.length === 8) {
+        // Keep first 4 hextets, zero out last 4
+        const anonymized = [...hextets.slice(0, 4), "0", "0", "0", "0"];
+        return anonymized.join(":");
       }
     }
 
-    return "127.0.0.1"; // Fallback to localhost
+    return "127.0.0.1"; // Fallback for invalid IP
   } catch {
     return "127.0.0.1";
   }
