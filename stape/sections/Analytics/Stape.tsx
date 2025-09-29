@@ -1,5 +1,9 @@
 import { AppContext } from "../../mod.ts";
 import { type SectionProps } from "@deco/deco";
+import {
+  extractConsentFromHeaders,
+  isAnyTrackingAllowed,
+} from "../../utils/gdpr.ts";
 
 export interface Props {
   /**
@@ -88,11 +92,11 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
     let hasConsent = true;
     if (enableGdprCompliance) {
       const cookieHeader = req.headers.get("cookie") || "";
-      const consentCookie = cookieHeader
-        .split("; ")
-        .find((row) => row.startsWith(`${consentCookieName}=`))
-        ?.split("=")[1];
-      hasConsent = consentCookie === "true" || consentCookie === "granted";
+      const consentData = extractConsentFromHeaders(
+        cookieHeader,
+        consentCookieName,
+      );
+      hasConsent = isAnyTrackingAllowed(consentData);
     }
 
     if (hasConsent) {
@@ -114,63 +118,7 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
             name: pageViewData.eventName,
             params: pageViewData.eventParams,
           }],
-    if (hasConsent) {
-      // Generate stable client ID from existing cookies or create new one
-      let clientId: string;
-
-      // Get cookie header for client ID extraction
-      const cookieHeader = req.headers.get("cookie") || "";
-
-      // Try to extract from existing _ga cookie first
-      const gaCookie = cookieHeader
-        .split("; ")
-        .find((row: string) => row.startsWith("_ga="))
-        ?.split("=")[1];
-
-      if (gaCookie) {
-        // Extract client ID from GA cookie format: GA1.1.clientId.timestamp
-        const gaParts = gaCookie.split(".");
-        if (gaParts.length >= 3) {
-          clientId = `${gaParts[2]}.${gaParts[3] || Date.now()}`;
-        } else {
-          clientId = crypto.randomUUID();
-        }
-      } else {
-        // Try to find existing Stape client ID cookie
-        const stapeClientCookie = cookieHeader
-          .split("; ")
-          .find((row: string) => row.startsWith("_stape_client_id="))
-          ?.split("=")[1];
-
-        if (stapeClientCookie) {
-          clientId = stapeClientCookie;
-        } else {
-          // Generate new stable ID and it should be set as cookie client-side
-          clientId = crypto.randomUUID();
-        }
-      }
-
-      // Use sendBasicEvent action via context to track page view server-side
-      const pageViewData = {
-        eventName: "page_view" as const,
-        eventParams: {
-          page_location: req.url,
-          page_title: "Page View",
-          timestamp_micros: Date.now() * 1000,
-          ...props.customParameters,
-        },
-      };
-
-      try {
-        // Send basic event directly using Stape API
-        const eventData = {
-          events: [{
-            name: pageViewData.eventName,
-            params: pageViewData.eventParams,
-          }],
-          client_id: clientId,
-          timestamp_micros: Date.now() * 1000,
-        };
+          client_id: crypto.randomUUID(),
           timestamp_micros: Date.now() * 1000,
         };
 

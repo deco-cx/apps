@@ -6,7 +6,10 @@ import {
   Item,
   StapeEventRequest,
 } from "../utils/types.ts";
-import { isAnalyticsAllowed, parseConsentCookie } from "../utils/gdpr.ts";
+import {
+  extractConsentFromHeaders,
+  isAnalyticsAllowed,
+} from "../utils/gdpr.ts";
 import { fetchWithTimeout } from "../utils/fetch.ts";
 
 export interface Props {
@@ -69,7 +72,7 @@ const action = async (
   const cookieHeader = req.headers.get("cookie") || "";
   const consentData = extractConsentFromHeaders(
     cookieHeader,
-    ctx.consentCookieName || "cookie_consent"
+    ctx.consentCookieName || "cookie_consent",
   );
 
   if (!isAnalyticsAllowed(consentData)) {
@@ -127,8 +130,10 @@ const action = async (
         headers: {
           "Content-Type": "application/json",
           "User-Agent": req.headers.get("user-agent") || "Deco/Stape-App",
-          "X-Forwarded-For": req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "127.0.0.1",
-          "X-Real-IP": req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1",
+          "X-Forwarded-For": req.headers.get("x-forwarded-for") ||
+            req.headers.get("x-real-ip") || "127.0.0.1",
+          "X-Real-IP": req.headers.get("x-real-ip") ||
+            req.headers.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1",
         },
         body: JSON.stringify(stapeRequest),
         timeoutMs: timeout,
@@ -144,7 +149,7 @@ const action = async (
         statusText: response.statusText || "",
         body: response.data || "",
       },
-      consent_status: "granted",
+      consent_status: consentData.analytics_storage,
       request_info: {
         url: req.url,
         method: req.method,
@@ -158,7 +163,7 @@ const action = async (
       event_name: finalEventName,
       request_data: stapeRequest,
       error: error instanceof Error ? error.message : String(error),
-      consent_status: "granted",
+      consent_status: consentData.analytics_storage,
       request_info: {
         url: req.url,
         method: req.method,

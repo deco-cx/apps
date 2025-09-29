@@ -1,5 +1,9 @@
 import { AppContext } from "../mod.ts";
 import { EcommerceEvents } from "../utils/types.ts";
+import {
+  extractConsentFromHeaders,
+  isAnyTrackingAllowed,
+} from "../utils/gdpr.ts";
 
 export interface Props {
   /**
@@ -67,44 +71,14 @@ const trackEcommerceEvent = async (
 
     // Check GDPR consent from cookies if enabled
     let hasConsent = true;
+    let consentData = null;
     if (enableGdprCompliance) {
-      const consentCookieName = ctx.consentCookieName || "cookie_consent";
       const cookieHeader = req.headers.get("cookie") || "";
-
-      const cookieMap = Object.fromEntries(
-        cookieHeader.split(";").map((c) => {
-          const [k, ...v] = c.split("=");
-          return [k.trim(), decodeURIComponent(v.join("=") || "")];
-        }),
+      consentData = extractConsentFromHeaders(
+        cookieHeader,
+        ctx.consentCookieName || "cookie_consent",
       );
-
-      const consentValue = cookieMap[consentCookieName];
-      let parsedConsent: unknown = null;
-
-      try {
-        // Try to parse as JSON first
-        parsedConsent = JSON.parse(consentValue || "null");
-      } catch {
-        // Fallback to string/boolean parsing
-        if (consentValue === "true" || consentValue === "granted") {
-          parsedConsent = true;
-        } else if (consentValue === "false" || consentValue === "denied") {
-          parsedConsent = false;
-        }
-      }
-
-      if (parsedConsent === true || parsedConsent === "granted") {
-        hasConsent = true;
-      } else if (parsedConsent === false || parsedConsent === "denied") {
-        hasConsent = false;
-      } else if (typeof parsedConsent === "object" && parsedConsent !== null) {
-        // Handle object-based consent
-        const consentObj = parsedConsent as Record<string, string>;
-        hasConsent = consentObj.analytics_storage === "granted" ||
-          consentObj.ad_storage === "granted";
-      } else {
-        hasConsent = false; // Default to no consent if unparsable
-      }
+      hasConsent = isAnyTrackingAllowed(consentData);
     }
 
     if (!hasConsent) {
@@ -133,11 +107,11 @@ const trackEcommerceEvent = async (
       gtm_container_id: gtmContainerId,
       client_id: clientId,
       user_id: props.userId || undefined,
-      consent: {
-        ad_storage: hasConsent ? "granted" : "denied",
-        analytics_storage: hasConsent ? "granted" : "denied",
-        ad_user_data: hasConsent ? "granted" : "denied",
-        ad_personalization: hasConsent ? "granted" : "denied",
+      consent: consentData || {
+        ad_storage: "denied",
+        analytics_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
       },
     };
 
