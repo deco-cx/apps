@@ -45,6 +45,20 @@ const action = async (
   }
 
   try {
+    const { enableGdprCompliance = true, consentCookieName = "cookie_consent" } = ctx;
+    let hasConsent = true;
+    if (enableGdprCompliance) {
+      const cookieHeader = req.headers.get("cookie") || "";
+      const consentCookie = cookieHeader
+        .split("; ")
+        .find((row) => row.startsWith(`${consentCookieName}=`))
+        ?.split("=")[1];
+      hasConsent = consentCookie === "true" || consentCookie === "granted";
+    }
+    if (!hasConsent) {
+      return { success: false, message: "GDPR consent not granted" };
+    }
+
     const eventData = {
       events: [{
         name: props.eventName,
