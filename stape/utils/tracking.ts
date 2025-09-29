@@ -57,6 +57,8 @@ export const createPageViewEvent = (
   ];
   sensitiveParams.forEach((param) => url.searchParams.delete(param));
 
+  const consentState = context.hasConsent ? "granted" : "denied";
+
   return {
     events: [{
       name: "page_view",
@@ -74,10 +76,10 @@ export const createPageViewEvent = (
     client_id: context.clientId,
     user_id: userId,
     consent: {
-      ad_storage: "granted",
-      analytics_storage: "granted",
-      ad_user_data: "granted",
-      ad_personalization: "granted",
+      ad_storage: consentState,
+      analytics_storage: consentState,
+      ad_user_data: consentState,
+      ad_personalization: consentState,
     },
   };
 };

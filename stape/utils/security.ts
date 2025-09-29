@@ -32,7 +32,7 @@ export const isValidEventName = (eventName: string): boolean => {
 };
 
 // Data sanitization functions
-export const sanitizeHeaders = (headers: Headers): Record<string, string> => {
+export const sanitizeHeaders = (headers: globalThis.Headers): Record<string, string> => {
   const safe: Record<string, string> = {};
 
   // Only allow specific safe headers
