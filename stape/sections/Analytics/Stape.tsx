@@ -37,17 +37,17 @@ export interface Props {
 export default function StapeConfiguration(
   props: SectionProps<typeof loader>,
 ) {
-  const { 
-    containerUrl, 
-    gtmContainerId, 
-    enableGdprCompliance, 
+  const {
+    containerUrl,
+    gtmContainerId,
+    enableGdprCompliance,
     enableServerSideTracking,
-    debugMode 
+    debugMode,
   } = props;
 
   // This section only configures server-side tracking
   // No client-side JavaScript is rendered
-  
+
   if (debugMode) {
     console.log("Stape Configuration:", {
       containerUrl,
@@ -59,8 +59,8 @@ export default function StapeConfiguration(
 
   // Return hidden div with configuration data for debugging
   return (
-    <div 
-      style={{ display: "none" }} 
+    <div
+      style={{ display: "none" }}
       data-stape-config="true"
       data-container-url={containerUrl}
       data-gtm-id={gtmContainerId}
@@ -69,16 +69,6 @@ export default function StapeConfiguration(
     />
   );
 }
-
-export const loader = (props: Props, req: Request, ctx: AppContext) => {
-  const {
-    containerUrl,
-    gtmContainerId,
-    enableGdprCompliance = true,
-    consentCookieName = "cookie_consent",
-  } = ctx;
-
-import sendBasicEvent from "../../actions/sendBasicEvent.ts";
 
 export const loader = async (props: Props, req: Request, ctx: AppContext) => {
   const {
@@ -106,9 +96,9 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
     }
 
     if (hasConsent) {
-      // Use sendEvent action to track page view server-side
+      // Use sendBasicEvent action via context to track page view server-side
       const pageViewData = {
-        eventName: "page_view",
+        eventName: "page_view" as const,
         eventParams: {
           page_location: req.url,
           page_title: "Page View",
@@ -117,21 +107,52 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
         },
       };
 
-      const res = await sendBasicEvent(
-        { eventName: pageViewData.eventName, eventParams: pageViewData.eventParams },
-        req,
-        ctx,
-      );
-      if (props.debugMode) {
-        console.log("Stape: page_view dispatch:", res);
+      try {
+        // Send basic event directly using Stape API
+        const eventData = {
+          events: [{
+            name: pageViewData.eventName,
+            params: pageViewData.eventParams,
+          }],
+          client_id: crypto.randomUUID(),
+          timestamp_micros: Date.now() * 1000,
+        };
+
+        const stapeUrl = new URL("/gtm", containerUrl);
+        const userAgent = req.headers.get("user-agent") ||
+          "Deco-Stape-Section/1.0";
+        const forwarded = req.headers.get("x-forwarded-for");
+        const clientIp = forwarded
+          ? forwarded.split(",")[0].trim()
+          : "127.0.0.1";
+
+        const response = await fetch(stapeUrl.toString(), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "User-Agent": userAgent,
+            "X-Forwarded-For": clientIp,
+          },
+          body: JSON.stringify(eventData),
+        });
+
+        const success = response.ok;
+        if (props.debugMode) {
+          console.log("Stape: page_view dispatch:", {
+            success,
+            status: response.status,
+            event: pageViewData.eventName,
+          });
+        }
+      } catch (error) {
+        if (props.debugMode) {
+          console.error("Stape: Failed to send page_view event:", error);
+        }
       }
     } else if (props.debugMode) {
       console.log("Stape: page_view blocked by GDPR consent");
     }
   }
-
-  // ...rest of loader logic...
-};
 
   return {
     ...props,

@@ -1,5 +1,5 @@
 import { AppContext } from "../mod.ts";
-import { StapeEventRequest, EventData } from "../utils/types.ts";
+import { EventData, StapeEventRequest } from "../utils/types.ts";
 
 export interface Props extends StapeEventRequest {
   /**
@@ -59,7 +59,7 @@ export default async function sendEvent(
   req: Request,
   ctx: AppContext,
 ): Promise<{ success: boolean; message?: string }> {
-  const { containerUrl, enableGdprCompliance, consentCookieName } = ctx as any;
+  const { containerUrl, enableGdprCompliance, consentCookieName } = ctx;
 
   if (!containerUrl) {
     return {
@@ -86,7 +86,6 @@ export default async function sendEvent(
   }
 
   try {
-  try {
     // Get client IP and user agent from request
     const userAgent = req.headers.get("user-agent") || "";
     const forwarded = req.headers.get("x-forwarded-for");
@@ -105,7 +104,7 @@ export default async function sendEvent(
 
     // Send to Stape container
     const stapeUrl = new URL("/gtm", containerUrl);
-    
+
     const response = await fetch(stapeUrl.toString(), {
       method: "POST",
       headers: {
@@ -118,7 +117,9 @@ export default async function sendEvent(
     });
 
     if (!response.ok) {
-      throw new Error(`Stape request failed: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Stape request failed: ${response.status} ${response.statusText}`,
+      );
     }
 
     return {
@@ -129,7 +130,9 @@ export default async function sendEvent(
     console.error("Failed to send event to Stape:", error);
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Unknown error occurred",
+      message: error instanceof Error
+        ? error.message
+        : "Unknown error occurred",
     };
   }
 }

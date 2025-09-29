@@ -44,7 +44,7 @@ A comprehensive **100% server-side** Stape integration for Deco.cx that eliminat
 - ✅ **Real-Time E-commerce Events** - purchase, add_to_cart, view_item, begin_checkout
 - ✅ **Easy Deco.cx Integration** - Simple actions and sections
 
-## � Available Actions
+## 🔧 Available Actions
 
 All actions are **server-side only** and handle real user data with GA4/GTM compatibility:
 
@@ -322,7 +322,7 @@ Enable to see real data being sent:
 ```
 
 **Real debug output:**
-```
+```text
 Stape: Server-side page view tracked successfully for https://store.com/product/123
 Stape: E-commerce event 'add_to_cart' tracked - Value: $49.99, Items: 1
 Stape: Event blocked due to GDPR consent (cookie_consent=denied)

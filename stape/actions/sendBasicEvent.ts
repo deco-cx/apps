@@ -45,7 +45,10 @@ const action = async (
   }
 
   try {
-    const { enableGdprCompliance = true, consentCookieName = "cookie_consent" } = ctx;
+    const {
+      enableGdprCompliance = true,
+      consentCookieName = "cookie_consent",
+    } = ctx;
     let hasConsent = true;
     if (enableGdprCompliance) {
       const cookieHeader = req.headers.get("cookie") || "";
@@ -69,20 +72,22 @@ const action = async (
       timestamp_micros: Date.now() * 1000,
     };
 
-    const stapeUrl = new URL('/gtm', containerUrl);
+    const stapeUrl = new URL("/gtm", containerUrl);
     const userAgent = req.headers.get("user-agent") || "";
 
     const response = await fetch(stapeUrl.toString(), {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': userAgent,
+        "Content-Type": "application/json",
+        "User-Agent": userAgent,
       },
       body: JSON.stringify(eventData),
     });
 
     if (!response.ok) {
-      throw new Error(`Stape request failed: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Stape request failed: ${response.status} ${response.statusText}`,
+      );
     }
 
     return {
@@ -93,7 +98,9 @@ const action = async (
     console.error("Failed to send event to Stape:", error);
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Unknown error occurred",
+      message: error instanceof Error
+        ? error.message
+        : "Unknown error occurred",
     };
   }
 };

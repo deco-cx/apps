@@ -1,4 +1,4 @@
-import { Container, CapiGateway, StapeGateway } from "./types.ts";
+import { CapiGateway, Container, StapeGateway } from "./types.ts";
 
 export interface StapeClient {
   // Container management

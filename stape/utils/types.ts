@@ -55,7 +55,7 @@ export interface EventParams {
   value?: number;
   transaction_id?: string;
   session_id?: string;
-  
+
   // Product parameters
   item_id?: string;
   item_name?: string;
@@ -63,15 +63,15 @@ export interface EventParams {
   item_variant?: string;
   price?: number;
   quantity?: number;
-  
+
   // Enhanced e-commerce parameters
   items?: Item[];
-  
+
   // Page view parameters
   page_location?: string;
   page_title?: string;
   page_referrer?: string;
-  
+
   // Custom parameters
   [key: string]: unknown;
 }
@@ -102,10 +102,10 @@ export interface Item {
 }
 
 // Standard e-commerce events supported by Stape
-export type StandardEvents = 
+export type StandardEvents =
   | "page_view"
   | "view_item"
-  | "view_item_list" 
+  | "view_item_list"
   | "select_item"
   | "add_to_wishlist"
   | "add_to_cart"

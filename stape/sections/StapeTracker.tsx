@@ -43,16 +43,16 @@ export interface Props {
 export default function StapeServerTracker(
   props: SectionProps<typeof loader>,
 ) {
-  const { 
-    containerUrl, 
-    gtmContainerId, 
+  const {
+    containerUrl,
+    gtmContainerId,
     enableGdprCompliance,
     enableAutoPageTracking,
     enableEcommerceTracking,
     debugMode,
     pageUrl,
     userAgent,
-    clientIp
+    clientIp,
   } = props;
 
   if (debugMode) {
@@ -70,16 +70,16 @@ export default function StapeServerTracker(
 
   // Return a minimal hidden element for configuration tracking
   return (
-    <div 
-      style={{ 
+    <div
+      style={{
         display: "none",
         position: "absolute",
         top: "-9999px",
         left: "-9999px",
         width: "1px",
         height: "1px",
-        overflow: "hidden"
-      }} 
+        overflow: "hidden",
+      }}
       data-stape-tracker="server-side"
       data-container-url={containerUrl}
       data-gtm-id={gtmContainerId}
@@ -105,9 +105,9 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
   // Extract request information for server-side tracking
   const pageUrl = req.url;
   const userAgent = req.headers.get("user-agent") || "";
-  const clientIp = req.headers.get("x-forwarded-for") || 
-                  req.headers.get("x-real-ip") || 
-                  "127.0.0.1";
+  const clientIp = req.headers.get("x-forwarded-for") ||
+    req.headers.get("x-real-ip") ||
+    "127.0.0.1";
 
   // Automatically track page view if enabled
   if (props.enableAutoPageTracking !== false && containerUrl) {
@@ -118,15 +118,47 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
         const cookieHeader = req.headers.get("cookie") || "";
         const consentCookie = cookieHeader
           .split("; ")
-          .find(row => row.startsWith(`${consentCookieName}=`))
+          .find((row) => row.startsWith(`${consentCookieName}=`))
           ?.split("=")[1];
-        
+
         hasConsent = consentCookie === "true" || consentCookie === "granted";
       }
 
       if (hasConsent) {
-        // Generate client ID from request or create new one
-        const clientId = crypto.randomUUID();
+        // Generate stable client ID from existing cookies or create new one
+        let clientId: string;
+
+        // Get cookie header for client ID extraction
+        const cookieHeader = req.headers.get("cookie") || "";
+
+        // Try to extract from existing _ga cookie first
+        const gaCookie = cookieHeader
+          .split("; ")
+          .find((row: string) => row.startsWith("_ga="))
+          ?.split("=")[1];
+
+        if (gaCookie) {
+          // Extract client ID from GA cookie format: GA1.1.clientId.timestamp
+          const gaParts = gaCookie.split(".");
+          if (gaParts.length >= 3) {
+            clientId = `${gaParts[2]}.${gaParts[3] || Date.now()}`;
+          } else {
+            clientId = crypto.randomUUID();
+          }
+        } else {
+          // Try to find existing Stape client ID cookie
+          const stapeClientCookie = cookieHeader
+            .split("; ")
+            .find((row: string) => row.startsWith("_stape_client_id="))
+            ?.split("=")[1];
+
+          if (stapeClientCookie) {
+            clientId = stapeClientCookie;
+          } else {
+            // Generate new stable ID and it should be set as cookie client-side
+            clientId = crypto.randomUUID();
+          }
+        }
 
         // Prepare page view event data
         const eventData = {
@@ -155,7 +187,7 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
 
         // Send to Stape container
         const stapeUrl = new URL("/gtm", containerUrl);
-        
+
         const response = await fetch(stapeUrl.toString(), {
           method: "POST",
           headers: {
@@ -167,7 +199,11 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
         });
 
         if (props.debugMode) {
-          console.log(`Stape: Auto page view tracked - ${response.ok ? 'Success' : 'Failed'} (${response.status})`);
+          console.log(
+            `Stape: Auto page view tracked - ${
+              response.ok ? "Success" : "Failed"
+            } (${response.status})`,
+          );
         }
       } else if (props.debugMode) {
         console.log("Stape: Page view blocked due to GDPR consent");

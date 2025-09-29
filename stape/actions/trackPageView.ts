@@ -66,7 +66,7 @@ const trackPageView = async (
     const pageUrl = props.pageUrl || req.url;
     const pageTitle = props.pageTitle || "Page View";
     const pageReferrer = props.pageReferrer || req.headers.get("referer") || "";
-    
+
     // Generate event ID
     const eventId = crypto.randomUUID();
 
@@ -82,7 +82,7 @@ const trackPageView = async (
         .map((row) => row.trim())
         .find((row) => row.startsWith(`${consentCookieName}=`))
         ?.split("=")[1];
-      
+
       hasConsent = consentCookie === "true" || consentCookie === "granted";
     }
 
@@ -120,21 +120,23 @@ const trackPageView = async (
 
     // Send to Stape container
     const stapeUrl = new URL("/gtm", containerUrl);
-    
+
     const response = await fetch(stapeUrl.toString(), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "User-Agent": req.headers.get("user-agent") || "Deco-Stape-Server/1.0",
-        "X-Forwarded-For": req.headers.get("x-forwarded-for") || 
-                          req.headers.get("x-real-ip") || 
-                          "127.0.0.1",
+        "X-Forwarded-For": req.headers.get("x-forwarded-for") ||
+          req.headers.get("x-real-ip") ||
+          "127.0.0.1",
       },
       body: JSON.stringify(eventData),
     });
 
     if (!response.ok) {
-      throw new Error(`Stape API error: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Stape API error: ${response.status} ${response.statusText}`,
+      );
     }
 
     console.log(`Stape: Page view tracked successfully for ${pageUrl}`);
@@ -143,10 +145,9 @@ const trackPageView = async (
       success: true,
       eventId,
     };
-
   } catch (error) {
     console.error("Failed to track page view to Stape:", error);
-    
+
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",

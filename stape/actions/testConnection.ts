@@ -23,10 +23,9 @@ export default async function testStapeConnection(
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<{ 
-  success: boolean; 
-  message: string; 
-  containerUrl?: string;
+): Promise<{
+  success: boolean;
+  message: string;
   testEvent?: Record<string, unknown>;
 }> {
   const { containerUrl } = ctx;
@@ -34,7 +33,8 @@ export default async function testStapeConnection(
   if (!containerUrl) {
     return {
       success: false,
-      message: "Container URL not configured. Please set the containerUrl in the app configuration.",
+      message:
+        "Container URL not configured. Please set the containerUrl in the app configuration.",
     };
   }
 
@@ -52,16 +52,16 @@ export default async function testStapeConnection(
       timestamp_micros: Date.now() * 1000,
     };
 
-    const stapeUrl = new URL('/gtm', containerUrl);
+    const stapeUrl = new URL("/gtm", containerUrl);
     const userAgent = req.headers.get("user-agent") || "Deco-Stape-Test/1.0";
 
     console.log(`Testing Stape connection to: ${stapeUrl.toString()}`);
 
     const response = await fetch(stapeUrl.toString(), {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': userAgent,
+        "Content-Type": "application/json",
+        "User-Agent": userAgent,
       },
       body: JSON.stringify(testEvent),
     });
@@ -73,16 +73,18 @@ export default async function testStapeConnection(
 
     return {
       success: true,
-      message: `Test event sent successfully to Stape container. Event: ${props.eventName || "test_event"}`,
-      containerUrl,
+      message: `Test event sent successfully to Stape container. Event: ${
+        props.eventName || "test_event"
+      }`,
       testEvent,
     };
   } catch (error) {
     console.error("Stape connection test failed:", error);
     return {
       success: false,
-      message: `Test failed: ${error instanceof Error ? error.message : "Unknown error"}`,
-      containerUrl,
+      message: `Test failed: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`,
     };
   }
 }

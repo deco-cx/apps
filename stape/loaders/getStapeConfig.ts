@@ -39,7 +39,7 @@ const getStapeConfig = async (
         console.error(
           "Stape container lookup failed:",
           response.status,
-          await response.text()
+          await response.text(),
         );
         return null;
       }

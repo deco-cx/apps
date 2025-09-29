@@ -1,4 +1,4 @@
-import type { App, FnContext } from "@deco/deco";
+import type { App as DecoApp, FnContext } from "@deco/deco";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
@@ -56,10 +56,12 @@ export interface State extends Omit<Props, "apiKey"> {
  * @category Analytics
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/stape/logo.png
  */
-export default function App(props: Props): App<Manifest, State> {
+export default function App(props: Props): DecoApp<Manifest, State> {
   const { apiKey, containerUrl: _containerUrl } = props;
 
-  const stringApiKey = typeof apiKey === "string" ? apiKey : apiKey?.get?.() ?? "";
+  const stringApiKey = typeof apiKey === "string"
+    ? apiKey
+    : apiKey?.get?.() ?? "";
 
   const api = createHttpClient<StapeClient>({
     base: "https://api.app.stape.io",
@@ -89,7 +91,8 @@ export const preview = () => {
     props: {
       name: "Stape Server-Side Tagging",
       owner: "deco.cx",
-      description: "Stape server-side tagging integration for enhanced tracking and GDPR compliance. Enables sending events to Meta Ads, TikTok Ads, Google Ads, and other channels.",
+      description:
+        "Stape server-side tagging integration for enhanced tracking and GDPR compliance. Enables sending events to Meta Ads, TikTok Ads, Google Ads, and other channels.",
       logo: "https://stape.io/favicon.ico",
       images: [],
       tabs: [],
