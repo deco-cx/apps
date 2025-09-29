@@ -67,7 +67,10 @@ const action = async (
   } = props;
 
   const cookieHeader = req.headers.get("cookie") || "";
-  const consentData = parseConsentCookie(cookieHeader);
+  const consentData = extractConsentFromHeaders(
+    cookieHeader,
+    ctx.consentCookieName || "cookie_consent"
+  );
 
   if (!isAnalyticsAllowed(consentData)) {
     return {
@@ -124,6 +127,8 @@ const action = async (
         headers: {
           "Content-Type": "application/json",
           "User-Agent": req.headers.get("user-agent") || "Deco/Stape-App",
+          "X-Forwarded-For": req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "127.0.0.1",
+          "X-Real-IP": req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1",
         },
         body: JSON.stringify(stapeRequest),
         timeoutMs: timeout,
