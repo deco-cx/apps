@@ -32,17 +32,47 @@ export default async function analyticsScript(
     );
   }
 
-  try {
-    // Use custom script URL or build from container URL
-    const scriptUrl = props.customScriptUrl || new URL("/gtag/js", containerUrl).toString();
+export default async function analyticsScript(
+  props: Props,
+  req: Request,
+  ctx: AppContext,
+): Promise<Response> {
+  const { containerUrl, gtmContainerId } = ctx;
 
-    // Fetch the script from Stape
+  try {
+    // Use custom script URL or build from container URL + container/measurement ID
+    let scriptUrl = props.customScriptUrl;
+    if (!scriptUrl) {
+      if (gtmContainerId?.startsWith("GTM-")) {
+        scriptUrl = new URL(
+          `/gtm.js?id=${encodeURIComponent(gtmContainerId)}`,
+          containerUrl
+        ).toString();
+      } else if (gtmContainerId?.startsWith("G-")) {
+        scriptUrl = new URL(
+          `/gtag/js?id=${encodeURIComponent(gtmContainerId)}`,
+          containerUrl
+        ).toString();
+      } else {
+        // Fallback: try GTM without id (may be rejected by container)
+        scriptUrl = new URL("/gtm.js", containerUrl).toString();
+      }
+    }
+
+    // Optional: 5s timeout to avoid request-thread blocking
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), 5000);
+
     const response = await fetch(scriptUrl, {
       headers: {
-        "User-Agent": req.headers.get("user-agent") || "Deco-Stape-Integration/1.0",
+        "User-Agent":
+          req.headers.get("user-agent") || "Deco-Stape-Integration/1.0",
       },
+      signal: ac.signal,
     });
+    clearTimeout(t);
 
+    // …rest of your logic…
     if (!response.ok) {
       throw new Error(`Failed to fetch script: ${response.status}`);
     }
