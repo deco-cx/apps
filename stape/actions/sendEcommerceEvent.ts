@@ -90,11 +90,13 @@ export default async function sendEcommerceEvent(
       eventParams.value = props.value;
     }
 
-    // Add transaction ID for purchase events
-    if (props.eventName === "purchase" && props.transactionId) {
+    // Add/require transaction ID for purchase events
+    if (props.eventName === "purchase") {
+      if (!props.transactionId) {
+        return { success: false, message: "transactionId is required for purchase events" };
+      }
       eventParams.transaction_id = props.transactionId;
     }
-
     const eventData: EventData = {
       name: props.eventName,
       params: eventParams,
