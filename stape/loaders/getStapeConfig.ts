@@ -24,7 +24,10 @@ const getStapeConfig = async (
     console.warn("Stape API key not configured");
     return null;
   }
-
+  if (!api) {
+    console.warn("Stape API client not available");
+    return null;
+  }
   try {
     if (props.containerId) {
       // Get specific container
