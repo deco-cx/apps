@@ -59,7 +59,7 @@ export default async function sendEvent(
   req: Request,
   ctx: AppContext,
 ): Promise<{ success: boolean; message?: string }> {
-  const { containerUrl } = ctx;
+  const { containerUrl, enableGdprCompliance, consentCookieName } = ctx as any;
 
   if (!containerUrl) {
     return {
@@ -68,6 +68,24 @@ export default async function sendEvent(
     };
   }
 
+  // Optional GDPR gate
+  if (enableGdprCompliance) {
+    const cookieHeader = req.headers.get("cookie") || "";
+    const cookieMap = Object.fromEntries(
+      cookieHeader.split(";").map((c) => {
+        const [k, ...v] = c.split("=");
+        return [k.trim(), decodeURIComponent(v.join("=") || "")];
+      }),
+    );
+    const consentName = consentCookieName || "cookie_consent";
+    const consentVal = cookieMap[consentName];
+    const hasConsent = consentVal === "true" || consentVal === "granted";
+    if (!hasConsent) {
+      return { success: false, message: "Event blocked due to GDPR consent" };
+    }
+  }
+
+  try {
   try {
     // Get client IP and user agent from request
     const userAgent = req.headers.get("user-agent") || "";
