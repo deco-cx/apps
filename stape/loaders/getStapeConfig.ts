@@ -31,6 +31,15 @@ const getStapeConfig = async (
       const response = await api["GET /api/v2/containers/:identifier"]({
         identifier: props.containerId,
       });
+      if (!response.ok) {
+        if (response.status === 404) return null;
+        console.error(
+          "Stape container lookup failed:",
+          response.status,
+          await response.text()
+        );
+        return null;
+      }
       return await response.json();
     } else {
       // Get all containers and return the first one
