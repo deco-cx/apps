@@ -1,249 +1,167 @@
 import { AppContext } from "../mod.ts";
-import { EventData, Item } from "../utils/types.ts";
+import {
+  EcommerceEvents,
+  EventData,
+  EventParams,
+  Item,
+  StapeEventRequest,
+} from "../utils/types.ts";
+import { isAnalyticsAllowed, parseConsentCookie } from "../utils/gdpr.ts";
+import { fetchWithTimeout } from "../utils/fetch.ts";
 
-export interface EcommerceEventProps {
+export interface Props {
   /**
-   * @title Event Name
-   * @description Type of e-commerce event
+   * @description The type of e-commerce event
    */
-  eventName:
-    | "purchase"
-    | "add_to_cart"
-    | "remove_from_cart"
-    | "view_item"
-    | "view_item_list"
-    | "begin_checkout"
-    | "add_payment_info"
-    | "add_shipping_info";
-
-  /**
-   * @title Transaction ID
-   * @description Unique identifier for the transaction (required for purchase)
-   */
-  transactionId?: string;
+  event_name: EcommerceEvents;
 
   /**
-   * @title Currency
-   * @description Currency code (ISO 4217)
-   * @default BRL
+   * @description Custom event name if not using standard events
    */
+  custom_event_name?: string;
   currency?: string;
-
-  /**
-   * @title Total Value
-   * @description Total value of the transaction
-   */
   value?: number;
-
-  /**
-   * @title Items
-   * @description Array of items involved in the event
-   */
-  items: Item[];
-
-  /**
-   * @title Client ID
-   * @description Client identifier for tracking
-   */
-  clientId?: string;
-
-  /**
-   * @title User ID
-   * @description User identifier for cross-device tracking
-   */
-  userId?: string;
-
-  /**
-   * @title Additional Parameters
-   * @description Additional event parameters
-   */
-  additionalParams?: Record<string, unknown>;
+  transaction_id?: string;
+  shipping?: number;
+  tax?: number;
+  items?: Item[];
+  custom_parameters?: Record<string, unknown>;
+  timeout?: number;
 }
 
-/**
- * @title Send E-commerce Event to Stape
- * @description Sends structured e-commerce events to Stape with proper GA4 formatting
- */
-export default async function sendEcommerceEvent(
-  props: EcommerceEventProps,
+export interface EcommerceEventResponse {
+  status: "success" | "error" | "skipped";
+  event_name?: string;
+  request_data?: StapeEventRequest;
+  response_data?: {
+    status: number;
+    statusText: string;
+    body?: string;
+  };
+  consent_status?: string;
+  error?: string;
+  request_info?: {
+    url: string;
+    method: string;
+    user_agent?: string;
+    ip?: string;
+  };
+}
+
+const action = async (
+  props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<{ success: boolean; message: string; eventData?: EventData }> {
-  const { containerUrl, enableGdprCompliance } = ctx;
+): Promise<EcommerceEventResponse> => {
+  const {
+    event_name,
+    custom_event_name,
+    currency,
+    value,
+    transaction_id,
+    shipping,
+    tax,
+    items = [],
+    custom_parameters = {},
+    timeout = 5000,
+  } = props;
 
-  if (!containerUrl) {
+  const cookieHeader = req.headers.get("cookie") || "";
+  const consentData = parseConsentCookie(cookieHeader);
+
+  if (!isAnalyticsAllowed(consentData)) {
     return {
-      success: false,
-      message: "Container URL not configured",
+      status: "skipped",
+      consent_status: "denied",
+      request_info: {
+        url: req.url,
+        method: req.method,
+        user_agent: req.headers.get("user-agent") || "",
+        ip: req.headers.get("x-forwarded-for") || "",
+      },
     };
   }
 
-  if (!props.items || props.items.length === 0) {
-    return {
-      success: false,
-      message: "At least one item is required for e-commerce events",
-    };
+  const finalEventName = custom_event_name || event_name;
+  const clientIdCookie = cookieHeader.match(/client_id=([^;]+)/)?.[1];
+  const clientId = clientIdCookie ||
+    `${Date.now()}.${Math.random().toString(36).substring(2)}`;
+
+  const eventParams: EventParams = { ...custom_parameters };
+
+  if (currency) eventParams.currency = currency;
+  if (value !== undefined) eventParams.value = value;
+  if (transaction_id) eventParams.transaction_id = transaction_id;
+  if (shipping !== undefined) eventParams.shipping = shipping;
+  if (tax !== undefined) eventParams.tax = tax;
+  if (items.length > 0) eventParams.items = items;
+
+  eventParams.session_id = req.headers.get("x-session-id") || `${Date.now()}`;
+  eventParams.page_location = req.headers.get("referer") || req.url;
+
+  const eventData: EventData = {
+    name: finalEventName,
+    params: eventParams,
+  };
+
+  const stapeRequest: StapeEventRequest = {
+    events: [eventData],
+    client_id: clientId,
+    timestamp_micros: Date.now() * 1000,
+    consent: consentData,
+  };
+
+  const userId = req.headers.get("x-user-id");
+  if (userId) {
+    stapeRequest.user_id = userId;
   }
 
   try {
-    // Build event parameters
-    const eventParams: Record<string, unknown> = {
-      currency: props.currency || "BRL",
-      items: props.items,
-      ...props.additionalParams,
-    };
-
-    // Add value for events that support it
-    if (props.value !== undefined) {
-      eventParams.value = props.value;
-    }
-
-    // Add/require transaction ID for purchase events
-    if (props.eventName === "purchase") {
-      if (!props.transactionId) {
-        return {
-          success: false,
-          message: "transactionId is required for purchase events",
-        };
-      }
-      eventParams.transaction_id = props.transactionId;
-    }
-    const eventData: EventData = {
-      name: props.eventName,
-      params: eventParams,
-    };
-
-    // Read GDPR consent from cookies if compliance is enabled
-    let consentData = {
-      ad_storage: "unknown" as "granted" | "denied" | "unknown",
-      analytics_storage: "unknown" as "granted" | "denied" | "unknown",
-      ad_user_data: "unknown" as "granted" | "denied" | "unknown",
-      ad_personalization: "unknown" as "granted" | "denied" | "unknown",
-    };
-
-    if (enableGdprCompliance) {
-      const cookieHeader = req.headers.get("cookie") || "";
-      const consentCookieName = ctx.consentCookieName || "cookie_consent";
-      const cookieMap = Object.fromEntries(
-        cookieHeader.split(";").map((c) => {
-          const [k, ...v] = c.split("=");
-          return [k.trim(), decodeURIComponent(v.join("=") || "")];
-        }),
-      );
-
-      const consentValue = cookieMap[consentCookieName];
-      let parsedConsent: unknown = null;
-
-      try {
-        // Try to parse as JSON first
-        parsedConsent = JSON.parse(consentValue || "null");
-      } catch {
-        // Fallback to string/boolean parsing
-        if (consentValue === "true" || consentValue === "granted") {
-          parsedConsent = true;
-        } else if (consentValue === "false" || consentValue === "denied") {
-          parsedConsent = false;
-        }
-      }
-
-      if (parsedConsent === true || parsedConsent === "granted") {
-        consentData = {
-          ad_storage: "granted",
-          analytics_storage: "granted",
-          ad_user_data: "granted",
-          ad_personalization: "granted",
-        };
-      } else if (parsedConsent === false || parsedConsent === "denied") {
-        consentData = {
-          ad_storage: "denied",
-          analytics_storage: "denied",
-          ad_user_data: "denied",
-          ad_personalization: "denied",
-        };
-      } else if (typeof parsedConsent === "object" && parsedConsent !== null) {
-        // Handle object-based consent
-        const consentObj = parsedConsent as Record<string, string>;
-        consentData = {
-          ad_storage:
-            (consentObj.ad_storage as "granted" | "denied" | "unknown") ||
-            "unknown",
-          analytics_storage: (consentObj.analytics_storage as
-            | "granted"
-            | "denied"
-            | "unknown") || "unknown",
-          ad_user_data:
-            (consentObj.ad_user_data as "granted" | "denied" | "unknown") ||
-            "unknown",
-          ad_personalization: (consentObj.ad_personalization as
-            | "granted"
-            | "denied"
-            | "unknown") || "unknown",
-        };
-      }
-
-      // Skip event entirely if analytics is denied
-      if (consentData.analytics_storage === "denied") {
-        console.log(
-          "Stape: Event blocked due to GDPR consent (analytics denied)",
-        );
-        return {
-          success: false,
-          message: "Event blocked due to GDPR consent",
-        };
-      }
-    } else {
-      // Fallback when GDPR compliance is disabled
-      consentData = {
-        ad_storage: "unknown",
-        analytics_storage: "unknown",
-        ad_user_data: "unknown",
-        ad_personalization: "unknown",
-      };
-    }
-
-    const payload = {
-      events: consentData.analytics_storage === "denied" ? [] : [eventData],
-      client_id: props.clientId || crypto.randomUUID(),
-      user_id: props.userId,
-      timestamp_micros: Date.now() * 1000,
-      consent: consentData,
-    };
-
-    const stapeUrl = new URL("/gtm", containerUrl);
-    const userAgent = req.headers.get("user-agent") || "";
-    const forwarded = req.headers.get("x-forwarded-for");
-    const clientIp = forwarded ? forwarded.split(",")[0].trim() : "127.0.0.1";
-
-    const response = await fetch(stapeUrl.toString(), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": userAgent,
-        "X-Forwarded-For": clientIp,
-        "X-Real-IP": clientIp,
+    const response = await fetchWithTimeout(
+      `${ctx.containerUrl}/data`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": req.headers.get("user-agent") || "Deco/Stape-App",
+        },
+        body: JSON.stringify(stapeRequest),
+        timeoutMs: timeout,
       },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        `Stape request failed: ${response.status} ${response.statusText}`,
-      );
-    }
+    );
 
     return {
-      success: true,
-      message:
-        `E-commerce event "${props.eventName}" sent successfully to Stape`,
-      eventData,
+      status: "success",
+      event_name: finalEventName,
+      request_data: stapeRequest,
+      response_data: {
+        status: response.status || 0,
+        statusText: response.statusText || "",
+        body: response.data || "",
+      },
+      consent_status: "granted",
+      request_info: {
+        url: req.url,
+        method: req.method,
+        user_agent: req.headers.get("user-agent") || "",
+        ip: req.headers.get("x-forwarded-for") || "",
+      },
     };
   } catch (error) {
-    console.error("Failed to send e-commerce event to Stape:", error);
     return {
-      success: false,
-      message: error instanceof Error
-        ? error.message
-        : "Unknown error occurred",
+      status: "error",
+      event_name: finalEventName,
+      request_data: stapeRequest,
+      error: error instanceof Error ? error.message : String(error),
+      consent_status: "granted",
+      request_info: {
+        url: req.url,
+        method: req.method,
+        user_agent: req.headers.get("user-agent") || "",
+        ip: req.headers.get("x-forwarded-for") || "",
+      },
     };
   }
-}
+};
+
+export default action;

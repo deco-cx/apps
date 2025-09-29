@@ -1,11 +1,12 @@
 import { AppContext } from "../mod.ts";
+import { EcommerceEvents } from "../utils/types.ts";
 
 export interface Props {
   /**
    * @title Event Name
-   * @description E-commerce event name (purchase, add_to_cart, view_item, etc.)
+   * @description E-commerce event name from GA4 standard events
    */
-  eventName: string;
+  eventName: EcommerceEvents;
 
   /**
    * @title Event Parameters

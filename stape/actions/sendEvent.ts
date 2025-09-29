@@ -1,7 +1,16 @@
 import { AppContext } from "../mod.ts";
-import { EventData, StapeEventRequest } from "../utils/types.ts";
+import {
+  EventData,
+  GdprConsentData,
+  StapeEventRequest,
+} from "../utils/types.ts";
+import {
+  extractConsentFromHeaders,
+  isAnalyticsAllowed,
+} from "../utils/gdpr.ts";
+import { extractRequestInfo, fetchStapeAPI } from "../utils/fetch.ts";
 
-export interface Props extends StapeEventRequest {
+export interface Props {
   /**
    * @title Event Data
    * @description The event data to send to Stape
@@ -42,17 +51,12 @@ export interface Props extends StapeEventRequest {
    * @title Consent Settings
    * @description GDPR consent settings
    */
-  consent?: {
-    ad_storage?: "granted" | "denied";
-    analytics_storage?: "granted" | "denied";
-    ad_user_data?: "granted" | "denied";
-    ad_personalization?: "granted" | "denied";
-  };
+  consent?: GdprConsentData;
 }
 
 /**
  * @title Send Event to Stape
- * @description Sends analytics events to Stape server-side tagging
+ * @description Sends analytics events to Stape server-side tagging with timeout and robust error handling
  */
 export default async function sendEvent(
   props: Props,
@@ -68,28 +72,25 @@ export default async function sendEvent(
     };
   }
 
-  // Optional GDPR gate
+  // GDPR compliance check
   if (enableGdprCompliance) {
     const cookieHeader = req.headers.get("cookie") || "";
-    const cookieMap = Object.fromEntries(
-      cookieHeader.split(";").map((c) => {
-        const [k, ...v] = c.split("=");
-        return [k.trim(), decodeURIComponent(v.join("=") || "")];
-      }),
+    const consentData = extractConsentFromHeaders(
+      cookieHeader,
+      consentCookieName,
     );
-    const consentName = consentCookieName || "cookie_consent";
-    const consentVal = cookieMap[consentName];
-    const hasConsent = consentVal === "true" || consentVal === "granted";
-    if (!hasConsent) {
-      return { success: false, message: "Event blocked due to GDPR consent" };
+
+    if (!isAnalyticsAllowed(consentData)) {
+      return {
+        success: false,
+        message: "Event blocked due to GDPR consent (analytics denied)",
+      };
     }
   }
 
   try {
-    // Get client IP and user agent from request
-    const userAgent = req.headers.get("user-agent") || "";
-    const forwarded = req.headers.get("x-forwarded-for");
-    const clientIp = forwarded ? forwarded.split(",")[0].trim() : "127.0.0.1";
+    // Extract request information
+    const { userAgent, clientIp } = extractRequestInfo(req);
 
     // Build event payload
     const eventPayload: StapeEventRequest = {
@@ -102,24 +103,20 @@ export default async function sendEvent(
       consent: props.consent,
     };
 
-    // Send to Stape container
-    const stapeUrl = new URL("/gtm", containerUrl);
+    // Send to Stape with timeout and error handling
+    const result = await fetchStapeAPI(
+      containerUrl,
+      eventPayload,
+      userAgent,
+      clientIp,
+    );
 
-    const response = await fetch(stapeUrl.toString(), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": userAgent,
-        "X-Forwarded-For": clientIp,
-        "X-Real-IP": clientIp,
-      },
-      body: JSON.stringify(eventPayload),
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        `Stape request failed: ${response.status} ${response.statusText}`,
-      );
+    if (!result.success) {
+      console.error("Stape API error:", result.error);
+      return {
+        success: false,
+        message: result.error || "Failed to send event to Stape",
+      };
     }
 
     return {
@@ -127,12 +124,13 @@ export default async function sendEvent(
       message: "Event sent successfully to Stape",
     };
   } catch (error) {
+    const errorMessage = error instanceof Error
+      ? error.message
+      : "Unknown error occurred";
     console.error("Failed to send event to Stape:", error);
     return {
       success: false,
-      message: error instanceof Error
-        ? error.message
-        : "Unknown error occurred",
+      message: errorMessage,
     };
   }
 }

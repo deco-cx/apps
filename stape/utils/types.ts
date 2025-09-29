@@ -101,7 +101,18 @@ export interface Item {
   promotion_name?: string;
 }
 
-// Standard e-commerce events supported by Stape
+// GDPR Consent Management Types - Baseado na documentação oficial do Google
+// https://support.google.com/analytics/answer/9976101
+export type ConsentStatus = "granted" | "denied";
+
+export interface GdprConsentData {
+  ad_storage: ConsentStatus;
+  analytics_storage: ConsentStatus;
+  ad_user_data: ConsentStatus;
+  ad_personalization: ConsentStatus;
+}
+
+// Standard e-commerce and recommended events supported by GA4
 export type StandardEvents =
   | "page_view"
   | "view_item"
@@ -118,7 +129,37 @@ export type StandardEvents =
   | "refund"
   | "search"
   | "select_promotion"
-  | "view_promotion";
+  | "view_promotion"
+  | "generate_lead"
+  | "login"
+  | "sign_up"
+  | "share"
+  | "select_content"
+  | "tutorial_begin"
+  | "tutorial_complete"
+  | "level_start"
+  | "level_end"
+  | "level_up"
+  | "post_score"
+  | "earn_virtual_currency"
+  | "spend_virtual_currency"
+  | "unlock_achievement"
+  | "join_group";
+
+// E-commerce specific events (subset of StandardEvents)
+export type EcommerceEvents =
+  | "view_item"
+  | "view_item_list"
+  | "select_item"
+  | "add_to_wishlist"
+  | "add_to_cart"
+  | "remove_from_cart"
+  | "view_cart"
+  | "begin_checkout"
+  | "add_payment_info"
+  | "add_shipping_info"
+  | "purchase"
+  | "refund";
 
 export interface StapeEventRequest {
   events: EventData[];
@@ -127,10 +168,5 @@ export interface StapeEventRequest {
   timestamp_micros?: number;
   user_properties?: Record<string, unknown>;
   non_personalized_ads?: boolean;
-  consent?: {
-    ad_storage?: "granted" | "denied";
-    analytics_storage?: "granted" | "denied";
-    ad_user_data?: "granted" | "denied";
-    ad_personalization?: "granted" | "denied";
-  };
+  consent?: GdprConsentData;
 }
