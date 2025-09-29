@@ -78,23 +78,60 @@ export const loader = (props: Props, req: Request, ctx: AppContext) => {
     consentCookieName = "cookie_consent",
   } = ctx;
 
-  // Send page view event server-side if enabled
-  if (props.trackPageViews !== false && props.enableServerSideTracking !== false) {
-    // Use sendEvent action to track page view server-side
-    const pageViewData = {
-      eventName: "page_view",
-      eventParams: {
-        page_location: req.url,
-        page_title: "Page View",
-        timestamp: new Date().toISOString(),
-        ...props.customParameters,
-      },
-    };
+import sendBasicEvent from "../../actions/sendBasicEvent.ts";
 
-    if (props.debugMode) {
-      console.log("Stape: Server-side page view tracked:", pageViewData);
+export const loader = async (props: Props, req: Request, ctx: AppContext) => {
+  const {
+    containerUrl,
+    gtmContainerId,
+    enableGdprCompliance = true,
+    consentCookieName = "cookie_consent",
+  } = ctx;
+
+  // Send page view event server-side if enabled
+  if (
+    props.trackPageViews !== false &&
+    props.enableServerSideTracking !== false &&
+    containerUrl
+  ) {
+    // GDPR consent gate
+    let hasConsent = true;
+    if (enableGdprCompliance) {
+      const cookieHeader = req.headers.get("cookie") || "";
+      const consentCookie = cookieHeader
+        .split("; ")
+        .find((row) => row.startsWith(`${consentCookieName}=`))
+        ?.split("=")[1];
+      hasConsent = consentCookie === "true" || consentCookie === "granted";
+    }
+
+    if (hasConsent) {
+      // Use sendEvent action to track page view server-side
+      const pageViewData = {
+        eventName: "page_view",
+        eventParams: {
+          page_location: req.url,
+          page_title: "Page View",
+          timestamp_micros: Date.now() * 1000,
+          ...props.customParameters,
+        },
+      };
+
+      const res = await sendBasicEvent(
+        { eventName: pageViewData.eventName, eventParams: pageViewData.eventParams },
+        req,
+        ctx,
+      );
+      if (props.debugMode) {
+        console.log("Stape: page_view dispatch:", res);
+      }
+    } else if (props.debugMode) {
+      console.log("Stape: page_view blocked by GDPR consent");
     }
   }
+
+  // ...rest of loader logic...
+};
 
   return {
     ...props,
