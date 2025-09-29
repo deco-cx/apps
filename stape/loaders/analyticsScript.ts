@@ -91,9 +91,8 @@ export default async function analyticsScript(
     console.error("Error loading Stape analytics script:", error);
     
     // Return a minimal fallback script
-    const fallbackScript = `
-// Stape analytics script fallback
-console.warn('Stape analytics script failed to load: ${error}');
+    const fallbackScript = `// Stape analytics script fallback
+console.warn('Stape analytics script failed to load. Using fallback.');
 window.dataLayer = window.dataLayer || [];
 function gtag() { dataLayer.push(arguments); }
 gtag('js', new Date());
