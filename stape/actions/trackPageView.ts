@@ -1,5 +1,8 @@
 import { AppContext } from "../mod.ts";
 
+// Request timeout configuration
+const REQUEST_TIMEOUT_MS = 5000; // 5 seconds
+
 export interface Props {
   /**
    * @title Page URL
@@ -118,36 +121,66 @@ const trackPageView = async (
       },
     };
 
-    // Send to Stape container
+    // Send to Stape container with timeout
     const stapeUrl = new URL("/gtm", containerUrl);
 
-    const response = await fetch(stapeUrl.toString(), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": req.headers.get("user-agent") || "Deco-Stape-Server/1.0",
-        "X-Forwarded-For": req.headers.get("x-forwarded-for") ||
-          req.headers.get("x-real-ip") ||
-          "127.0.0.1",
-      },
-      body: JSON.stringify(eventData),
-    });
+    // Setup timeout controller
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, REQUEST_TIMEOUT_MS);
 
-    if (!response.ok) {
-      throw new Error(
-        `Stape API error: ${response.status} ${response.statusText}`,
-      );
+    try {
+      const response = await fetch(stapeUrl.toString(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": req.headers.get("user-agent") ||
+            "Deco-Stape-Server/1.0",
+          "X-Forwarded-For": req.headers.get("x-forwarded-for") ||
+            req.headers.get("x-real-ip") ||
+            "127.0.0.1",
+        },
+        body: JSON.stringify(eventData),
+        signal: controller.signal,
+      });
+
+      // Clear timeout on successful response
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(
+          `Stape API error: ${response.status} ${response.statusText}. Response: ${errorBody}`,
+        );
+      }
+
+      console.log(`Stape: Page view tracked successfully for ${pageUrl}`);
+
+      return {
+        success: true,
+        eventId,
+      };
+    } catch (error) {
+      // Clear timeout on error
+      clearTimeout(timeoutId);
+
+      if (error instanceof Error && error.name === "AbortError") {
+        console.error(`Request timeout after ${REQUEST_TIMEOUT_MS}ms`);
+        return {
+          success: false,
+          error: `Request timeout after ${REQUEST_TIMEOUT_MS}ms`,
+        };
+      }
+
+      console.error("Failed to track page view to Stape:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
-
-    console.log(`Stape: Page view tracked successfully for ${pageUrl}`);
-
-    return {
-      success: true,
-      eventId,
-    };
   } catch (error) {
     console.error("Failed to track page view to Stape:", error);
-
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",

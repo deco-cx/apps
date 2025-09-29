@@ -1,5 +1,8 @@
 import { AppContext } from "../mod.ts";
 
+// Request timeout configuration
+const REQUEST_TIMEOUT_MS = 5000; // 5 seconds
+
 export interface Props {
   /**
    * @title Test Event Name
@@ -57,27 +60,54 @@ export default async function testStapeConnection(
 
     console.log(`Testing Stape connection to: ${stapeUrl.toString()}`);
 
-    const response = await fetch(stapeUrl.toString(), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": userAgent,
-      },
-      body: JSON.stringify(testEvent),
-    });
+    // Setup timeout controller
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, REQUEST_TIMEOUT_MS);
 
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => "Unknown error");
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    try {
+      const response = await fetch(stapeUrl.toString(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": userAgent,
+        },
+        body: JSON.stringify(testEvent),
+        signal: controller.signal,
+      });
+
+      // Clear timeout on successful response
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "Unknown error");
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      return {
+        success: true,
+        message: `Test event sent successfully to Stape container. Event: ${
+          props.eventName || "test_event"
+        }`,
+        testEvent,
+      };
+    } catch (error) {
+      // Clear timeout on error
+      clearTimeout(timeoutId);
+
+      if (error instanceof Error && error.name === "AbortError") {
+        console.error(
+          `Stape connection test timeout after ${REQUEST_TIMEOUT_MS}ms`,
+        );
+        return {
+          success: false,
+          message: `Test timeout after ${REQUEST_TIMEOUT_MS}ms`,
+        };
+      }
+
+      throw error;
     }
-
-    return {
-      success: true,
-      message: `Test event sent successfully to Stape container. Event: ${
-        props.eventName || "test_event"
-      }`,
-      testEvent,
-    };
   } catch (error) {
     console.error("Stape connection test failed:", error);
     return {

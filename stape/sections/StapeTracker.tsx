@@ -1,6 +1,9 @@
 import { AppContext } from "../mod.ts";
 import { type SectionProps } from "@deco/deco";
 
+// Request timeout configuration
+const REQUEST_TIMEOUT_MS = 5000; // 5 seconds
+
 export interface Props {
   /**
    * @title Enable Auto Page Tracking
@@ -188,22 +191,52 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
         // Send to Stape container
         const stapeUrl = new URL("/gtm", containerUrl);
 
-        const response = await fetch(stapeUrl.toString(), {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "User-Agent": userAgent || "Deco-Stape-Server/1.0",
-            "X-Forwarded-For": clientIp,
-          },
-          body: JSON.stringify(eventData),
-        });
+        // Setup timeout controller
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort();
+        }, REQUEST_TIMEOUT_MS);
 
-        if (props.debugMode) {
-          console.log(
-            `Stape: Auto page view tracked - ${
-              response.ok ? "Success" : "Failed"
-            } (${response.status})`,
-          );
+        try {
+          const response = await fetch(stapeUrl.toString(), {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "User-Agent": userAgent || "Deco-Stape-Server/1.0",
+              "X-Forwarded-For": clientIp,
+            },
+            body: JSON.stringify(eventData),
+            signal: controller.signal,
+          });
+
+          // Clear timeout on successful response
+          clearTimeout(timeoutId);
+
+          if (props.debugMode) {
+            console.log(
+              `Stape: Auto page view tracked - ${
+                response.ok ? "Success" : "Failed"
+              } (${response.status})`,
+            );
+          }
+        } catch (fetchError) {
+          // Clear timeout on error
+          clearTimeout(timeoutId);
+
+          if (fetchError instanceof Error && fetchError.name === "AbortError") {
+            if (props.debugMode) {
+              console.error(
+                `Stape: Request timeout after ${REQUEST_TIMEOUT_MS}ms`,
+              );
+            }
+          } else {
+            if (props.debugMode) {
+              console.error(
+                "Stape: Failed to send auto page view:",
+                fetchError,
+              );
+            }
+          }
         }
       } else if (props.debugMode) {
         console.log("Stape: Page view blocked due to GDPR consent");

@@ -1,5 +1,8 @@
 import { AppContext } from "../mod.ts";
 
+// Request timeout configuration
+const REQUEST_TIMEOUT_MS = 5000; // 5 seconds
+
 export interface Props {
   /**
    * @title Event Name
@@ -75,25 +78,57 @@ const action = async (
     const stapeUrl = new URL("/gtm", containerUrl);
     const userAgent = req.headers.get("user-agent") || "";
 
-    const response = await fetch(stapeUrl.toString(), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": userAgent,
-      },
-      body: JSON.stringify(eventData),
-    });
+    // Setup timeout controller
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, REQUEST_TIMEOUT_MS);
 
-    if (!response.ok) {
-      throw new Error(
-        `Stape request failed: ${response.status} ${response.statusText}`,
-      );
+    try {
+      const response = await fetch(stapeUrl.toString(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": userAgent,
+        },
+        body: JSON.stringify(eventData),
+        signal: controller.signal,
+      });
+
+      // Clear timeout on successful response
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(
+          `Stape request failed: ${response.status} ${response.statusText}. Response: ${errorBody}`,
+        );
+      }
+
+      return {
+        success: true,
+        message: `Event "${props.eventName}" sent successfully to Stape`,
+      };
+    } catch (error) {
+      // Clear timeout on error
+      clearTimeout(timeoutId);
+
+      if (error instanceof Error && error.name === "AbortError") {
+        console.error(`Stape request timeout after ${REQUEST_TIMEOUT_MS}ms`);
+        return {
+          success: false,
+          message: `Request timeout after ${REQUEST_TIMEOUT_MS}ms`,
+        };
+      }
+
+      console.error("Failed to send event to Stape:", error);
+      return {
+        success: false,
+        message: error instanceof Error
+          ? error.message
+          : "Unknown error occurred",
+      };
     }
-
-    return {
-      success: true,
-      message: `Event "${props.eventName}" sent successfully to Stape`,
-    };
   } catch (error) {
     console.error("Failed to send event to Stape:", error);
     return {

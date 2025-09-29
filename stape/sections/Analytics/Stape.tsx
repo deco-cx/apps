@@ -5,6 +5,9 @@ import {
   isAnyTrackingAllowed,
 } from "../../utils/gdpr.ts";
 
+// Request timeout configuration
+const REQUEST_TIMEOUT_MS = 5000; // 5 seconds
+
 export interface Props {
   /**
    * @title Enable Server-Side Events
@@ -130,27 +133,57 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
           ? forwarded.split(",")[0].trim()
           : "127.0.0.1";
 
-        const response = await fetch(stapeUrl.toString(), {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "User-Agent": userAgent,
-            "X-Forwarded-For": clientIp,
-          },
-          body: JSON.stringify(eventData),
-        });
+        // Setup timeout controller
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort();
+        }, REQUEST_TIMEOUT_MS);
 
-        const success = response.ok;
-        if (props.debugMode) {
-          console.log("Stape: page_view dispatch:", {
-            success,
-            status: response.status,
-            event: pageViewData.eventName,
+        try {
+          const response = await fetch(stapeUrl.toString(), {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "User-Agent": userAgent,
+              "X-Forwarded-For": clientIp,
+            },
+            body: JSON.stringify(eventData),
+            signal: controller.signal,
           });
+
+          // Clear timeout on successful response
+          clearTimeout(timeoutId);
+
+          const success = response.ok;
+          if (props.debugMode) {
+            console.log("Stape: page_view dispatch:", {
+              success,
+              status: response.status,
+              event: pageViewData.eventName,
+            });
+          }
+        } catch (fetchError) {
+          // Clear timeout on error
+          clearTimeout(timeoutId);
+
+          if (fetchError instanceof Error && fetchError.name === "AbortError") {
+            if (props.debugMode) {
+              console.error(
+                `Stape: Request timeout after ${REQUEST_TIMEOUT_MS}ms`,
+              );
+            }
+          } else {
+            if (props.debugMode) {
+              console.error(
+                "Stape: Failed to send page_view event:",
+                fetchError,
+              );
+            }
+          }
         }
       } catch (error) {
         if (props.debugMode) {
-          console.error("Stape: Failed to send page_view event:", error);
+          console.error("Stape: Failed to setup page_view event:", error);
         }
       }
     } else if (props.debugMode) {
