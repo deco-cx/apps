@@ -21,22 +21,31 @@ async function action(
   const setCookiesSoFar = getSetCookies(ctx.response.headers);
   const { header: cookie } = buildCookieJar(req.headers, setCookiesSoFar);
 
-  const response = await vcs["POST /api/sessions"]({
-    items: items.join(","),
-  }, {
-    body: {
-      public: {
-        ...props.publicProperties,
+  const url = new URL(req.url);
+  const searchParams = new URLSearchParams(url.search);
+  searchParams.set("items", items.join(","));
+
+  const response = await vcs["POST /api/sessions"](
+    Object.fromEntries(searchParams.entries()),
+    {
+      body: {
+        public: {
+          ...props.publicProperties,
+        },
       },
+      headers: { cookie },
     },
-    headers: { cookie },
-  });
+  );
 
   if (!response.ok) {
     throw new Error(`Failed to create session: ${response.status}`);
   }
 
-  setCookiesFromSession(response.headers, ctx.response.headers, req.url);
+  setCookiesFromSession({
+    from: response.headers,
+    req,
+    ctx,
+  });
 
   return await response.json() as GetSessionResponse;
 }

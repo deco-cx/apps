@@ -41,7 +41,11 @@ async function action(
     throw new Error(`Failed to edit session: ${response.status}`);
   }
 
-  setCookiesFromSession(response.headers, ctx.response.headers, req.url);
+  setCookiesFromSession({
+    from: response.headers,
+    req,
+    ctx,
+  });
 
   return (await response.json()) as GetSessionResponse;
 }

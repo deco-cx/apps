@@ -77,6 +77,11 @@ export interface Props {
    */
   setRefreshToken?: boolean;
   defaultSegment?: SegmentCulture;
+  /**
+   * @description Preserve UTM characters on cookies.
+   * @default false
+   */
+  preserveUtmChars?: boolean;
   usePortalSitemap?: boolean;
   /**
    * @description Use VTEX as backend platform
@@ -84,7 +89,6 @@ export interface Props {
    * @hide true
    */
   platform: "vtex";
-
   advancedConfigs?: {
     doNotFetchVariantsForRelatedProducts?: boolean;
     /**

@@ -139,21 +139,21 @@ const serialize = ({
   countryCode,
   cultureInfo,
   channelPrivacy,
-}: Partial<Segment>) => {
+}: Partial<Segment>, preserveUtmChars = false) => {
+  const normalize = (value: string | null | undefined) =>
+    value && !preserveUtmChars ? removeNonLatin1Chars(value) : value;
+
   const seg = {
     campaigns,
     channel,
     priceTables,
     regionId,
-    utm_campaign: utm_campaign &&
-      removeNonLatin1Chars(utm_campaign).replace(/[\/\[\]{}()<>.]/g, ""),
-    utm_source: utm_source &&
-      removeNonLatin1Chars(utm_source).replace(/[\/\[\]{}()<>.]/g, ""),
-    utm_medium: utm_medium &&
-      removeNonLatin1Chars(utm_medium).replace(/[\/\[\]{}()<>.]/g, ""),
-    utmi_campaign: utmi_campaign && removeNonLatin1Chars(utmi_campaign),
-    utmi_page: utmi_page && removeNonLatin1Chars(utmi_page),
-    utmi_part: utmi_part && removeNonLatin1Chars(utmi_part),
+    utm_campaign: normalize(utm_campaign)?.replace(/[\/\[\]{}()<>.]/g, ""),
+    utm_source: normalize(utm_source)?.replace(/[\/\[\]{}()<>.]/g, ""),
+    utm_medium: normalize(utm_medium)?.replace(/[\/\[\]{}()<>.]/g, ""),
+    utmi_campaign: normalize(utmi_campaign),
+    utmi_page: normalize(utmi_page),
+    utmi_part: normalize(utmi_part),
     currencyCode,
     currencySymbol,
     countryCode,
@@ -223,10 +223,9 @@ export const setSegmentBag = (
   const segmentFromCookie = vtex_segment ? parse(vtex_segment) : null;
 
   const segmentFromSalesChannelCookie = cookies[SALES_CHANNEL_COOKIE]
-    ? {
-      channel: cookies[SALES_CHANNEL_COOKIE]?.split("=")[1],
-    }
+    ? { channel: cookies[SALES_CHANNEL_COOKIE]?.split("=")[1] }
     : {};
+
   const segmentFromRequest = buildSegmentFromRequest(req);
 
   const locale = {
@@ -247,7 +246,8 @@ export const setSegmentBag = (
     ...segmentFromRequest,
     ...locale,
   };
-  const token = serialize(segment);
+
+  const token = serialize(segment, ctx.preserveUtmChars);
   setSegmentInBag(ctx, { payload: segment, token });
 
   // Always persist sales channel when it comes from request params so the
@@ -262,19 +262,9 @@ export const setSegmentBag = (
     });
   }
 
-<<<<<<< HEAD
   // Only set vtex_segment when the channel is non-default so that default-SC
   // responses remain cacheable by the CDN without a Set-Cookie header.
   if (vtex_segment !== token && !isAnonymous(ctx)) {
-=======
-  // Avoid setting cookie when segment from request matches the one generated
-  if (vtex_segment !== token) {
-<<<<<<< HEAD
-    console.log("setSegmentBag vtex_segment !== token");
-    console.log("setSegmentBag segment", segment);
->>>>>>> 0f5f80f6 (WIP: fix segment in headless login/logout)
-=======
->>>>>>> b55ac963 (refactor: remove unused cookie handling and logging in authentication actions; streamline session management)
     setCookie(ctx.response.headers, {
       value: token,
       name: SEGMENT_COOKIE_NAME,

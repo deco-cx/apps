@@ -4,7 +4,8 @@ import {
   getSetCookies,
   setCookie,
 } from "std/http/cookie.ts";
-import { SEGMENT_COOKIE_NAME } from "./segment.ts";
+import { SEGMENT_COOKIE_NAME, setSegmentBag } from "./segment.ts";
+import type { AppContext } from "../mod.ts";
 
 export const stringify = (cookies: Record<string, string>) =>
   Object.entries(cookies)
@@ -30,28 +31,29 @@ export const proxySetCookie = (
   }
 };
 
-export const setCookiesFromSession = (
-  from: Headers,
-  to: Headers,
-  domain: URL | string,
-) => {
-  const newDomain = new URL(domain);
+export const setCookiesFromSession = ({
+  from,
+  req,
+  ctx,
+}: {
+  from: Headers;
+  req: Request;
+  ctx: AppContext;
+}) => {
+  const newDomain = new URL(req.url);
 
   for (const cookie of getSetCookies(from)) {
-    const newCookie = cookie.name === SEGMENT_COOKIE_NAME
-      ? {
-        value: cookie.value,
-        name: cookie.name,
-        path: "/",
-        secure: true,
-        httpOnly: true,
-      }
-      : {
-        ...cookie,
-        domain: newDomain.hostname,
-      };
+    if (cookie.name === SEGMENT_COOKIE_NAME) {
+      const { cookies } = buildCookieJar(from, getSetCookies(from));
+      setSegmentBag(cookies, req, ctx);
+      continue;
+    }
+    const newCookie = {
+      ...cookie,
+      domain: newDomain.hostname,
+    };
 
-    setCookie(to, newCookie);
+    setCookie(ctx.response.headers, newCookie);
   }
 };
 
@@ -61,7 +63,7 @@ export const setCookiesFromSession = (
  */
 export interface CookieJarResult {
   header: string;
-  record: Record<string, string>;
+  cookies: Record<string, string>;
   detailed: Cookie[];
 }
 
@@ -85,12 +87,8 @@ export function buildCookieJar(
   const cookies = Array.from(jar.values());
 
   return {
-    header: cookies
-      .map((c) => `${c.name}=${c.value}`)
-      .join("; "),
-    record: Object.fromEntries(
-      cookies.map((c) => [c.name, c.value]),
-    ),
+    header: cookies.map((c) => `${c.name}=${c.value}`).join("; "),
+    cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
     detailed: cookies,
   };
 }
