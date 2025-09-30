@@ -163,20 +163,22 @@ export const toProduct = (
       const { key, value, reference, references } = metafield || {};
 
       const referenceImageUrl =
-        (reference as { image?: { url?: string } } | undefined)?.image?.url ?? null;
+        (reference as { image?: { url?: string } } | undefined)?.image?.url ??
+          null;
 
       const edgeImages = Array.isArray(references?.edges)
         ? references.edges.map(
-            (edge) =>
-              (edge?.node as { image?: { url?: string } } | undefined)?.image
-                ?.url ?? null
-          )
+          (edge) =>
+            (edge?.node as { image?: { url?: string } } | undefined)?.image
+              ?.url ?? null,
+        )
         : null;
 
-      const validEdgeImages = edgeImages?.filter((url) => !!url) as string[] | undefined;
+      const validEdgeImages = edgeImages?.filter((url) => !!url) as
+        | string[]
+        | undefined;
 
-      const valueToReturn =
-        referenceImageUrl ??
+      const valueToReturn = referenceImageUrl ??
         (validEdgeImages && validEdgeImages.length > 0
           ? validEdgeImages.join(",")
           : value);

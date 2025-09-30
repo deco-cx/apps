@@ -4,7 +4,10 @@ import {
   OrderFinancialStatus,
   OrderFulfillmentStatus,
 } from "./enums.ts";
-import { LanguageCode, CountryCode } from "./storefront/storefront.graphql.gen.ts";
+import {
+  CountryCode,
+  LanguageCode,
+} from "./storefront/storefront.graphql.gen.ts";
 
 type Attribute = {
   key: string;

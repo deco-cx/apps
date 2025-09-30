@@ -6,13 +6,13 @@ import {
   ProductRecommendations,
 } from "../utils/storefront/queries.ts";
 import {
+  CountryCode,
   GetProductQuery,
   GetProductQueryVariables,
   HasMetafieldsMetafieldsArgs,
+  LanguageCode,
   ProductRecommendationsQuery,
   ProductRecommendationsQueryVariables,
-  LanguageCode,
-  CountryCode
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toProduct } from "../utils/transform.ts";
 import { LanguageContextArgs, Metafield } from "../utils/types.ts";
@@ -74,13 +74,15 @@ const loader = async (
 
   const data = await storefront.query<
     ProductRecommendationsQuery,
-    ProductRecommendationsQueryVariables & HasMetafieldsMetafieldsArgs & LanguageContextArgs
+    & ProductRecommendationsQueryVariables
+    & HasMetafieldsMetafieldsArgs
+    & LanguageContextArgs
   >({
     variables: {
       productId: query.product.id,
       identifiers: metafields,
       languageCode,
-      countryCode
+      countryCode,
     },
     ...ProductRecommendations,
   });

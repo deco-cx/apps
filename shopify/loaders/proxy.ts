@@ -29,7 +29,8 @@ const buildProxyRoutes = (
   {
     ctx,
     ctx: { storeName, publicUrl },
-    extraPathsToProxy: extraPaths = [],
+    extraPathsToProxy = [],
+    extraPaths = [],
     includeSiteMap,
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
@@ -37,8 +38,18 @@ const buildProxyRoutes = (
     replaces,
   }: Props & {
     ctx: AppContext;
+    extraPaths?: string[];
   },
 ) => {
+  // Handle backward compatibility for extraPaths prop
+  const finalExtraPathsToProxy = extraPathsToProxy.length > 0
+    ? extraPathsToProxy
+    : extraPaths;
+  if (extraPaths.length > 0 && extraPathsToProxy.length === 0) {
+    console.warn(
+      'DEPRECATION WARNING: "extraPaths" prop is deprecated. Use "extraPathsToProxy" instead.',
+    );
+  }
   const urlToUse = publicUrl
     ? new URL(publicUrl.startsWith("http") ? publicUrl : `https://${publicUrl}`)
     : new URL(`https://${storeName}.myshopify.com`);
@@ -60,7 +71,9 @@ const buildProxyRoutes = (
       pathTemplate,
       handler: {
         value: {
-          __resolveType: pathTemplate.includes("sitemap") ? "shopify/handlers/sitemap.ts" : "website/handlers/proxy.ts",
+          __resolveType: pathTemplate.includes("sitemap")
+            ? "shopify/handlers/sitemap.ts"
+            : "website/handlers/proxy.ts",
           url: urlToProxy,
           host: hostToUse,
           customHeaders: withDigestCookie(ctx),
@@ -68,7 +81,7 @@ const buildProxyRoutes = (
         },
       },
     });
-    const routesFromPaths = [...PATHS_TO_PROXY, ...extraPaths].map(
+    const routesFromPaths = [...PATHS_TO_PROXY, ...finalExtraPathsToProxy].map(
       routeFromPath,
     );
 
@@ -116,6 +129,10 @@ const buildProxyRoutes = (
 export interface Props {
   extraPathsToProxy?: string[];
   /**
+   * @deprecated Use extraPathsToProxy instead
+   */
+  extraPaths?: string[];
+  /**
    * @title Other site maps to include
    */
   includeSiteMap?: string[];
@@ -140,6 +157,7 @@ export interface Props {
 function loader(
   {
     extraPathsToProxy = [],
+    extraPaths = [],
     includeSiteMap = [],
     generateDecoSiteMap = true,
     excludePathsFromDecoSiteMap = [],
@@ -155,6 +173,7 @@ function loader(
     excludePathsFromShopifySiteMap,
     includeSiteMap,
     extraPathsToProxy,
+    extraPaths,
     replaces,
     ctx,
   });

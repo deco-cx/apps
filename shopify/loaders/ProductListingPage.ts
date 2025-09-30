@@ -6,15 +6,15 @@ import {
 } from "../utils/storefront/queries.ts";
 import {
   CollectionProductsArgs,
+  CountryCode,
   HasMetafieldsMetafieldsArgs,
+  LanguageCode,
   Product,
   ProductConnection,
   QueryRoot,
   QueryRootCollectionArgs,
   QueryRootSearchArgs,
   SearchResultItemConnection,
-  LanguageCode,
-  CountryCode
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toFilter, toProduct } from "../utils/transform.ts";
 import { LanguageContextArgs, Metafield } from "../utils/types.ts";
@@ -142,7 +142,7 @@ const loader = async (
         identifiers: metafields,
         languageCode,
         countryCode,
-        ...searchSortShopify[sort],
+        ...(searchSortShopify[sort] || {}),
       },
       ...SearchProducts,
     });
@@ -157,7 +157,8 @@ const loader = async (
   } else {
     // Support for multiple paths, such as /{lang}/collections/first-collection/second-collection
     // Always takes the last non-empty segment as pathname
-    const pathname = props.collectionName || url.pathname.split("/").filter(Boolean).pop();
+    const pathname = props.collectionName ||
+      url.pathname.split("/").filter(Boolean).pop();
 
     const data = await storefront.query<
       QueryRoot,
@@ -176,7 +177,7 @@ const loader = async (
         filters: getFiltersByUrl(url),
         languageCode,
         countryCode,
-        ...sortShopify[sort],
+        ...(sortShopify[sort] || {}),
       },
       ...ProductsByCollection,
     });

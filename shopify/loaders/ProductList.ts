@@ -6,15 +6,15 @@ import {
 } from "../utils/storefront/queries.ts";
 import {
   CollectionProductsArgs,
+  CountryCode,
   HasMetafieldsMetafieldsArgs,
+  LanguageCode,
   Product as ProductShopify,
   ProductConnection,
   QueryRoot,
   QueryRootCollectionArgs,
   QueryRootSearchArgs,
   SearchResultItemConnection,
-  LanguageCode,
-  CountryCode
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toProduct } from "../utils/transform.ts";
 import {
@@ -135,7 +135,6 @@ const loader = async (
   });
 
   if (isQueryList(props)) {
-
     const data = await storefront.query<
       QueryRoot,
       QueryRootSearchArgs & HasMetafieldsMetafieldsArgs & LanguageContextArgs

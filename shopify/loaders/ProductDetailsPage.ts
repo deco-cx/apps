@@ -3,11 +3,11 @@ import { AppContext } from "../../shopify/mod.ts";
 import { toProductPage } from "../../shopify/utils/transform.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import {
+  CountryCode,
   GetProductQuery,
   GetProductQueryVariables,
   HasMetafieldsMetafieldsArgs,
   LanguageCode,
-  CountryCode
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { GetProduct } from "../utils/storefront/queries.ts";
 import { LanguageContextArgs, Metafield } from "../utils/types.ts";

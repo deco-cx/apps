@@ -4,13 +4,16 @@ import { withDigestCookie } from "../utils/password.ts";
 
 type ConnInfo = Deno.ServeHandlerInfo;
 
-const XML_HEADER = '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-const TODAY = new Date().toISOString().substring(0, 10);
+const XML_HEADER =
+  '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+// Helper function to get current date in YYYY-MM-DD format
+const getToday = (): string => new Date().toISOString().substring(0, 10);
 
 function buildIncludeSitemaps(origin: string, includes?: string[]) {
   if (!includes?.length) return "";
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getToday();
   const esc = (s: string) =>
     s
       .replaceAll("&", "&amp;")
@@ -76,8 +79,13 @@ export default function Sitemap(
     if (!proxyResponse.ok) return proxyResponse;
 
     const originalXml = await proxyResponse.text();
-    const originWithSlash = reqOrigin.endsWith("/") ? reqOrigin.slice(0, -1) : reqOrigin;
-    const originReplacedXml = originalXml.replaceAll(shopifyUrl, originWithSlash);
+    const originWithSlash = reqOrigin.endsWith("/")
+      ? reqOrigin.slice(0, -1)
+      : reqOrigin;
+    const originReplacedXml = originalXml.replaceAll(
+      shopifyUrl,
+      originWithSlash,
+    );
     const excludedXml = excludeSitemaps(originReplacedXml, reqOrigin, exclude);
 
     const includeBlock = buildIncludeSitemaps(reqOrigin, include);

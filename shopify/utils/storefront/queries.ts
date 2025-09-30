@@ -603,7 +603,7 @@ export const CartBuyerIdentityUpdate = {
       }
     }
   `,
-}
+};
 
 export const SignInWithEmailAndPassword = {
   query: gql`
