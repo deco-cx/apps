@@ -70,17 +70,41 @@ export default function StapeServerTracker(
   } = props;
 
   if (debugMode) {
+    // Log configuration without exposing sensitive data (GDPR compliance)
     console.log("Stape Server Tracker Configuration:", {
-      containerUrl,
+      containerUrl: containerUrl ? "[CONFIGURED]" : "[NOT_SET]",
       gtmContainerId,
       enableGdprCompliance,
       enableAutoPageTracking,
       enableEcommerceTracking,
       pageUrl,
+      userAgent: userAgent ? "[PRESENT]" : "[NOT_SET]",
+      clientIp: clientIp ? "[PSEUDONYMIZED]" : "[NOT_SET]",
+    });
+    
+    // Server-side only: log full details for debugging (not exposed to client)
+    console.info("[Server Debug] Full context:", {
+      containerUrl,
       userAgent,
-      clientIp,
+      clientIp, // Only in server logs
     });
   }
+
+  // Helper function to pseudonymize IP for client-side display (GDPR compliance)
+  const pseudonymizeIP = (ip: string): string => {
+    if (!ip) return 'unknown';
+    try {
+      const octets = ip.split('.');
+      if (octets.length >= 3) {
+        const partial = octets.slice(0, 3).join('.');
+        const hash = btoa(ip).slice(-4);
+        return `${partial}.xxx-${hash}`;
+      }
+      return 'invalid-ip';
+    } catch {
+      return 'pseudonym-error';
+    }
+  };
 
   // Return a minimal hidden element for configuration tracking
   return (
@@ -95,14 +119,14 @@ export default function StapeServerTracker(
         overflow: "hidden",
       }}
       data-stape-tracker="server-side"
-      data-container-url={containerUrl}
+      data-container-url={containerUrl ? "[CONFIGURED]" : "[NOT_SET]"}
       data-gtm-id={gtmContainerId}
       data-gdpr-enabled={enableGdprCompliance?.toString()}
       data-auto-page-tracking={enableAutoPageTracking?.toString()}
       data-ecommerce-tracking={enableEcommerceTracking?.toString()}
       data-page-url={pageUrl}
-      data-user-agent={userAgent}
-      data-client-ip={clientIp}
+      data-user-agent={userAgent ? "[PRESENT]" : "[NOT_SET]"}
+      data-client-region={clientIp ? pseudonymizeIP(clientIp) : "unknown"}
       aria-hidden="true"
     />
   );

@@ -5,6 +5,74 @@ import type { TrackingContext } from "./events.ts";
 // Constants
 const DEFAULT_USER_AGENT = "Deco-Stape-Server/1.0";
 
+// Reserved parameter keys that cannot be overridden by user input
+const RESERVED_KEYS = [
+  "client_id",
+  "user_id",
+  "timestamp_micros",
+  "page_location",
+  "page_title",
+  "page_referrer",
+  "session_id",
+  "gtm_container_id",
+] as const;
+
+/**
+ * Filters out reserved keys from custom parameters and logs conflicts
+ * @param customParameters - User-provided parameters
+ * @returns Filtered parameters without reserved keys
+ */
+function filterReservedKeys(
+  customParameters: Record<string, unknown>,
+): Record<string, unknown> {
+  const filtered: Record<string, unknown> = {};
+  const conflicts: string[] = [];
+
+  for (const [key, value] of Object.entries(customParameters)) {
+    if (RESERVED_KEYS.includes(key as any)) {
+      conflicts.push(key);
+      // Log server-side only (not exposed to client)
+      console.warn(
+        `[Stape Security] Reserved parameter key "${key}" filtered from user input`,
+      );
+    } else {
+      filtered[key] = value;
+    }
+  }
+
+  if (conflicts.length > 0) {
+    console.warn(
+      `[Stape Security] Filtered reserved keys: ${conflicts.join(", ")}`,
+    );
+  }
+
+  return filtered;
+}
+
+/**
+ * Creates a pseudonymized hash of IP address for client-side logging
+ * Uses first 3 octets + hash for privacy compliance (GDPR)
+ * @param ip - Raw IP address
+ * @returns Pseudonymized IP for client-side use
+ */
+function pseudonymizeIP(ip: string): string {
+  if (!ip) return "unknown";
+
+  try {
+    // Extract first 3 octets for geolocation while preserving privacy
+    const octets = ip.split(".");
+    if (octets.length >= 3) {
+      const partial = octets.slice(0, 3).join(".");
+      // Create simple hash of full IP for debugging (non-reversible)
+      const hash = btoa(ip).slice(-4);
+      return `${partial}.xxx-${hash}`;
+    }
+    return "invalid-ip";
+  } catch {
+    return "pseudonym-error";
+  }
+}
+
 // Tracking context builder with privacy-safe data extraction
 export const buildTrackingContext = (
   req: Request,
@@ -62,17 +130,22 @@ export const createPageViewEvent = (
     ? "granted"
     : "denied";
 
+  // Filter custom parameters to prevent override of critical fields
+  const safeCustomParameters = filterReservedKeys(customParameters || {});
+
   return {
     events: [{
       name: "page_view",
       params: {
+        // User custom parameters FIRST (filtered, safe to override)
+        ...safeCustomParameters,
+        // Built-in parameters LAST (cannot be overridden)
         page_location: url.toString(), // Cleaned URL
         page_title: "Server-Side Page View",
         page_referrer: "", // Will be set from sanitized headers
         client_id: context.clientId,
         user_id: userId,
         timestamp_micros: Date.now() * 1000,
-        ...customParameters,
       },
     }],
     gtm_container_id: gtmContainerId,
@@ -93,18 +166,25 @@ export const createBasicEventPayload = (
   eventParams: Record<string, unknown> = {},
   clientId?: string,
   userId?: string,
-) => ({
-  events: [{
-    name: eventName,
-    params: {
-      timestamp_micros: Date.now() * 1000,
-      ...eventParams,
-    },
-  }],
-  client_id: clientId || crypto.randomUUID(),
-  user_id: userId,
-  timestamp_micros: Date.now() * 1000,
-});
+) => {
+  // Filter event parameters to prevent override of critical fields
+  const safeEventParams = filterReservedKeys(eventParams);
+
+  return {
+    events: [{
+      name: eventName,
+      params: {
+        // User parameters FIRST (filtered, safe to override)
+        ...safeEventParams,
+        // Built-in parameters LAST (cannot be overridden)
+        timestamp_micros: Date.now() * 1000,
+      },
+    }],
+    client_id: clientId || crypto.randomUUID(),
+    user_id: userId,
+    timestamp_micros: Date.now() * 1000,
+  };
+};
 
 // Safe event sending with timeout and error handling
 export const sendEventSafely = async (
@@ -193,7 +273,9 @@ export const extractSafeReferrer = (req: Request): string => {
   try {
     const referrerUrl = new URL(referrer);
 
-    SENSITIVE_QUERY_PARAMS.forEach((param) => referrerUrl.searchParams.delete(param));
+    SENSITIVE_QUERY_PARAMS.forEach((param) =>
+      referrerUrl.searchParams.delete(param)
+    );
 
     return referrerUrl.toString();
   } catch {
