@@ -9,6 +9,8 @@ import {
 import {
   buildTrackingContext,
   createPageViewEvent,
+  extractSafeReferrer,
+  pseudonymizeIP,
   sendEventSafely,
 } from "../utils/tracking.ts";
 
@@ -81,7 +83,7 @@ export default function StapeServerTracker(
       userAgent: userAgent ? "[PRESENT]" : "[NOT_SET]",
       clientIp: clientIp ? "[PSEUDONYMIZED]" : "[NOT_SET]",
     });
-    
+
     // Server-side only: log full details for debugging (not exposed to client)
     console.info("[Server Debug] Full context:", {
       containerUrl,
@@ -90,23 +92,6 @@ export default function StapeServerTracker(
     });
   }
 
-  // Helper function to pseudonymize IP for client-side display (GDPR compliance)
-  const pseudonymizeIP = (ip: string): string => {
-    if (!ip) return 'unknown';
-    try {
-      const octets = ip.split('.');
-      if (octets.length >= 3) {
-        const partial = octets.slice(0, 3).join('.');
-        const hash = btoa(ip).slice(-4);
-        return `${partial}.xxx-${hash}`;
-      }
-      return 'invalid-ip';
-    } catch {
-      return 'pseudonym-error';
-    }
-  };
-
-  // Return a minimal hidden element for configuration tracking
   return (
     <div
       style={{
@@ -180,27 +165,6 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
   return createLoaderResult(props, ctx, req.url, userAgent, clientIp);
 };
 
-// At top of file, alongside other imports:
-import {
-  logDebugError,
-  logDebugMessage,
-  type TrackingContext,
-} from "../utils/events.ts";
-import {
-  buildTrackingContext,
-  createPageViewEvent,
-  extractSafeReferrer,
-  sendEventSafely,
-} from "../utils/tracking.ts";
-
-// Request timeout configuration
-const REQUEST_TIMEOUT_MS = 5000; // 5 seconds
-
-export const loader = async (props: Props, req: Request, ctx: AppContext) => {
-  // ... loader implementation
-  return createLoaderResult(props, ctx, req.url, userAgent, clientIp);
-};
-
 const sendPageViewEvent = async (
   context: TrackingContext,
   props: Props,
@@ -221,24 +185,6 @@ const sendPageViewEvent = async (
   if (eventData.events[0]?.params) {
     eventData.events[0].params.page_referrer = extractSafeReferrer(req);
   }
-
-  const result = await sendEventSafely(
-    containerUrl,
-    eventData,
-    context,
-    REQUEST_TIMEOUT_MS,
-  );
-
-  if (result.success) {
-    logDebugMessage(props.debugMode, "Stape: Auto page view tracked - Success");
-  } else {
-    logDebugError(
-      props.debugMode,
-      "Stape: Auto page view tracking failed:",
-      result.error,
-    );
-  }
-};
 
   const result = await sendEventSafely(
     containerUrl,
