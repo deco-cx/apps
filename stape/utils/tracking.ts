@@ -135,6 +135,55 @@ export const sendEventSafely = async (
   }
 };
 
+// Sensitive query parameters to exclude from URLs
+const SENSITIVE_QUERY_PARAMS = [
+  "token",
+  "key",
+  "password",
+  "secret",
+  "auth",
+  "session",
+  "api_key",
+];
+
+// Safe page view event creation (no sensitive data leakage)
+export const createPageViewEvent = (
+  context: TrackingContext,
+  customParameters?: Record<string, string>,
+  gtmContainerId?: string,
+  userId?: string,
+  hasConsent?: boolean,
+) => {
+  // Parse URL to remove sensitive query parameters
+  const url = new URL(context.pageUrl);
+
+  SENSITIVE_QUERY_PARAMS.forEach((param) => url.searchParams.delete(param));
+
+  return {
+    events: [{
+      name: "page_view",
+      params: {
+        page_location: url.toString(),
+        page_title: "Server-Side Page View",
+        page_referrer: "",
+        client_id: context.clientId,
+        user_id: userId,
+        timestamp_micros: Date.now() * 1000,
+        ...customParameters,
+      },
+    }],
+    gtm_container_id: gtmContainerId,
+    client_id: context.clientId,
+    user_id: userId,
+    consent: {
+      ad_storage: hasConsent ? "granted" : "denied",
+      analytics_storage: hasConsent ? "granted" : "denied",
+      ad_user_data: hasConsent ? "granted" : "denied",
+      ad_personalization: hasConsent ? "granted" : "denied",
+    },
+  };
+};
+
 // Safe referrer extraction (removes sensitive information)
 export const extractSafeReferrer = (req: Request): string => {
   const referrer = req.headers.get("referer") || "";
@@ -144,17 +193,7 @@ export const extractSafeReferrer = (req: Request): string => {
   try {
     const referrerUrl = new URL(referrer);
 
-    // Remove sensitive query parameters from referrer
-    const sensitiveParams = [
-      "token",
-      "key",
-      "password",
-      "secret",
-      "auth",
-      "session",
-      "api_key",
-    ];
-    sensitiveParams.forEach((param) => referrerUrl.searchParams.delete(param));
+    SENSITIVE_QUERY_PARAMS.forEach((param) => referrerUrl.searchParams.delete(param));
 
     return referrerUrl.toString();
   } catch {
