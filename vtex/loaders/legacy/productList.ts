@@ -4,9 +4,8 @@ import { AppContext } from "../../mod.ts";
 import { isFilterParam, toSegmentParams } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
-import { toProduct } from "../../utils/transform.ts";
+import { sortProducts, toProduct } from "../../utils/transform.ts";
 import type { LegacyItem, LegacySort } from "../../utils/types.ts";
-import { sortProducts } from "../../utils/transform.ts";
 
 /**
  * @title Collection ID
@@ -286,10 +285,8 @@ export const cacheKey = (
 
   const url = new URL(req.url);
 
-  if (
-    // Avoid cache on loader call over call and on search pages
-    (!isTermProps(props) && url.searchParams.has("q")) || ctx.isInvoke
-  ) {
+  // Avoid cache on loader call over call as it should be handled by the caller
+  if (ctx.isInvoke) {
     return null;
   }
 
@@ -304,10 +301,8 @@ export const cacheKey = (
     params.append("skuids", skuIds.join(","));
   }
 
-  if (
-    isProductIDProps(props)
-  ) {
-    const productIds = [props.productIds ?? []].sort();
+  if (isProductIDProps(props)) {
+    const productIds = [...props.productIds ?? []].sort();
     params.append("productids", productIds.join(","));
   }
 
