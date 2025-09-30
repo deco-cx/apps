@@ -180,24 +180,26 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
   return createLoaderResult(props, ctx, req.url, userAgent, clientIp);
 };
 
-const sendPageViewEvent = async (
-  context: TrackingContext,
-  props: Props,
-  containerUrl: string,
-  gtmContainerId: string | undefined,
-  req: Request,
-  hasConsent: boolean,
-) => {
-  const eventData = createPageViewEvent(
-    context,
-    props.customParameters,
-    gtmContainerId,
-    props.userId,
-    hasConsent,
-  );
+// At top of file, alongside other imports:
+import {
+  logDebugError,
+  logDebugMessage,
+  type TrackingContext,
+} from "../utils/events.ts";
+import {
+  buildTrackingContext,
+  createPageViewEvent,
+  extractSafeReferrer,
+  sendEventSafely,
+} from "../utils/tracking.ts";
 
-// At the top of the file, alongside your other imports
-import { createPageViewEvent, extractSafeReferrer } from "../utils/tracking.ts";
+// Request timeout configuration
+const REQUEST_TIMEOUT_MS = 5000; // 5 seconds
+
+export const loader = async (props: Props, req: Request, ctx: AppContext) => {
+  // ... loader implementation
+  return createLoaderResult(props, ctx, req.url, userAgent, clientIp);
+};
 
 const sendPageViewEvent = async (
   context: TrackingContext,
@@ -220,7 +222,22 @@ const sendPageViewEvent = async (
     eventData.events[0].params.page_referrer = extractSafeReferrer(req);
   }
 
-  // …rest of function unchanged…
+  const result = await sendEventSafely(
+    containerUrl,
+    eventData,
+    context,
+    REQUEST_TIMEOUT_MS,
+  );
+
+  if (result.success) {
+    logDebugMessage(props.debugMode, "Stape: Auto page view tracked - Success");
+  } else {
+    logDebugError(
+      props.debugMode,
+      "Stape: Auto page view tracking failed:",
+      result.error,
+    );
+  }
 };
 
   const result = await sendEventSafely(
