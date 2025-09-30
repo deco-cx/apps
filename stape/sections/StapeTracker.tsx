@@ -172,10 +172,32 @@ const sendPageViewEvent = async (
     hasConsent,
   );
 
+// At the top of the file, alongside your other imports
+import { createPageViewEvent, extractSafeReferrer } from "../utils/tracking.ts";
+
+const sendPageViewEvent = async (
+  context: TrackingContext,
+  props: Props,
+  containerUrl: string,
+  gtmContainerId: string | undefined,
+  req: Request,
+  hasConsent: boolean,
+) => {
+  const eventData = createPageViewEvent(
+    context,
+    props.customParameters,
+    gtmContainerId,
+    props.userId,
+    hasConsent,
+  );
+
   // Add referrer from request headers safely
   if (eventData.events[0]?.params) {
-    eventData.events[0].params.page_referrer = req.headers.get("referer") || "";
+    eventData.events[0].params.page_referrer = extractSafeReferrer(req);
   }
+
+  // …rest of function unchanged…
+};
 
   const result = await sendEventSafely(
     containerUrl,
