@@ -36,8 +36,10 @@ const loader = async (
   const maybeCartId = getCartCookie(req.headers);
 
   const cartId = maybeCartId ||
+  const cartId = maybeCartId ||
     await storefront.query<CreateCartMutation, CreateCartMutationVariables>({
       ...CreateCart,
+      variables: { countryCode },
     }).then((data) => data.payload?.cart?.id);
 
   if (!cartId) {

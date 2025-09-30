@@ -10,10 +10,20 @@ const TODAY = new Date().toISOString().substring(0, 10);
 function buildIncludeSitemaps(origin: string, includes?: string[]) {
   if (!includes?.length) return "";
 
+  const today = new Date().toISOString().slice(0, 10);
+  const esc = (s: string) =>
+    s
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&apos;");
+
   return includes
     .map((include) => {
       const loc = include.startsWith("/") ? `${origin}${include}` : include;
-      return `  <sitemap>\n    <loc>${loc}</loc>\n    <lastmod>${TODAY}</lastmod>\n  </sitemap>`;
+      const safeLoc = esc(loc);
+      return `  <sitemap>\n    <loc>${safeLoc}</loc>\n    <lastmod>${today}</lastmod>\n  </sitemap>`;
     })
     .join("\n");
 }
@@ -21,14 +31,23 @@ function buildIncludeSitemaps(origin: string, includes?: string[]) {
 function excludeSitemaps(xml: string, origin: string, excludes?: string[]) {
   if (!excludes?.length) return xml;
 
+  // Ensure all exclude prefixes start with a slash
+  const normalized = excludes.map((ex) => (ex.startsWith("/") ? ex : `/${ex}`));
+
   return xml.replace(
     /<sitemap>\s*<loc>(.*?)<\/loc>[\s\S]*?<\/sitemap>/g,
     (match, loc) => {
-      const locPath = loc.startsWith(origin)
-        ? loc.slice(origin.length)
-        : new URL(loc).pathname;
+      let locPath: string;
+      try {
+        // Use origin as base to support both absolute and relative URLs
+        const u = new URL(loc, origin);
+        locPath = u.pathname;
+      } catch {
+        // If URL parsing fails, leave the sitemap entry untouched
+        return match;
+      }
 
-      return excludes.some((ex) => locPath.startsWith(ex)) ? "" : match;
+      return normalized.some((ex) => locPath.startsWith(ex)) ? "" : match;
     },
   );
 }
@@ -66,9 +85,17 @@ export default function Sitemap(
       ? excludedXml.replace(XML_HEADER, `${XML_HEADER}\n${includeBlock}`)
       : excludedXml;
 
+    const headers = new Headers(proxyResponse.headers);
+    headers.delete("content-length");
+    headers.delete("content-encoding");
+    headers.delete("etag");
+    headers.delete("accept-ranges");
+    if (!headers.get("content-type")?.includes("xml")) {
+      headers.set("content-type", "application/xml; charset=utf-8");
+    }
     return new Response(finalXml, {
-      headers: proxyResponse.headers,
       status: proxyResponse.status,
+      headers,
     });
   };
 }
