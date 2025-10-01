@@ -135,7 +135,7 @@ The app provides these endpoints for OAuth:
 
 ### Flow Diagram
 
-```
+```text
 User → Start OAuth → Selection UI → [Choose Option] → Slack Authorization → Callback → Complete
                         ↓                    ↓
                   [deco.chat bot]    [Custom bot + credentials]

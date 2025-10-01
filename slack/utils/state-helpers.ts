@@ -32,8 +32,8 @@ export function decodeCustomBotState(state: string): CustomBotState {
  */
 export function generateSessionToken(): string {
   // Resolve whatever WebCrypto might be available, either on globalThis or as the legacy `crypto` global
-  const webCrypto: Crypto | undefined =
-    (typeof globalThis !== "undefined" && (globalThis.crypto as Crypto | undefined)) ||
+  const webCrypto: Crypto | undefined = (typeof globalThis !== "undefined" &&
+    (globalThis.crypto as Crypto | undefined)) ||
     (typeof crypto !== "undefined" ? (crypto as Crypto) : undefined);
 
   // Prefer crypto.randomUUID() when available
@@ -44,7 +44,7 @@ export function generateSessionToken(): string {
   // Ensure getRandomValues is available before falling back
   if (!webCrypto?.getRandomValues) {
     throw new Error(
-      "Web Crypto API is not available; register a crypto polyfill before calling generateSessionToken()."
+      "Web Crypto API is not available; register a crypto polyfill before calling generateSessionToken().",
     );
   }
 
@@ -55,7 +55,6 @@ export function generateSessionToken(): string {
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=/g, "");
-}
 }
 
 /**
