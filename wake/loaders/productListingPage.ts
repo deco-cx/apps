@@ -373,7 +373,7 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
   // Add any filter parameters
   url.searchParams.forEach((value, key) => {
     if (
-      key.startsWith("filter.") || key === "q" || key === "sort" ||
+      key === "filtro" || key === "q" || key === "sort" ||
       key === "page"
     ) {
       params.append(key, value);
