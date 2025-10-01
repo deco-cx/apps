@@ -31,18 +31,31 @@ export function decodeCustomBotState(state: string): CustomBotState {
  * Generate a cryptographically secure session token
  */
 export function generateSessionToken(): string {
-  // Use crypto.randomUUID() for better security
-  if (typeof crypto !== "undefined" && crypto.randomUUID) {
-    return crypto.randomUUID();
+  // Resolve whatever WebCrypto might be available, either on globalThis or as the legacy `crypto` global
+  const webCrypto: Crypto | undefined =
+    (typeof globalThis !== "undefined" && (globalThis.crypto as Crypto | undefined)) ||
+    (typeof crypto !== "undefined" ? (crypto as Crypto) : undefined);
+
+  // Prefer crypto.randomUUID() when available
+  if (webCrypto?.randomUUID) {
+    return webCrypto.randomUUID();
   }
 
-  // Fallback for environments without randomUUID
+  // Ensure getRandomValues is available before falling back
+  if (!webCrypto?.getRandomValues) {
+    throw new Error(
+      "Web Crypto API is not available; register a crypto polyfill before calling generateSessionToken()."
+    );
+  }
+
+  // Fallback: fill 32 bytes of randomness and base64-URL-encode them
   const array = new Uint8Array(32);
-  crypto.getRandomValues(array);
+  webCrypto.getRandomValues(array);
   return btoa(String.fromCharCode(...array))
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=/g, "");
+}
 }
 
 /**
