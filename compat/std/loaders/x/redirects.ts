@@ -11,6 +11,9 @@ export interface Redirect {
    * @description Path is url pattern. https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API
    */
   to: string;
+  /**
+   * @default "temporary"
+   */
   type?: "temporary" | "permanent";
   /**
    * @title Discard query parameters
@@ -23,6 +26,7 @@ export interface Redirects {
 }
 
 export default function redirect({ redirects }: Redirects): Route[] {
+  console.log("redirects", redirects);
   const routes: Route[] = (redirects || []).map((
     { from, to, type, discardQueryParameters },
   ) => ({

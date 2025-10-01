@@ -8,6 +8,9 @@ const CONCATENATE_PARAMS_VALUES = ["true", "false"];
 export interface Redirect {
   from: string;
   to: string;
+  /**
+   * @default "temporary"
+   */
   type?: "temporary" | "permanent";
   discardQueryParameters?: boolean;
 }
