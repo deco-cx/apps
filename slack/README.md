@@ -97,6 +97,23 @@ The app now features an interactive selection interface that appears during OAut
 
 ### Custom Bot Configuration
 
+When selecting "Custom Bot", the integration follows a secure credential flow:
+
+1. **Client-Side**: User enters credentials in the selection interface
+2. **Secure Storage**: Credentials are sent via POST to `/slack/actions/oauth/store-credentials`
+3. **Token Generation**: Server generates a secure, time-limited token
+4. **OAuth Flow**: Token is used in URL instead of raw credentials
+5. **Credential Retrieval**: Server retrieves credentials server-side using the token
+
+**Security Features:**
+- ✅ **No credential exposure** in URL parameters, logs, or browser history
+- ✅ **Time-limited tokens** (5-minute expiration)
+- ✅ **One-time use** tokens are deleted after retrieval
+- ✅ **HTTPS enforcement** for credential transmission
+- ✅ **Automatic cleanup** of expired tokens
+
+### Custom Bot Configuration
+
 When selecting "Custom Bot", you'll need to provide:
 
 - **Client ID** (required): From your Slack app's "Basic Information" page
@@ -255,111 +272,3 @@ When contributing to this app:
 3. Verify mobile responsiveness of the selection page
 4. Test credential validation and error handling
 5. Maintain backward compatibility with existing bot token approach
-
-## API Methods
-
-### Channels
-- `getChannels(teamId, limit?, cursor?)` - List workspace channels
-- `getChannelHistory(channelId, limit?)` - Get channel message history
-
-### Messages
-- `postMessage(channelId, text)` - Send a message to a channel
-- `postReply(channelId, threadTs, text)` - Reply to a thread
-- `getThreadReplies(channelId, threadTs)` - Get thread replies
-
-### Users
-- `getUsers(teamId, limit?, cursor?)` - List workspace users
-- `getUserProfile(userId)` - Get user profile information
-
-### Reactions
-- `addReaction(channelId, timestamp, reaction)` - Add emoji reaction
-
-### File Upload
-- `uploadFileV2(options)` - Upload files using new V2 API (recommended)
-- `uploadFile(options)` - Upload files using legacy API (deprecated, shows warning)
-
-**New V2 Upload Example:**
-```typescript
-const response = await slack.uploadFileV2({
-  channels: "C1234567890", // Optional
-  file: fileBlob, // Supports Uint8Array, Blob, File, base64, data URL
-  filename: "document.pdf",
-  title: "Important Document",
-  thread_ts: "1234567890.123456", // Optional - upload to thread
-  initial_comment: "Here's the document"
-});
-```
-
-## Custom Bot Configuration
-
-### Setting Up a Custom Bot
-
-1. **Create Your Custom Slack App** following steps 1-3 above
-2. **Use Custom Scopes** - Choose appropriate scopes for your bot's functionality
-3. **Configure Bot Name** - Set a unique identifier for your bot
-
-### Bot Name Usage
-
-The bot name is used in:
-- Channel welcome messages: `"To interact with me, just mention @your-bot-name in your messages!"`
-- Channel listings: Shows `@your-bot-name` instead of `@deco.chat`
-- App configuration: Stored as `customBotName` for future reference
-
-**Bot Name Preservation**: During re-authentication or token refresh, the system preserves the previously configured custom bot name. A new `botName` parameter will override the existing configuration, while omitting it maintains the current setting.
-
-### Multiple Bot Support
-
-The system now supports multiple custom bots by:
-- Storing bot-specific information in app configuration
-- Dynamic bot name resolution in channel operations
-- Preserving custom bot names across re-authentications
-
-### Re-authentication Behavior
-
-When OAuth runs again (token refresh, re-install):
-- **With botName parameter**: Updates to the new custom name
-- **Without botName parameter**: Preserves the existing custom bot name
-- **First install**: Uses "deco.chat" as default if no botName provided
-
-This prevents accidental loss of custom bot branding during routine re-authorizations.
-
-## Migration from Bot Token
-
-If you're migrating from the previous bot token approach:
-
-1. The app maintains backward compatibility with `botToken` prop
-2. OAuth tokens take precedence over bot tokens when both are present
-3. Update your app configuration to use OAuth instead of direct bot tokens
-4. The `teamId` is now automatically obtained during OAuth flow
-5. **New**: Custom bot information is preserved across OAuth flows
-
-## Security
-
-- Tokens are stored securely in the app configuration
-- Automatic token refresh prevents expired token issues
-- OAuth scopes limit app permissions to only what's needed
-- HTTPS is required for redirect URLs in production
-
-## Troubleshooting
-
-### Common Issues
-
-1. **"Team ID is required" error**: Ensure OAuth flow completed successfully and `teamId` is set
-2. **"Invalid redirect URI" error**: Check that redirect URL matches exactly in Slack app settings
-3. **"Invalid scope" error**: Verify all required scopes are added to your Slack app
-4. **Token refresh failures**: Check that `client_secret` is correctly configured
-
-### Debug Mode
-
-Enable debug logging by checking the browser developer tools or server logs for OAuth-related errors.
-
-## Development
-
-The app uses the MCP (Multi-Channel Platform) OAuth utilities for token management and HTTP client creation. The main components are:
-
-- `mod.ts` - Main app configuration with OAuth setup
-- `client.ts` - Slack API client with OAuth support
-- `utils/constants.ts` - OAuth URLs and scopes
-- `utils/client.ts` - TypeScript interfaces for API endpoints
-- `loaders/oauth/start.ts` - OAuth initiation
-- `actions/oauth/callback.ts` - OAuth completion

@@ -566,6 +566,17 @@ export function generateBotSelectionPage(
       document.addEventListener("DOMContentLoaded", function () {
         const theme = localStorage.getItem("theme") || "light";
         applyTheme(theme);
+        
+        // Setup validation for custom bot inputs
+        const clientIdInput = document.getElementById('clientId');
+        const clientSecretInput = document.getElementById('clientSecret');
+        
+        if (clientIdInput && clientSecretInput) {
+          clientIdInput.addEventListener('input', updateContinueButton);
+          clientSecretInput.addEventListener('input', updateContinueButton);
+        }
+        
+        updateContinueButton();
       });
 
       function selectBot(botType) {
@@ -614,26 +625,20 @@ export function generateBotSelectionPage(
         }
       }
 
-      // Add input validation for custom bot fields
-      document.addEventListener('DOMContentLoaded', function() {
-        const clientIdInput = document.getElementById('clientId');
-        const clientSecretInput = document.getElementById('clientSecret');
-        
-        [clientIdInput, clientSecretInput].forEach(input => {
-          input.addEventListener('input', updateContinueButton);
-        });
-      });
-
       function continueWithSelection() {
         if (!selectedBotType) {
           alert("Please select an integration type to continue.");
           return;
         }
 
-        const urlParams = new URLSearchParams();
-        
         if (selectedBotType === 'deco-bot') {
+          const urlParams = new URLSearchParams();
           urlParams.set('useDecoChatBot', 'true');
+          
+          // Properly construct URL with query parameters
+          const finalUrl = new URL(callbackUrl);
+          finalUrl.searchParams.set('useDecoChatBot', 'true');
+          window.location.href = finalUrl.toString();
         } else if (selectedBotType === 'custom-bot') {
           const clientId = document.getElementById('clientId').value.trim();
           const clientSecret = document.getElementById('clientSecret').value.trim();
@@ -644,16 +649,101 @@ export function generateBotSelectionPage(
             return;
           }
           
-          urlParams.set('useCustomBot', 'true');
-          urlParams.set('customClientId', clientId);
-          urlParams.set('customClientSecret', clientSecret);
-          if (botName) {
-            urlParams.set('customBotName', botName);
+          // Show loading state
+          const continueBtn = document.getElementById('continue-btn');
+          const originalText = continueBtn.textContent;
+          continueBtn.textContent = 'Storing credentials...';
+          continueBtn.disabled = true;
+          
+          // Try modern fetch approach first, fall back to form submission
+          if (typeof fetch !== 'undefined') {
+            storeCredentialsWithFetch(clientId, clientSecret, botName, continueBtn, originalText);
+          } else {
+            storeCredentialsWithForm(clientId, clientSecret, botName);
           }
         }
+      }
+      
+      function storeCredentialsWithFetch(clientId, clientSecret, botName, continueBtn, originalText) {
+        // Get the base URL from the current location
+        const baseUrl = window.location.origin;
+        const storeUrl = baseUrl + '/slack/actions/oauth/store-credentials';
         
-        const finalUrl = callbackUrl + '&' + urlParams.toString();
-        window.location.href = finalUrl;
+        // Store credentials securely via POST
+        fetch(storeUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          credentials: 'same-origin',
+          body: JSON.stringify({
+            clientId: clientId,
+            clientSecret: clientSecret,
+            botName: botName || undefined
+          })
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.sessionToken) {
+            // Properly construct URL with query parameters
+            const finalUrl = new URL(callbackUrl);
+            finalUrl.searchParams.set('useCustomBot', 'true');
+            finalUrl.searchParams.set('sessionToken', data.sessionToken);
+            window.location.href = finalUrl.toString();
+          } else {
+            throw new Error('No session token received from server');
+          }
+        })
+        .catch(error => {
+          console.error('Fetch failed, falling back to form submission:', error);
+          // Restore button state and try form fallback
+          continueBtn.textContent = originalText;
+          continueBtn.disabled = false;
+          storeCredentialsWithForm(clientId, clientSecret, botName);
+        });
+      }
+      
+      function storeCredentialsWithForm(clientId, clientSecret, botName) {
+        // Create a hidden form for POST submission
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/slack/actions/oauth/store-credentials';
+        form.style.display = 'none';
+        
+        // Add CSRF protection if available
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+          const csrfField = document.createElement('input');
+          csrfField.type = 'hidden';
+          csrfField.name = '_token';
+          csrfField.value = csrfToken.getAttribute('content');
+          form.appendChild(csrfField);
+        }
+        
+        // Add credentials fields
+        const fields = [
+          { name: 'clientId', value: clientId },
+          { name: 'clientSecret', value: clientSecret },
+          { name: 'botName', value: botName || '' },
+          { name: 'returnUrl', value: callbackUrl }
+        ];
+        
+        fields.forEach(field => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = field.name;
+          input.value = field.value;
+          form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
       }
 
       function applyTheme(theme) {

@@ -11,7 +11,8 @@ import * as $$$$$$$$$5 from "./actions/messages/post.ts";
 import * as $$$$$$$$$6 from "./actions/messages/react.ts";
 import * as $$$$$$$$$7 from "./actions/messages/threads/reply.ts";
 import * as $$$$$$$$$8 from "./actions/oauth/callback.ts";
-import * as $$$$$$$$$9 from "./actions/webhook/broker.ts";
+import * as $$$$$$$$$9 from "./actions/oauth/store-credentials.ts";
+import * as $$$$$$$$$10 from "./actions/webhook/broker.ts";
 import * as $$$0 from "./loaders/channels.ts";
 import * as $$$1 from "./loaders/channels/history.ts";
 import * as $$$2 from "./loaders/conversations/open.ts";
@@ -48,7 +49,8 @@ const manifest = {
     "slack/actions/messages/react.ts": $$$$$$$$$6,
     "slack/actions/messages/threads/reply.ts": $$$$$$$$$7,
     "slack/actions/oauth/callback.ts": $$$$$$$$$8,
-    "slack/actions/webhook/broker.ts": $$$$$$$$$9,
+    "slack/actions/oauth/store-credentials.ts": $$$$$$$$$9,
+    "slack/actions/webhook/broker.ts": $$$$$$$$$10,
   },
   "name": "slack",
   "baseUrl": import.meta.url,

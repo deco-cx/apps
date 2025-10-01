@@ -1,6 +1,10 @@
 import { AppContext } from "../../mod.ts";
 import { SlackOAuthResponse } from "../../utils/client.ts";
-import { decodeCustomBotState } from "../../utils/state-helpers.ts";
+import {
+  decodeCustomBotState,
+  invalidateSession,
+  retrieveCustomBotSession,
+} from "../../utils/state-helpers.ts";
 
 export interface Props {
   code: string;
@@ -40,16 +44,27 @@ export default async function callback(
   const finalRedirectUri = redirectUri ||
     new URL("/oauth/callback", req.url).href;
 
-  // Check if this is a custom bot from state
+  // SECURITY: Retrieve credentials using session token, never from state
   const finalClientId = clientId;
   let finalClientSecret = clientSecret;
   let finalBotName = botName;
 
   if (state) {
     const stateData = decodeCustomBotState(state);
-    if (stateData.isCustomBot) {
-      finalClientSecret = stateData.customClientSecret || clientSecret;
-      finalBotName = stateData.customBotName || botName;
+    if (stateData.isCustomBot && stateData.sessionToken) {
+      // Retrieve credentials securely using session token
+      const credentials = retrieveCustomBotSession(stateData.sessionToken);
+
+      if (credentials) {
+        finalClientSecret = credentials.clientSecret;
+        finalBotName = credentials.botName || stateData.customBotName ||
+          botName;
+
+        // Invalidate session token after successful retrieval
+        invalidateSession(stateData.sessionToken);
+      } else {
+        throw new Error("Invalid or expired session token in OAuth callback");
+      }
     }
   }
 

@@ -1,6 +1,9 @@
 import { OAUTH_URL_AUTH, SCOPES } from "../../utils/constants.ts";
 import { generateBotSelectionPage } from "../../utils/ui-templates/page-generator.ts";
-import { decodeState } from "../../utils/state-helpers.ts";
+import {
+  decodeState,
+  retrieveCustomBotSession,
+} from "../../utils/state-helpers.ts";
 
 export interface Props {
   clientId: string;
@@ -41,24 +44,31 @@ export default function start(props: Props, req: Request) {
     : props.redirectUri;
 
   if (useCustomBot) {
-    const customClientId = url.searchParams.get("customClientId");
-    const customClientSecret = url.searchParams.get("customClientSecret");
-    const customBotName = url.searchParams.get("customBotName");
+    // SECURITY: Only accept session token, never raw credentials
+    const sessionToken = url.searchParams.get("sessionToken");
 
-    if (!customClientId || !customClientSecret) {
-      throw new Error("Custom bot requires clientId and clientSecret");
+    if (!sessionToken) {
+      throw new Error("Custom bot requires a valid session token");
     }
 
-    // Store custom credentials in state for callback
+    // Retrieve credentials securely using the session token
+    const credentials = retrieveCustomBotSession(sessionToken);
+
+    if (!credentials) {
+      throw new Error("Invalid or expired session token");
+    }
+
+    // Store ONLY the session token in state, never the actual secret
     const stateData = decodeState(props.state);
-    stateData.customClientSecret = customClientSecret;
-    stateData.customBotName = customBotName || "Custom Bot";
+    stateData.sessionToken = sessionToken;
+    stateData.customBotName = credentials.botName || "Custom Bot";
     stateData.isCustomBot = true;
 
-    const enhancedState = btoa(JSON.stringify(stateData));
+    // SECURITY: Properly URL-encode the base64 state
+    const enhancedState = encodeURIComponent(btoa(JSON.stringify(stateData)));
 
     const authParams = new URLSearchParams({
-      client_id: customClientId,
+      client_id: credentials.clientId,
       redirect_uri: redirectUri?.replace("http://", "https://"),
       response_type: "code",
       scope: SCOPES.join(","),
