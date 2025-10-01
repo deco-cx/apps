@@ -49,8 +49,21 @@ export default function storeCustomCredentials(
   );
 
   if (isFormSubmission && returnUrl) {
+    // Validate returnUrl is a valid URL
+    let url: URL;
+    try {
+      url = new URL(returnUrl);
+    } catch {
+      throw new Error("Invalid return URL");
+    }
+
+    // Optional: validate origin matches current request to prevent open redirect
+    const currentOrigin = new URL(req.url).origin;
+    if (url.origin !== currentOrigin) {
+      throw new Error("Return URL must be same-origin");
+    }
+
     // Form fallback: redirect with session token in URL
-    const url = new URL(returnUrl);
     url.searchParams.set("useCustomBot", "true");
     url.searchParams.set("sessionToken", sessionToken);
 
