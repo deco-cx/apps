@@ -1,5 +1,6 @@
 import { OAUTH_URL_AUTH, SCOPES } from "../../utils/constants.ts";
 import { generateBotSelectionPage } from "../../utils/ui-templates/page-generator.ts";
+import { decodeState } from "../../utils/state-helpers.ts";
 
 export interface Props {
   clientId: string;
@@ -10,15 +11,6 @@ export interface Props {
    * @description Name identifier for custom bot (used for identification)
    */
   botName?: string;
-}
-
-function decodeState(state: string) {
-  try {
-    const decoded = atob(decodeURIComponent(state));
-    return JSON.parse(decoded);
-  } catch {
-    return {};
-  }
 }
 
 export default function start(props: Props, req: Request) {

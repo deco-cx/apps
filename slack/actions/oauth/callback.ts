@@ -1,5 +1,6 @@
 import { AppContext } from "../../mod.ts";
 import { SlackOAuthResponse } from "../../utils/client.ts";
+import { decodeCustomBotState } from "../../utils/state-helpers.ts";
 
 export interface Props {
   code: string;
@@ -17,15 +18,6 @@ export interface Props {
    * @description OAuth state parameter
    */
   state?: string;
-}
-
-function decodeState(state: string) {
-  try {
-    const decoded = atob(decodeURIComponent(state));
-    return JSON.parse(decoded);
-  } catch {
-    return {};
-  }
 }
 
 /**
@@ -54,7 +46,7 @@ export default async function callback(
   let finalBotName = botName;
 
   if (state) {
-    const stateData = decodeState(state);
+    const stateData = decodeCustomBotState(state);
     if (stateData.isCustomBot) {
       finalClientSecret = stateData.customClientSecret || clientSecret;
       finalBotName = stateData.customBotName || botName;
