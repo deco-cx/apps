@@ -26,7 +26,6 @@ export interface Redirects {
 }
 
 export default function redirect({ redirects }: Redirects): Route[] {
-  console.log("redirects", redirects);
   const routes: Route[] = (redirects || []).map((
     { from, to, type, discardQueryParameters },
   ) => ({
