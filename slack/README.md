@@ -107,11 +107,10 @@ When selecting "Custom Bot", the integration follows a secure credential flow:
 
 **Security Features:**
 - ✅ **No credential exposure** in URL parameters, logs, or browser history
-- ✅ **Time-limited tokens** (5-minute expiration)
-- ✅ **One-time use** tokens are deleted after retrieval
+- ✅ **Time-limited tokens** (10-minute expiration)
+- ✅ **Tokens are cleared after the OAuth callback invalidates the session or when the 10-minute window elapses**
 - ✅ **HTTPS enforcement** for credential transmission
 - ✅ **Automatic cleanup** of expired tokens
-
 ### Custom Bot Configuration
 
 When selecting "Custom Bot", you'll need to provide:
