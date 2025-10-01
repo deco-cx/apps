@@ -11,18 +11,20 @@ async function getAllRedirects(ctx: AppContext): Promise<Route[]> {
     __resolveType: "resolveTypeSelector",
   });
 
-  const routes: Route[] = allRedirects.map(({ redirect }) => ({
-    pathTemplate: redirect.from,
-    isHref: isHref(redirect.from),
-    handler: {
-      value: {
-        __resolveType: "website/handlers/redirect.ts",
-        to: redirect.to,
-        type: redirect.type,
-        discardQueryParameters: redirect.discardQueryParameters,
+  const routes: Route[] = allRedirects
+    .filter((item) => item && item.redirect)
+    .map(({ redirect }) => ({
+      pathTemplate: redirect.from,
+      isHref: isHref(redirect.from),
+      handler: {
+        value: {
+          __resolveType: "website/handlers/redirect.ts",
+          to: redirect.to,
+          type: redirect.type,
+          discardQueryParameters: redirect.discardQueryParameters,
+        },
       },
-    },
-  }));
+    }));
 
   return routes;
 }
