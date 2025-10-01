@@ -81,6 +81,7 @@ function Component({
       <meta property="og:description" content={description} />
       <meta property="og:type" content={type} />
       <meta property="og:image" content={image} />
+      {canonical && <meta property="og:url" content={canonical} />}
 
       {/* Link tags */}
       {canonical && <link rel="canonical" href={canonical} />}
