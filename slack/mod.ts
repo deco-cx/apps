@@ -76,15 +76,6 @@ export interface Props {
    * @description Name identifier for custom bot
    */
   customBotName?: string;
-
-  /**
-   * @title App Information
-   * @description Information about the connected Slack app
-   */
-  appInfo?: {
-    id: string;
-    name: string;
-  };
 }
 
 export interface State extends Props {

@@ -12,6 +12,20 @@ export interface Props {
    * @description Custom bot identifier
    */
   botName?: string;
+  /**
+   * @title State
+   * @description OAuth state parameter
+   */
+  state?: string;
+}
+
+function decodeState(state: string) {
+  try {
+    const decoded = atob(decodeURIComponent(state));
+    return JSON.parse(decoded);
+  } catch {
+    return {};
+  }
 }
 
 /**
@@ -20,7 +34,8 @@ export interface Props {
  * @description Exchanges the authorization code for access tokens
  */
 export default async function callback(
-  { code, installId, clientId, clientSecret, redirectUri, botName }: Props,
+  { code, installId, clientId, clientSecret, redirectUri, botName, state }:
+    Props,
   req: Request,
   ctx: AppContext,
 ): Promise<
@@ -33,12 +48,26 @@ export default async function callback(
   const finalRedirectUri = redirectUri ||
     new URL("/oauth/callback", req.url).href;
 
+  // Check if this is a custom bot from state
+  const finalClientId = clientId;
+  let finalClientSecret = clientSecret;
+  let finalBotName = botName;
+
+  if (state) {
+    const stateData = decodeState(state);
+    if (stateData.isCustomBot) {
+      finalClientSecret = stateData.customClientSecret || clientSecret;
+      finalBotName = stateData.customBotName || botName;
+    }
+  }
+
   const body = new URLSearchParams({
     code,
-    client_id: clientId,
-    client_secret: clientSecret,
+    client_id: finalClientId,
+    client_secret: finalClientSecret,
     redirect_uri: finalRedirectUri.replace("http://", "https://"),
   });
+
   // Exchange code for tokens using Slack's oauth.v2.access endpoint
   const tokenResponse = await fetch("https://slack.com/api/oauth.v2.access", {
     method: "POST",
@@ -58,7 +87,8 @@ export default async function callback(
 
   // Get current configuration and update with new tokens
   const currentCtx = await ctx.getConfiguration();
-  const effectiveBotName = botName ?? currentCtx?.customBotName;
+  const effectiveBotName = finalBotName ?? currentCtx?.customBotName ??
+    "deco.chat";
 
   await ctx.configure({
     ...currentCtx,
@@ -66,15 +96,10 @@ export default async function callback(
     botToken: tokenData.access_token, // Bot token for API calls
     userToken: tokenData.authed_user.access_token, // User token if needed
     teamId: tokenData.team.id,
-    clientSecret: clientSecret,
-    clientId: clientId,
+    clientSecret: finalClientSecret,
+    clientId: finalClientId,
     // Add custom bot info
-    customBotName: effectiveBotName ?? "deco.chat",
-    appInfo: {
-      id: tokenData.app_id,
-      name: effectiveBotName ?? currentCtx?.appInfo?.name ??
-        tokenData.team.name,
-    },
+    customBotName: effectiveBotName,
     tokens: {
       access_token: tokenData.access_token,
       scope: tokenData.scope,
@@ -83,13 +108,15 @@ export default async function callback(
     },
   });
 
+  const displayName = `${effectiveBotName} | ${tokenData.team.name}`;
+
   return {
     installId,
-    name: `${effectiveBotName || "Slack"} | ${tokenData.team.name}`,
+    name: displayName,
     botInfo: {
       id: tokenData.bot_user_id,
       appId: tokenData.app_id,
-      name: effectiveBotName || "deco.chat",
+      name: effectiveBotName,
     },
   };
 }
