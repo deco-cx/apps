@@ -122,6 +122,9 @@ export function generateBotSelectionPage(currentUrl: string): string {
   </div>
 
   <script>
+    // Sanitize the current URL to prevent XSS attacks
+    const sanitizedJSCurrentUrl = ${JSON.stringify(currentUrl)};
+    
     let selectedType = null;
     const form = document.getElementById('botForm');
     const submitBtn = document.getElementById('submitBtn');
@@ -150,7 +153,7 @@ export function generateBotSelectionPage(currentUrl: string): string {
 
     function updateFormAction() {
       if (selectedType === 'deco') {
-        const url = new URL('${currentUrl}');
+        const url = new URL(sanitizedJSCurrentUrl);
         url.searchParams.set('useDecoChatBot', 'true');
         form.action = url.toString();
       } else if (selectedType === 'custom') {
@@ -182,7 +185,7 @@ export function generateBotSelectionPage(currentUrl: string): string {
           submitBtn.disabled = true;
 
           // Store credentials via POST request
-          const response = await fetch('${currentUrl}', {
+          const response = await fetch(sanitizedJSCurrentUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -197,7 +200,7 @@ export function generateBotSelectionPage(currentUrl: string): string {
 
           if (result.success) {
             // Redirect with session token
-            const url = new URL('${currentUrl}');
+            const url = new URL(sanitizedJSCurrentUrl);
             url.searchParams.set('useCustomBot', 'true');
             url.searchParams.set('sessionToken', result.sessionToken);
             window.location.href = url.toString();

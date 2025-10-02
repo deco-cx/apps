@@ -111,10 +111,8 @@ When selecting "Custom Bot", the integration follows a secure credential flow:
 - ✅ **Tokens are cleared after the OAuth callback invalidates the session or when the 10-minute window elapses**
 - ✅ **HTTPS enforcement** for credential transmission
 - ✅ **Automatic cleanup** of expired tokens
-### Custom Bot Configuration
 
-When selecting "Custom Bot", you'll need to provide:
-
+**Required Credentials:**
 - **Client ID** (required): From your Slack app's "Basic Information" page
 - **Client Secret** (required): From your Slack app's "Basic Information" page
 - **Bot Name** (optional): Custom identifier for branding purposes
