@@ -70,6 +70,12 @@ export interface Props {
    * @description Callbacks for the slack binding
    */
   callbacks?: Callbacks;
+
+  /**
+   * @title Custom Bot Name
+   * @description Name identifier for custom bot
+   */
+  customBotName?: string;
 }
 
 export interface State extends Props {
