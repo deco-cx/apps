@@ -258,8 +258,9 @@ The app uses the MCP (Multi-Channel Platform) OAuth utilities for token manageme
 - `client.ts` - Slack API client with OAuth support
 - `utils/constants.ts` - OAuth URLs and scopes
 - `utils/client.ts` - TypeScript interfaces for API endpoints
-- `utils/ui-templates/page-generator.ts` - Bot selection interface HTML generation
-- `loaders/oauth/start.ts` - OAuth initiation with selection interface
+- `utils/state-helpers.ts` - Secure session token management
+- `utils/ui-templates/page-generator.ts` - Clean bot selection interface generator
+- `loaders/oauth/start.ts` - OAuth initiation with bot selection logic
 - `actions/oauth/callback.ts` - OAuth completion with custom bot support
 
 ## Contributing

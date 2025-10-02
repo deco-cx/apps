@@ -2,6 +2,17 @@ import { JoinChannelProps, processStream } from "../../../../mcp/bindings.ts";
 import { DECO_CHAT_CHANNEL_ID } from "../../../loaders/deco-chat/channels/list.ts";
 import type { AppContext, SlackWebhookPayload } from "../../../mod.ts";
 
+// Tool call interfaces for proper typing
+interface ToolCall {
+  toolName: string;
+  toolCallId: string;
+  args: Record<string, unknown>;
+}
+
+interface ToolResult extends ToolCall {
+  result: unknown;
+}
+
 /**
  * @name DECO_CHAT_CHANNELS_INVOKE
  * @title Deco Chat Channel Invoke
@@ -53,6 +64,12 @@ export default async function invoke(
     "__d",
     `slack-${props.event.team}-${channel}`,
   );
+
+  // Debug mode: show tool calls only for developers
+  // Can be controlled via:
+  // 1. Environment variable DEBUG_TOOLS=true
+  const isDebugMode = Deno.env.get("DEBUG_TOOLS") === "true";
+
   const toolCallMessageTs: Record<
     string,
     { ts: string; name: string; arguments: Record<string, unknown> }
@@ -70,7 +87,12 @@ export default async function invoke(
         resourceId: thread,
       },
     },
-    onToolCallPart: async (toolCall) => {
+    onToolCallPart: async (toolCall: ToolCall) => {
+      // Only show tool calls in debug mode
+      if (!isDebugMode) {
+        return;
+      }
+
       const blocks = [
         {
           type: "section",
@@ -115,7 +137,12 @@ export default async function invoke(
         };
       }
     },
-    onToolResultPart: async (toolCall) => {
+    onToolResultPart: async (toolCall: ToolResult) => {
+      // Only show tool results in debug mode
+      if (!isDebugMode) {
+        return;
+      }
+
       const call = toolCallMessageTs[toolCall.toolCallId];
       if (call) {
         const blocks = [
