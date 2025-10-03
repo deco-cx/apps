@@ -1,9 +1,13 @@
 import { useContext, useMemo } from "preact/hooks";
 import { forwardRef } from "preact/compat";
 import { ComponentChildren, createContext, JSX } from "preact";
-import { Head } from "$fresh/runtime.ts";
+import { Head, IS_BROWSER } from "$fresh/runtime.ts";
 
-import { getSrcSet } from "./Image.tsx";
+import {
+  getEarlyHintFromSrcProps,
+  getSrcSet,
+  type SetEarlyHint,
+} from "./Image.tsx";
 
 interface Context {
   preload?: boolean;
@@ -25,6 +29,7 @@ type SourceProps =
     preload?: boolean;
     /** @description Improves Web Vitals (LCP). Use high for LCP image. Auto for other images */
     fetchPriority?: "high" | "low" | "auto";
+    setEarlyHint?: SetEarlyHint;
   };
 
 export const Source = forwardRef<HTMLSourceElement, SourceProps>(
@@ -37,7 +42,18 @@ export const Source = forwardRef<HTMLSourceElement, SourceProps>(
       imagesizes: props.sizes,
       fetchpriority: props.fetchPriority,
       media: props.media,
+    } as {
+      imagesrcset: string | undefined;
+      imagesizes: string | undefined;
+      fetchpriority: "high" | "low" | "auto" | undefined;
+      media: string | undefined;
     };
+
+    if (!IS_BROWSER && preload && linkProps && props.setEarlyHint) {
+      props.setEarlyHint(
+        getEarlyHintFromSrcProps({ ...linkProps, src: props.src }),
+      );
+    }
 
     return (
       <>
