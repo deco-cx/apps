@@ -6,6 +6,7 @@ import { Manifest } from "../manifest.gen.ts";
 export const PATH: `/live/invoke/${keyof Manifest["loaders"]}` =
   "/live/invoke/website/loaders/image.ts";
 
+export type SetEarlyHint = (hint: string) => void;
 export type Props =
   & Omit<
     JSX.IntrinsicElements["img"],
@@ -23,6 +24,7 @@ export type Props =
     fetchPriority?: "high" | "low" | "auto";
     /** @description Object-fit */
     fit?: FitOptions;
+    setEarlyHint?: SetEarlyHint;
   };
 
 const FACTORS = [1, 2];
@@ -80,8 +82,13 @@ const optimizeVTEX = (opts: OptimizationOptions) => {
   const [slash, arquivos, ids, rawId, ...rest] = src.pathname.split("/");
   const [trueId, _w, _h] = rawId.split("-");
 
-  src.pathname = [slash, arquivos, ids, `${trueId}-${width}-${height}`, ...rest]
-    .join("/");
+  src.pathname = [
+    slash,
+    arquivos,
+    ids,
+    `${trueId}-${width}-${height}`,
+    ...rest,
+  ].join("/");
 
   return src.href;
 };
@@ -161,6 +168,34 @@ export const getSrcSet = (
   return srcSet.length > 0 ? srcSet.join(", ") : undefined;
 };
 
+export const getEarlyHintFromSrcProps = (srcProps: {
+  imagesrcset: string | undefined;
+  imagesizes: string | undefined;
+  fetchpriority: "high" | "low" | "auto" | undefined;
+  media: string | undefined;
+  src: string;
+}) => {
+  const earlyHintParts = [`<${srcProps.src}>; rel=preload; as=image`];
+
+  if (srcProps?.imagesrcset) {
+    earlyHintParts.push(`; imagesrcset="${srcProps.imagesrcset}"`);
+  }
+
+  if (srcProps?.imagesizes) {
+    earlyHintParts.push(`; imagesizes="${srcProps.imagesizes}"`);
+  }
+
+  if (srcProps?.fetchpriority) {
+    earlyHintParts.push(`; fetchpriority=${srcProps.fetchpriority}`);
+  }
+
+  if (srcProps?.media) {
+    earlyHintParts.push(`; media=${srcProps.media}`);
+  }
+
+  return earlyHintParts.join("");
+};
+
 const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
   const { preload, loading = "lazy" } = props;
 
@@ -173,12 +208,27 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
   const srcSet = props.srcSet ??
     getSrcSet(props.src, props.width, props.height, props.fit);
 
-  const linkProps = srcSet && {
-    imagesrcset: srcSet,
-    imagesizes: props.sizes,
-    fetchpriority: props.fetchPriority,
-    media: props.media,
-  };
+  const linkProps = srcSet &&
+    ({
+      imagesrcset: srcSet,
+      imagesizes: props.sizes,
+      fetchpriority: props.fetchPriority,
+      media: props.media,
+    } as
+      | ""
+      | undefined
+      | {
+        imagesrcset: string;
+        imagesizes: string | undefined;
+        fetchpriority: "high" | "low" | "auto" | undefined;
+        media: string | undefined;
+      });
+
+  if (!IS_BROWSER && props.setEarlyHint && preload && linkProps) {
+    props.setEarlyHint(
+      getEarlyHintFromSrcProps({ ...linkProps, src: props.src }),
+    );
+  }
 
   return (
     <>
