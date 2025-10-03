@@ -178,11 +178,11 @@ export const getEarlyHintFromSrcProps = (srcProps: {
   const earlyHintParts = [`<${srcProps.src}>; rel=preload; as=image`];
 
   if (srcProps?.imagesrcset) {
-    earlyHintParts.push(`; imagesrcset=${srcProps.imagesrcset}`);
+    earlyHintParts.push(`; imagesrcset="${srcProps.imagesrcset}"`);
   }
 
   if (srcProps?.imagesizes) {
-    earlyHintParts.push(`; imagesizes=${srcProps.imagesizes}`);
+    earlyHintParts.push(`; imagesizes="${srcProps.imagesizes}"`);
   }
 
   if (srcProps?.fetchpriority) {
