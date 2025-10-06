@@ -89,6 +89,14 @@ export function generateBotSelectionPage(currentUrl: string): string {
         <div class="option-desc">
           Use the official deco.chat bot for seamless integration. Recommended for most users.
         </div>
+        <div class="custom-form" id="decoForm" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">
+              <input type="checkbox" id="decoDebugMode" name="decoDebugMode" style="margin-right: 8px;">
+              Show tool calls in Slack (for developers)
+            </label>
+          </div>
+        </div>
       </div>
 
       <!-- Custom Bot Option -->
@@ -113,6 +121,12 @@ export function generateBotSelectionPage(currentUrl: string): string {
             <input type="text" id="botName" name="botName" class="form-input" 
                    placeholder="Custom bot identifier">
           </div>
+          <div class="form-group">
+            <label class="form-label">
+              <input type="checkbox" id="debugMode" name="debugMode" style="margin-right: 8px;">
+              Show tool calls in Slack (for developers)
+            </label>
+          </div>
         </div>
       </div>
 
@@ -130,16 +144,19 @@ export function generateBotSelectionPage(currentUrl: string): string {
     const submitBtn = document.getElementById('submitBtn');
     const errorMsg = document.getElementById('errorMsg');
     const customForm = document.getElementById('customForm');
+    const decoForm = document.getElementById('decoForm');
 
     function selectDecoBot() {
       selectedType = 'deco';
       customForm.style.display = 'none';
+      decoForm.style.display = 'block';
       submitBtn.disabled = false;
       updateFormAction();
     }
 
     function selectCustomBot() {
       selectedType = 'custom';
+      decoForm.style.display = 'none';
       customForm.style.display = 'block';
       validateCustomForm();
     }
@@ -155,6 +172,10 @@ export function generateBotSelectionPage(currentUrl: string): string {
       if (selectedType === 'deco') {
         const url = new URL(sanitizedJSCurrentUrl);
         url.searchParams.set('useDecoChatBot', 'true');
+        const decoDebugMode = document.getElementById('decoDebugMode')?.checked;
+        if (decoDebugMode) {
+          url.searchParams.set('debugMode', 'true');
+        }
         form.action = url.toString();
       } else if (selectedType === 'custom') {
         // Will be handled by form submission
@@ -166,6 +187,9 @@ export function generateBotSelectionPage(currentUrl: string): string {
     ['clientId', 'clientSecret'].forEach(id => {
       document.getElementById(id).addEventListener('input', validateCustomForm);
     });
+    
+    // Add event listener for deco debug mode checkbox
+    document.getElementById('decoDebugMode').addEventListener('change', updateFormAction);
 
     form.addEventListener('submit', async function(e) {
       if (selectedType === 'custom') {
@@ -174,6 +198,7 @@ export function generateBotSelectionPage(currentUrl: string): string {
         const clientId = document.getElementById('clientId').value.trim();
         const clientSecret = document.getElementById('clientSecret').value.trim();
         const botName = document.getElementById('botName').value.trim();
+        const debugMode = document.getElementById('debugMode').checked;
 
         if (!clientId || !clientSecret) {
           showError('Please provide both Client ID and Client Secret');
@@ -192,7 +217,8 @@ export function generateBotSelectionPage(currentUrl: string): string {
               action: 'storeCredentials',
               clientId: clientId,
               clientSecret: clientSecret,
-              botName: botName
+              botName: botName,
+              debugMode: debugMode
             })
           });
 

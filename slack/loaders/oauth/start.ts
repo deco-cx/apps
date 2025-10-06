@@ -50,7 +50,7 @@ export default async function start(
 
       // Enhanced validation
       if (body.action === "storeCredentials") {
-        const { clientId, clientSecret, botName } = body;
+        const { clientId, clientSecret, botName, debugMode } = body;
 
         // Validate required fields
         if (!clientId || !clientSecret) {
@@ -129,6 +129,7 @@ export default async function start(
           clientId.trim(),
           clientSecret.trim(),
           botName?.trim() || undefined,
+          Boolean(debugMode),
         );
 
         return new Response(
@@ -202,12 +203,21 @@ export default async function start(
 
   // Handle deco.chat bot (default flow)
   if (useDecoChatBot) {
+    const debugMode = url.searchParams.get("debugMode") === "true";
+
+    // Encode debugMode in state for callback processing
+    const stateData = decodeState(props.state);
+    const enhancedState = btoa(JSON.stringify({
+      ...stateData,
+      debugMode,
+    }));
+
     const authParams = new URLSearchParams({
       client_id: props.clientId,
       redirect_uri: redirectUri?.replace("http://", "https://"),
       response_type: "code",
       scope: SCOPES.join(","),
-      state: props.state,
+      state: enhancedState,
     });
 
     const authorizationUrl = `${OAUTH_URL_AUTH}?${authParams.toString()}`;

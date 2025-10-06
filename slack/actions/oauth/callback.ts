@@ -48,9 +48,16 @@ export default async function callback(
   const finalClientId = clientId;
   let finalClientSecret = clientSecret;
   let finalBotName = botName;
+  let finalDebugMode = false;
 
   if (state) {
     const stateData = decodeCustomBotState(state);
+
+    // Handle debugMode from state (for deco.chat bot)
+    if (stateData.debugMode) {
+      finalDebugMode = true;
+    }
+
     if (stateData.isCustomBot && stateData.sessionToken) {
       // Retrieve credentials securely using session token
       const credentials = retrieveCustomBotSession(stateData.sessionToken);
@@ -59,6 +66,7 @@ export default async function callback(
         finalClientSecret = credentials.clientSecret;
         finalBotName = credentials.botName || stateData.customBotName ||
           botName;
+        finalDebugMode = credentials.debugMode || false;
 
         // Invalidate session token after successful retrieval
         invalidateSession(stateData.sessionToken);
@@ -107,6 +115,7 @@ export default async function callback(
     clientId: finalClientId,
     // Add custom bot info
     customBotName: effectiveBotName,
+    debugMode: finalDebugMode,
     tokens: {
       access_token: tokenData.access_token,
       scope: tokenData.scope,

@@ -76,6 +76,13 @@ export interface Props {
    * @description Name identifier for custom bot
    */
   customBotName?: string;
+
+  /**
+   * @title Debug Mode
+   * @description Show tool calls and results in Slack (for developers)
+   * @default false
+   */
+  debugMode?: boolean;
 }
 
 export interface State extends Props {

@@ -65,10 +65,9 @@ export default async function invoke(
     `slack-${props.event.team}-${channel}`,
   );
 
-  // Debug mode: show tool calls only for developers
-  // Can be controlled via:
-  // 1. Environment variable DEBUG_TOOLS=true
-  const isDebugMode = Deno.env.get("DEBUG_TOOLS") === "true";
+  // Debug mode: show tool calls only when enabled in app configuration
+  // Configured during OAuth setup - defaults to false for clean user experience
+  const isDebugMode = Boolean(config.debugMode);
 
   const toolCallMessageTs: Record<
     string,
