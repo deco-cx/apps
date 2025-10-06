@@ -70,7 +70,6 @@ const oneDollarSnippet = () => {
     }
     const values = { ...props };
     for (const key in params) {
-      // @ts-expect-error somehow typescript bugs
       const value = params[key];
       if (value !== null && value !== undefined) {
         values[key] = truncate(
@@ -101,6 +100,7 @@ function Component({ collectorAddress, staticScriptUrl }: Props) {
         data-autocollect="false"
         data-hash-routing="true"
         data-url={collector}
+        type="module"
         src={`/live/invoke/website/loaders/analyticsScript.ts?url=${staticScript}`}
       />
       <script defer src={useScriptAsDataURI(oneDollarSnippet)} />
