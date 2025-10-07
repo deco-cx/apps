@@ -66,11 +66,11 @@ export default async function action(
   for (const domain of domains) {
     try {
       // Get traffic data
-      const trafficResponse = await ctx.api
+      const trafficResponse = await ctx.client
         ["POST /traffic_analytics/overview/live"](
           {},
           {
-            body: { target: domain },
+            body: [{ target: domain }],
           },
         );
       const trafficData = await trafficResponse
@@ -85,11 +85,11 @@ export default async function action(
         };
 
       // Get backlinks data
-      const backlinksResponse = await ctx.api
+      const backlinksResponse = await ctx.client
         ["POST /backlinks/domain_info/live"](
           {},
           {
-            body: { target: domain },
+            body: [{ target: domain }],
           },
         );
       const backlinksData = await backlinksResponse

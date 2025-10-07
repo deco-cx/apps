@@ -70,6 +70,7 @@ const oneDollarSnippet = () => {
     }
     const values = { ...props };
     for (const key in params) {
+      // @ts-expect-error somehow typescript bugs
       const value = params[key];
       if (value !== null && value !== undefined) {
         values[key] = truncate(
