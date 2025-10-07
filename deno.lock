@@ -3,7 +3,7 @@
   "specifiers": {
     "jsr:@core/asyncutil@^1.0.2": "1.2.0",
     "jsr:@deco/codemod-toolkit@~0.3.4": "0.3.4",
-    "jsr:@deco/deco@^1.98.3": "1.126.0",
+    "jsr:@deco/deco@^1.127.0": "1.127.0",
     "jsr:@deco/deno-ast-wasm@~0.5.5": "0.5.5",
     "jsr:@deco/durable@~0.5.3": "0.5.3",
     "jsr:@deco/inspect-vscode@0.2.1": "0.2.1",
@@ -83,8 +83,8 @@
     "@deco/codemod-toolkit@0.3.4": {
       "integrity": "577c8089316c9e6c39eed22edea94deb5d3480887507f58dc62c90ba668318e5"
     },
-    "@deco/deco@1.126.0": {
-      "integrity": "9160bac6bd114c0b69a67bab7ecdbb55f4e2622c812c631c0b67f570b4f97b5d",
+    "@deco/deco@1.127.0": {
+      "integrity": "5655f17454528d250fc864bf1250b333156397464a2a346a613582d1d7c020ec",
       "dependencies": [
         "jsr:@core/asyncutil",
         "jsr:@deco/codemod-toolkit",
@@ -1164,7 +1164,7 @@
         "@types/shimmer",
         "import-in-the-middle",
         "require-in-the-middle",
-        "semver@7.7.2",
+        "semver@7.7.3",
         "shimmer"
       ]
     },
@@ -1247,7 +1247,7 @@
         "@opentelemetry/propagator-b3",
         "@opentelemetry/propagator-jaeger",
         "@opentelemetry/sdk-trace-base",
-        "semver@7.7.2"
+        "semver@7.7.3"
       ]
     },
     "@opentelemetry/sdk-trace-web@1.25.1_@opentelemetry+api@1.9.0": {
@@ -2331,8 +2331,8 @@
       "integrity": "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==",
       "bin": true
     },
-    "semver@7.7.2": {
-      "integrity": "sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==",
+    "semver@7.7.3": {
+      "integrity": "sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==",
       "bin": true
     },
     "sentence-case@3.0.4": {
@@ -2731,7 +2731,7 @@
     "dependencies": [
       "jsr:@cliffy/prompt@^1.0.0-rc.5",
       "jsr:@core/asyncutil@^1.0.2",
-      "jsr:@deco/deco@^1.98.3",
+      "jsr:@deco/deco@^1.127.0",
       "jsr:@deco/durable@~0.5.3",
       "jsr:@deco/warp@0.3.6",
       "jsr:@hono/hono@^4.5.4",
