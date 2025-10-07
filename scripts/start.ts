@@ -1,11 +1,11 @@
 // deno-lint-ignore-file no-explicit-any
-import "npm:@graphql-codegen@0.4.0/add";
-import "npm:@graphql-codegen@0.4.0/schema-ast";
-import "npm:@graphql-codegen@0.4.0/typescript";
-import "npm:@graphql-codegen@0.4.0/typescript-operations";
+import "npm:@graphql-codegen/add@6.0.0";
+import "npm:@graphql-codegen/schema-ast@5.0.0";
+import "npm:@graphql-codegen/typescript@5.0.2";
+import "npm:@graphql-codegen/typescript-operations@5.0.2";
 
 import { setupGithooks } from "https://deno.land/x/githooks@0.0.4/githooks.ts";
-import { CodegenConfig, generate } from "npm:@graphql-codegen@0.4.0/cli";
+import { CodegenConfig, generate } from "npm:@graphql-codegen/cli@6.0.0";
 import camel from "npm:camelcase@8.0.0";
 import { compile } from "npm:json-schema-to-typescript@15.0.4";
 import { OpenAPIV3 } from "npm:openapi-types@12.1.3";
