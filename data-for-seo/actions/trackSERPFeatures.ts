@@ -130,7 +130,7 @@ export default async function action(
   for (const keyword of keywords) {
     try {
       // Post SERP task
-      const response = await ctx.api["POST /serp/google/organic/task_post"](
+      const response = await ctx.client["POST /serp/google/organic/task_post"](
         {},
         {
           body: [{
@@ -152,7 +152,7 @@ export default async function action(
       await new Promise((resolve) => setTimeout(resolve, 3000));
 
       // Get results
-      const resultResponse = await ctx.api
+      const resultResponse = await ctx.client
         [`GET /serp/google/organic/task_get/:id`]({
           "id": taskId,
         });

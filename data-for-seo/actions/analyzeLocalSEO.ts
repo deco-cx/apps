@@ -122,7 +122,7 @@ export default async function action(
 
     try {
       // Get Maps results
-      const mapsResponse = await ctx.api["POST /serp/google/maps/task_post"](
+      const mapsResponse = await ctx.client["POST /serp/google/maps/task_post"](
         {},
         {
           body: [{
@@ -137,7 +137,7 @@ export default async function action(
       const mapsTaskId = mapsData.tasks?.[0]?.id;
 
       // Get Organic results
-      const organicResponse = await ctx.api
+      const organicResponse = await ctx.client
         ["POST /serp/google/organic/task_post"](
           {},
           {
@@ -162,7 +162,7 @@ export default async function action(
 
       // Process Maps results
       if (mapsTaskId) {
-        const mapsResultResp = await ctx.api
+        const mapsResultResp = await ctx.client
           [`GET /serp/google/organic/task_get/:id`]({
             "id": mapsTaskId,
           });
@@ -206,7 +206,7 @@ export default async function action(
 
       // Process Organic results
       if (organicTaskId) {
-        const organicResultResp = await ctx.api
+        const organicResultResp = await ctx.client
           [`GET /serp/google/organic/task_get/:id`]({
             "id": organicTaskId,
           });
