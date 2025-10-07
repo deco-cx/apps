@@ -90,21 +90,21 @@ const serialize = ({
   countryCode,
   cultureInfo,
   channelPrivacy,
-}: Partial<Segment>, preserveUtmChars = false) => {
-  const normalize = (value: string | null | undefined) =>
-    value && !preserveUtmChars ? removeNonLatin1Chars(value) : value;
-
+}: Partial<Segment>) => {
   const seg = {
     campaigns,
     channel,
     priceTables,
     regionId,
-    utm_campaign: normalize(utm_campaign)?.replace(/[\/\[\]{}()<>.]/g, ""),
-    utm_source: normalize(utm_source)?.replace(/[\/\[\]{}()<>.]/g, ""),
-    utm_medium: normalize(utm_medium)?.replace(/[\/\[\]{}()<>.]/g, ""),
-    utmi_campaign: normalize(utmi_campaign),
-    utmi_page: normalize(utmi_page),
-    utmi_part: normalize(utmi_part),
+    utm_campaign: utm_campaign &&
+      removeNonLatin1Chars(utm_campaign).replace(/[\/\[\]{}()<>.]/g, ""),
+    utm_source: utm_source &&
+      removeNonLatin1Chars(utm_source).replace(/[\/\[\]{}()<>.]/g, ""),
+    utm_medium: utm_medium &&
+      removeNonLatin1Chars(utm_medium).replace(/[\/\[\]{}()<>.]/g, ""),
+    utmi_campaign: utmi_campaign && removeNonLatin1Chars(utmi_campaign),
+    utmi_page: utmi_page && removeNonLatin1Chars(utmi_page),
+    utmi_part: utmi_part && removeNonLatin1Chars(utmi_part),
     currencyCode,
     currencySymbol,
     countryCode,
@@ -113,6 +113,7 @@ const serialize = ({
   };
   return btoa(JSON.stringify(seg));
 };
+
 
 export const parse = (cookie: string) => JSON.parse(atob(cookie));
 
@@ -182,7 +183,7 @@ export const setSegmentBag = (
     ...segmentFromRequest,
   };
 
-  const token = serialize(segment, ctx.preserveUtmChars);
+  const token = serialize(segment);
   setSegmentInBag(ctx, { payload: segment, token });
 
   if (segmentFromRequest.channel) {
