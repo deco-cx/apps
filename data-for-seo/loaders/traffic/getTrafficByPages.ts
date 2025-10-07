@@ -51,16 +51,16 @@ const loader = async (
   const filters = minVisits > 0 ? [`visits,>,${minVisits}`] : undefined;
   const order_by = orderBy ? [orderBy] : undefined;
 
-  const response = await ctx.api["POST /traffic_analytics/by_pages/live"](
+  const response = await ctx.client["POST /traffic_analytics/by_pages/live"](
     {},
     {
-      body: {
+      body: [{
         target,
         limit,
         offset,
         filters,
         order_by,
-      },
+      }],
     },
   );
 

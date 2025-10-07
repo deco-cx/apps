@@ -52,7 +52,7 @@ export default async function loader(
   }
 
   // Post the task
-  const taskResponse = await ctx.api["POST /serp/google/ads/task_post"](
+  const taskResponse = await ctx.client["POST /serp/google/ads/task_post"](
     {},
     {
       body: [{
@@ -80,9 +80,10 @@ export default async function loader(
   while (attempts < maxAttempts) {
     await new Promise((resolve) => setTimeout(resolve, delay));
 
-    const resultResponse = await ctx.api[`GET /serp/google/ads/task_get/:id`]({
-      id: taskId,
-    });
+    const resultResponse = await ctx.client
+      [`GET /serp/google/ads/task_get/:id`]({
+        id: taskId,
+      });
 
     const resultData = await resultResponse.json() as DataForSeoTaskResponse;
 

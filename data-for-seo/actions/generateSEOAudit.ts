@@ -122,10 +122,10 @@ export default async function action(
   } = props;
 
   // Fetch traffic overview
-  const trafficResponse = await ctx.api
+  const trafficResponse = await ctx.client
     ["POST /traffic_analytics/overview/live"](
       {},
-      { body: { target: domain } },
+      { body: [{ target: domain }] },
     );
   const trafficData = await trafficResponse.json();
   const traffic = trafficData.tasks?.[0]?.result?.[0] as
@@ -133,10 +133,11 @@ export default async function action(
     | undefined;
 
   // Fetch backlinks overview
-  const backlinksResponse = await ctx.api["POST /backlinks/domain_info/live"](
-    {},
-    { body: { target: domain } },
-  );
+  const backlinksResponse = await ctx.client
+    ["POST /backlinks/domain_info/live"](
+      {},
+      { body: [{ target: domain }] },
+    );
   const backlinksData = await backlinksResponse.json();
   const backlinks = backlinksData.tasks?.[0]?.result?.[0] as
     | BacklinksOverview
@@ -149,16 +150,17 @@ export default async function action(
 
   for (const keyword of keywords) {
     try {
-      const serpResponse = await ctx.api["POST /serp/google/organic/task_post"](
-        {},
-        {
-          body: [{
-            keyword,
-            language_name,
-            location_name,
-          }],
-        },
-      );
+      const serpResponse = await ctx.client
+        ["POST /serp/google/organic/task_post"](
+          {},
+          {
+            body: [{
+              keyword,
+              language_name,
+              location_name,
+            }],
+          },
+        );
 
       const serpData = await serpResponse.json();
       const taskId = serpData.tasks?.[0]?.id;
@@ -167,7 +169,7 @@ export default async function action(
         // Wait for processing
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
-        const resultResponse = await ctx.api
+        const resultResponse = await ctx.client
           [`GET /serp/google/organic/task_get/:id`]({
             "id": taskId,
           });
@@ -354,20 +356,21 @@ async function analyzeCompetitors(
   // Get competitor metrics
   for (const competitor of competitors.slice(0, 3)) {
     try {
-      const trafficResp = await ctx.api
+      const trafficResp = await ctx.client
         ["POST /traffic_analytics/overview/live"](
           {},
-          { body: { target: competitor } },
+          { body: [{ target: competitor }] },
         );
       const trafficData = await trafficResp.json();
       const traffic = trafficData.tasks?.[0]?.result?.[0] as
         | TrafficOverview
         | undefined;
 
-      const backlinksResp = await ctx.api["POST /backlinks/domain_info/live"](
-        {},
-        { body: { target: competitor } },
-      );
+      const backlinksResp = await ctx.client
+        ["POST /backlinks/domain_info/live"](
+          {},
+          { body: [{ target: competitor }] },
+        );
       const backlinksData = await backlinksResp.json();
       const backlinks = backlinksData.tasks?.[0]?.result?.[0] as
         | BacklinksOverview

@@ -64,7 +64,7 @@ export default async function action(
   }
 
   // Get search volume data
-  const volumeTaskResponse = await ctx.api
+  const volumeTaskResponse = await ctx.client
     ["POST /keywords_data/google/search_volume/task_post"](
       {},
       {
@@ -88,7 +88,7 @@ export default async function action(
   const serpTaskIds: { keyword: string; taskId: string }[] = [];
 
   for (const keyword of keywords) {
-    const serpTaskResponse = await ctx.api
+    const serpTaskResponse = await ctx.client
       ["POST /serp/google/organic/task_post"](
         {},
         {
@@ -119,7 +119,7 @@ export default async function action(
   while (attempts < maxAttempts) {
     await new Promise((resolve) => setTimeout(resolve, delay));
 
-    const volumeResultResponse = await ctx.api
+    const volumeResultResponse = await ctx.client
       [`GET /keywords_data/google/search_volume/task_get/:id`]({
         id: volumeTaskId,
       });
@@ -163,7 +163,7 @@ export default async function action(
     while (attempts < maxAttempts) {
       await new Promise((resolve) => setTimeout(resolve, delay));
 
-      const serpResultResponse = await ctx.api
+      const serpResultResponse = await ctx.client
         [`GET /serp/google/organic/task_get/:id`]({
           id: taskId,
         });

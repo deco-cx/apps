@@ -34,14 +34,14 @@ const loader = async (
 ): Promise<AnchorText[]> => {
   const { target, limit = 100, offset = 0 } = props;
 
-  const response = await ctx.api["POST /backlinks/anchors/live"](
+  const response = await ctx.client["POST /backlinks/anchors/live"](
     {},
     {
-      body: {
+      body: [{
         target,
         limit,
         offset,
-      },
+      }],
     },
   );
 

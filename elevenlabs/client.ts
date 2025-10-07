@@ -2,7 +2,7 @@ import {
   type FetchFunction,
   loadApiKey,
   withoutTrailingSlash,
-} from "npm:@ai-sdk/provider-utils";
+} from "npm:@ai-sdk/provider-utils@3.0.10";
 import { ElevenLabsAudioModel } from "./audio-model.ts";
 
 /**

@@ -75,7 +75,7 @@ const loader = async (
   const { keyword, language_name, location_name, device = "desktop" } = props;
 
   // Post the task
-  const taskResponse = await ctx.api["POST /serp/google/maps/task_post"](
+  const taskResponse = await ctx.client["POST /serp/google/maps/task_post"](
     {},
     {
       body: [{
@@ -99,11 +99,12 @@ const loader = async (
   await new Promise((resolve) => setTimeout(resolve, 3000));
 
   // Get results (simplified polling)
-  const resultResponse = await ctx.api[`GET /serp/google/organic/task_get/:id`](
-    {
-      "id": taskId,
-    },
-  );
+  const resultResponse = await ctx.client
+    [`GET /serp/google/organic/task_get/:id`](
+      {
+        "id": taskId,
+      },
+    );
 
   const resultData = await resultResponse.json() as DataForSeoTaskResponse;
 

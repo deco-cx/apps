@@ -46,7 +46,7 @@ const loader = async (
   const { keywords, language_name, location_name } = props;
 
   // Post the task
-  const taskResponse = await ctx.api
+  const taskResponse = await ctx.client
     ["POST /keywords_data/google/ads_competition/task_post"](
       {},
       {
@@ -70,7 +70,7 @@ const loader = async (
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
   // Get results (simplified polling)
-  const resultResponse = await ctx.api
+  const resultResponse = await ctx.client
     [`GET /keywords_data/google/search_volume/task_get/:id`]({
       "id": taskId,
     });

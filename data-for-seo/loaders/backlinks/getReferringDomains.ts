@@ -51,16 +51,16 @@ const loader = async (
   const filters = minRank > 0 ? [`rank,>,${minRank}`] : undefined;
   const order_by = orderBy ? [orderBy] : undefined;
 
-  const response = await ctx.api["POST /backlinks/referring_domains/live"](
+  const response = await ctx.client["POST /backlinks/referring_domains/live"](
     {},
     {
-      body: {
+      body: [{
         target,
         limit,
         offset,
         filters,
         order_by,
-      },
+      }],
     },
   );
 

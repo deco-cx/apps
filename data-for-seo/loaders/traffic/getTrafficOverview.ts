@@ -24,12 +24,12 @@ export default async function loader(
     throw new Error("Target domain is required");
   }
 
-  const response = await ctx.api["POST /traffic_analytics/overview/live"](
+  const response = await ctx.client["POST /traffic_analytics/overview/live"](
     {},
     {
-      body: {
+      body: [{
         target,
-      },
+      }],
     },
   );
 

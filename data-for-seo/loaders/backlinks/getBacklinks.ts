@@ -50,15 +50,15 @@ export default async function loader(
     throw new Error("Target domain or URL is required");
   }
 
-  const response = await ctx.api["POST /backlinks/backlinks/live"](
+  const response = await ctx.client["POST /backlinks/backlinks/live"](
     {},
     {
-      body: {
+      body: [{
         target,
         limit,
         offset,
         order_by: [order_by],
-      },
+      }],
     },
   );
 
