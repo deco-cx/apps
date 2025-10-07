@@ -1,4 +1,4 @@
-import { SearchResponse } from "npm:@algolia/client-search";
+import { SearchResponse } from "npm:@algolia/client-search@5.0.0";
 import { Filter, ProductListingPage } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
 import { replaceHighlight } from "../../utils/highlight.ts";

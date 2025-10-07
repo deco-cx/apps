@@ -64,7 +64,7 @@
   },
   "lint": {
     "rules": {
-      "exclude": [ "no-import-prefix" ]
+      "exclude": ["no-import-prefix"]
     }
   },
   "version": "0.126.15"

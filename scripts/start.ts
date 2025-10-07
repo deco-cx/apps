@@ -1,4 +1,4 @@
-// deno-lint-ignore-file no-explicit-any
+// deno-lint-ignore-file no-explicit-any no-import-prefix
 import "npm:@graphql-codegen/add";
 import "npm:@graphql-codegen/schema-ast";
 import "npm:@graphql-codegen/typescript";

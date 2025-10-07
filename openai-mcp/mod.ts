@@ -1,6 +1,6 @@
 import { type App, type AppContext as AC } from "@deco/deco";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import OpenAI from "npm:openai";
+import OpenAI from "npm:openai@6.2.0";
 import { Secret } from "../website/loaders/secret.ts";
 
 export interface State {
