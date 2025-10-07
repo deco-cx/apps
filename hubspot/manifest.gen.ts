@@ -95,6 +95,7 @@ import * as $$$53 from "./loaders/settings/getAccount.ts";
 import * as $$$54 from "./loaders/settings/getBusinessUnits.ts";
 import * as $$$55 from "./loaders/settings/getUsers.ts";
 import * as $$$56 from "./loaders/webhooks/getWebhooks.ts";
+import * as $$$57 from "./loaders/conversations/getTheadHistory.ts";
 
 const manifest = {
   "loaders": {
@@ -155,6 +156,7 @@ const manifest = {
     "hubspot/loaders/settings/getBusinessUnits.ts": $$$54,
     "hubspot/loaders/settings/getUsers.ts": $$$55,
     "hubspot/loaders/webhooks/getWebhooks.ts": $$$56,
+    "hubspot/loaders/conversations/getTheadHistory.ts": $$$57,
   },
   "actions": {
     "hubspot/actions/automation/enrollInWorkflow.ts": $$$$$$$$$0,
