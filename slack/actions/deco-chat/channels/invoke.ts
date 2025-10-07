@@ -136,7 +136,9 @@ export default async function invoke(
         };
       }
     },
-    onToolResultPart: async (toolCall: ToolResult) => {
+    onToolResultPart: async (
+      toolCall: Omit<ToolResult, "args" | "toolName">,
+    ) => {
       // Only show tool results in debug mode
       if (!isDebugMode) {
         return;
