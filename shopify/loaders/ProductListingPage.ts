@@ -8,11 +8,10 @@ import {
   CollectionProductsArgs,
   HasMetafieldsMetafieldsArgs,
   ProductConnection,
-  ProductFragment as ProductShopify,
   QueryRoot,
   QueryRootCollectionArgs,
   QueryRootSearchArgs,
-  SearchResultItemConnection,
+  SearchResultItemConnection
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toFilter, toProduct } from "../utils/transform.ts";
 import { Metafield } from "../utils/types.ts";
