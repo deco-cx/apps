@@ -47,7 +47,7 @@ export default async function loader(
   }
 
   // Post the task
-  const taskResponse = await ctx.api
+  const taskResponse = await ctx.client
     ["POST /keywords_data/google/search_volume/task_post"](
       {},
       {
@@ -75,7 +75,7 @@ export default async function loader(
   while (attempts < maxAttempts) {
     await new Promise((resolve) => setTimeout(resolve, delay));
 
-    const resultResponse = await ctx.api
+    const resultResponse = await ctx.client
       [`GET /keywords_data/google/search_volume/task_get/:id`]({
         id: taskId,
       });

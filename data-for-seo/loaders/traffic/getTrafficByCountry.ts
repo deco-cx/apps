@@ -34,14 +34,14 @@ const loader = async (
 ): Promise<TrafficByCountry[]> => {
   const { target, limit = 50, offset = 0 } = props;
 
-  const response = await ctx.api["POST /traffic_analytics/by_country/live"](
+  const response = await ctx.client["POST /traffic_analytics/by_country/live"](
     {},
     {
-      body: {
+      body: [{
         target,
         limit,
         offset,
-      },
+      }],
     },
   );
 

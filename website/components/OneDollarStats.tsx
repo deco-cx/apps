@@ -101,6 +101,7 @@ function Component({ collectorAddress, staticScriptUrl }: Props) {
         data-autocollect="false"
         data-hash-routing="true"
         data-url={collector}
+        type="module"
         src={`/live/invoke/website/loaders/analyticsScript.ts?url=${staticScript}`}
       />
       <script defer src={useScriptAsDataURI(oneDollarSnippet)} />

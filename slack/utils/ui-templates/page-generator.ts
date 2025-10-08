@@ -731,6 +731,7 @@ function generateFallbackPage(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
   <title>MCP Connector - Slack Access</title>
   <style>
     body {
@@ -789,6 +790,53 @@ function generateFallbackPage(
       </button>
     </div>
   </div>
+        <div class="custom-form" id="decoForm" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">
+              <input type="checkbox" id="decoDebugMode" name="decoDebugMode" style="margin-right: 8px;">
+              Show tool calls in Slack (for developers)
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Bot Option -->
+      <div class="option" onclick="selectCustomBot()">
+        <div class="option-title">Custom Bot</div>
+        <div class="option-desc">
+          Configure your own Slack app with custom credentials and settings.
+        </div>
+        <div class="custom-form" id="customForm">
+          <div class="form-group">
+            <label class="form-label" for="clientId">Client ID</label>
+            <input type="text" id="clientId" name="clientId" class="form-input" 
+                   placeholder="Enter your Slack app Client ID" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="clientSecret">Client Secret</label>
+            <input type="password" id="clientSecret" name="clientSecret" class="form-input" 
+                   placeholder="Enter your Slack app Client Secret" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="botName">Bot Name (Optional)</label>
+            <input type="text" id="botName" name="botName" class="form-input" 
+                   placeholder="Custom bot identifier">
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              <input type="checkbox" id="debugMode" name="debugMode" style="margin-right: 8px;">
+              Show tool calls in Slack (for developers)
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="error" id="errorMsg"></div>
+      <button type="submit" class="btn" id="submitBtn" disabled>Continue</button>
+    </form>
+  </div>
+
+  </script>
 </body>
 </html>`;
 }

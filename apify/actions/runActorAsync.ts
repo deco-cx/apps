@@ -49,18 +49,10 @@ export default async function runActorAsync(
   }
 > {
   try {
-    const { actorId, input: inputString, timeout, memory, build } = props;
+    const { actorId, timeout, memory, build } = props;
 
     if (!actorId) {
       return { error: "Actor ID is required", data: null };
-    }
-
-    // Parse input JSON
-    let parsedInput: unknown;
-    try {
-      parsedInput = JSON.parse(inputString);
-    } catch {
-      return { error: "Invalid JSON input", data: null };
     }
 
     // Build query parameters
@@ -78,8 +70,6 @@ export default async function runActorAsync(
     const response = await ctx.api["POST /v2/acts/:actorId/runs"]({
       actorId,
       ...(searchParams.toString() ? { searchParams } : {}),
-    }, {
-      body: parsedInput,
     });
 
     if (!response.ok) {

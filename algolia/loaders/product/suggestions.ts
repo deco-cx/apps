@@ -1,4 +1,4 @@
-import type { SearchResponse } from "npm:@algolia/client-search";
+import type { SearchResponse } from "npm:@algolia/client-search@5.0.0";
 import { Suggestion } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
 import { replaceHighlight } from "../../utils/highlight.ts";

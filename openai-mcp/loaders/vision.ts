@@ -1,5 +1,5 @@
 import { AppContext } from "../mod.ts";
-import OpenAI from "npm:openai";
+import OpenAI from "npm:openai@6.2.0";
 
 export interface Props {
   /**

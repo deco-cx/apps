@@ -34,11 +34,11 @@
     "fast-json-patch": "npm:fast-json-patch@^3.1.1",
     "simple-git": "npm:simple-git@^3.25.0",
     "https://esm.sh/*preact-render-to-string@6.3.1": "npm:preact-render-to-string@6.4.2",
-    "@deco/deco": "jsr:@deco/deco@^1.98.3"
+    "@deco/deco": "jsr:@deco/deco@^1.127.0"
   },
   "lock": false,
   "tasks": {
-    "check": "deno fmt && deno lint && deno check --allow-import **/mod.ts",
+    "check": "deno fmt --check && deno lint && deno check **/mod.ts",
     "release": "deno eval 'import \"deco/scripts/release.ts\"'",
     "start": "deno run -A ./scripts/start.ts",
     "bundle": "deno run -A jsr:@deco/deco/scripts/bundle",
@@ -62,5 +62,12 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact"
   },
-  "version": "0.126.10"
+  "lint": {
+    "rules": {
+      "exclude": [
+        "no-import-prefix"
+      ]
+    }
+  },
+  "version": "0.128.1"
 }

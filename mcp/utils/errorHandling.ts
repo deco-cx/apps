@@ -124,7 +124,7 @@ export function createErrorHandler(options: ErrorHandlerOptions): ErrorHandler {
     if (isErrorWithStatus(error)) {
       const { message, status } = typeof error.message === "string"
         ? extractCleanErrorMessage(error.message)
-        : { message: String(error.message) };
+        : { message: String(error.message), status: error.status };
 
       throw new HttpError(status || error.status, message);
     }
