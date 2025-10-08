@@ -559,10 +559,10 @@ export function generateSelectionPage(
     </div>
 
     <script>
-      const workspaceData = "{{WORKSPACE_DATA}}";
-      const channelsData = "{{CHANNELS_DATA}}";
-      const userData = "{{USER_DATA}}";
-      const callbackUrl = "{{CALLBACK_URL}}";
+      const workspaceData = {{WORKSPACE_DATA}};
+      const channelsData = {{CHANNELS_DATA}};
+      const userData = {{USER_DATA}};
+      const callbackUrl = {{CALLBACK_URL}};
 
       let workspace, channels, user;
       try {
