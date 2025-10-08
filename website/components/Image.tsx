@@ -27,7 +27,7 @@ export type Props =
     setEarlyHint?: SetEarlyHint;
   };
 
-const FACTORS = [1, 2];
+export const FACTORS = [1, 2];
 
 type FitOptions = "contain" | "cover";
 
@@ -144,11 +144,12 @@ export const getSrcSet = (
   width: number,
   height?: number,
   fit?: FitOptions,
+  factors: number[] = FACTORS,
 ) => {
   const srcSet = [];
 
-  for (let it = 0; it < FACTORS.length; it++) {
-    const factor = FACTORS[it];
+  for (let it = 0; it < factors.length; it++) {
+    const factor = factors[it];
     const w = Math.trunc(factor * width);
     const h = height && Math.trunc(factor * height);
 
@@ -169,31 +170,31 @@ export const getSrcSet = (
 };
 
 export const getEarlyHintFromSrcProps = (srcProps: {
-  imagesrcset: string | undefined;
-  imagesizes: string | undefined;
   fetchpriority: "high" | "low" | "auto" | undefined;
-  media: string | undefined;
   src: string;
+  fit?: FitOptions;
+  width: number;
+  height?: number;
 }) => {
-  const earlyHintParts = [`<${srcProps.src}>; rel=preload; as=image`];
-
-  if (srcProps?.imagesrcset) {
-    earlyHintParts.push(`; imagesrcset="${srcProps.imagesrcset}"`);
-  }
-
-  if (srcProps?.imagesizes) {
-    earlyHintParts.push(`; imagesizes="${srcProps.imagesizes}"`);
-  }
+  const factor = FACTORS.at(-1)!;
+  const src = getOptimizedMediaUrl({
+    originalSrc: srcProps.src,
+    width: Math.trunc(srcProps.width * factor),
+    height: srcProps.height && Math.trunc(srcProps.height * factor),
+    fit: srcProps.fit || "cover",
+    factor,
+  });
+  const earlyHintParts = [
+    `<${src}>`,
+    `rel=preload`,
+    `as=image`,
+  ];
 
   if (srcProps?.fetchpriority) {
-    earlyHintParts.push(`; fetchpriority=${srcProps.fetchpriority}`);
+    earlyHintParts.push(`fetchpriority=${srcProps.fetchpriority}`);
   }
 
-  if (srcProps?.media) {
-    earlyHintParts.push(`; media=${srcProps.media}`);
-  }
-
-  return earlyHintParts.join("");
+  return earlyHintParts.join("; ");
 };
 
 const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
@@ -205,28 +206,40 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
     );
   }
 
+  const shouldSetEarlyHint = !!props.setEarlyHint && preload;
   const srcSet = props.srcSet ??
-    getSrcSet(props.src, props.width, props.height, props.fit);
+    getSrcSet(
+      props.src,
+      props.width,
+      props.height,
+      props.fit,
+      shouldSetEarlyHint ? FACTORS.slice(-1) : FACTORS,
+    );
 
   const linkProps = srcSet &&
     ({
-      imagesrcset: srcSet,
-      imagesizes: props.sizes,
-      fetchpriority: props.fetchPriority,
+      imageSrcSet: srcSet,
+      imageSizes: props.sizes,
+      fetchPriority: props.fetchPriority,
       media: props.media,
     } as
       | ""
       | undefined
       | {
-        imagesrcset: string;
-        imagesizes: string | undefined;
-        fetchpriority: "high" | "low" | "auto" | undefined;
+        imageSrcSet: string;
+        imageSizes: string | undefined;
+        fetchPriority: "high" | "low" | "auto" | undefined;
         media: string | undefined;
       });
 
-  if (!IS_BROWSER && props.setEarlyHint && preload && linkProps) {
-    props.setEarlyHint(
-      getEarlyHintFromSrcProps({ ...linkProps, src: props.src }),
+  if (!IS_BROWSER && shouldSetEarlyHint) {
+    props.setEarlyHint!(
+      getEarlyHintFromSrcProps({
+        width: props.width,
+        height: props.height,
+        fetchpriority: props.fetchPriority,
+        src: props.src,
+      }),
     );
   }
 
