@@ -4,6 +4,7 @@ import { ComponentChildren, createContext, JSX } from "preact";
 import { Head, IS_BROWSER } from "$fresh/runtime.ts";
 
 import {
+  FACTORS,
   getEarlyHintFromSrcProps,
   getSrcSet,
   type SetEarlyHint,
@@ -36,7 +37,14 @@ export const Source = forwardRef<HTMLSourceElement, SourceProps>(
   (props, ref) => {
     const { preload } = useContext(Context);
 
-    const srcSet = getSrcSet(props.src, props.width, props.height);
+    const shouldSetEarlyHint = !!props.setEarlyHint && preload;
+    const srcSet = getSrcSet(
+      props.src,
+      props.width,
+      props.height,
+      undefined,
+      shouldSetEarlyHint ? FACTORS.slice(-1) : FACTORS,
+    );
     const linkProps = {
       imagesrcset: srcSet,
       imagesizes: props.sizes,
@@ -49,9 +57,14 @@ export const Source = forwardRef<HTMLSourceElement, SourceProps>(
       media: string | undefined;
     };
 
-    if (!IS_BROWSER && preload && linkProps && props.setEarlyHint) {
-      props.setEarlyHint(
-        getEarlyHintFromSrcProps({ ...linkProps, src: props.src }),
+    if (!IS_BROWSER && shouldSetEarlyHint) {
+      props.setEarlyHint!(
+        getEarlyHintFromSrcProps({
+          width: props.width,
+          height: props.height,
+          fetchpriority: props.fetchPriority,
+          src: props.src,
+        }),
       );
     }
 
