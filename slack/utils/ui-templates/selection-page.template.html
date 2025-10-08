@@ -468,13 +468,17 @@
 
         <div class="selection-content">
           <div class="workspace-info">
-            <div class="workspace-name" id="workspace-name">{{WORKSPACE_NAME}}</div>
+            <div class="workspace-name" id="workspace-name">
+              {{WORKSPACE_NAME}}
+            </div>
             <div class="workspace-domain">{{WORKSPACE_DOMAIN}}.slack.com</div>
             <div class="user-info">Connected as: {{USER_NAME}}</div>
           </div>
 
           <div class="channels-section">
-            <div class="channels-title">Available Channels ({{CHANNELS_COUNT}})</div>
+            <div class="channels-title">
+              Available Channels ({{CHANNELS_COUNT}})
+            </div>
             <div class="channels-list" id="channels-list">
               {{CHANNELS_LIST}}
             </div>
@@ -541,7 +545,7 @@
             id: workspace.id,
             name: workspace.name,
           },
-          channels: channels.map(ch => ({
+          channels: channels.map((ch) => ({
             id: ch.id,
             name: ch.name,
             is_private: ch.is_private,
@@ -579,7 +583,9 @@
         const restrictBtn = document.getElementById("restrict-btn");
         const continueBtn = document.getElementById("continue-btn");
         const themeIcon = document.getElementById("theme-icon");
-        const themeIconPath = document.getElementById("theme-icon-path");
+        const themeIconPath = document.getElementById(
+          "theme-icon-path",
+        );
 
         if (theme === "light") {
           body.classList.add("light-mode");
@@ -600,9 +606,13 @@
           header.classList.remove("light-mode");
           content.classList.remove("light-mode");
           buttonSection.classList.remove("light-mode");
-          if (workspaceInfo) workspaceInfo.classList.remove("light-mode");
+          if (workspaceInfo) {
+            workspaceInfo.classList.remove("light-mode");
+          }
           if (channelsList) channelsList.classList.remove("light-mode");
-          if (workspaceName) workspaceName.classList.remove("light-mode");
+          if (workspaceName) {
+            workspaceName.classList.remove("light-mode");
+          }
           if (headerTitle) headerTitle.classList.remove("light-mode");
           if (subtitle) subtitle.classList.remove("light-mode");
           if (restrictBtn) restrictBtn.classList.remove("light-mode");

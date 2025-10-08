@@ -174,39 +174,48 @@ export default async function callback(
       try {
         // Decode base64 and validate it's valid UTF-8
         const decodedPermissions = atob(permissions);
-        
+
         // Validate that the decoded string is valid UTF-8 by attempting to encode it back
         if (btoa(decodedPermissions) !== permissions) {
           throw new Error("Invalid base64 encoding or non-UTF-8 content");
         }
-        
+
         // Parse JSON with validation
         permissionsData = JSON.parse(decodedPermissions);
-        
+
         // Validate object shape
         if (typeof permissionsData !== "object" || permissionsData === null) {
           throw new Error("Permissions data must be a valid object");
         }
-        
+
         // Validate workspace object
-        if (!permissionsData.workspace || typeof permissionsData.workspace !== "object") {
+        if (
+          !permissionsData.workspace ||
+          typeof permissionsData.workspace !== "object"
+        ) {
           throw new Error("Permissions data must contain a workspace object");
         }
-        
-        if (!permissionsData.workspace.name || typeof permissionsData.workspace.name !== "string") {
+
+        if (
+          !permissionsData.workspace.name ||
+          typeof permissionsData.workspace.name !== "string"
+        ) {
           throw new Error("Workspace must have a valid name string");
         }
-        
-        if (!permissionsData.workspace.id || typeof permissionsData.workspace.id !== "string") {
+
+        if (
+          !permissionsData.workspace.id ||
+          typeof permissionsData.workspace.id !== "string"
+        ) {
           throw new Error("Workspace must have a valid id string");
         }
-        
+
         // Validate channels array (optional)
         if (permissionsData.channels !== undefined) {
           if (!Array.isArray(permissionsData.channels)) {
             throw new Error("Channels must be an array");
           }
-          
+
           // Validate each channel object
           for (const channel of permissionsData.channels) {
             if (typeof channel !== "object" || channel === null) {
@@ -220,19 +229,20 @@ export default async function callback(
             }
           }
         }
-        
       } catch (error) {
         console.error("Error parsing permissions data:", error);
         return new Response(
           JSON.stringify({
             error: "Invalid permissions data",
-            message: error instanceof Error ? error.message : "Unknown parsing error",
+            message: error instanceof Error
+              ? error.message
+              : "Unknown parsing error",
             installId: stateData.installId,
           }),
           {
             status: 400,
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
       }
 
@@ -301,7 +311,7 @@ export default async function callback(
     // Fetch basic workspace and user info with error handling
     let teamResponse: Response;
     let userResponse: Response;
-    
+
     try {
       [teamResponse, userResponse] = await Promise.all([
         fetch("https://slack.com/api/team.info", {
@@ -323,21 +333,39 @@ export default async function callback(
       ]);
     } catch (fetchError) {
       console.error("Network error during Slack API calls:", fetchError);
-      throw new Error(`Failed to connect to Slack API: ${fetchError instanceof Error ? fetchError.message : 'Unknown network error'}`);
+      throw new Error(
+        `Failed to connect to Slack API: ${
+          fetchError instanceof Error
+            ? fetchError.message
+            : "Unknown network error"
+        }`,
+      );
     }
 
     // Validate HTTP responses
     if (!teamResponse.ok) {
-      throw new Error(`Slack team.info API returned ${teamResponse.status} ${teamResponse.statusText} (${teamResponse.url})`);
-    }
-    
-    if (!userResponse.ok) {
-      throw new Error(`Slack users.info API returned ${userResponse.status} ${userResponse.statusText} (${userResponse.url})`);
+      throw new Error(
+        `Slack team.info API returned ${teamResponse.status} ${teamResponse.statusText} (${teamResponse.url})`,
+      );
     }
 
-    let teamData: { ok: boolean; error?: string; team?: { id: string; name: string; domain?: string } };
-    let userData: { ok: boolean; error?: string; user?: { id: string; name: string; real_name?: string } };
-    
+    if (!userResponse.ok) {
+      throw new Error(
+        `Slack users.info API returned ${userResponse.status} ${userResponse.statusText} (${userResponse.url})`,
+      );
+    }
+
+    let teamData: {
+      ok: boolean;
+      error?: string;
+      team?: { id: string; name: string; domain?: string };
+    };
+    let userData: {
+      ok: boolean;
+      error?: string;
+      user?: { id: string; name: string; real_name?: string };
+    };
+
     try {
       [teamData, userData] = await Promise.all([
         teamResponse.json(),
@@ -345,12 +373,20 @@ export default async function callback(
       ]);
     } catch (parseError) {
       console.error("Error parsing Slack API responses:", parseError);
-      throw new Error(`Failed to parse Slack API response: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`);
+      throw new Error(
+        `Failed to parse Slack API response: ${
+          parseError instanceof Error
+            ? parseError.message
+            : "Unknown parse error"
+        }`,
+      );
     }
 
     if (!teamData.ok || !userData.ok) {
       throw new Error(
-        `Failed to fetch Slack data: team=${teamData.error || 'unknown error'}, user=${userData.error || 'unknown error'}`,
+        `Failed to fetch Slack data: team=${
+          teamData.error || "unknown error"
+        }, user=${userData.error || "unknown error"}`,
       );
     }
 
@@ -358,7 +394,7 @@ export default async function callback(
     if (!teamData.team) {
       throw new Error("Slack team.info response missing team data");
     }
-    
+
     if (!userData.user) {
       throw new Error("Slack users.info response missing user data");
     }
