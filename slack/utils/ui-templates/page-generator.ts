@@ -610,9 +610,21 @@ export function generateSelectionPage(
           timestamp: new Date().toISOString(),
         };
 
-        const permissionsEncoded = btoa(
-          JSON.stringify(permissionsData),
-        );
+        const permissionsEncoded = (() => {
+          const jsonString = JSON.stringify(permissionsData);
+          const encoder = new TextEncoder();
+          const uint8Array = encoder.encode(jsonString);
+          
+          // Convert Uint8Array to binary string in chunks to avoid argument size limits
+          let binaryString = '';
+          const chunkSize = 8192; // Process in 8KB chunks
+          for (let i = 0; i < uint8Array.length; i += chunkSize) {
+            const chunk = uint8Array.slice(i, i + chunkSize);
+            binaryString += String.fromCharCode(...chunk);
+          }
+          
+          return btoa(binaryString);
+        })();
 
         const urlParams = new URLSearchParams();
         urlParams.set("savePermission", "true");
@@ -781,61 +793,14 @@ function generateFallbackPage(
     <p>User: <strong>${user.real_name || user.name}</strong></p>
     <p>Found ${channels.length} channels.</p>
     <div>
-      <button class="btn btn-secondary" onclick="window.location.href='${callbackUrl}&skip=true'">
+      <button class="btn btn-secondary" onclick="window.location.href='${callbackUrl}&continue=true'">
         Skip configuration
       </button>
-      <button class="btn btn-primary" onclick="window.location.href='${callbackUrl}&isSaveBase=true'">
-        Continue
+      <button class="btn btn-primary" onclick="window.location.href='${callbackUrl}&savePermission=true'">
+        Configure access
       </button>
     </div>
   </div>
-        <div class="custom-form" id="decoForm" style="display: none;">
-          <div class="form-group">
-            <label class="form-label">
-              <input type="checkbox" id="decoDebugMode" name="decoDebugMode" style="margin-right: 8px;">
-              Show tool calls in Slack (for developers)
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Custom Bot Option -->
-      <div class="option" onclick="selectCustomBot()">
-        <div class="option-title">Custom Bot</div>
-        <div class="option-desc">
-          Configure your own Slack app with custom credentials and settings.
-        </div>
-        <div class="custom-form" id="customForm">
-          <div class="form-group">
-            <label class="form-label" for="clientId">Client ID</label>
-            <input type="text" id="clientId" name="clientId" class="form-input" 
-                   placeholder="Enter your Slack app Client ID" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="clientSecret">Client Secret</label>
-            <input type="password" id="clientSecret" name="clientSecret" class="form-input" 
-                   placeholder="Enter your Slack app Client Secret" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="botName">Bot Name (Optional)</label>
-            <input type="text" id="botName" name="botName" class="form-input" 
-                   placeholder="Custom bot identifier">
-          </div>
-          <div class="form-group">
-            <label class="form-label">
-              <input type="checkbox" id="debugMode" name="debugMode" style="margin-right: 8px;">
-              Show tool calls in Slack (for developers)
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="error" id="errorMsg"></div>
-      <button type="submit" class="btn" id="submitBtn" disabled>Continue</button>
-    </form>
-  </div>
-
-  </script>
 </body>
 </html>`;
 }

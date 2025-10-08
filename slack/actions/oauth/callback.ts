@@ -92,7 +92,7 @@ function decodeState(state: string): State & StateProvider {
 
     return parsed;
   } catch (error) {
-    console.error("Erro ao decodificar state:", error);
+    console.error("Error decoding state:", error);
     return {} as State & StateProvider;
   }
 }
@@ -165,8 +165,82 @@ export default async function callback(
         );
       }
 
-      const permissionsData = JSON.parse(atob(permissions));
-      const { workspace, channels } = permissionsData;
+      // Validate and parse permissions data with proper error handling
+      let permissionsData: {
+        workspace: { name: string; id?: string; [key: string]: unknown };
+        channels?: Array<{ id: string; name: string; [key: string]: unknown }>;
+        [key: string]: unknown;
+      };
+      try {
+        // Decode base64 and validate it's valid UTF-8
+        const decodedPermissions = atob(permissions);
+        
+        // Validate that the decoded string is valid UTF-8 by attempting to encode it back
+        if (btoa(decodedPermissions) !== permissions) {
+          throw new Error("Invalid base64 encoding or non-UTF-8 content");
+        }
+        
+        // Parse JSON with validation
+        permissionsData = JSON.parse(decodedPermissions);
+        
+        // Validate object shape
+        if (typeof permissionsData !== "object" || permissionsData === null) {
+          throw new Error("Permissions data must be a valid object");
+        }
+        
+        // Validate workspace object
+        if (!permissionsData.workspace || typeof permissionsData.workspace !== "object") {
+          throw new Error("Permissions data must contain a workspace object");
+        }
+        
+        if (!permissionsData.workspace.name || typeof permissionsData.workspace.name !== "string") {
+          throw new Error("Workspace must have a valid name string");
+        }
+        
+        if (!permissionsData.workspace.id || typeof permissionsData.workspace.id !== "string") {
+          throw new Error("Workspace must have a valid id string");
+        }
+        
+        // Validate channels array (optional)
+        if (permissionsData.channels !== undefined) {
+          if (!Array.isArray(permissionsData.channels)) {
+            throw new Error("Channels must be an array");
+          }
+          
+          // Validate each channel object
+          for (const channel of permissionsData.channels) {
+            if (typeof channel !== "object" || channel === null) {
+              throw new Error("Each channel must be a valid object");
+            }
+            if (!channel.id || typeof channel.id !== "string") {
+              throw new Error("Each channel must have a valid id string");
+            }
+            if (!channel.name || typeof channel.name !== "string") {
+              throw new Error("Each channel must have a valid name string");
+            }
+          }
+        }
+        
+      } catch (error) {
+        console.error("Error parsing permissions data:", error);
+        return new Response(
+          JSON.stringify({
+            error: "Invalid permissions data",
+            message: error instanceof Error ? error.message : "Unknown parsing error",
+            installId: stateData.installId,
+          }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      // At this point, we know permissionsData is valid and has required fields
+      const { workspace, channels } = permissionsData as {
+        workspace: { id: string; name: string; [key: string]: unknown };
+        channels?: Array<{ id: string; name: string; [key: string]: unknown }>;
+      };
 
       await ctx.configure({
         ...currentCtx,
@@ -224,33 +298,69 @@ export default async function callback(
       },
     });
 
-    // Fetch basic workspace and user info
-    const [teamResponse, userResponse] = await Promise.all([
-      fetch("https://slack.com/api/team.info", {
-        headers: {
-          "Authorization": `Bearer ${tokenData.access_token}`,
-          "Content-Type": "application/json",
-        },
-      }),
-      fetch("https://slack.com/api/users.info", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${tokenData.access_token}`,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-          user: tokenData.authed_user.id,
+    // Fetch basic workspace and user info with error handling
+    let teamResponse: Response;
+    let userResponse: Response;
+    
+    try {
+      [teamResponse, userResponse] = await Promise.all([
+        fetch("https://slack.com/api/team.info", {
+          headers: {
+            "Authorization": `Bearer ${tokenData.access_token}`,
+            "Content-Type": "application/json",
+          },
         }),
-      }),
-    ]);
+        fetch("https://slack.com/api/users.info", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${tokenData.access_token}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            user: tokenData.authed_user.id,
+          }),
+        }),
+      ]);
+    } catch (fetchError) {
+      console.error("Network error during Slack API calls:", fetchError);
+      throw new Error(`Failed to connect to Slack API: ${fetchError instanceof Error ? fetchError.message : 'Unknown network error'}`);
+    }
 
-    const teamData = await teamResponse.json();
-    const userData = await userResponse.json();
+    // Validate HTTP responses
+    if (!teamResponse.ok) {
+      throw new Error(`Slack team.info API returned ${teamResponse.status} ${teamResponse.statusText} (${teamResponse.url})`);
+    }
+    
+    if (!userResponse.ok) {
+      throw new Error(`Slack users.info API returned ${userResponse.status} ${userResponse.statusText} (${userResponse.url})`);
+    }
+
+    let teamData: { ok: boolean; error?: string; team?: { id: string; name: string; domain?: string } };
+    let userData: { ok: boolean; error?: string; user?: { id: string; name: string; real_name?: string } };
+    
+    try {
+      [teamData, userData] = await Promise.all([
+        teamResponse.json(),
+        userResponse.json(),
+      ]);
+    } catch (parseError) {
+      console.error("Error parsing Slack API responses:", parseError);
+      throw new Error(`Failed to parse Slack API response: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`);
+    }
 
     if (!teamData.ok || !userData.ok) {
       throw new Error(
-        `Failed to fetch Slack data: team=${teamData.error}, user=${userData.error}`,
+        `Failed to fetch Slack data: team=${teamData.error || 'unknown error'}, user=${userData.error || 'unknown error'}`,
       );
+    }
+
+    // Validate that required data exists
+    if (!teamData.team) {
+      throw new Error("Slack team.info response missing team data");
+    }
+    
+    if (!userData.user) {
+      throw new Error("Slack users.info response missing user data");
     }
 
     // Fetch channels (limit to first 50 for display)
