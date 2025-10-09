@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { FigmaResponse } from "../client.ts";
+import type { FigmaImagesResponse, FigmaResponse } from "../utils/client.ts";
 
 export interface Props {
   /**
@@ -24,13 +24,25 @@ export default async function getFileImageSpecificNode(
   _req: Request,
   ctx: AppContext,
 ): Promise<
-  FigmaResponse<{
-    images: Record<string, string>;
-  }>
+  FigmaResponse<FigmaImagesResponse>
 > {
   const { fileKey, nodeIds } = props;
-  if (!ctx.figma) {
-    throw new Error("Figma client not found");
+  const response = await ctx.client["GET /v1/images/:fileKey"]({
+    fileKey,
+    ids: nodeIds.join(","),
+  });
+
+  if (!response.ok) {
+    return {
+      err: `HTTP ${response.status}: ${response.statusText}`,
+      status: response.status,
+    };
   }
-  return await ctx.figma.getImageFromNode(fileKey, nodeIds);
+
+  const data = await response.json();
+
+  return {
+    status: response.status,
+    data: data,
+  };
 }
