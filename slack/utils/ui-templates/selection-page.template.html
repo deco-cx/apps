@@ -476,13 +476,10 @@
           </div>
 
           <div class="channels-section">
-            <div class="channels-title">
-              Available Channels ({{CHANNELS_COUNT}})
-            </div>
+            <div class="channels-title">Available Channels (0)</div>
             <div class="channels-list" id="channels-list">
-              {{CHANNELS_LIST}}
+              <div class="no-channels">No channels available</div>
             </div>
-            {{MORE_CHANNELS_MESSAGE}}
           </div>
         </div>
 
@@ -507,7 +504,7 @@
 
     <script>
       const workspaceData = "{{WORKSPACE_DATA}}";
-      const channelsData = "{{CHANNELS_DATA}}";
+      const channelsData = "[]";
       const userData = "{{USER_DATA}}";
       const callbackUrl = "{{CALLBACK_URL}}";
 
@@ -516,15 +513,13 @@
         workspace = typeof workspaceData === "string"
           ? JSON.parse(workspaceData)
           : workspaceData;
-        channels = typeof channelsData === "string"
-          ? JSON.parse(channelsData)
-          : channelsData;
+        channels = [];
         user = typeof userData === "string"
           ? JSON.parse(userData)
           : userData;
       } catch (e) {
         workspace = workspaceData;
-        channels = channelsData;
+        channels = [];
         user = userData;
       }
 
@@ -545,11 +540,7 @@
             id: workspace.id,
             name: workspace.name,
           },
-          channels: channels.map((ch) => ({
-            id: ch.id,
-            name: ch.name,
-            is_private: ch.is_private,
-          })),
+          channels: [],
           user: {
             id: user.id,
             name: user.name,

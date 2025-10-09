@@ -23,13 +23,12 @@ export interface SlackUser {
 
 export interface SelectionPageOptions {
   workspace: SlackWorkspace;
-  channels: SlackChannel[];
   user: SlackUser;
   callbackUrl: string;
 }
 
 export function generateSelectionPage(
-  { workspace, channels, user, callbackUrl }: SelectionPageOptions,
+  { workspace, user, callbackUrl }: SelectionPageOptions,
 ): string {
   let htmlTemplate: string;
 
@@ -531,11 +530,10 @@ export function generateSelectionPage(
           </div>
 
           <div class="channels-section">
-            <div class="channels-title">Available Channels ({{CHANNELS_COUNT}})</div>
+            <div class="channels-title">Available Channels (0)</div>
             <div class="channels-list" id="channels-list">
-              {{CHANNELS_LIST}}
+              <div class="no-channels">No channels available</div>
             </div>
-            {{MORE_CHANNELS_MESSAGE}}
           </div>
         </div>
 
@@ -560,7 +558,7 @@ export function generateSelectionPage(
 
     <script>
       const workspaceData = {{WORKSPACE_DATA}};
-      const channelsData = {{CHANNELS_DATA}};
+      const channelsData = [];
       const userData = {{USER_DATA}};
       const callbackUrl = {{CALLBACK_URL}};
 
@@ -569,15 +567,13 @@ export function generateSelectionPage(
         workspace = typeof workspaceData === "string"
           ? JSON.parse(workspaceData)
           : workspaceData;
-        channels = typeof channelsData === "string"
-          ? JSON.parse(channelsData)
-          : channelsData;
+        channels = [];
         user = typeof userData === "string"
           ? JSON.parse(userData)
           : userData;
       } catch (e) {
         workspace = workspaceData;
-        channels = channelsData;
+        channels = [];
         user = userData;
       }
 
@@ -691,52 +687,22 @@ export function generateSelectionPage(
 `;
   } catch (error) {
     console.error("Failed to read HTML template:", error);
-    return generateFallbackPage({ workspace, channels, user, callbackUrl });
+    return generateFallbackPage({ workspace, user, callbackUrl });
   }
 
   const processedHtml = htmlTemplate
     .replace("{{WORKSPACE_DATA}}", JSON.stringify(workspace))
-    .replace("{{CHANNELS_DATA}}", JSON.stringify(channels))
     .replace("{{USER_DATA}}", JSON.stringify(user))
     .replace("{{CALLBACK_URL}}", JSON.stringify(callbackUrl))
     .replace("{{WORKSPACE_NAME}}", workspace.name)
     .replace("{{WORKSPACE_DOMAIN}}", workspace.domain || "")
-    .replace("{{USER_NAME}}", user.real_name || user.name)
-    .replace("{{CHANNELS_COUNT}}", channels.length.toString())
-    .replace("{{CHANNELS_LIST}}", generateChannelsList(channels))
-    .replace(
-      "{{MORE_CHANNELS_MESSAGE}}",
-      channels.length > 50
-        ? '<p class="no-channels">Showing first 50 channels. Configure access to see all.</p>'
-        : "",
-    );
+    .replace("{{USER_NAME}}", user.real_name || user.name);
 
   return processedHtml;
 }
 
-function generateChannelsList(channels: SlackChannel[]): string {
-  if (channels.length === 0) {
-    return '<div class="no-channels">No channels found</div>';
-  }
-
-  // Limit to first 50 channels for display
-  const displayChannels = channels.slice(0, 50);
-
-  return displayChannels.map((channel) => {
-    const channelType = channel.is_private ? "Private" : "Public";
-    const typeClass = channel.is_private ? "private" : "public";
-
-    return `
-      <div class="channel-item">
-        <div class="channel-name">#${channel.name}</div>
-        <div class="channel-type ${typeClass}">${channelType}</div>
-      </div>
-    `;
-  }).join("");
-}
-
 function generateFallbackPage(
-  { workspace, channels, user, callbackUrl }: SelectionPageOptions,
+  { workspace, user, callbackUrl }: SelectionPageOptions,
 ): string {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -791,7 +757,6 @@ function generateFallbackPage(
     <p>Template file not found. Using fallback interface.</p>
     <p>Connected to workspace: <strong>${workspace.name}</strong></p>
     <p>User: <strong>${user.real_name || user.name}</strong></p>
-    <p>Found ${channels.length} channels.</p>
     <div>
       <button class="btn btn-secondary" onclick="window.location.href='${callbackUrl}&continue=true'">
         Skip configuration
