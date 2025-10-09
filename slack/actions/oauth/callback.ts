@@ -114,7 +114,11 @@ export default async function callback(
         };
       }
 
-      if (savePermission && typeof savePermission === "string") {
+      // Check if savePermission is a confirming value (boolean true or string "true")
+      const isConfirmingSavePermission = savePermission === true ||
+        (typeof savePermission === "string" && savePermission === "true");
+
+      if (isConfirmingSavePermission) {
         return {
           installId: stateData.installId,
           name: `Slack | ${tokenData.team.name}`,
@@ -129,7 +133,6 @@ export default async function callback(
           id: tokenData.team.id,
           name: tokenData.team.name,
         },
-        channels: [],
         user: {
           id: tokenData.authed_user.id,
           name: tokenData.authed_user.id,
