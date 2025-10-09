@@ -2,7 +2,9 @@ import { Markdown } from "../decohub/components/Markdown.tsx";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
-import type { Secret } from "../website/loaders/secret.ts";
+import Secret, {
+  type Props as SecretProps,
+} from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { ResendApi } from "./utils/client.ts";
 import { type App, type AppContext as AC } from "@deco/deco";
@@ -12,7 +14,7 @@ export interface EmailFrom {
 }
 export interface Props {
   /**@title API KEY Resend  */
-  apiKey?: Secret;
+  apiKey?: SecretProps;
   /**
    * @title Sender Options | Default
    */
@@ -36,7 +38,7 @@ export interface State extends Props {
  * @description Send transactional or marketing emails with a reliable delivery API.
  * @logo https://assets.decocache.com/mcp/932e4c3a-6045-40af-9fd1-42894bdd138e/Resend.svg
  */
-export default function App({
+export default async function App({
   apiKey,
   emailFrom = {
     name: "Contact",
@@ -44,10 +46,9 @@ export default function App({
   },
   emailTo,
   subject = "Contato via app resend",
-}: State): App<Manifest, State> {
-  const apiKeyToken = typeof apiKey === "string"
-    ? apiKey
-    : apiKey?.get?.() ?? "";
+}: State): Promise<App<Manifest, State>> {
+  const processedApiKey = apiKey ? await Secret(apiKey) : null;
+  const apiKeyToken = processedApiKey?.get() ?? "";
   const apiWrite = createHttpClient<ResendApi>({
     base: "https://api.resend.com",
     fetcher: fetchSafe,
@@ -69,7 +70,7 @@ export default function App({
   };
   return app;
 }
-export type AppContext = AC<ReturnType<typeof App>>;
+export type AppContext = AC<App<Manifest, State>>;
 export const preview = async () => {
   const markdownContent = await Markdown(
     new URL("./README.md", import.meta.url).href,
