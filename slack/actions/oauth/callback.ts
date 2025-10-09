@@ -47,7 +47,8 @@ function decodeState(state: string): State & StateProvider {
  * @description Exchanges the authorization code for access tokens
  */
 export default async function callback(
-  { code, installId, clientId, clientSecret, redirectUri, state, queryParams }: Props,
+  { code, installId, clientId, clientSecret, redirectUri, state, queryParams }:
+    Props,
   req: Request,
   ctx: AppContext,
 ): Promise<{ installId: string; name: string } | Response> {
@@ -103,7 +104,8 @@ export default async function callback(
   if (state) {
     const stateData = decodeState(state);
     if (queryParams?.savePermission || queryParams?.continue) {
-      const { savePermission, continue: continueQueryParam } = queryParams || {};
+      const { savePermission, continue: continueQueryParam } = queryParams ||
+        {};
 
       if (continueQueryParam) {
         return {
