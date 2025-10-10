@@ -1,10 +1,6 @@
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import { SlackOAuthResponse } from "../../utils/client.ts";
-import {
-  decodeCustomBotState,
-  invalidateSession,
-  retrieveCustomBotSession,
-} from "../../utils/state-helpers.ts";
+import { generateSelectionPage } from "../../utils/ui-templates/page-generator.ts";
 
 export interface Props {
   code: string;
@@ -12,16 +8,37 @@ export interface Props {
   clientId: string;
   clientSecret: string;
   redirectUri: string;
-  /**
-   * @title Bot Name
-   * @description Custom bot identifier
-   */
-  botName?: string;
-  /**
-   * @title State
-   * @description OAuth state parameter
-   */
   state?: string;
+  queryParams?: Record<string, string | boolean | undefined>;
+}
+
+interface StateProvider {
+  original_state?: string;
+}
+
+interface State {
+  appName: string;
+  installId: string;
+  invokeApp: string;
+  returnUrl?: string | null;
+  redirectUri?: string | null;
+  original_state?: string;
+}
+
+function decodeState(state: string): State & StateProvider {
+  try {
+    const decoded = atob(decodeURIComponent(state));
+    const parsed = JSON.parse(decoded) as State & StateProvider;
+
+    if (parsed.original_state) {
+      return decodeState(parsed.original_state);
+    }
+
+    return parsed;
+  } catch (error) {
+    console.error("Error decoding state:", error);
+    return {} as State & StateProvider;
+  }
 }
 
 /**
@@ -30,56 +47,18 @@ export interface Props {
  * @description Exchanges the authorization code for access tokens
  */
 export default async function callback(
-  { code, installId, clientId, clientSecret, redirectUri, botName, state }:
+  { code, installId, clientId, clientSecret, redirectUri, state, queryParams }:
     Props,
   req: Request,
   ctx: AppContext,
-): Promise<
-  {
-    installId: string;
-    name: string;
-    botInfo?: { id: string; appId: string; name: string };
-  }
-> {
+): Promise<{ installId: string; name: string } | Response> {
   const finalRedirectUri = redirectUri ||
     new URL("/oauth/callback", req.url).href;
 
-  // SECURITY: Retrieve credentials using session token, never from state
-  const finalClientId = clientId;
-  let finalClientSecret = clientSecret;
-  let finalBotName = botName;
-  let finalDebugMode = false;
-
-  if (state) {
-    const stateData = decodeCustomBotState(state);
-
-    // Handle debugMode from state (for deco.chat bot)
-    if (stateData.debugMode) {
-      finalDebugMode = true;
-    }
-
-    if (stateData.isCustomBot && stateData.sessionToken) {
-      // Retrieve credentials securely using session token
-      const credentials = retrieveCustomBotSession(stateData.sessionToken);
-
-      if (credentials) {
-        finalClientSecret = credentials.clientSecret;
-        finalBotName = credentials.botName || stateData.customBotName ||
-          botName;
-        finalDebugMode = credentials.debugMode || false;
-
-        // Invalidate session token after successful retrieval
-        invalidateSession(stateData.sessionToken);
-      } else {
-        throw new Error("Invalid or expired session token in OAuth callback");
-      }
-    }
-  }
-
   const body = new URLSearchParams({
     code,
-    client_id: finalClientId,
-    client_secret: finalClientSecret,
+    client_id: clientId,
+    client_secret: clientSecret,
     redirect_uri: finalRedirectUri.replace("http://", "https://"),
   });
 
@@ -102,20 +81,18 @@ export default async function callback(
 
   // Get current configuration and update with new tokens
   const currentCtx = await ctx.getConfiguration();
-  const effectiveBotName = finalBotName ?? currentCtx?.customBotName ??
-    "deco.chat";
-
   await ctx.configure({
     ...currentCtx,
     botUserId: tokenData.bot_user_id,
     botToken: tokenData.access_token, // Bot token for API calls
     userToken: tokenData.authed_user.access_token, // User token if needed
     teamId: tokenData.team.id,
-    clientSecret: finalClientSecret,
-    clientId: finalClientId,
-    // Add custom bot info
-    customBotName: effectiveBotName,
-    debugMode: finalDebugMode,
+    clientSecret: clientSecret,
+    clientId: clientId,
+    permission: {
+      allCurrentAndFutureChannels: true,
+    },
+    account: tokenData.team.name,
     tokens: {
       access_token: tokenData.access_token,
       scope: tokenData.scope,
@@ -124,15 +101,52 @@ export default async function callback(
     },
   });
 
-  const displayName = `${effectiveBotName} | ${tokenData.team.name}`;
+  if (state) {
+    const stateData = decodeState(state);
+    if (queryParams?.savePermission || queryParams?.continue) {
+      const { savePermission, continue: continueQueryParam } = queryParams ||
+        {};
 
-  return {
-    installId,
-    name: displayName,
-    botInfo: {
-      id: tokenData.bot_user_id,
-      appId: tokenData.app_id,
-      name: effectiveBotName,
-    },
-  };
+      if (continueQueryParam) {
+        return {
+          installId: stateData.installId,
+          name: `Slack | ${tokenData.team.name}`,
+        };
+      }
+
+      // Check if savePermission is a confirming value (boolean true or string "true")
+      const isConfirmingSavePermission = savePermission === true ||
+        (typeof savePermission === "string" && savePermission === "true");
+
+      if (isConfirmingSavePermission) {
+        return {
+          installId: stateData.installId,
+          name: `Slack | ${tokenData.team.name}`,
+        };
+      }
+
+      const callbackUrl = new URL(req.url);
+      callbackUrl.searchParams.set("savePermission", "true");
+
+      const html = generateSelectionPage({
+        workspace: {
+          id: tokenData.team.id,
+          name: tokenData.team.name,
+        },
+        user: {
+          id: tokenData.authed_user.id,
+          name: tokenData.authed_user.id,
+        },
+        callbackUrl: callbackUrl.toString(),
+      });
+
+      return new Response(html, {
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+        },
+      });
+    }
+  }
+
+  return { installId, name: `Slack | ${tokenData.team.name}` };
 }
