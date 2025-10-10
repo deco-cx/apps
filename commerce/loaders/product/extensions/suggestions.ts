@@ -14,3 +14,5 @@ export default function ProductDetailsExt(
 ): Promise<Suggestion | null> {
   return extend(props);
 }
+
+export const cache = "no-cache";
