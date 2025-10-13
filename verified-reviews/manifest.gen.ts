@@ -2,19 +2,21 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/productDetailsPage.ts";
-import * as $$$1 from "./loaders/productList.ts";
-import * as $$$2 from "./loaders/productListingPage.ts";
-import * as $$$3 from "./loaders/productReviews.ts";
-import * as $$$4 from "./loaders/storeReview.ts";
+import * as $$$0 from "./loaders/fullReview.ts";
+import * as $$$1 from "./loaders/productDetailsPage.ts";
+import * as $$$2 from "./loaders/productList.ts";
+import * as $$$3 from "./loaders/productListingPage.ts";
+import * as $$$4 from "./loaders/productReviews.ts";
+import * as $$$5 from "./loaders/storeReview.ts";
 
 const manifest = {
   "loaders": {
-    "verified-reviews/loaders/productDetailsPage.ts": $$$0,
-    "verified-reviews/loaders/productList.ts": $$$1,
-    "verified-reviews/loaders/productListingPage.ts": $$$2,
-    "verified-reviews/loaders/productReviews.ts": $$$3,
-    "verified-reviews/loaders/storeReview.ts": $$$4,
+    "verified-reviews/loaders/fullReview.ts": $$$0,
+    "verified-reviews/loaders/productDetailsPage.ts": $$$1,
+    "verified-reviews/loaders/productList.ts": $$$2,
+    "verified-reviews/loaders/productListingPage.ts": $$$3,
+    "verified-reviews/loaders/productReviews.ts": $$$4,
+    "verified-reviews/loaders/storeReview.ts": $$$5,
   },
   "name": "verified-reviews",
   "baseUrl": import.meta.url,
