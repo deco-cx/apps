@@ -1,17 +1,7 @@
 import { JoinChannelProps, processStream } from "../../../../mcp/bindings.ts";
 import { DECO_CHAT_CHANNEL_ID } from "../../../loaders/deco-chat/channels/list.ts";
 import type { AppContext, SlackWebhookPayload } from "../../../mod.ts";
-
-// Tool call interfaces for proper typing
-interface ToolCall {
-  toolName: string;
-  toolCallId: string;
-  args: Record<string, unknown>;
-}
-
-interface ToolResult extends ToolCall {
-  result: unknown;
-}
+import type { UIDataTypes, UIMessagePart, UITools } from "npm:ai@5.0.70";
 
 /**
  * @name DECO_CHAT_CHANNELS_INVOKE
@@ -79,138 +69,154 @@ export default async function invoke(
     { ts: string; name: string; arguments: Record<string, unknown> }
   > = {};
   let buffer = "";
-  processStream({
-    streamProps: {
-      messages: [{
-        id: props.event_id,
-        content: props.event.text,
-        role: "user",
+
+  // Process the stream using the new async iterator API
+  processStream(streamURL.href, {
+    messages: [{
+      id: props.event_id,
+      parts: [{
+        type: "text",
+        text: props.event.text,
       }],
-      options: {
-        threadId: thread,
-        resourceId: thread,
-      },
-    },
-    onToolCallPart: async (toolCall: ToolCall) => {
-      // Only show tool calls in debug mode
-      if (!isDebugMode) {
-        return;
+      role: "user",
+    }],
+    threadId: thread,
+    resourceId: thread,
+  }).then(async (stream) => {
+    try {
+      for await (const uiMessage of stream) {
+        // Process each part in the UIMessage
+        for (const part of uiMessage.parts) {
+          switch (part.type) {
+            case "text":
+              // Accumulate text parts
+              buffer += part.text;
+              break;
+
+            default:
+              // Handle tool-call parts (type will be like "tool-weather")
+              if (part.type.startsWith("tool-")) {
+                const toolPart = part as UIMessagePart<UIDataTypes, UITools>;
+
+                // Check if it's a typed tool part with state
+                if ("state" in toolPart && "toolCallId" in toolPart) {
+                  if (toolPart.state === "input-available") {
+                    // Tool call with input available
+                    if (isDebugMode && "input" in toolPart) {
+                      const toolName = part.type.substring(5); // Remove "tool-" prefix
+                      const blocks = [
+                        {
+                          type: "section",
+                          text: {
+                            type: "mrkdwn",
+                            text: `🛠️ Running tool: *${toolName}*`,
+                          },
+                        },
+                        {
+                          type: "section",
+                          text: {
+                            type: "mrkdwn",
+                            text: "*Arguments:*",
+                          },
+                        },
+                        {
+                          type: "section",
+                          text: {
+                            type: "mrkdwn",
+                            text: "```" +
+                              JSON.stringify(toolPart.input, null, 2) + "```",
+                          },
+                        },
+                        {
+                          type: "context",
+                          elements: [
+                            {
+                              type: "mrkdwn",
+                              text: "_Status: Processing..._",
+                            },
+                          ],
+                        },
+                      ];
+                      const response = await client.postMessage(channel, "", {
+                        thread_ts: props.event.ts,
+                        blocks,
+                      });
+                      if (response.ok) {
+                        toolCallMessageTs[toolPart.toolCallId] = {
+                          ts: response.data.ts,
+                          name: toolName,
+                          arguments: toolPart.input as Record<string, unknown>,
+                        };
+                      }
+                    }
+                  } else if (toolPart.state === "output-available") {
+                    // Tool result available
+                    if (isDebugMode && "output" in toolPart) {
+                      const call = toolCallMessageTs[toolPart.toolCallId];
+                      if (call) {
+                        const blocks = [
+                          {
+                            type: "section",
+                            text: {
+                              type: "mrkdwn",
+                              text: `🛠️ Tool: *${call.name}*`,
+                            },
+                          },
+                          {
+                            type: "section",
+                            text: {
+                              type: "mrkdwn",
+                              text: "*Arguments:*",
+                            },
+                          },
+                          {
+                            type: "section",
+                            text: {
+                              type: "mrkdwn",
+                              text: "```" +
+                                JSON.stringify(call.arguments, null, 2) + "```",
+                            },
+                          },
+                          {
+                            type: "section",
+                            text: {
+                              type: "mrkdwn",
+                              text: "*Result:*",
+                            },
+                          },
+                          {
+                            type: "section",
+                            text: {
+                              type: "mrkdwn",
+                              text: "```" +
+                                JSON.stringify(toolPart.output, null, 2) +
+                                "```",
+                            },
+                          },
+                          {
+                            type: "context",
+                            elements: [
+                              {
+                                type: "mrkdwn",
+                                text: "✅ Result received.",
+                              },
+                            ],
+                          },
+                        ];
+                        await client.updateMessage(channel, call.ts, "", {
+                          blocks,
+                        });
+                      }
+                    }
+                  }
+                }
+              }
+              break;
+          }
+        }
       }
 
-      const blocks = [
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `🛠️ Running tool: *${toolCall.toolName}*`,
-          },
-        },
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: "*Arguments:*",
-          },
-        },
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: "```" + JSON.stringify(toolCall.args, null, 2) + "```",
-          },
-        },
-        {
-          type: "context",
-          elements: [
-            {
-              type: "mrkdwn",
-              text: "_Status: Processing..._",
-            },
-          ],
-        },
-      ];
-      const response = await client.postMessage(channel, "", {
-        thread_ts: props.event.ts,
-        blocks,
-      });
-      if (response.ok) {
-        toolCallMessageTs[toolCall.toolCallId] = {
-          ts: response.data.ts,
-          name: toolCall.toolName,
-          arguments: toolCall.args,
-        };
-      }
-    },
-    onToolResultPart: async (
-      toolCall: Omit<ToolResult, "args" | "toolName">,
-    ) => {
-      // Only show tool results in debug mode
-      if (!isDebugMode) {
-        return;
-      }
-
-      const call = toolCallMessageTs[toolCall.toolCallId];
-      if (call) {
-        const blocks = [
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: `🛠️ Tool: *${call.name}*`,
-            },
-          },
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: "*Arguments:*",
-            },
-          },
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: "```" + JSON.stringify(call.arguments, null, 2) + "```",
-            },
-          },
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: "*Result:*",
-            },
-          },
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: "```" + JSON.stringify(toolCall.result, null, 2) + "```",
-            },
-          },
-          {
-            type: "context",
-            elements: [
-              {
-                type: "mrkdwn",
-                text: "✅ Result received.",
-              },
-            ],
-          },
-        ];
-        await client.updateMessage(channel, call.ts, "", {
-          blocks,
-        });
-      }
-    },
-    onTextPart: (part: string) => {
-      buffer += part;
-    },
-    onErrorPart: async (err: string) => {
-      await client.postMessage(channel, `❌ Error: ${err}`, {
-        thread_ts: props.event.ts,
-      });
-    },
-    onFinishMessagePart: async () => {
+      // Send the final message after stream completes
       if (linkProps.agentLink && linkProps.agentName) {
         buffer = `<${linkProps.agentLink}|${linkProps.agentName}>: ${buffer}`;
       }
@@ -226,8 +232,13 @@ export default async function invoke(
           );
         }
       });
-    },
-  }, streamURL.href).catch((err) => {
-    console.error("error streaming to slack", err, linkProps, config, props);
+    } catch (err) {
+      console.error("error streaming to slack", err, linkProps, config, props);
+      await client.postMessage(channel, `❌ Error: ${err}`, {
+        thread_ts: props.event.ts,
+      });
+    }
+  }).catch((err) => {
+    console.error("error starting stream", err, linkProps, config, props);
   });
 }
