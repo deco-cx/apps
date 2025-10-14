@@ -30,7 +30,7 @@ export default async function invoke(
     await ctx.appStorage.getItem<JoinChannelProps & { installId: string }>(
       ctx.cb.forTeam(props.event.team, joinChannel),
     ) ??
-      undefined;
+    undefined;
   console.log("linkProps", joinChannel, channel, thread, linkProps);
   if (!linkProps) {
     return;
@@ -87,6 +87,7 @@ export default async function invoke(
       for await (const uiMessage of stream) {
         // Process each part in the UIMessage
         for (const part of uiMessage.parts) {
+          console.log("slack part", part);
           switch (part.type) {
             case "text":
               // Accumulate text parts
