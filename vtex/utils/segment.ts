@@ -114,7 +114,6 @@ const serialize = ({
   return btoa(JSON.stringify(seg));
 };
 
-
 export const parse = (cookie: string) => JSON.parse(atob(cookie));
 
 const SEGMENT_QUERY_PARAMS = [

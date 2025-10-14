@@ -63,7 +63,13 @@ export default async function action(
 
   const data: AuthResponse = await response.json();
   proxySetCookie(response.headers, ctx.response.headers, req.url);
-  await ctx.invoke.vtex.actions.session.validateSession();
+  const dataRefreshToken = await ctx.invoke.vtex.actions.authentication
+    .refreshToken();
+  await ctx.invoke.vtex.actions.session.validateSession({
+    publicProperties: {
+      refreshAfter: { value: dataRefreshToken.refreshAfter },
+    },
+  });
 
   // TODO: REMOVE THIS AFTER TESTING AND VALIDATE IF NEEDED REWRITE REFRESH_TOKEN_COOKIE
   const setCookies = getSetCookies(ctx.response.headers);

@@ -10,7 +10,7 @@ export type Props = PaginationOptions & {
 export default async function loader(
   props: Props,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<VerifiedReviewsFullReview> {
   try {
     const client = createClient({ ...ctx });

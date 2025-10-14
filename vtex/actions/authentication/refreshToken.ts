@@ -1,7 +1,6 @@
-import { deleteCookie, getCookies } from "std/http/cookie.ts";
+import { deleteCookie, getSetCookies, setCookie } from "std/http/cookie.ts";
 import { AppContext } from "../../mod.ts";
-import { REFRESH_TOKEN_COOKIE } from "../../utils/cookies.ts";
-import { proxySetCookie } from "../../utils/cookies.ts";
+import { buildCookieJar, REFRESH_TOKEN_COOKIE } from "../../utils/cookies.ts";
 
 interface Props {
   fingerprint?: string;
@@ -27,7 +26,11 @@ export default async function refreshToken(
 ) {
   const { fingerprint } = props;
   const { vcsDeprecated } = ctx;
-  const cookies = getCookies(req.headers);
+  const setCookiesSoFar = getSetCookies(ctx.response.headers);
+  const { cookies, header: cookie } = buildCookieJar(
+    req.headers,
+    setCookiesSoFar,
+  );
 
   if (!cookies[REFRESH_TOKEN_COOKIE]) {
     throw new Error("Refresh token cookie is missing");
@@ -39,7 +42,7 @@ export default async function refreshToken(
         fingerprint,
       },
       headers: {
-        cookie: req.headers.get("cookie") || "",
+        cookie,
       },
     });
 
@@ -58,7 +61,14 @@ export default async function refreshToken(
     });
   }
 
-  proxySetCookie(response.headers, ctx.response.headers, req.url);
+  const setCookies = getSetCookies(response.headers);
+  for (const cookie of setCookies) {
+    setCookie(ctx.response.headers, {
+      ...cookie,
+      path: cookie.name === REFRESH_TOKEN_COOKIE ? "/" : cookie.path,
+      domain: new URL(req.url).hostname,
+    });
+  }
 
   return data;
 }

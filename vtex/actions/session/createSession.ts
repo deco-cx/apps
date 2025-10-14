@@ -2,18 +2,18 @@ import { getSetCookies } from "std/http/cookie.ts";
 import type { AppContext } from "../../mod.ts";
 import { buildCookieJar, setCookiesFromSession } from "../../utils/cookies.ts";
 import type { GetSessionResponse } from "../../utils/openapi/vcs.openapi.gen.ts";
-import { items } from "../../utils/session.ts";
-
-interface Props {
-  publicProperties: Record<string, { value: string }>;
-}
+import { defaultItems } from "../../utils/session.ts";
+import { SessionProps } from "../../utils/types.ts";
 
 /**
  * @title Create Session
  * @description Create a new session
  */
 async function action(
-  props: Props,
+  {
+    publicProperties,
+    items,
+  }: SessionProps,
   req: Request,
   ctx: AppContext,
 ): Promise<GetSessionResponse> {
@@ -23,14 +23,14 @@ async function action(
 
   const url = new URL(req.url);
   const searchParams = new URLSearchParams(url.search);
-  searchParams.set("items", items.join(","));
+  searchParams.set("items", items?.join(",") || defaultItems);
 
   const response = await vcs["POST /api/sessions"](
     Object.fromEntries(searchParams.entries()),
     {
       body: {
         public: {
-          ...props.publicProperties,
+          ...publicProperties,
         },
       },
       headers: { cookie },
