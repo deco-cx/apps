@@ -86,10 +86,6 @@ export default async function invoke(
       let lastMessage;
       console.log("starting to iterate over stream");
 
-      // Try to get the async iterator explicitly
-      const iterator = stream[Symbol.asyncIterator]();
-      console.log("got iterator:", iterator);
-
       try {
         for await (const uiMessage of stream) {
           console.log("slack uiMessage", uiMessage);
