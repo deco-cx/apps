@@ -23,6 +23,7 @@ export default async function invoke(
   _req: Request,
   ctx: AppContext,
 ) {
+  console.log("slack webhook invoked", props);
   const challenge = props.challenge;
   if (challenge) {
     return { challenge };
@@ -40,12 +41,15 @@ export default async function invoke(
       ctx.cb.forTeam(props.event.team, joinChannel),
     ) ??
       undefined;
+  console.log("linkProps", joinChannel, channel, thread, linkProps);
   if (!linkProps) {
     return;
   }
 
   const config = await ctx.getConfiguration(linkProps.installId);
+  console.log("config", config);
   const botId = config.botUserId;
+  console.log("botId", botId);
   // avoid loops
   if (
     botId &&
@@ -54,6 +58,7 @@ export default async function invoke(
       (props.event.channel_type === "im" &&
         props.event.user === botId))
   ) {
+    console.log("botId is the same as the user, returning");
     return;
   }
   const client = ctx.slackClientFor(config);
