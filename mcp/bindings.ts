@@ -99,6 +99,9 @@ export const processStream = async <
       : undefined,
   });
 
+  console.log("processStream response status:", response.status);
+  console.log("processStream response headers:", response.headers);
+
   if (!response.body) {
     throw new Error("Stream body is null");
   }
@@ -108,7 +111,22 @@ export const processStream = async <
   const parser = new ChatStreamParser();
   const chunkStream = parser.parseStream(response.body);
 
+  console.log("chunkStream created, type:", typeof chunkStream);
+
   // Read UIMessages from the parsed chunk stream
   // https://ai-sdk.dev/docs/ai-sdk-ui/reading-ui-message-streams
-  return readUIMessageStream({ stream: chunkStream });
+  const uiMessageStream = readUIMessageStream({
+    stream: chunkStream,
+    onError: (error) => {
+      console.error("readUIMessageStream error:", error);
+    },
+  });
+
+  console.log("uiMessageStream created, type:", typeof uiMessageStream);
+  console.log(
+    "uiMessageStream has Symbol.asyncIterator:",
+    Symbol.asyncIterator in uiMessageStream,
+  );
+
+  return uiMessageStream;
 };
