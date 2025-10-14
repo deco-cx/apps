@@ -22,6 +22,8 @@ export const defaultItems = [
   "profile.isAuthenticated",
   "profile.lastName",
   "profile.phone",
+  "priceTables",
+  "profilePriceTables",
   "profile.priceTables",
   "profile.profilePriceTables",
   "shopper.firstName",
