@@ -13,7 +13,6 @@ export default async function invoke(
   _req: Request,
   ctx: AppContext,
 ) {
-  console.log("slack webhook invoked", props);
   const challenge = props.challenge;
   if (challenge) {
     return { challenge };
@@ -31,15 +30,12 @@ export default async function invoke(
       ctx.cb.forTeam(props.event.team, joinChannel),
     ) ??
       undefined;
-  console.log("linkProps", joinChannel, channel, thread, linkProps);
   if (!linkProps) {
     return;
   }
 
   const config = await ctx.getConfiguration(linkProps.installId);
-  console.log("config", config);
   const botId = config.botUserId;
-  console.log("botId", botId);
   // avoid loops
   if (
     botId &&
@@ -48,7 +44,6 @@ export default async function invoke(
       (props.event.channel_type === "im" &&
         props.event.user === botId))
   ) {
-    console.log("botId is the same as the user, returning");
     return;
   }
   const client = ctx.slackClientFor(config);
@@ -84,13 +79,18 @@ export default async function invoke(
     resourceId: thread,
   }).then(async (stream) => {
     try {
+      let lastMessage;
       for await (const uiMessage of stream) {
-        // Process each part in the UIMessage
+        console.log("slack uiMessage", uiMessage);
+        lastMessage = uiMessage;
+
+        // Process each part in the UIMessage for real-time tool updates
         for (const part of uiMessage.parts) {
+          console.log("slack part", part);
           switch (part.type) {
             case "text":
-              // Accumulate text parts
-              buffer += part.text;
+              // Text is already accumulated in each UIMessage, so we just update the buffer
+              // We'll use the final message's text after the stream completes
               break;
 
             default:
@@ -215,6 +215,20 @@ export default async function invoke(
           }
         }
       }
+
+      // Extract text from the final message
+      console.log("lastMessage:", lastMessage);
+      if (lastMessage) {
+        console.log("lastMessage.parts:", lastMessage.parts);
+        for (const part of lastMessage.parts) {
+          console.log("final part type:", part.type, "part:", part);
+          if (part.type === "text") {
+            console.log("adding text to buffer:", part.text);
+            buffer += part.text;
+          }
+        }
+      }
+      console.log("final buffer:", buffer);
 
       // Send the final message after stream completes
       if (linkProps.agentLink && linkProps.agentName) {
