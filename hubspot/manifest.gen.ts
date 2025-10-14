@@ -3,41 +3,43 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$$$$0 from "./actions/automation/enrollInWorkflow.ts";
-import * as $$$$$$$$$1 from "./actions/conversations/sendThreadComment.ts";
-import * as $$$$$$$$$2 from "./actions/conversations/sendThreadMessage.ts";
-import * as $$$$$$$$$3 from "./actions/crm/addSchemaProperty.ts";
-import * as $$$$$$$$$4 from "./actions/crm/addToList.ts";
-import * as $$$$$$$$$5 from "./actions/crm/batchCreateContacts.ts";
-import * as $$$$$$$$$6 from "./actions/crm/createAssociation.ts";
-import * as $$$$$$$$$7 from "./actions/crm/createCall.ts";
-import * as $$$$$$$$$8 from "./actions/crm/createCart.ts";
-import * as $$$$$$$$$9 from "./actions/crm/createCommunication.ts";
-import * as $$$$$$$$$10 from "./actions/crm/createCompany.ts";
-import * as $$$$$$$$$11 from "./actions/crm/createContact.ts";
-import * as $$$$$$$$$12 from "./actions/crm/createCustomObject.ts";
-import * as $$$$$$$$$13 from "./actions/crm/createDeal.ts";
-import * as $$$$$$$$$14 from "./actions/crm/createInvoice.ts";
-import * as $$$$$$$$$15 from "./actions/crm/createLead.ts";
-import * as $$$$$$$$$16 from "./actions/crm/createLineItem.ts";
-import * as $$$$$$$$$17 from "./actions/crm/createMeeting.ts";
-import * as $$$$$$$$$18 from "./actions/crm/createNote.ts";
-import * as $$$$$$$$$19 from "./actions/crm/createOrder.ts";
-import * as $$$$$$$$$20 from "./actions/crm/createProduct.ts";
-import * as $$$$$$$$$21 from "./actions/crm/createSchema.ts";
-import * as $$$$$$$$$22 from "./actions/crm/createTask.ts";
-import * as $$$$$$$$$23 from "./actions/crm/createTicket.ts";
-import * as $$$$$$$$$24 from "./actions/crm/deleteContact.ts";
-import * as $$$$$$$$$25 from "./actions/crm/updateContact.ts";
-import * as $$$$$$$$$26 from "./actions/crm/updateCustomObject.ts";
-import * as $$$$$$$$$27 from "./actions/crm/updateDeal.ts";
-import * as $$$$$$$$$28 from "./actions/events/sendCustomEvent.ts";
-import * as $$$$$$$$$29 from "./actions/files/uploadFile.ts";
-import * as $$$$$$$$$30 from "./actions/marketing/sendTransactionalEmail.ts";
-import * as $$$$$$$$$31 from "./actions/marketing/updateCommunicationPreferences.ts";
-import * as $$$$$$$$$32 from "./actions/oauth/refreshToken.ts";
-import * as $$$$$$$$$33 from "./actions/settings/createUser.ts";
-import * as $$$$$$$$$34 from "./actions/webhooks/createWebhook.ts";
-import * as $$$$$$$$$35 from "./actions/webhooks/deleteWebhook.ts";
+import * as $$$$$$$$$1 from "./actions/conversations/archiveThread.ts";
+import * as $$$$$$$$$2 from "./actions/conversations/sendThreadComment.ts";
+import * as $$$$$$$$$3 from "./actions/conversations/sendThreadMessage.ts";
+import * as $$$$$$$$$4 from "./actions/conversations/updateThread.ts";
+import * as $$$$$$$$$5 from "./actions/crm/addSchemaProperty.ts";
+import * as $$$$$$$$$6 from "./actions/crm/addToList.ts";
+import * as $$$$$$$$$7 from "./actions/crm/batchCreateContacts.ts";
+import * as $$$$$$$$$8 from "./actions/crm/createAssociation.ts";
+import * as $$$$$$$$$9 from "./actions/crm/createCall.ts";
+import * as $$$$$$$$$10 from "./actions/crm/createCart.ts";
+import * as $$$$$$$$$11 from "./actions/crm/createCommunication.ts";
+import * as $$$$$$$$$12 from "./actions/crm/createCompany.ts";
+import * as $$$$$$$$$13 from "./actions/crm/createContact.ts";
+import * as $$$$$$$$$14 from "./actions/crm/createCustomObject.ts";
+import * as $$$$$$$$$15 from "./actions/crm/createDeal.ts";
+import * as $$$$$$$$$16 from "./actions/crm/createInvoice.ts";
+import * as $$$$$$$$$17 from "./actions/crm/createLead.ts";
+import * as $$$$$$$$$18 from "./actions/crm/createLineItem.ts";
+import * as $$$$$$$$$19 from "./actions/crm/createMeeting.ts";
+import * as $$$$$$$$$20 from "./actions/crm/createNote.ts";
+import * as $$$$$$$$$21 from "./actions/crm/createOrder.ts";
+import * as $$$$$$$$$22 from "./actions/crm/createProduct.ts";
+import * as $$$$$$$$$23 from "./actions/crm/createSchema.ts";
+import * as $$$$$$$$$24 from "./actions/crm/createTask.ts";
+import * as $$$$$$$$$25 from "./actions/crm/createTicket.ts";
+import * as $$$$$$$$$26 from "./actions/crm/deleteContact.ts";
+import * as $$$$$$$$$27 from "./actions/crm/updateContact.ts";
+import * as $$$$$$$$$28 from "./actions/crm/updateCustomObject.ts";
+import * as $$$$$$$$$29 from "./actions/crm/updateDeal.ts";
+import * as $$$$$$$$$30 from "./actions/events/sendCustomEvent.ts";
+import * as $$$$$$$$$31 from "./actions/files/uploadFile.ts";
+import * as $$$$$$$$$32 from "./actions/marketing/sendTransactionalEmail.ts";
+import * as $$$$$$$$$33 from "./actions/marketing/updateCommunicationPreferences.ts";
+import * as $$$$$$$$$34 from "./actions/oauth/refreshToken.ts";
+import * as $$$$$$$$$35 from "./actions/settings/createUser.ts";
+import * as $$$$$$$$$36 from "./actions/webhooks/createWebhook.ts";
+import * as $$$$$$$$$37 from "./actions/webhooks/deleteWebhook.ts";
 import * as $$$0 from "./loaders/automation/getWorkflows.ts";
 import * as $$$1 from "./loaders/cms/getPages.ts";
 import * as $$$2 from "./loaders/conversations/getChannelAccounts.ts";
@@ -160,41 +162,43 @@ const manifest = {
   },
   "actions": {
     "hubspot/actions/automation/enrollInWorkflow.ts": $$$$$$$$$0,
-    "hubspot/actions/conversations/sendThreadComment.ts": $$$$$$$$$1,
-    "hubspot/actions/conversations/sendThreadMessage.ts": $$$$$$$$$2,
-    "hubspot/actions/crm/addSchemaProperty.ts": $$$$$$$$$3,
-    "hubspot/actions/crm/addToList.ts": $$$$$$$$$4,
-    "hubspot/actions/crm/batchCreateContacts.ts": $$$$$$$$$5,
-    "hubspot/actions/crm/createAssociation.ts": $$$$$$$$$6,
-    "hubspot/actions/crm/createCall.ts": $$$$$$$$$7,
-    "hubspot/actions/crm/createCart.ts": $$$$$$$$$8,
-    "hubspot/actions/crm/createCommunication.ts": $$$$$$$$$9,
-    "hubspot/actions/crm/createCompany.ts": $$$$$$$$$10,
-    "hubspot/actions/crm/createContact.ts": $$$$$$$$$11,
-    "hubspot/actions/crm/createCustomObject.ts": $$$$$$$$$12,
-    "hubspot/actions/crm/createDeal.ts": $$$$$$$$$13,
-    "hubspot/actions/crm/createInvoice.ts": $$$$$$$$$14,
-    "hubspot/actions/crm/createLead.ts": $$$$$$$$$15,
-    "hubspot/actions/crm/createLineItem.ts": $$$$$$$$$16,
-    "hubspot/actions/crm/createMeeting.ts": $$$$$$$$$17,
-    "hubspot/actions/crm/createNote.ts": $$$$$$$$$18,
-    "hubspot/actions/crm/createOrder.ts": $$$$$$$$$19,
-    "hubspot/actions/crm/createProduct.ts": $$$$$$$$$20,
-    "hubspot/actions/crm/createSchema.ts": $$$$$$$$$21,
-    "hubspot/actions/crm/createTask.ts": $$$$$$$$$22,
-    "hubspot/actions/crm/createTicket.ts": $$$$$$$$$23,
-    "hubspot/actions/crm/deleteContact.ts": $$$$$$$$$24,
-    "hubspot/actions/crm/updateContact.ts": $$$$$$$$$25,
-    "hubspot/actions/crm/updateCustomObject.ts": $$$$$$$$$26,
-    "hubspot/actions/crm/updateDeal.ts": $$$$$$$$$27,
-    "hubspot/actions/events/sendCustomEvent.ts": $$$$$$$$$28,
-    "hubspot/actions/files/uploadFile.ts": $$$$$$$$$29,
-    "hubspot/actions/marketing/sendTransactionalEmail.ts": $$$$$$$$$30,
-    "hubspot/actions/marketing/updateCommunicationPreferences.ts": $$$$$$$$$31,
-    "hubspot/actions/oauth/refreshToken.ts": $$$$$$$$$32,
-    "hubspot/actions/settings/createUser.ts": $$$$$$$$$33,
-    "hubspot/actions/webhooks/createWebhook.ts": $$$$$$$$$34,
-    "hubspot/actions/webhooks/deleteWebhook.ts": $$$$$$$$$35,
+    "hubspot/actions/conversations/archiveThread.ts": $$$$$$$$$1,
+    "hubspot/actions/conversations/sendThreadComment.ts": $$$$$$$$$2,
+    "hubspot/actions/conversations/sendThreadMessage.ts": $$$$$$$$$3,
+    "hubspot/actions/conversations/updateThread.ts": $$$$$$$$$4,
+    "hubspot/actions/crm/addSchemaProperty.ts": $$$$$$$$$5,
+    "hubspot/actions/crm/addToList.ts": $$$$$$$$$6,
+    "hubspot/actions/crm/batchCreateContacts.ts": $$$$$$$$$7,
+    "hubspot/actions/crm/createAssociation.ts": $$$$$$$$$8,
+    "hubspot/actions/crm/createCall.ts": $$$$$$$$$9,
+    "hubspot/actions/crm/createCart.ts": $$$$$$$$$10,
+    "hubspot/actions/crm/createCommunication.ts": $$$$$$$$$11,
+    "hubspot/actions/crm/createCompany.ts": $$$$$$$$$12,
+    "hubspot/actions/crm/createContact.ts": $$$$$$$$$13,
+    "hubspot/actions/crm/createCustomObject.ts": $$$$$$$$$14,
+    "hubspot/actions/crm/createDeal.ts": $$$$$$$$$15,
+    "hubspot/actions/crm/createInvoice.ts": $$$$$$$$$16,
+    "hubspot/actions/crm/createLead.ts": $$$$$$$$$17,
+    "hubspot/actions/crm/createLineItem.ts": $$$$$$$$$18,
+    "hubspot/actions/crm/createMeeting.ts": $$$$$$$$$19,
+    "hubspot/actions/crm/createNote.ts": $$$$$$$$$20,
+    "hubspot/actions/crm/createOrder.ts": $$$$$$$$$21,
+    "hubspot/actions/crm/createProduct.ts": $$$$$$$$$22,
+    "hubspot/actions/crm/createSchema.ts": $$$$$$$$$23,
+    "hubspot/actions/crm/createTask.ts": $$$$$$$$$24,
+    "hubspot/actions/crm/createTicket.ts": $$$$$$$$$25,
+    "hubspot/actions/crm/deleteContact.ts": $$$$$$$$$26,
+    "hubspot/actions/crm/updateContact.ts": $$$$$$$$$27,
+    "hubspot/actions/crm/updateCustomObject.ts": $$$$$$$$$28,
+    "hubspot/actions/crm/updateDeal.ts": $$$$$$$$$29,
+    "hubspot/actions/events/sendCustomEvent.ts": $$$$$$$$$30,
+    "hubspot/actions/files/uploadFile.ts": $$$$$$$$$31,
+    "hubspot/actions/marketing/sendTransactionalEmail.ts": $$$$$$$$$32,
+    "hubspot/actions/marketing/updateCommunicationPreferences.ts": $$$$$$$$$33,
+    "hubspot/actions/oauth/refreshToken.ts": $$$$$$$$$34,
+    "hubspot/actions/settings/createUser.ts": $$$$$$$$$35,
+    "hubspot/actions/webhooks/createWebhook.ts": $$$$$$$$$36,
+    "hubspot/actions/webhooks/deleteWebhook.ts": $$$$$$$$$37,
   },
   "name": "hubspot",
   "baseUrl": import.meta.url,
