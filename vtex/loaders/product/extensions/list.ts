@@ -23,4 +23,3 @@ async (products: Product[] | null) =>
 export const cache = "no-cache";
 
 export default loader;
-

@@ -1,4 +1,4 @@
-export const items = [
+export const defaultItems = [
   "account.id",
   "account.accountName",
   "store.channel",
@@ -22,6 +22,8 @@ export const items = [
   "profile.isAuthenticated",
   "profile.lastName",
   "profile.phone",
+  "profile.priceTables",
+  "profile.profilePriceTables",
   "shopper.firstName",
   "shopper.lastName",
   "checkout.regionId",
@@ -33,4 +35,5 @@ export const items = [
   "public.utmi_p",
   "public.utmi_pc",
   "public.postalCode",
-];
+  "public.refreshAfter",
+].join(",");

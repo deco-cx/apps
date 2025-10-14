@@ -1,9 +1,10 @@
 import { getCookies } from "std/http/cookie.ts";
 import type { AppContext } from "../../mod.ts";
 import { GetSessionResponse } from "../../utils/openapi/vcs.openapi.gen.ts";
+import { SessionProps } from "../../utils/types.ts";
 
 export default async function action(
-  _props: unknown,
+  props: SessionProps,
   req: Request,
   ctx: AppContext,
 ): Promise<GetSessionResponse> {
@@ -12,6 +13,6 @@ export default async function action(
     ? ctx.invoke.vtex.actions.session.editSession
     : ctx.invoke.vtex.actions.session.createSession;
 
-  const response = await sessionAction();
+  const response = await sessionAction(props);
   return response;
 }
