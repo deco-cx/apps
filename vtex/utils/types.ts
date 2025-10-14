@@ -1650,43 +1650,6 @@ export interface LoginSessionsInfo {
   loginSessions?: Maybe<LoginSession[]>;
 }
 
-export interface Session {
-  id: string;
-  namespaces?: {
-    profile: SessionProfile;
-    impersonate: SessionImpersonate;
-    authentication: Record<string, string>;
-    public: SessionPublic;
-  };
-}
-
-export interface SessionProfile {
-  id?: { value: string };
-  email?: { value: string };
-  firstName?: { value: string };
-  lastName?: { value: string };
-  phone?: { value: string };
-  isAuthenticated?: { value: string };
-  priceTables?: { value: string };
-}
-
-export interface SessionImpersonate {
-  storeUserEmail?: { value: string };
-  storeUserId?: { value: string };
-}
-
-export interface SessionPublic {
-  orderFormId?: { value: string };
-  utm_source?: { value: string };
-  utm_medium?: { value: string };
-  utm_campaign?: { value: string };
-  utm_term?: { value: string };
-  utm_content?: { value: string };
-  utmi_cp?: { value: string };
-  utmi_pc?: { value: string };
-  utmi_p?: { value: string };
-}
-
 export interface ProfileCustomField {
   key?: Maybe<string>;
   value?: Maybe<string>;
@@ -1896,4 +1859,408 @@ export interface SessionProps {
    * If you wish to recover the data sent on Create new session, it should be public.{key}, replacing {key} with the name of the custom property you created. Following the example request presented in Create new session, it would be public.variable1,public.variable2.
    */
   items: string[];
+}
+
+export interface Session {
+  /**
+   * Session ID.
+   */
+  id?: string;
+  /**
+   * Object with namespaces, each containing a set of information about the session.
+   */
+  namespaces?: {
+    /**
+     * Account information related to the session.
+     */
+    account?: {
+      /**
+       * VTEX account ID.
+       */
+      id?: {
+        /**
+         * Value of the VTEX account ID.
+         */
+        value?: string;
+        /**
+         * Determines whether or not the connection should be kept alive.
+         */
+        keepAlive?: boolean;
+      };
+      /**
+       * VTEX account name.
+       */
+      accountName?: {
+        /**
+         * Value of the VTEX account name.
+         */
+        value?: string;
+      };
+    };
+    /**
+     * Store information related to the session.
+     */
+    store?: {
+      /**
+       * [Trade policy](https://help.vtex.com/en/tutorial/how-trade-policies-work--6Xef8PZiFm40kg2STrMkMV) ID.
+       */
+      channel?: {
+        /**
+         * Value of the [Trade policy](https://help.vtex.com/en/tutorial/how-trade-policies-work--6Xef8PZiFm40kg2STrMkMV) ID.
+         */
+        value?: string;
+      };
+      /**
+       * Country code.
+       */
+      countryCode?: {
+        /**
+         * Value of the country code.
+         */
+        value?: string;
+      };
+      /**
+       * Locale that provides culture-specific information, such as the language, sublanguage, country/region, calendar, and conventions associated with a particular culture. Read [this documentation](https://learn.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo?view=net-7.0#culture-names-and-identifiers) for more details.
+       */
+      cultureInfo?: {
+        /**
+         * Value of the `cultureInfo` property.
+         */
+        value?: string;
+      };
+      /**
+       * Currency code.
+       */
+      currencyCode?: {
+        /**
+         * Value of the currency code.
+         */
+        value?: string;
+      };
+      /**
+       * Currency symbol.
+       */
+      currencySymbol?: {
+        /**
+         * Value of the currency symbol.
+         */
+        value?: string;
+      };
+      /**
+       * Defines whether or not the channel is private.
+       */
+      channelPrivacy?: {
+        /**
+         * Value containing the channel's privacy option.
+         */
+        value?: string;
+      };
+      /**
+       * Admin culture info.
+       */
+      admin_cultureInfo?: {
+        /**
+         * Value of the admin culture info.
+         */
+        value?: string;
+      };
+      /**
+       * Custom store properties.
+       */
+      [k: string]: {
+        /**
+         * Value of the custom store property.
+         */
+        value?: string;
+      } | undefined;
+    };
+    /**
+     * Public and editable information related to the session.
+     * All properties in this namespace are custom and dynamic.
+     */
+    public?: {
+      /**
+       * Custom public properties.
+       */
+      [k: string]: {
+        /**
+         * Value of the custom property.
+         */
+        value?: string;
+      };
+    };
+    /**
+     * Cookie information related to the session.
+     */
+    cookie?: {
+      /**
+       * Custom cookie properties.
+       */
+      [k: string]: {
+        /**
+         * Value of the cookie.
+         */
+        value?: string;
+      };
+    };
+    /**
+     * Checkout information related to the session.
+     */
+    checkout?: {
+      /**
+       * ID of the session's region.
+       */
+      regionId?: {
+        /**
+         * Value of the Region ID.
+         */
+        value?: string;
+      };
+      /**
+       * Order form ID associated with the session.
+       */
+      orderFormId?: {
+        /**
+         * Value of the order form ID.
+         */
+        value?: string;
+      };
+      /**
+       * Custom checkout properties.
+       */
+      [k: string]: {
+        /**
+         * Value of the custom checkout property.
+         */
+        value?: string;
+      } | undefined;
+    };
+    /**
+     * Profile information related to the session.
+     */
+    profile?: {
+      /**
+       * Whether the user is authenticated.
+       */
+      isAuthenticated?: {
+        /**
+         * Value indicating authentication status.
+         */
+        value?: string;
+      };
+      /**
+       * Profile ID.
+       */
+      id?: {
+        /**
+         * Value of the profile ID.
+         */
+        value?: string;
+      };
+      /**
+       * User's email address.
+       */
+      email?: {
+        /**
+         * Value of the email.
+         */
+        value?: string;
+      };
+      /**
+       * User's first name.
+       */
+      firstName?: {
+        /**
+         * Value of the first name.
+         */
+        value?: string;
+      };
+      /**
+       * User's last name.
+       */
+      lastName?: {
+        /**
+         * Value of the last name.
+         */
+        value?: string;
+      };
+      /**
+       * User's document number.
+       */
+      document?: {
+        /**
+         * Value of the document.
+         */
+        value?: string;
+      };
+      /**
+       * User's phone number.
+       */
+      phone?: {
+        /**
+         * Value of the phone number.
+         */
+        value?: string;
+      };
+      /**
+       * Price tables assigned to the user.
+       */
+      priceTables?: {
+        /**
+         * Comma-separated list of price table IDs.
+         */
+        value?: string;
+      };
+      /**
+       * Profile-specific price tables.
+       */
+      profilePriceTables?: {
+        /**
+         * Comma-separated list of profile price table IDs.
+         */
+        value?: string;
+      };
+      /**
+       * Custom profile properties.
+       */
+      [k: string]: {
+        /**
+         * Value of the custom profile property.
+         */
+        value?: string;
+      } | undefined;
+    };
+    /**
+     * Authentication information related to the session.
+     */
+    authentication?: {
+      /**
+       * Store user ID.
+       */
+      storeUserId?: {
+        /**
+         * Value of the store user ID.
+         */
+        value?: string;
+      };
+      /**
+       * Store user email.
+       */
+      storeUserEmail?: {
+        /**
+         * Value of the store user email.
+         */
+        value?: string;
+      };
+      /**
+       * Customer ID.
+       */
+      customerId?: {
+        /**
+         * Value of the customer ID.
+         */
+        value?: string;
+      };
+      /**
+       * Unit ID for B2B contexts.
+       */
+      unitId?: {
+        /**
+         * Value of the unit ID.
+         */
+        value?: string;
+      };
+      /**
+       * Unit name for B2B contexts.
+       */
+      unitName?: {
+        /**
+         * Value of the unit name.
+         */
+        value?: string;
+      };
+      /**
+       * Custom authentication properties.
+       */
+      [k: string]: {
+        /**
+         * Value of the custom authentication property.
+         */
+        value?: string;
+      } | undefined;
+    };
+    /**
+     * Credit control information.
+     */
+    creditControl?: {
+      /**
+       * Credit accounts information.
+       */
+      creditAccounts?: {
+        /**
+         * Value of credit accounts data.
+         */
+        value?: string;
+      };
+      /**
+       * Payment deadlines.
+       */
+      deadlines?: {
+        /**
+         * Value of deadlines configuration.
+         */
+        value?: string;
+      };
+      /**
+       * Minimum installment value.
+       */
+      minimumInstallmentValue?: {
+        /**
+         * Value of minimum installment.
+         */
+        value?: string;
+      };
+      /**
+       * Custom credit control properties.
+       */
+      [k: string]: {
+        /**
+         * Value of the custom credit control property.
+         */
+        value?: string;
+      } | undefined;
+    };
+    /**
+     * Shopper information.
+     */
+    shopper?: {
+      /**
+       * Shopper's first name.
+       */
+      firstName?: {
+        /**
+         * Value of the shopper's first name.
+         */
+        value?: string;
+      };
+      /**
+       * Shopper's last name.
+       */
+      lastName?: {
+        /**
+         * Value of the shopper's last name.
+         */
+        value?: string;
+      };
+      /**
+       * Custom shopper properties.
+       */
+      [k: string]: {
+        /**
+         * Value of the custom shopper property.
+         */
+        value?: string;
+      } | undefined;
+    };
+  };
 }
