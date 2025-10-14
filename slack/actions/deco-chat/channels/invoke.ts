@@ -78,88 +78,49 @@ export default async function invoke(
     threadId: thread,
     resourceId: thread,
   }).then(async (stream) => {
+    console.log("stream received in slack:", stream);
+    console.log("stream type:", typeof stream);
+    console.log("stream is async iterable:", Symbol.asyncIterator in stream);
+
     try {
       let lastMessage;
-      for await (const uiMessage of stream) {
-        console.log("slack uiMessage", uiMessage);
-        lastMessage = uiMessage;
+      console.log("starting to iterate over stream");
 
-        // Process each part in the UIMessage for real-time tool updates
-        for (const part of uiMessage.parts) {
-          console.log("slack part", part);
-          switch (part.type) {
-            case "text":
-              // Text is already accumulated in each UIMessage, so we just update the buffer
-              // We'll use the final message's text after the stream completes
-              break;
+      // Try to get the async iterator explicitly
+      const iterator = stream[Symbol.asyncIterator]();
+      console.log("got iterator:", iterator);
 
-            default:
-              // Handle tool-call parts (type will be like "tool-weather")
-              if (part.type.startsWith("tool-")) {
-                const toolPart = part as UIMessagePart<UIDataTypes, UITools>;
+      try {
+        for await (const uiMessage of stream) {
+          console.log("slack uiMessage", uiMessage);
+          lastMessage = uiMessage;
 
-                // Check if it's a typed tool part with state
-                if ("state" in toolPart && "toolCallId" in toolPart) {
-                  if (toolPart.state === "input-available") {
-                    // Tool call with input available
-                    if (isDebugMode && "input" in toolPart) {
-                      const toolName = part.type.substring(5); // Remove "tool-" prefix
-                      const blocks = [
-                        {
-                          type: "section",
-                          text: {
-                            type: "mrkdwn",
-                            text: `🛠️ Running tool: *${toolName}*`,
-                          },
-                        },
-                        {
-                          type: "section",
-                          text: {
-                            type: "mrkdwn",
-                            text: "*Arguments:*",
-                          },
-                        },
-                        {
-                          type: "section",
-                          text: {
-                            type: "mrkdwn",
-                            text: "```" +
-                              JSON.stringify(toolPart.input, null, 2) + "```",
-                          },
-                        },
-                        {
-                          type: "context",
-                          elements: [
-                            {
-                              type: "mrkdwn",
-                              text: "_Status: Processing..._",
-                            },
-                          ],
-                        },
-                      ];
-                      const response = await client.postMessage(channel, "", {
-                        thread_ts: props.event.ts,
-                        blocks,
-                      });
-                      if (response.ok) {
-                        toolCallMessageTs[toolPart.toolCallId] = {
-                          ts: response.data.ts,
-                          name: toolName,
-                          arguments: toolPart.input as Record<string, unknown>,
-                        };
-                      }
-                    }
-                  } else if (toolPart.state === "output-available") {
-                    // Tool result available
-                    if (isDebugMode && "output" in toolPart) {
-                      const call = toolCallMessageTs[toolPart.toolCallId];
-                      if (call) {
+          // Process each part in the UIMessage for real-time tool updates
+          for (const part of uiMessage.parts) {
+            console.log("slack part", part);
+            switch (part.type) {
+              case "text":
+                // Text is already accumulated in each UIMessage, so we just update the buffer
+                // We'll use the final message's text after the stream completes
+                break;
+
+              default:
+                // Handle tool-call parts (type will be like "tool-weather")
+                if (part.type.startsWith("tool-")) {
+                  const toolPart = part as UIMessagePart<UIDataTypes, UITools>;
+
+                  // Check if it's a typed tool part with state
+                  if ("state" in toolPart && "toolCallId" in toolPart) {
+                    if (toolPart.state === "input-available") {
+                      // Tool call with input available
+                      if (isDebugMode && "input" in toolPart) {
+                        const toolName = part.type.substring(5); // Remove "tool-" prefix
                         const blocks = [
                           {
                             type: "section",
                             text: {
                               type: "mrkdwn",
-                              text: `🛠️ Tool: *${call.name}*`,
+                              text: `🛠️ Running tool: *${toolName}*`,
                             },
                           },
                           {
@@ -174,23 +135,7 @@ export default async function invoke(
                             text: {
                               type: "mrkdwn",
                               text: "```" +
-                                JSON.stringify(call.arguments, null, 2) + "```",
-                            },
-                          },
-                          {
-                            type: "section",
-                            text: {
-                              type: "mrkdwn",
-                              text: "*Result:*",
-                            },
-                          },
-                          {
-                            type: "section",
-                            text: {
-                              type: "mrkdwn",
-                              text: "```" +
-                                JSON.stringify(toolPart.output, null, 2) +
-                                "```",
+                                JSON.stringify(toolPart.input, null, 2) + "```",
                             },
                           },
                           {
@@ -198,23 +143,99 @@ export default async function invoke(
                             elements: [
                               {
                                 type: "mrkdwn",
-                                text: "✅ Result received.",
+                                text: "_Status: Processing..._",
                               },
                             ],
                           },
                         ];
-                        await client.updateMessage(channel, call.ts, "", {
+                        const response = await client.postMessage(channel, "", {
+                          thread_ts: props.event.ts,
                           blocks,
                         });
+                        if (response.ok) {
+                          toolCallMessageTs[toolPart.toolCallId] = {
+                            ts: response.data.ts,
+                            name: toolName,
+                            arguments: toolPart.input as Record<
+                              string,
+                              unknown
+                            >,
+                          };
+                        }
+                      }
+                    } else if (toolPart.state === "output-available") {
+                      // Tool result available
+                      if (isDebugMode && "output" in toolPart) {
+                        const call = toolCallMessageTs[toolPart.toolCallId];
+                        if (call) {
+                          const blocks = [
+                            {
+                              type: "section",
+                              text: {
+                                type: "mrkdwn",
+                                text: `🛠️ Tool: *${call.name}*`,
+                              },
+                            },
+                            {
+                              type: "section",
+                              text: {
+                                type: "mrkdwn",
+                                text: "*Arguments:*",
+                              },
+                            },
+                            {
+                              type: "section",
+                              text: {
+                                type: "mrkdwn",
+                                text: "```" +
+                                  JSON.stringify(call.arguments, null, 2) +
+                                  "```",
+                              },
+                            },
+                            {
+                              type: "section",
+                              text: {
+                                type: "mrkdwn",
+                                text: "*Result:*",
+                              },
+                            },
+                            {
+                              type: "section",
+                              text: {
+                                type: "mrkdwn",
+                                text: "```" +
+                                  JSON.stringify(toolPart.output, null, 2) +
+                                  "```",
+                              },
+                            },
+                            {
+                              type: "context",
+                              elements: [
+                                {
+                                  type: "mrkdwn",
+                                  text: "✅ Result received.",
+                                },
+                              ],
+                            },
+                          ];
+                          await client.updateMessage(channel, call.ts, "", {
+                            blocks,
+                          });
+                        }
                       }
                     }
                   }
                 }
-              }
-              break;
+                break;
+            }
           }
         }
+      } catch (iterError) {
+        console.error("Error during stream iteration:", iterError);
+        throw iterError;
       }
+
+      console.log("finished iterating over stream");
 
       // Extract text from the final message
       console.log("lastMessage:", lastMessage);
