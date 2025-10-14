@@ -1,9 +1,8 @@
 import { getSetCookies } from "std/http/cookie.ts";
 import type { AppContext } from "../../mod.ts";
 import { buildCookieJar, setCookiesFromSession } from "../../utils/cookies.ts";
-import type { GetSessionResponse } from "../../utils/openapi/vcs.openapi.gen.ts";
 import { defaultItems } from "../../utils/session.ts";
-import { SessionProps } from "../../utils/types.ts";
+import { Session, SessionProps } from "../../utils/types.ts";
 
 /**
  * @title Edit Session
@@ -16,7 +15,7 @@ async function action(
   }: SessionProps,
   req: Request,
   ctx: AppContext,
-): Promise<GetSessionResponse> {
+): Promise<Session> {
   const { vcs } = ctx;
   const setCookiesSoFar = getSetCookies(ctx.response.headers);
   const { header: cookie } = buildCookieJar(req.headers, setCookiesSoFar);
@@ -47,7 +46,7 @@ async function action(
     ctx,
   });
 
-  return (await response.json()) as GetSessionResponse;
+  return (await response.json()) as Session;
 }
 
 export default action;
