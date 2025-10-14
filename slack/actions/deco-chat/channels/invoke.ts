@@ -85,6 +85,7 @@ export default async function invoke(
   }).then(async (stream) => {
     try {
       for await (const uiMessage of stream) {
+        console.log("uiMessage", uiMessage);
         // Process each part in the UIMessage
         for (const part of uiMessage.parts) {
           switch (part.type) {
