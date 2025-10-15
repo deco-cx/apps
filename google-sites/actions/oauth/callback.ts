@@ -1,5 +1,5 @@
-import { AppContext } from "../../mod.ts";
 import { whoami } from "../../../mcp/utils/google/whoami.ts";
+import { AppContext } from "../../mod.ts";
 
 interface OAuthCallbackResponse {
   access_token: string;
@@ -49,6 +49,8 @@ export default async function callback(
   client.oauth.tokens.scope = tokenData.scope;
   client.oauth.tokens.token_type = tokenData.token_type;
   client.oauth.tokens.tokenObtainedAt = currentTime;
+
+  console.log("🔑 Access Token:", tokenData.access_token);
 
   const currentCtx = await ctx.getConfiguration();
   await ctx.configure({

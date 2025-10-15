@@ -105,6 +105,7 @@ export interface GoogleSearchClient {
       query: string;
       pageSize?: number;
       start?: number;
+      corpus?: string;
       dataSourceRestrictions?: Array<{
         source: {
           name: string;

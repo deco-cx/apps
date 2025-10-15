@@ -1,8 +1,8 @@
-import { AppContext } from "../mod.ts";
-import type { SearchResult } from "../utils/types.ts";
-import { normalize, PT_STOP_WORDS } from "../utils/helpers.ts";
-import type { CloudSearchResponse } from "../utils/client.ts";
 import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.43/deno-dom-wasm.ts";
+import { AppContext } from "../mod.ts";
+import type { CloudSearchResponse } from "../utils/client.ts";
+import { normalize, PT_STOP_WORDS } from "../utils/helpers.ts";
+import type { SearchResult } from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -612,6 +612,51 @@ async function searchWithCloudSearch(
   }
 > {
   try {
+    // Primeiro, tentar com corpus (mais direto para sites específicos)
+    if (siteUrl) {
+      try {
+        const domain = new URL(siteUrl).hostname;
+        const corpusBody = {
+          query,
+          pageSize,
+          start,
+          corpus: `datasources/${domain}`,
+          requestOptions: {
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          },
+        };
+
+        console.log("🔍 Tentando busca com corpus:", corpusBody);
+
+        const corpusResponse = await ctx.cloudSearchClient["POST /v1/query/search"]("", {
+          body: corpusBody,
+        });
+
+        if (!("error" in corpusResponse)) {
+          console.log("✅ Sucesso com corpus!");
+          const results = formatCloudSearchResults(corpusResponse as CloudSearchResponse);
+          const total = (corpusResponse as CloudSearchResponse).searchInformation
+            ? parseInt(
+              (corpusResponse as CloudSearchResponse).searchInformation?.totalResults ||
+                "0",
+            )
+            : results.length;
+
+          return { results, total };
+        } else {
+          const err = corpusResponse.error as { code?: number; message?: string };
+          console.log("❌ Corpus falhou:", err.message);
+          // Se erro não for relacionado ao corpus/corpo de dados, não tentar searchApplicationId
+          if (err.code !== 403 && err.code !== 404) {
+            throw new Error(`Cloud Search API Error: ${err.message}`);
+          }
+        }
+      } catch (corpusError) {
+        console.log("❌ Erro ao tentar corpus:", corpusError);
+      }
+    }
+
+    // Fallback: tentar com searchApplicationId
     const body: {
       query: string;
       pageSize: number;
@@ -664,6 +709,8 @@ async function searchWithCloudSearch(
         },
       }];
     }
+
+    console.log("🔍 Tentando busca com searchApplicationId:", body);
 
     const response = await ctx.cloudSearchClient["POST /v1/query/search"]("", {
       body,
