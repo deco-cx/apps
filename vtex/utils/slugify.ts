@@ -2,8 +2,24 @@ const mapped = JSON.parse(
   `{"Á":"A","Ä":"A","Â":"A","À":"A","Ã":"A","Å":"A","Č":"C","Ç":"C","Ć":"C","Ď":"D","É":"E","Ě":"E","Ë":"E","È":"E","Ê":"E","Ẽ":"E","Ĕ":"E","Ȇ":"E","Í":"I","Ì":"I","Î":"I","Ï":"I","Ň":"N","Ñ":"N","Ó":"O","Ö":"O","Ò":"O","Ô":"O","Õ":"O","Ø":"O","Ř":"R","Ŕ":"R","Š":"S","Ť":"T","Ú":"U","Ů":"U","Ü":"U","Ù":"U","Û":"U","Ý":"Y","Ÿ":"Y","Ž":"Z","á":"a","ä":"a","â":"a","à":"a","ã":"a","å":"a","č":"c","ç":"c","ć":"c","ď":"d","é":"e","ě":"e","ë":"e","è":"e","ê":"e","ẽ":"e","ĕ":"e","ȇ":"e","í":"i","ì":"i","î":"i","ï":"i","ň":"n","ñ":"n","ó":"o","ö":"o","ò":"o","ô":"o","õ":"o","ø":"o","ð":"o","ř":"r","ŕ":"r","š":"s","ť":"t","ú":"u","ů":"u","ü":"u","ù":"u","û":"u","ý":"y","ÿ":"y","ž":"z","þ":"b","Þ":"B","Đ":"D","đ":"d","ß":"B","Æ":"A","a":"a"}`,
 );
 
-export const slugify = (str: string) =>
-  str
+export const slugify = (str: string) => {
+  // Check if this looks like a price range (e.g., "de-400-a-799.99")
+  const isPriceRange = /de-\d+([,.]?\d+)?-a-\d+([,.]?\d+)?/.test(str);
+  
+  if (isPriceRange) {
+    // For price ranges, preserve decimal points and only replace other special chars
+    return str
+      .replace(/,/g, "")
+      .replace(/[·/_:]/g, "-")  // Remove dot from this regex to preserve decimals
+      .replace(/[*+~()'"!:@&\[\]`/ %$#?{}|><=_^]/g, "-")  // Remove dot from this regex too
+      .split("")
+      .map((char) => mapped[char] ?? char)
+      .join("")
+      .toLowerCase();
+  }
+  
+  // Original behavior for non-price strings
+  return str
     .replace(/,/g, "")
     .replace(/[·/_,:]/g, "-")
     .replace(/[*+~.()'"!:@&\[\]`/ %$#?{}|><=_^]/g, "-")
@@ -11,3 +27,4 @@ export const slugify = (str: string) =>
     .map((char) => mapped[char] ?? char)
     .join("")
     .toLowerCase();
+};
