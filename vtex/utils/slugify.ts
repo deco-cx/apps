@@ -5,19 +5,19 @@ const mapped = JSON.parse(
 export const slugify = (str: string) => {
   // Check if this looks like a price range (e.g., "de-400-a-799.99")
   const isPriceRange = /de-\d+([,.]?\d+)?-a-\d+([,.]?\d+)?/.test(str);
-  
+
   if (isPriceRange) {
     // For price ranges, preserve decimal points and only replace other special chars
     return str
       .replace(/,/g, "")
-      .replace(/[·/_:]/g, "-")  // Remove dot from this regex to preserve decimals
-      .replace(/[*+~()'"!:@&\[\]`/ %$#?{}|><=_^]/g, "-")  // Remove dot from this regex too
+      .replace(/[·/_:]/g, "-") // Remove dot from this regex to preserve decimals
+      .replace(/[*+~()'"!:@&\[\]`/ %$#?{}|><=_^]/g, "-") // Remove dot from this regex too
       .split("")
       .map((char) => mapped[char] ?? char)
       .join("")
       .toLowerCase();
   }
-  
+
   // Original behavior for non-price strings
   return str
     .replace(/,/g, "")
