@@ -151,4 +151,3 @@ export default async function updateThread(
 
   return response;
 }
-

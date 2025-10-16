@@ -2,10 +2,10 @@ import { QueryCondition } from "./types.ts";
 
 /**
  * Builds a Google Drive API query string from an array of query conditions.
- * 
+ *
  * @param queries Array of query conditions
  * @returns Formatted query string for Google Drive API
- * 
+ *
  * @example
  * ```typescript
  * const queries = [
@@ -63,4 +63,3 @@ export function buildQueryString(queries: QueryCondition[]): string {
     return conditionStr;
   }).join(" ");
 }
-
