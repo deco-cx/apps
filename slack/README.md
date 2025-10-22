@@ -1,11 +1,12 @@
 # Slack OAuth App
 
-A Deco app for integrating with Slack using OAuth 2.0 authentication. This app allows you to send messages, interact with channels, and manage Slack workspaces through a secure OAuth flow with flexible bot configuration options.
+A Deco app for integrating with Slack using OAuth 2.0 authentication. This app allows you to send messages, interact with channels, and manage Slack workspaces through a secure OAuth flow with flexible bot configuration options, including **channel-specific bot routing**.
 
 ## Features
 
 - 🔐 **OAuth 2.0 Authentication** - Secure token-based authentication
 - 🤖 **Flexible Bot Configuration** - Choose between deco.chat bot or custom Slack apps
+- 🎯 **Channel-Specific Bot Routing** - Configure different bots for different channels independently
 - 💬 **Message Management** - Send messages and replies to channels
 - 📋 **Channel Operations** - List and interact with workspace channels
 - 👥 **User Management** - Get user information and profiles
@@ -13,6 +14,48 @@ A Deco app for integrating with Slack using OAuth 2.0 authentication. This app a
 - 📁 **File Upload V2** - Upload files using the new Slack API (files.upload sunset Nov 12, 2025)
 - 🔄 **Automatic Token Refresh** - Handles token expiration automatically
 - 🎨 **Custom Bot Selection UI** - Interactive interface for choosing integration type
+
+## Channel-Specific Bot Routing
+
+### Overview
+
+The app now supports **channel-specific bot routing**, allowing you to configure different bot personalities, names, and configurations for each channel independently. This enables:
+
+- 🎯 **Per-channel bot customization** - Different bot names and settings for each channel
+- 🏢 **Multi-team support** - Use different OAuth credentials for different channels
+- 🎨 **Brand consistency** - Customize bot appearance per channel or use case
+- 🔄 **Easy management** - Set, update, and remove channel configurations via API
+- 📊 **Configuration overview** - List and compare bot configurations across channels
+
+### How It Works
+
+The system uses a **routing architecture** where:
+
+1. **Default Bot Configuration**: A fallback configuration used for all channels without specific settings
+2. **Channel-Specific Configurations**: Custom bot settings that override the default for specific channels
+3. **Dynamic Resolution**: When performing actions, the system automatically selects the appropriate bot configuration for each channel
+
+### Configuration Structure
+
+Each bot configuration includes:
+
+```typescript
+interface ChannelBotConfig {
+  id: string;              // Unique identifier
+  channelId: string;       // Channel this applies to ("*" for default)
+  botName: string;         // Bot name (e.g., "support-bot", "sales-assistant")
+  displayName?: string;    // Display name shown to users
+  avatar?: string;         // Bot avatar URL or emoji
+  description?: string;    // Bot description
+  botToken?: string;       // Custom bot token (optional)
+  clientId?: string;       // Custom OAuth client ID (optional)
+  clientSecret?: string;   // Custom OAuth client secret (optional)
+  isActive: boolean;       // Whether this configuration is active
+  createdAt: string;       // Creation timestamp
+  updatedAt: string;       // Last update timestamp
+  metadata?: Record<string, unknown>; // Additional custom data
+}
+```
 
 ## Integration Options
 
@@ -150,6 +193,64 @@ SLACK_CLIENT_SECRET=your_slack_client_secret  # Optional: Default custom bot
 
 ## API Methods
 
+### Bot Configuration Management
+
+#### Set Channel Bot Configuration
+```typescript
+// Configure a bot for a specific channel
+await ctx.invoke("slack/actions/bot-routing/set-config", {
+  channelId: "C1234567890",
+  botName: "support-bot",
+  displayName: "Customer Support Assistant",
+  avatar: "🛠️",
+  description: "I help with customer support inquiries",
+  isActive: true,
+  forceUpdate: false // Set to true to override existing configuration
+});
+```
+
+#### Remove Channel Bot Configuration
+```typescript
+// Remove channel-specific configuration (reverts to default bot)
+await ctx.invoke("slack/actions/bot-routing/remove-config", {
+  channelId: "C1234567890"
+});
+```
+
+#### Update Default Bot Configuration
+```typescript
+// Update the default bot configuration
+await ctx.invoke("slack/actions/bot-routing/set-default", {
+  botName: "deco-assistant",
+  displayName: "Deco AI Assistant",
+  description: "Your friendly AI assistant"
+});
+```
+
+#### List Bot Configurations
+```typescript
+// List all bot configurations
+const configs = await ctx.invoke("slack/loaders/bot-routing/list", {
+  includeInactive: false // Set to true to include inactive configurations
+});
+```
+
+#### Get Channel Bot Configuration
+```typescript
+// Get the resolved bot configuration for a specific channel
+const channelConfig = await ctx.invoke("slack/loaders/bot-routing/get-config", {
+  channelId: "C1234567890"
+});
+```
+
+#### Compare Channel Configurations
+```typescript
+// Compare configurations across multiple channels
+const comparison = await ctx.invoke("slack/loaders/bot-routing/compare", {
+  channelIds: ["C1234567890", "C0987654321", "C1122334455"]
+});
+```
+
 ### Channels
 - `getChannels(teamId, limit?, cursor?)` - List workspace channels
 - `getChannelHistory(channelId, limit?)` - Get channel message history
@@ -205,9 +306,136 @@ The system supports multiple custom bots by:
 - Dynamic bot name resolution in channel operations
 - Preserving custom bot names across re-authentications
 
-## Migration from Bot Token
+## Channel Bot Routing Examples
 
-If you're migrating from the previous bot token approach:
+### Example 1: Customer Support vs Sales Channels
+
+```typescript
+// Configure a support bot for customer service channels
+await ctx.invoke("slack/actions/bot-routing/set-config", {
+  channelId: "C1234567890", // #customer-support
+  botName: "support-assistant",
+  displayName: "Support Assistant",
+  avatar: "🛠️",
+  description: "I help resolve customer issues and questions",
+});
+
+// Configure a sales bot for sales channels
+await ctx.invoke("slack/actions/bot-routing/set-config", {
+  channelId: "C0987654321", // #sales-team
+  botName: "sales-bot",
+  displayName: "Sales Assistant",
+  avatar: "💼",
+  description: "I help with sales inquiries and lead management",
+});
+```
+
+### Example 2: Multi-Organization Setup
+
+```typescript
+// Use different OAuth credentials for different client channels
+await ctx.invoke("slack/actions/bot-routing/set-config", {
+  channelId: "C1111111111", // #client-a-project
+  botName: "client-a-bot",
+  displayName: "Client A Assistant",
+  clientId: "client-a-slack-app-id",
+  clientSecret: "client-a-slack-app-secret",
+  botToken: "xoxb-client-a-token",
+});
+
+await ctx.invoke("slack/actions/bot-routing/set-config", {
+  channelId: "C2222222222", // #client-b-project
+  botName: "client-b-bot",
+  displayName: "Client B Assistant",
+  clientId: "client-b-slack-app-id",
+  clientSecret: "client-b-slack-app-secret",
+  botToken: "xoxb-client-b-token",
+});
+```
+
+### Example 3: Department-Specific Bots
+
+```typescript
+// Engineering team bot
+await ctx.invoke("slack/actions/bot-routing/set-config", {
+  channelId: "C3333333333", // #engineering
+  botName: "dev-bot",
+  displayName: "DevOps Assistant",
+  avatar: "⚙️",
+  description: "I help with development and deployment tasks",
+  metadata: {
+    department: "engineering",
+    specialization: "devops"
+  }
+});
+
+// Marketing team bot
+await ctx.invoke("slack/actions/bot-routing/set-config", {
+  channelId: "C4444444444", // #marketing
+  botName: "marketing-bot",
+  displayName: "Marketing Assistant",
+  avatar: "📈",
+  description: "I help with campaigns and analytics",
+  metadata: {
+    department: "marketing",
+    specialization: "campaigns"
+  }
+});
+```
+
+### Example 4: Automatic Bot Resolution
+
+When you send messages, the system automatically uses the correct bot configuration:
+
+```typescript
+// This will use the support-assistant bot configuration
+await ctx.invoke("slack/actions/messages/post", {
+  channelId: "C1234567890", // #customer-support
+  text: "Hello! How can I help you today?"
+});
+
+// This will use the sales-bot configuration
+await ctx.invoke("slack/actions/messages/post", {
+  channelId: "C0987654321", // #sales-team
+  text: "New lead available for review!"
+});
+
+// This will use the default bot configuration
+await ctx.invoke("slack/actions/messages/post", {
+  channelId: "C5555555555", // #general (no specific configuration)
+  text: "General announcement"
+});
+```
+
+## Migration from Single Bot Configuration
+
+If you're upgrading from a previous version that only supported a single bot configuration:
+
+If you're upgrading from a previous version that only supported a single bot configuration:
+
+1. **Automatic Migration**: Your existing configuration becomes the default bot configuration
+2. **Backward Compatibility**: All existing functionality continues to work unchanged
+3. **Gradual Adoption**: You can add channel-specific configurations incrementally
+4. **Legacy Support**: The `customBotName` prop is still supported and updates the default bot
+
+### Migration Steps
+
+1. **Current setup continues to work** - No immediate changes required
+2. **Review your current configuration**:
+   ```typescript
+   const configs = await ctx.invoke("slack/loaders/bot-routing/list");
+   console.log("Default bot:", configs.defaultBot);
+   ```
+3. **Add channel-specific configurations as needed**:
+   ```typescript
+   await ctx.invoke("slack/actions/bot-routing/set-config", {
+     channelId: "C1234567890",
+     botName: "specialized-bot",
+     // ... other configuration
+   });
+   ```
+
+## Migration from Bot Token
 
 1. The app maintains backward compatibility with `botToken` prop
 2. OAuth tokens take precedence over bot tokens when both are present
@@ -224,6 +452,39 @@ If you're migrating from the previous bot token approach:
 - 🔐 Client secrets are handled securely and never exposed in frontend
 
 ## Troubleshooting
+
+## Troubleshooting
+
+### Bot Routing Issues
+
+1. **Wrong bot responding in channel**:
+   ```typescript
+   // Check which bot configuration is resolved for a channel
+   const resolved = await ctx.invoke("slack/loaders/bot-routing/get-config", {
+     channelId: "C1234567890"
+   });
+   console.log("Resolved config:", resolved);
+   ```
+
+2. **Bot configuration not taking effect**:
+   - Verify the configuration is active: `isActive: true`
+   - Check for typos in the channel ID
+   - Ensure the bot has proper permissions in the channel
+
+3. **Default bot not working**:
+   ```typescript
+   // Check default bot configuration
+   const configs = await ctx.invoke("slack/loaders/bot-routing/list");
+   console.log("Default bot config:", configs.defaultBot);
+   ```
+
+4. **Multiple bots with same name**:
+   ```typescript
+   // Compare configurations across channels
+   const comparison = await ctx.invoke("slack/loaders/bot-routing/compare", {
+     channelIds: ["C1234567890", "C0987654321"]
+   });
+   ```
 
 ### Selection Interface Issues
 
@@ -252,21 +513,36 @@ Enable debug logging by checking the browser developer tools or server logs for 
 
 The app uses the MCP (Multi-Channel Platform) OAuth utilities for token management and HTTP client creation. The main components are:
 
-- `mod.ts` - Main app configuration with OAuth setup
+- `mod.ts` - Main app configuration with OAuth setup and bot routing
 - `client.ts` - Slack API client with OAuth support
+- `types/bot-routing.ts` - TypeScript interfaces for bot routing system
+- `utils/bot-router.ts` - Core bot routing logic and configuration management
 - `utils/constants.ts` - OAuth URLs and scopes
 - `utils/client.ts` - TypeScript interfaces for API endpoints
 - `utils/state-helpers.ts` - Secure session token management
 - `utils/ui-templates/page-generator.ts` - Clean bot selection interface generator
 - `loaders/oauth/start.ts` - OAuth initiation with bot selection logic
+- `loaders/bot-routing/` - Loaders for bot configuration management
 - `actions/oauth/callback.ts` - OAuth completion with custom bot support
+- `actions/bot-routing/` - Actions for managing channel-specific bot configurations
+
+### Key Architecture Changes
+
+1. **Bot Router System**: Central routing system that resolves bot configurations per channel
+2. **Dynamic Client Creation**: `slackClientForChannel()` method creates Slack clients with channel-specific configurations
+3. **Configuration Persistence**: Bot routing configurations are stored in the app's configuration state
+4. **Backward Compatibility**: Existing single-bot setups continue to work as default configurations
 
 ## Contributing
 
 When contributing to this app:
 
-1. Test both deco.chat bot and custom bot flows
-2. Ensure the selection interface works on both light and dark themes
-3. Verify mobile responsiveness of the selection page
-4. Test credential validation and error handling
-5. Maintain backward compatibility with existing bot token approach
+1. Test both single bot and multi-bot routing scenarios
+2. Test both deco.chat bot and custom bot flows
+3. Ensure bot routing works correctly for different channels
+4. Verify configuration persistence across app restarts
+5. Test the selection interface works on both light and dark themes
+6. Verify mobile responsiveness of the selection page
+7. Test credential validation and error handling
+8. Test bot configuration management actions and loaders
+9. Maintain backward compatibility with existing bot token approach

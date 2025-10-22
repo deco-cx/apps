@@ -38,5 +38,9 @@ export default async function postMessage(
   }>
 > {
   const { channelId, text, thread_ts, blocks } = props;
-  return await ctx.slack.postMessage(channelId, text, { thread_ts, blocks });
+  
+  // Use channel-specific Slack client to get the right bot configuration
+  const slackClient = ctx.slackClientForChannel(channelId);
+  
+  return await slackClient.postMessage(channelId, text, { thread_ts, blocks });
 }
