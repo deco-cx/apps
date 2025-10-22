@@ -32,18 +32,18 @@ export default function compareChannelBotConfigs(
   const { channelIds } = props;
   const { botRouter } = ctx;
 
-  const channels: ChannelComparisonResult[] = channelIds.map(channelId => ({
+  const channels: ChannelComparisonResult[] = channelIds.map((channelId) => ({
     channelId,
     resolvedConfig: botRouter.resolveForChannel(channelId),
   }));
 
   // Count unique configurations
   const uniqueConfigIds = new Set(
-    channels.map(ch => ch.resolvedConfig.config.id)
+    channels.map((ch) => ch.resolvedConfig.config.id),
   );
 
   // Check if all channels are using default configuration
-  const allUsingDefault = channels.every(ch => ch.resolvedConfig.isDefault);
+  const allUsingDefault = channels.every((ch) => ch.resolvedConfig.isDefault);
 
   return {
     channels,

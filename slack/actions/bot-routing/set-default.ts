@@ -6,37 +6,37 @@ export interface Props {
    * @description Default bot name
    */
   botName: string;
-  
+
   /**
    * @description Default bot display name (optional)
    */
   displayName?: string;
-  
+
   /**
    * @description Default bot avatar (optional)
    */
   avatar?: string;
-  
+
   /**
    * @description Default bot description (optional)
    */
   description?: string;
-  
+
   /**
    * @description Default bot token (optional)
    */
   botToken?: string;
-  
+
   /**
    * @description Default client ID for OAuth (optional)
    */
   clientId?: string;
-  
+
   /**
    * @description Default client secret for OAuth (optional)
    */
   clientSecret?: string;
-  
+
   /**
    * @description Additional metadata
    */
@@ -128,7 +128,9 @@ export default async function setDefaultBotConfig(
     console.error("Error setting default bot configuration:", error);
     return {
       success: false,
-      message: `Failed to set default bot configuration: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      message: `Failed to set default bot configuration: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`,
     };
   }
 }

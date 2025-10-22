@@ -54,13 +54,16 @@ export default async function removeChannelBotConfig(
 
     return {
       success: true,
-      message: `Bot configuration removed successfully for channel ${channelId}. Channel will now use the default bot.`,
+      message:
+        `Bot configuration removed successfully for channel ${channelId}. Channel will now use the default bot.`,
     };
   } catch (error) {
     console.error("Error removing bot configuration:", error);
     return {
       success: false,
-      message: `Failed to remove bot configuration: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      message: `Failed to remove bot configuration: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`,
     };
   }
 }

@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { BotConfigRequest } from "../../types/bot-routing.ts";
 import { validateBotConfig } from "../../utils/bot-router.ts";
 
 export interface Props {
@@ -7,47 +6,47 @@ export interface Props {
    * @description Channel ID where this bot will be used
    */
   channelId: string;
-  
+
   /**
    * @description Bot name
    */
   botName: string;
-  
+
   /**
    * @description Bot display name (optional)
    */
   displayName?: string;
-  
+
   /**
    * @description Bot avatar (optional)
    */
   avatar?: string;
-  
+
   /**
    * @description Bot description (optional)
    */
   description?: string;
-  
+
   /**
    * @description Custom bot token (optional)
    */
   botToken?: string;
-  
+
   /**
    * @description Client ID for OAuth (optional)
    */
   clientId?: string;
-  
+
   /**
    * @description Client secret for OAuth (optional)
    */
   clientSecret?: string;
-  
+
   /**
    * @description Whether bot should be active
    */
   isActive?: boolean;
-  
+
   /**
    * @description Additional metadata
    */
@@ -113,7 +112,8 @@ export default async function setChannelBotConfig(
   if (existingBot && !forceUpdate) {
     return {
       success: false,
-      message: `Bot configuration already exists for channel ${channelId}. Use forceUpdate=true to override.`,
+      message:
+        `Bot configuration already exists for channel ${channelId}. Use forceUpdate=true to override.`,
     };
   }
 
@@ -133,7 +133,9 @@ export default async function setChannelBotConfig(
       clientId,
       clientSecret,
       isActive,
-      createdAt: existingBot ? botRouter.getAllChannelBots()[channelId]?.createdAt || now : now,
+      createdAt: existingBot
+        ? botRouter.getAllChannelBots()[channelId]?.createdAt || now
+        : now,
       updatedAt: now,
       createdBy: undefined, // Could be extracted from request context
       metadata,
@@ -151,14 +153,18 @@ export default async function setChannelBotConfig(
 
     return {
       success: true,
-      message: `Bot configuration ${existingBot ? 'updated' : 'created'} successfully for channel ${channelId}`,
+      message: `Bot configuration ${
+        existingBot ? "updated" : "created"
+      } successfully for channel ${channelId}`,
       botId,
     };
   } catch (error) {
     console.error("Error setting bot configuration:", error);
     return {
       success: false,
-      message: `Failed to set bot configuration: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      message: `Failed to set bot configuration: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`,
     };
   }
 }

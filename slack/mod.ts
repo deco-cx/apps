@@ -143,8 +143,9 @@ export default function App(
   // Initialize bot routing configuration
   const teamId = appProps.teamId || "";
   const defaultBotName = appProps.customBotName || "deco.chat";
-  
-  const botRouting = appProps.botRouting || createDefaultBotRouting(teamId, defaultBotName);
+
+  const botRouting = appProps.botRouting ||
+    createDefaultBotRouting(teamId, defaultBotName);
   const botRouter = new BotRouter(botRouting);
 
   // Create OAuth client or fallback to direct token
@@ -190,7 +191,7 @@ export default function App(
   const slackClientForChannel = (channelId: string) => {
     const resolvedBot = botRouter.resolveForChannel(channelId);
     const config = resolvedBot.config;
-    
+
     // Create props for this specific bot configuration
     const channelProps: Props = {
       ...appProps,

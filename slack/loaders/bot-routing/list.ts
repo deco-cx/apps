@@ -6,7 +6,7 @@ export interface Props {
    * @description Filter by channel ID (optional)
    */
   channelId?: string;
-  
+
   /**
    * @description Include inactive configurations
    */
@@ -34,11 +34,15 @@ export default function listBotConfigurations(
   const { botRouter, teamId } = ctx;
 
   const defaultBot = botRouter.getDefaultBot();
-  let channelBots: ChannelBotConfig[] = Object.values(botRouter.getAllChannelBots());
+  let channelBots: ChannelBotConfig[] = Object.values(
+    botRouter.getAllChannelBots(),
+  );
 
   // Filter by channel if specified
   if (channelId) {
-    channelBots = channelBots.filter((bot: ChannelBotConfig) => bot.channelId === channelId);
+    channelBots = channelBots.filter((bot: ChannelBotConfig) =>
+      bot.channelId === channelId
+    );
   }
 
   // Filter out inactive bots unless requested

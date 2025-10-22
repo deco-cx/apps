@@ -1,4 +1,8 @@
-import { BotRoutingConfig, ChannelBotConfig, ResolvedBotConfig } from "../types/bot-routing.ts";
+import {
+  BotRoutingConfig,
+  ChannelBotConfig,
+  ResolvedBotConfig,
+} from "../types/bot-routing.ts";
 
 /**
  * @description Bot routing system that resolves which bot configuration to use for each channel
@@ -18,7 +22,7 @@ export class BotRouter {
   resolveForChannel(channelId: string): ResolvedBotConfig {
     // First, check if there's a specific configuration for this channel
     const channelBot = this.config.channelBots[channelId];
-    
+
     if (channelBot && channelBot.isActive) {
       return {
         config: channelBot,
@@ -89,8 +93,8 @@ export class BotRouter {
    */
   listAllConfigurations(): ChannelBotConfig[] {
     const configurations = [this.config.defaultBot];
-    
-    Object.values(this.config.channelBots).forEach(config => {
+
+    Object.values(this.config.channelBots).forEach((config) => {
       if (config.isActive) {
         configurations.push(config);
       }
@@ -136,7 +140,7 @@ export function createDefaultBotRouting(
   defaultBotName: string = "deco.chat",
 ): BotRoutingConfig {
   const now = new Date().toISOString();
-  
+
   return {
     teamId,
     defaultBot: {

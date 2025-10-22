@@ -29,9 +29,9 @@ export default async function replyToThread(
   SlackResponse<{ channel: string; ts: string; message: SlackMessage }>
 > {
   const { channelId, threadTs, text } = props;
-  
+
   // Use channel-specific Slack client to get the right bot configuration
   const slackClient = ctx.slackClientForChannel(channelId);
-  
+
   return await slackClient.postReply(channelId, threadTs, text);
 }
