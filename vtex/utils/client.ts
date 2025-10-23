@@ -171,7 +171,7 @@ export interface VTEXCommerceStable {
     };
   };
 
-  "GET /api/checkout/changeToAnonymousUser/:orderFormId": {
+  "GET /checkout/changeToAnonymousUser/:orderFormId": {
     response: OrderForm;
     searchParams: { sc?: string };
   };
