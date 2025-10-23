@@ -48,6 +48,7 @@ export default async function action(
 
   proxySetCookie(response.headers, ctx.response.headers, req.url);
 
+  await ctx.invoke.vtex.actions.cart.updateUser();
   await ctx.invoke.vtex.actions.session
     .validateSession();
 
