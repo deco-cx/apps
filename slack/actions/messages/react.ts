@@ -28,5 +28,9 @@ export default async function addReaction(
   ctx: AppContext,
 ): Promise<SlackResponse<{ channel: string; ts: string }>> {
   const { channelId, timestamp, reaction } = props;
-  return await ctx.slack.addReaction(channelId, timestamp, reaction);
+
+  // Use channel-specific Slack client to get the right bot configuration
+  const slackClient = ctx.slackClientForChannel(channelId);
+
+  return await slackClient.addReaction(channelId, timestamp, reaction);
 }
