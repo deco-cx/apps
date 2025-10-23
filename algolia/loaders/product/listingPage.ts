@@ -50,7 +50,6 @@ interface Props {
 
   /**
    * @description Index Name
-   * @default 0
    */
   indexName?:string
 }
