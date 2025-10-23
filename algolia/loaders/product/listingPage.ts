@@ -2,11 +2,7 @@ import { SearchResponse } from "npm:@algolia/client-search@5.0.0";
 import { Filter, ProductListingPage } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
 import { replaceHighlight } from "../../utils/highlight.ts";
-import {
-  IndexedProduct,
-  Indices,
-  resolveProducts,
-} from "../../utils/product.ts";
+import { IndexedProduct, Indices, resolveProducts } from "../../utils/product.ts";
 
 /** @titleBy label */
 interface Facet {
@@ -51,6 +47,12 @@ interface Props {
    * @default 0
    */
   startingPage?: 0 | 1;
+
+  /**
+   * @description Index Name
+   * @default 0
+   */
+  indexName?:string
 }
 
 const getPageInfo = (
@@ -59,7 +61,7 @@ const getPageInfo = (
   nbHits: number,
   hitsPerPage: number,
   url: URL,
-  startingPage: number,
+  startingPage: number
 ) => {
   const next = page + 1;
   const prev = page - 1;
@@ -88,14 +90,12 @@ const getPageInfo = (
 // Transforms facets and re-orders so they match what's configured on deco admin
 const transformFacets = (
   facets: Record<string, Record<string, number>>,
-  options: { order: Facet[]; facetFilters: [string, string[]][]; url: URL },
+  options: { order: Facet[]; facetFilters: [string, string[]][]; url: URL }
 ): Filter[] => {
   const { facetFilters, url, order } = options;
   const params = new URLSearchParams(url.searchParams);
   const filters = Object.fromEntries(facetFilters);
-  const orderByKey = new Map(
-    order.map(({ name, label }, index) => [name, { label, index }]),
-  );
+  const orderByKey = new Map(order.map(({ name, label }, index) => [name, { label, index }]));
   const entries = Object.entries(facets);
 
   const transformed: Filter[] = new Array(entries.length);
@@ -123,13 +123,13 @@ const transformFacets = (
         const selected = index > -1;
         const newFilter = selected
           ? {
-            ...filters,
-            [key]: [...filter].filter((f) => f !== value),
-          }
+              ...filters,
+              [key]: [...filter].filter((f) => f !== value),
+            }
           : {
-            ...filters,
-            [key]: [...filter, value],
-          };
+              ...filters,
+              [key]: [...filter, value],
+            };
 
         if (newFilter[key].length === 0) {
           delete newFilter[key];
@@ -167,20 +167,14 @@ const getIndex = (options: string | null): Indices => {
 /**
  * @title Algolia Integration
  */
-const loader = async (
-  props: Props,
-  req: Request,
-  ctx: AppContext,
-): Promise<ProductListingPage | null> => {
+const loader = async (props: Props, req: Request, ctx: AppContext): Promise<ProductListingPage | null> => {
   const url = new URL(req.url);
   const { client } = ctx;
-  const indexName = getIndex(url.searchParams.get("sort"));
+  const indexName = props?.indexName ?? getIndex(url.searchParams.get("sort"));
   const startingPage = props.startingPage ?? 0;
   const pageIndex = Number(url.searchParams.get("page")) || startingPage;
 
-  const facetFilters: [string, string[]][] = JSON.parse(
-    url.searchParams.get("facetFilters") ?? "[]",
-  );
+  const facetFilters: [string, string[]][] = JSON.parse(url.searchParams.get("facetFilters") ?? "[]");
 
   if (props.hideUnavailable) {
     facetFilters.push(["available", ["true"]]);
@@ -191,15 +185,14 @@ const loader = async (
   // different categories are split by an AND. e.g.:
   //
   // (department:"man" OR department:"woman") AND (brand:"deco") AND (available:"true")
-  const fFilters = facetFilters.map(([key, values]) =>
-    `(${values.map((value) => `${key}:"${value}"`).join(" OR ")})`
-  ).join(" AND ");
+  const fFilters = facetFilters
+    .map(([key, values]) => `(${values.map((value) => `${key}:"${value}"`).join(" OR ")})`)
+    .join(" AND ");
 
   const { results } = await client.search([
     {
       indexName,
-      query: props.term ?? url.searchParams.get("q") ??
-        url.searchParams.get("query") ?? "",
+      query: props.term ?? url.searchParams.get("q") ?? url.searchParams.get("query") ?? "",
       params: {
         filters: fFilters,
         facets: [],
@@ -210,39 +203,25 @@ const loader = async (
     },
     {
       indexName,
-      query: props.term ?? url.searchParams.get("q") ??
-        url.searchParams.get("query") ?? "",
+      query: props.term ?? url.searchParams.get("q") ?? url.searchParams.get("query") ?? "",
       params: {
         facetingAfterDistinct: true,
-        facets: (props.facets?.length || 0) > 0
-          ? props.facets?.map((f) => f.name)
-          : ["*"],
+        facets: (props.facets?.length || 0) > 0 ? props.facets?.map((f) => f.name) : ["*"],
         hitsPerPage: 0,
         sortFacetValuesBy: props.sortFacetValuesBy,
       },
     },
   ]);
 
-  const [
-    { hits, page = 0, nbPages = 1, queryID, nbHits = 12, hitsPerPage = 12 },
-    { facets },
-  ] = results as SearchResponse<IndexedProduct>[];
+  const [{ hits, page = 0, nbPages = 1, queryID, nbHits = 12, hitsPerPage = 12 }, { facets }] =
+    results as SearchResponse<IndexedProduct>[];
 
   const products = await resolveProducts(
-    hits.map(({ _highlightResult, ...p }) =>
-      replaceHighlight(p, props.highlight ? _highlightResult : {})
-    ),
+    hits.map(({ _highlightResult, ...p }) => replaceHighlight(p, props.highlight ? _highlightResult : {})),
     client,
-    { url, queryID, indexName },
+    { url, queryID, indexName }
   );
-  const pageInfo = getPageInfo(
-    page,
-    nbPages,
-    nbHits,
-    hitsPerPage,
-    url,
-    startingPage,
-  );
+  const pageInfo = getPageInfo(page, nbPages, nbHits, hitsPerPage, url, startingPage);
   const filters = transformFacets(facets ?? {}, {
     order: props.facets ?? [],
     facetFilters,
