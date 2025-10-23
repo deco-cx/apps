@@ -780,9 +780,13 @@ export const legacyFacetToFilter = (
     const map = hasToBeFullpath
       ? facet.Link.split("map=")[1].split(",")
       : [facet.Map];
-    const value = hasToBeFullpath
+    let value = hasToBeFullpath
       ? facet.Link.split("?")[0].slice(1).split("/")
       : [facet.Value];
+
+      if (hasToBeFullpath && value.some(v => /de-\d+-a-\d+-\d+/.test(v))) {
+      value = value.map(v => v.replace(/-(\d{2})$/, '.$1'));
+    }
 
     const pathSegmentsFiltered = hasProductClusterIds
       ? [pathSegments[mapSegments.indexOf("productClusterIds")]]
