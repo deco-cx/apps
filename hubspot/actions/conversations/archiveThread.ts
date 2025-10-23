@@ -26,4 +26,3 @@ export default async function archiveThread(
     `/conversations/v3/conversations/threads/${threadId}`,
   );
 }
-
