@@ -2,8 +2,9 @@ import { setCookie } from "std/http/mod.ts";
 import { AppContext } from "../mod.ts";
 import type { Segment } from "./types.ts";
 import { removeNonLatin1Chars } from "../../utils/normalize.ts";
+// import { parseCookie } from "./vtexId.ts";
 
-const SEGMENT_COOKIE_NAME = "vtex_segment";
+export const SEGMENT_COOKIE_NAME = "vtex_segment";
 const SALES_CHANNEL_COOKIE = "VTEXSC";
 const SEGMENT = Symbol("segment");
 
@@ -113,7 +114,7 @@ const serialize = ({
   return btoa(JSON.stringify(seg));
 };
 
-const parse = (cookie: string) => JSON.parse(atob(cookie));
+export const parse = (cookie: string) => JSON.parse(atob(cookie));
 
 const SEGMENT_QUERY_PARAMS = [
   "utmi_campaign" as const,
@@ -164,12 +165,12 @@ export const setSegmentBag = (
   ctx: AppContext,
 ) => {
   const vtex_segment = cookies[SEGMENT_COOKIE_NAME];
-  const segmentFromCookie = vtex_segment && parse(vtex_segment);
+  const segmentFromCookie = vtex_segment ? parse(vtex_segment) : null;
+
   const segmentFromSalesChannelCookie = cookies[SALES_CHANNEL_COOKIE]
-    ? {
-      channel: cookies[SALES_CHANNEL_COOKIE]?.split("=")[1],
-    }
+    ? { channel: cookies[SALES_CHANNEL_COOKIE]?.split("=")[1] }
     : {};
+
   const segmentFromRequest = buildSegmentFromRequest(req);
 
   const segment = {
@@ -180,10 +181,10 @@ export const setSegmentBag = (
     ...segmentFromSalesChannelCookie,
     ...segmentFromRequest,
   };
+
   const token = serialize(segment);
   setSegmentInBag(ctx, { payload: segment, token });
 
-  // If the user came from a sales channel in the URL, we set the cookie
   if (segmentFromRequest.channel) {
     setCookie(ctx.response.headers, {
       value: `sc=${segmentFromRequest.channel}`,
@@ -193,7 +194,6 @@ export const setSegmentBag = (
     });
   }
 
-  // Avoid setting cookie when segment from request matches the one generated
   if (vtex_segment !== token) {
     setCookie(ctx.response.headers, {
       value: token,
