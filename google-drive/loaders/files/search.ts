@@ -9,13 +9,15 @@ import {
   PAGE_TOKEN,
   Q,
 } from "../../utils/constant.ts";
+import { buildQueryString } from "../../utils/query.ts";
 import { FileList, SearchFilesParams } from "../../utils/types.ts";
 
 export interface Props extends SearchFilesParams {}
 
 /**
- * @title Search Files
- * @description Searches for files in Google Drive by name or content
+ * @title Search Files in Google Drive
+ * @description Searches for files and folders in Google Drive using structured query conditions.
+ * @see https://developers.google.com/drive/api/guides/search-files
  */
 export default async function searchFiles(
   props: Props,
@@ -23,25 +25,36 @@ export default async function searchFiles(
   ctx: AppContext,
 ): Promise<FileList> {
   const {
-    query,
+    queries,
     pageSize = DEFAULT_PAGE_SIZE,
     pageToken,
     fields = DEFAULT_FIELDS,
+    spaces,
+    corpora,
+    orderBy,
+    includeItemsFromAllDrives,
   } = props;
 
-  if (!query) {
+  if (!queries || queries.length === 0) {
     ctx.errorHandler.toHttpError(
       ERROR_INVALID_PARAMETERS,
-      ERROR_INVALID_PARAMETERS,
+      'At least one query condition is required. Example: [{ "term": "trashed", "operator": "=", "value": "false" }]',
     );
   }
 
   try {
-    const params: Record<string, string | number | undefined> = {
-      [Q]: query,
+    // Build the query string from the conditions array
+    const queryString = buildQueryString(queries);
+
+    const params: Record<string, string | number | boolean | undefined> = {
+      [Q]: queryString,
       [PAGE_SIZE]: pageSize,
       [PAGE_TOKEN]: pageToken,
       [FIELDS]: fields,
+      spaces,
+      corpora,
+      orderBy,
+      includeItemsFromAllDrives,
     };
 
     Object.keys(params).forEach((key) => {

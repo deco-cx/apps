@@ -1,11 +1,20 @@
 // deno-lint-ignore-file no-explicit-any
-import { processDataStream } from "npm:@ai-sdk/ui-utils@1.2.11";
-import { Message } from "npm:ai@4.3.16";
+import {
+  type AsyncIterableStream,
+  DefaultChatTransport,
+  readUIMessageStream,
+  UIMessage,
+} from "npm:ai@5.0.70";
 
-export type ProcessDataStreamParameters = Omit<
-  Parameters<typeof processDataStream>[0],
-  "stream"
->;
+/**
+ * Helper class to expose protected processResponseStream method
+ * from DefaultChatTransport for parsing SSE streams
+ */
+class ChatStreamParser extends DefaultChatTransport<UIMessage> {
+  public parseStream(stream: ReadableStream<Uint8Array>) {
+    return this.processResponseStream(stream);
+  }
+}
 export interface Callbacks {
   stream: string;
   generate: string;
@@ -40,16 +49,6 @@ export interface OutputChannelProps<
   threadId: string;
   resourceId: string;
 }
-export interface StreamOptions<
-  TMetadata extends Record<string, unknown> = Record<string, unknown>,
-> {
-  messages: Message[];
-  options: {
-    threadId?: string;
-    resourceId?: string;
-    metadata?: TMetadata;
-  };
-}
 
 export interface ListChannelsProps {
   workspace: string;
@@ -64,36 +63,70 @@ export interface ListChannelsResponse {
   channels: ChannelItem[];
 }
 
-export interface HandleStreamProps<
+export interface StreamOptions<
   TMetadata extends Record<string, unknown> = Record<string, unknown>,
-> extends ProcessDataStreamParameters {
-  streamProps?: StreamOptions<TMetadata>;
+> {
+  messages: UIMessage[];
+  metadata?: TMetadata;
+  threadId?: string;
+  resourceId?: string;
 }
+
+/**
+ * Process a stream from an AI SDK v5 endpoint that returns toUIMessageStreamResponse()
+ * @returns An async iterable stream of UIMessage objects that can be consumed directly
+ */
 export const processStream = async <
   TMetadata extends Record<string, unknown> = Record<string, unknown>,
 >(
-  { streamProps, ...rest }: HandleStreamProps<TMetadata>,
   streamEndpoint: string,
-) => {
-  const stream = await fetch(streamEndpoint, {
+  options?: StreamOptions<TMetadata>,
+): Promise<AsyncIterableStream<UIMessage>> => {
+  const response = await fetch(streamEndpoint, {
     method: "POST",
-    body: streamProps
+    body: options
       ? JSON.stringify({
-        args: [streamProps.messages, streamProps.options],
+        args: [options.messages, options.metadata, {
+          threadId: options.threadId,
+          resourceId: options.resourceId,
+        }],
       })
       : undefined,
-    headers: streamProps
+    headers: options
       ? {
         "Content-Type": "application/json",
       }
       : undefined,
   });
 
-  if (!stream.body) {
+  console.log("processStream response status:", response.status);
+  console.log("processStream response headers:", response.headers);
+
+  if (!response.body) {
     throw new Error("Stream body is null");
   }
-  await processDataStream({
-    stream: stream.body,
-    ...rest,
+
+  // Use DefaultChatTransport to parse SSE stream from toUIMessageStreamResponse()
+  // This handles the SSE decoding and transforms it into UIMessageChunks
+  const parser = new ChatStreamParser();
+  const chunkStream = parser.parseStream(response.body);
+
+  console.log("chunkStream created, type:", typeof chunkStream);
+
+  // Read UIMessages from the parsed chunk stream
+  // https://ai-sdk.dev/docs/ai-sdk-ui/reading-ui-message-streams
+  const uiMessageStream = readUIMessageStream({
+    stream: chunkStream,
+    onError: (error) => {
+      console.error("readUIMessageStream error:", error);
+    },
   });
+
+  console.log("uiMessageStream created, type:", typeof uiMessageStream);
+  console.log(
+    "uiMessageStream has Symbol.asyncIterator:",
+    Symbol.asyncIterator in uiMessageStream,
+  );
+
+  return uiMessageStream;
 };
