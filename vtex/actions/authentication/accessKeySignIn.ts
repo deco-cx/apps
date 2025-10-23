@@ -63,22 +63,24 @@ export default async function action(
 
   const data: AuthResponse = await response.json();
   proxySetCookie(response.headers, ctx.response.headers, req.url);
-  const dataRefreshToken = await ctx.invoke.vtex.actions.authentication
-    .refreshToken();
-  await ctx.invoke.vtex.actions.session.validateSession({
-    publicProperties: {
-      refreshAfter: { value: dataRefreshToken.refreshAfter },
-    },
-  });
+  if (data.authStatus === "Success") {
+    const dataRefreshToken = await ctx.invoke.vtex.actions.authentication
+      .refreshToken();
+    await ctx.invoke.vtex.actions.session.validateSession({
+      publicProperties: {
+        refreshAfter: { value: dataRefreshToken.refreshAfter },
+      },
+    });
 
-  // TODO: REMOVE THIS AFTER TESTING AND VALIDATE IF NEEDED REWRITE REFRESH_TOKEN_COOKIE
-  const setCookies = getSetCookies(ctx.response.headers);
-  for (const cookie of setCookies) {
-    if (cookie.name === REFRESH_TOKEN_COOKIE) {
-      setCookie(ctx.response.headers, {
-        ...cookie,
-        path: "/", // default path is /api/vtexid/refreshtoken/webstore, but browser dont send to backend headers
-      });
+    // TODO: REMOVE THIS AFTER TESTING AND VALIDATE IF NEEDED REWRITE REFRESH_TOKEN_COOKIE
+    const setCookies = getSetCookies(ctx.response.headers);
+    for (const cookie of setCookies) {
+      if (cookie.name === REFRESH_TOKEN_COOKIE) {
+        setCookie(ctx.response.headers, {
+          ...cookie,
+          path: "/", // default path is /api/vtexid/refreshtoken/webstore, but browser dont send to backend headers
+        });
+      }
     }
   }
 
