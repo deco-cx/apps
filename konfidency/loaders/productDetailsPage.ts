@@ -43,7 +43,18 @@ export default function productDetailsPage(
           pageSize,
           sku: productDetailsPage.product.inProductGroupWithID as string,
         }).then((res) => res.json());
-      const { aggregateRating, review } = toReview(reviews.reviews[0]);
+      const firstSummary = reviews?.reviews?.[0];
+      if (!firstSummary) {
+        return {
+          ...productDetailsPage,
+          product: {
+            ...productDetailsPage.product,
+            aggregateRating: undefined,
+            review: [],
+          },
+        };
+      }
+      const { aggregateRating, review } = toReview(firstSummary);
       return {
         ...productDetailsPage,
         product: {

@@ -2,6 +2,10 @@ import type { Place } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
 import { toPlace } from "../../utils/transform.ts";
 
+/**
+ * @title List Pickup Points
+ * @description List all pickup points
+ */
 export default async function loader(
   _props: unknown,
   _req: Request,

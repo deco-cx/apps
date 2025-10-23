@@ -35,9 +35,10 @@ export interface State {
 
 /**
  * @title Tiny ERP
- * @description Integration with Tiny ERP system for managing financial data, contacts, products, and more
+ * @appName tiny
+ * @description Sync products, contacts, invoices, and financial data.
  * @category ERP
- * @logo https://smartenvios.com/wp-content/uploads/2022/12/logo-tiny-smartenvios.jpg
+ * @logo https://assets.decocache.com/mcp/c073765e-e869-4244-9504-1edf6af02073/TinyERP.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { token, baseUrl = "https://api.tiny.com.br/public-api/v3" } = props;

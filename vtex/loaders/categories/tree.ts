@@ -10,6 +10,11 @@ export interface Props {
    */
   categoryLevels?: number;
 }
+
+/**
+ * @title Get Category Tree
+ * @description Get the category tree
+ */
 export default async function loader(
   { categoryLevels }: Props,
   _req: Request,

@@ -8,6 +8,10 @@ export interface Props {
   per_page?: string;
 }
 
+/**
+ * @title List Orders
+ * @description List orders
+ */
 export default async function loader(
   props: Props,
   req: Request,

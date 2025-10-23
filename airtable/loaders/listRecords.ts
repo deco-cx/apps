@@ -1,7 +1,11 @@
 import type { AppContext } from "../mod.ts";
-import type { ListRecordsOptions, ListRecordsResponse } from "../types.ts";
+import type {
+  ListRecordsResponse,
+  ValidationFilterResult,
+  ValidationResult,
+} from "../utils/types.ts";
 
-interface Props extends ListRecordsOptions {
+interface Props extends Record<string, unknown> {
   /**
    * @title Base ID
    * @description The ID of the Airtable base (e.g., appXXXXXXXXXXXXXX).
@@ -9,50 +13,95 @@ interface Props extends ListRecordsOptions {
   baseId: string;
 
   /**
-   * @title Table ID or Name
-   * @description The ID or name of the table (e.g., tblXXXXXXXXXXXXXX or "Table Name").
+   * @title Table ID
+   * @description The ID of the table within the base.
+   * @title Table ID
+   * @description The ID of the table within the base.
    */
-  tableIdOrName: string;
+  tableId: string;
 
   /**
-   * @title API Key
+   * @title Max Records
+   * @description Maximum number of records to return.
    */
-  apiKey?: string;
+  maxRecords?: number;
+
+  /**
+   * @title Page Size
+   * @description Number of records per page.
+   */
+  pageSize?: number;
+
+  /**
+   * @title Offset
+   * @description Pagination offset for listing records.
+   */
+  offset?: string;
+
+  /**
+   * @title View
+   * @description The name or ID of the view to use.
+   */
+  view?: string;
+
+  /**
+   * @title Filter By Formula
+   * @description Airtable formula to filter records.
+   */
+  filterByFormula?: string;
+
+  /**
+   * @title Sort
+   * @description Array of sort objects to order the records.
+   */
+  sort?: Array<{
+    field: string;
+    direction: "asc" | "desc";
+  }>;
+
+  /**
+   * @title Fields
+   * @description Array of field names to include in the response.
+   */
+  fields?: string[];
 }
 
 /**
+ * @name List_Table_Records
  * @title List Airtable Records
- * @description Fetches records from a specific table in an Airtable base.
+ * @description Fetches records from a specific table using OAuth with optional filtering and sorting.
  */
 const loader = async (
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<ListRecordsResponse | Response> => {
-  const { baseId, tableIdOrName, apiKey, ...searchOptions } = props;
-
-  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
-  const resolvedApiKey = authHeader || apiKey;
-
-  if (!resolvedApiKey) {
-    return new Response("API Key is required", { status: 403 });
+  if (!ctx.client) {
+    return new Response("OAuth authentication is required", { status: 401 });
   }
 
-  // searchOptions já é do tipo ListRecordsOptions (ou um subconjunto dele)
-  // Os parâmetros baseId e tableIdOrName são passados na URL.
-  // O objeto passado para a API deve conter os parâmetros de path e os de query (searchOptions).
-  const response = await ctx.api(resolvedApiKey)
-    ["GET /v0/:baseId/:tableIdOrName"]({
-      ...searchOptions, // Contém os parâmetros de ListRecordsOptions
-      baseId, // Para o path parameter :baseId
-      tableIdOrName, // Para o path parameter :tableIdOrName
+  const propsValidationResult: ValidationResult = await ctx.invoke["airtable"]
+    .loaders.permissioning.validatePermissions({
+      mode: "filter",
+      props: { ...props, tableIdOrName: props.tableId },
     });
+
+  if ("error" in propsValidationResult && propsValidationResult.error) {
+    return new Response(propsValidationResult.error, { status: 403 });
+  }
+
+  const filterResult = propsValidationResult as ValidationFilterResult;
+  const validatedProps = (filterResult.filteredProps || props) as Props;
+
+  const response = await ctx.client["GET /v0/:baseId/:tableId"](
+    validatedProps,
+  );
 
   if (!response.ok) {
     throw new Error(`Error listing records: ${response.statusText}`);
   }
 
-  return response.json();
+  return await response.json();
 };
 
 export default loader;

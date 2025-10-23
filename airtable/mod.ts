@@ -1,66 +1,135 @@
-import type { App, FnContext } from "@deco/deco";
-import type { AirtableClient } from "./client.ts";
-import type { Secret } from "../website/loaders/secret.ts";
-import { createHttpClient } from "../utils/http.ts"; // Corrected path
-import { fetchSafe } from "../utils/fetch.ts"; // Corrected path
+import { createOAuthHttpClient } from "../mcp/utils/httpClient.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import type { FnContext } from "@deco/deco";
+import { McpContext } from "../mcp/context.ts";
+import {
+  AIRTABLE_API_BASE_URL,
+  OAUTH_SCOPES,
+  OAUTH_URL_AUTH,
+  OAUTH_URL_TOKEN,
+} from "./utils/constants.ts";
+import { AirtableClient } from "./utils/client.ts";
+import {
+  DEFAULT_OAUTH_HEADERS,
+  OAuthClientOptions,
+  OAuthClients,
+  OAuthProvider,
+  OAuthTokens,
+} from "../mcp/oauth.ts";
+import type { Permission } from "./utils/types.ts";
 
-export type AppContext = FnContext<State, Manifest>;
+export const AirtableProvider: OAuthProvider = {
+  name: "Airtable",
+  authUrl: OAUTH_URL_AUTH,
+  tokenUrl: OAUTH_URL_TOKEN,
+  scopes: OAUTH_SCOPES,
+  clientId: "",
+  clientSecret: "",
+};
 
 export interface Props {
   /**
-   * @title Airtable API Key
-   * @description The API key for accessing your Airtable account.
-   * @format password
+   * @title OAuth Tokens
+   * @description OAuth tokens for authenticated requests
    */
-  apiKey: string | Secret;
+  tokens?: OAuthTokens;
 
   /**
-   * @title Airtable Base URL
-   * @description The base URL for the Airtable API.
-   * @default https://api.airtable.com
+   * @title OAuth Client Secret
+   * @description OAuth client secret for authentication
    */
-  baseUrl: string;
+  clientSecret?: string;
+
+  /**
+   * @title OAuth Client ID
+   * @description OAuth client ID for authentication
+   */
+  clientId?: string;
+
+  /**
+   * @title Permission
+   * @description Permission to access the Airtable API and selected bases and tables
+   */
+  permission: Permission;
 }
 
-export interface State {
-  api: (apiKey: string) => ReturnType<typeof createHttpClient<AirtableClient>>;
-  apiKey: string; // Store the resolved API key
-  baseUrl: string;
+export interface State extends Props {
+  client: OAuthClients<AirtableClient, AirtableClient>;
 }
+
+export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
- * @name Airtable
- * @description Connect to Airtable bases and manage records, tables, and fields.
+ * @title Airtable
+ * @appName airtable
+ * @description Access and manage data from Airtable bases, tables, and records.
  * @category Productivity
- * @logo https://static-00.iconduck.com/assets.00/airtable-icon-512x428-olxouyvv.png
+ * @logo https://assets.decocache.com/mcp/e724f447-3b98-46c4-9194-6b79841305a2/Airtable.svg
  */
-export default function App(props: Props): App<Manifest, State> {
-  const resolvedApiKey = typeof props.apiKey === "string"
-    ? props.apiKey
-    : props.apiKey.get();
-  const resolvedBaseUrl = props.baseUrl || "https://api.airtable.com";
+export default function App(
+  props: Props,
+  _req: Request,
+  ctx: AppContext,
+) {
+  const { tokens, clientId, clientSecret } = props;
 
-  const createClientWithHeaders = (headers: Headers) => {
-    return createHttpClient<AirtableClient>({
-      base: resolvedBaseUrl,
-      fetcher: fetchSafe,
-      headers,
-    });
+  const airtableProvider: OAuthProvider = {
+    ...AirtableProvider,
+    clientId: clientId ?? "",
+    clientSecret: clientSecret ?? "",
+  };
+  const options: OAuthClientOptions = {
+    headers: DEFAULT_OAUTH_HEADERS,
+    authClientConfig: {
+      headers: new Headers({
+        "Accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+      }),
+    },
   };
 
-  const api = (apiKey: string) =>
-    createClientWithHeaders(
-      new Headers({
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      }),
-    );
+  const client = createOAuthHttpClient<AirtableClient, AirtableClient>({
+    provider: airtableProvider,
+    apiBaseUrl: AIRTABLE_API_BASE_URL,
+    tokens,
+    options,
+    onTokenRefresh: async (newTokens: OAuthTokens) => {
+      if (ctx) {
+        await ctx.configure({
+          ...ctx,
+          tokens: newTokens,
+        });
+      }
+    },
+    customRefreshFunction: async (params: {
+      refresh_token: string;
+      client_id: string;
+      client_secret: string;
+    }) => {
+      const response = await fetch(OAUTH_URL_TOKEN, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json",
+          "Authorization": `Basic ${
+            btoa(`${params.client_id}:${params.client_secret}`)
+          }`,
+        },
+        body: new URLSearchParams({
+          grant_type: "refresh_token",
+          refresh_token: params.refresh_token,
+          client_id: params.client_id,
+          client_secret: params.client_secret,
+        }),
+      });
+
+      return response.json();
+    },
+  });
 
   const state: State = {
-    api,
-    apiKey: resolvedApiKey || "",
-    baseUrl: resolvedBaseUrl,
+    ...props,
+    client,
   };
 
   return {

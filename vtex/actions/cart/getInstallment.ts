@@ -10,6 +10,8 @@ export interface Props {
 
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pub/orderForm/-orderFormId-/installments
+ * @title Get Installment
+ * @description Get the installment options for a given cart with a given payment method
  */
 const action = async (
   props: Props,

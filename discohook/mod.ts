@@ -12,9 +12,10 @@ export interface State {
 
 /**
  * @title Discord Webhook
- * @description Send rich messages to Discord channels using webhooks. Customize messages with embeds, mentions, and formatting.
+ * @appName discohook
+ * @description Send rich, formatted messages to Discord channels.
  * @category Communication
- * @logo https://cdn-1.webcatalog.io/catalog/discohook/discohook-icon.png?v=1714780453968
+ * @logo https://assets.decocache.com/mcp/a626d828-e641-4931-8557-850276e91702/DiscordWebhook.svg
  */
 export default function App(): App<Manifest, State> {
   const api = createHttpClient<DiscordWebhookClient>({

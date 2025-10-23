@@ -24,5 +24,13 @@ export default async function getUsers(
   ctx: AppContext,
 ): Promise<SlackResponse<{ members: SlackUser[] }>> {
   const { limit, cursor } = props;
-  return await ctx.slack.getUsers(ctx.teamId, limit, cursor);
+  const teamId = ctx.teamId;
+
+  if (!teamId) {
+    throw new Error(
+      "Team ID is required. Please configure the Slack app with a valid team ID.",
+    );
+  }
+
+  return await ctx.slack.getUsers(teamId, limit, cursor);
 }

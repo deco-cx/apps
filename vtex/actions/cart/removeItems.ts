@@ -6,6 +6,8 @@ import { getSegmentFromBag } from "../../utils/segment.ts";
 
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/items/removeAll
+ * @title Remove Items from Cart
+ * @description Remove all items from the cart
  */
 const action = async (
   _props: unknown,

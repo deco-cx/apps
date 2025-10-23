@@ -1,11 +1,16 @@
 import { Head } from "$fresh/runtime.ts";
 import { useScriptAsDataURI } from "@deco/deco/hooks";
+import { DEFAULT_ANALYTICS_SCRIPT_URL } from "../loaders/analyticsScript.ts";
 
 export interface Props {
   /**
    * @description collector address to use
    */
   collectorAddress?: string;
+  /**
+   * @description static script to use
+   */
+  staticScriptUrl?: string;
 }
 
 declare global {
@@ -82,11 +87,11 @@ const oneDollarSnippet = () => {
   });
 };
 
-export const DEFAULT_COLLECTOR_ADDRESS =
-  "https://collector.deco.cx/events?tenant=decocx";
+export const DEFAULT_COLLECTOR_ADDRESS = "https://d.lilstts.com/events";
 
-function Component({ collectorAddress }: Props) {
+function Component({ collectorAddress, staticScriptUrl }: Props) {
   const collector = collectorAddress ?? DEFAULT_COLLECTOR_ADDRESS;
+  const staticScript = staticScriptUrl ?? DEFAULT_ANALYTICS_SCRIPT_URL;
 
   return (
     <Head>
@@ -97,13 +102,12 @@ function Component({ collectorAddress }: Props) {
         crossOrigin="anonymous"
       />
       <script
-        dangerouslySetInnerHTML={{
-          __html: trackerOriginal,
-        }}
         id="tracker"
         data-autocollect="false"
         data-hash-routing="true"
         data-url={collector}
+        type="module"
+        src={`/live/invoke/website/loaders/analyticsScript.ts?url=${staticScript}`}
       />
       <script defer src={useScriptAsDataURI(oneDollarSnippet)} />
     </Head>

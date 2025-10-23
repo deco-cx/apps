@@ -4,6 +4,10 @@ import { allowCorsFor } from "@deco/deco";
 export interface Props {
   term?: string;
 }
+/**
+ * @title Get Collection List
+ * @description Get the list of collections
+ */
 export default async function loader(
   { term }: Props,
   req: Request,

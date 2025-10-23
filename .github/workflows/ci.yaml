@@ -28,7 +28,7 @@ jobs:
             /home/runner/.cache/deno/deps/https/deno.land
       - uses: denoland/setup-deno@v2
         with:
-          deno-version: v2.x
+          deno-version: v2.4.5
       - name: Bundle Apps
         run: deno run -A --lock=deno.lock --frozen=false --reload scripts/start.ts
 
@@ -40,7 +40,7 @@ jobs:
         shell: bash
         run: |
           git status --porcelain
-          if [[ $(git status --porcelain | wc -c) -eq 0 ]]; then
+          if [[ $(git status --porcelain | wc -c) -ne 0 ]]; then
               echo "uncommitted changes detected"
               exit 1
           fi

@@ -7,8 +7,8 @@ import {
 import {
   CollectionProductsArgs,
   HasMetafieldsMetafieldsArgs,
-  Product as ProductShopify,
   ProductConnection,
+  ProductFragment,
   QueryRoot,
   QueryRootCollectionArgs,
   QueryRootSearchArgs,
@@ -158,8 +158,8 @@ const loader = async (
   // it in here
   const products = shopifyProducts?.nodes.map((p) =>
     toProduct(
-      p as ProductShopify,
-      (p as ProductShopify).variants.nodes[0],
+      p as ProductFragment,
+      (p as ProductFragment).variants.nodes[0],
       new URL(req.url),
     )
   );

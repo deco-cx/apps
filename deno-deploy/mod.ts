@@ -29,10 +29,11 @@ export interface State {
 }
 
 /**
- * @name Deno Deploy
- * @description Official Deno Deploy integration for deco.cx
+ * @title Deno Deploy
+ * @appName deno-deploy
+ * @description Deploy edge functions globally with Deno’s cloud platform.
  * @category Cloud Services
- * @logo https://blog.hyper.io/content/images/2021/05/deno.png
+ * @logo https://assets.decocache.com/mcp/f8ee96b7-9d64-4680-a2a8-008bf5f0a6e9/Deno-Deploy.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { token, apiVersion = "v1" } = props;

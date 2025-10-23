@@ -1,6 +1,10 @@
 import type { AppContext } from "../../mod.ts";
 import { SalesChannel } from "../../utils/types.ts";
 
+/**
+ * @title List Sales Channels
+ * @description List all sales channels
+ */
 export default async function loader(
   _props: unknown,
   _req: Request,

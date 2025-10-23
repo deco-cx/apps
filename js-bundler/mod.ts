@@ -8,7 +8,7 @@ export interface Props {
 }
 
 /**
- * @name JS_BUNDLER
+ * @appName js-bundler
  * @description Build and bundle JavaScript/TypeScript code using esbuild
  * @category Developer Tools
  * @logo https://esbuild.github.io/favicon.svg

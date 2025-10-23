@@ -97,6 +97,10 @@ const OLD_BROWSER_KEY = {
 
 const loader = async (props: Props, _req: Request): Promise<Font> => {
   const { fonts = [] } = props;
+  // If no fonts requested, avoid making a request that will 400 on Google Fonts
+  if (fonts.length === 0) {
+    return { family: "", styleSheet: "" };
+  }
   const url = new URL("https://fonts.googleapis.com/css2?display=swap");
 
   const reduced = fonts.reduce((acc, font) => {
@@ -119,19 +123,23 @@ const loader = async (props: Props, _req: Request): Promise<Font> => {
     );
   }
 
+  const logFontError = (label: string, url: URL, e: unknown) => {
+    const message = e instanceof Error ? e.message : String(e);
+    const short = message.length > 300 ? `${message.slice(0, 300)}…` : message;
+    console.error(
+      `Error fetching font (${label}): ${url.toString()} - ${short}`,
+    );
+  };
+
   const sheets = await Promise.all([
     fetchSafe(url, { headers: OLD_BROWSER_KEY }).then((res) => res.text())
       .catch((e) => {
-        console.error(
-          `Error fetching font: ${url} -  headers: ${OLD_BROWSER_KEY} - error: ${e}`,
-        );
+        logFontError("OLD_UA", url, e);
         return "";
       }),
     fetchSafe(url, { headers: NEW_BROWSER_KEY }).then((res) => res.text())
       .catch((e) => {
-        console.error(
-          `Error fetching font: ${url} -  headers: ${NEW_BROWSER_KEY} - error: ${e}`,
-        );
+        logFontError("NEW_UA", url, e);
         return "";
       })
       .catch(() => ""),

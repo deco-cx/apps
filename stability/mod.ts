@@ -21,10 +21,10 @@ interface Props {
 
 /**
  * @title Stability
- * @name Stability
- * @description This uses the Stability AI API to generate images from text descriptions. A presigned URL is required to upload the result of any tool call.
+ * @appName stability
+ * @description Create images from text using Stability AI’s diffusion models.
  * @category Tool
- * @logo https://logowik.com/content/uploads/images/stability-ai-icon3444.logowik.com.webp
+ * @logo https://assets.decocache.com/mcp/438d786a-4266-4196-876d-eccde1310e24/Stability.svg
  */
 export default function Stability(props: Props): App<Manifest, State> {
   const { apiKey, previewUrl } = props;

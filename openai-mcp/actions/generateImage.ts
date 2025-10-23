@@ -1,13 +1,7 @@
 import { AppContext } from "../mod.ts";
 import { Buffer } from "node:buffer";
-import OpenAI from "npm:openai";
+import OpenAI from "npm:openai@6.2.0";
 
-/**
- * @title Generate Image
- * @description Creates high-quality images from text prompts using OpenAI's image generation models.
- * This action allows you to generate images by providing a descriptive prompt and customizing
- * various parameters to control the output.
- */
 export interface Props {
   /**
    * @description The presigned URLs to upload the generated images to. The images will be
@@ -125,7 +119,14 @@ export interface Props {
   moderation?: "auto" | "low";
 }
 
-export default function generateImageAction(
+/**
+ * @title Generate Image
+ * @name Generate Image
+ * @description Creates high-quality images from text prompts using OpenAI's image generation models.
+ * This action allows you to generate images by providing a descriptive prompt and customizing
+ * various parameters to control the output.
+ */
+export default async function generateImageAction(
   props: Props,
   _req: Request,
   ctx: AppContext,
@@ -136,35 +137,33 @@ export default function generateImageAction(
 
   const openAI = ctx.openAI;
 
-  // If presigned URLs are provided, return preview URL
-  if (presignedUrls && presignedUrls.length > 0) {
-    // Run image generation asynchronously without awaiting
-    setTimeout(() => {
-      processImageGeneration(props, openAI, presignedUrls)
-        .catch((error) => {
-          console.error("Async image generation failed:", error);
-          // If there's an error, write the error message to the presigned URLs
-          Promise.all(
-            presignedUrls.map((url) =>
-              writeErrorToPresignedUrl(
-                url,
-                "This generation has failed." + error,
-              )
-            ),
-          ).catch((err) => {
-            console.error(
-              "Failed to write error message to presigned URL:",
-              err,
-            );
-          });
-        });
-    }, 0);
-
+  if (!presignedUrls || presignedUrls.length === 0) {
     return {
       success: true,
-      message: "Image generation started.",
+      message: "No presigned URLs provided, skipping image generation.",
     };
   }
+
+  if (props.n && props.n !== presignedUrls.length) {
+    return {
+      success: false,
+      message:
+        "Number of presigned URLs does not match number of images to generate.",
+    };
+  }
+
+  const results = await processImageGeneration(props, openAI, presignedUrls);
+
+  const failedResults = results?.filter((result) => !result.ok);
+
+  return {
+    success: true,
+    message: `Image generation completed. ${
+      failedResults && failedResults.length > 0
+        ? `Failed to upload ${failedResults.length} images.`
+        : ""
+    }`,
+  };
 }
 
 /**
@@ -237,39 +236,13 @@ async function processImageGeneration(
       throw new Error("No image data returned from OpenAI");
     }
 
-    await Promise.all(presignedUrls.map(async (presignedUrl) => {
-      return await uploadImage(imageData, presignedUrl, outputFormat);
-    }));
-  }
-}
+    const results = await Promise.all(
+      presignedUrls.map(async (presignedUrl) => {
+        return await uploadImage(imageData, presignedUrl, outputFormat);
+      }),
+    );
 
-/**
- * Writes an error message to a presigned URL
- */
-async function writeErrorToPresignedUrl(
-  presignedUrl: string,
-  errorMessage: string,
-) {
-  const textEncoder = new TextEncoder();
-  const errorBuffer = textEncoder.encode(errorMessage);
-
-  try {
-    const response = await fetch(presignedUrl, {
-      method: "PUT",
-      body: errorBuffer,
-      headers: {
-        "Content-Type": "text/plain",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to write error to URL: ${response.status}`);
-    }
-
-    console.log("Successfully wrote error message to presigned URL");
-  } catch (error) {
-    console.error("Error writing to presigned URL:", error);
-    throw error;
+    return results;
   }
 }
 
@@ -284,18 +257,11 @@ export async function uploadImage(
   image: string,
   presignedUrl: string,
   format: string = "png",
-): Promise<string> {
-  console.log("Starting image upload...");
-  console.log("Presigned URL:", presignedUrl);
-  console.log("Image length:", image.length);
-
+): Promise<{ ok: boolean }> {
   const imageBuffer = new Uint8Array(Buffer.from(image, "base64"));
-  console.log("Image buffer length:", imageBuffer.length);
 
   // Set the appropriate content type based on format
   const contentType = `image/${format}`;
-
-  console.log({ contentType });
 
   const response = await fetch(presignedUrl, {
     method: "PUT",
@@ -305,12 +271,6 @@ export async function uploadImage(
     },
   });
 
-  console.log("Upload response status:", response.status);
-  console.log(
-    "Upload response headers:",
-    Object.fromEntries(response.headers.entries()),
-  );
-
   if (!response.ok) {
     let errorText;
     try {
@@ -318,24 +278,10 @@ export async function uploadImage(
     } catch {
       errorText = "Unknown error";
     }
-    console.error("Upload failed with response:", errorText);
     throw new Error(`Failed to upload image: ${response.status} ${errorText}`);
   }
 
-  // Extract the URL from the presigned URL (removing query parameters)
-  let resultUrl = presignedUrl.split("?")[0];
-
-  // Some storage services return the final URL in the response
-  try {
-    const data = await response.json();
-    if (data.url) {
-      resultUrl = data.url;
-    }
-    console.log("Upload response data:", data);
-  } catch (_error) {
-    // If no JSON is returned, just use the base URL from the presigned URL
-    console.log("No JSON returned in upload response, using base URL");
-  }
-
-  return resultUrl;
+  return {
+    ok: true,
+  };
 }

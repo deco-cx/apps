@@ -1,4 +1,5 @@
 import { Suggestion } from "../../commerce/types.ts";
+import { handleAuthError } from "../utils/authError.ts";
 import { AppContext } from "../mod.ts";
 import { Autocomplete } from "../utils/graphql/queries.ts";
 import {
@@ -32,17 +33,22 @@ const loader = async (
 
   if (!query) return null;
 
-  const data = await storefront.query<
-    AutocompleteQuery,
-    AutocompleteQueryVariables
-  >({
-    variables: { query, limit, partnerAccessToken },
-    ...Autocomplete,
-  }, {
-    headers,
-  });
+  let data: AutocompleteQuery | undefined;
+  try {
+    data = await storefront.query<
+      AutocompleteQuery,
+      AutocompleteQueryVariables
+    >({
+      variables: { query, limit, partnerAccessToken },
+      ...Autocomplete,
+    }, {
+      headers,
+    });
+  } catch (error: unknown) {
+    handleAuthError(error, "load product suggestions");
+  }
 
-  const { products: wakeProducts, suggestions = [] } = data.autocomplete ?? {};
+  const { products: wakeProducts, suggestions = [] } = data?.autocomplete ?? {};
 
   if (!wakeProducts?.length && !suggestions?.length) return null;
 
@@ -56,6 +62,24 @@ const loader = async (
       term: suggestion!,
     })),
   };
+};
+
+export const cache = "no-cache";
+
+export const cacheKey = (props: Props, req: Request): string | null => {
+  // Avoid cross-tenant cache bleed when a partner token is present
+  if (getPartnerCookie(req.headers)) {
+    return null;
+  }
+
+  const params = new URLSearchParams([
+    ["query", props.query],
+    ["limit", String(props.limit ?? 10)],
+  ]);
+
+  const url = new URL(req.url);
+  url.search = params.toString();
+  return url.href;
 };
 
 export default loader;

@@ -9,6 +9,7 @@ import {
   GetCartQueryVariables,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
+import { handleAuthError } from "../utils/authError.ts";
 
 /**
  * @title VNDA Integration
@@ -23,18 +24,26 @@ const loader = async (
   const cartId = getCartCookie(req.headers);
   const headers = parseHeaders(req.headers);
 
-  const data = cartId
-    ? await storefront.query<GetCartQuery, GetCartQueryVariables>({
-      variables: { checkoutId: cartId },
-      ...GetCart,
-    }, {
-      headers,
-    })
-    : await storefront.query<CreateCartMutation, CreateCartMutationVariables>({
-      ...CreateCart,
-    }, {
-      headers,
-    });
+  let data: GetCartQuery | CreateCartMutation | undefined;
+  try {
+    data = cartId
+      ? await storefront.query<GetCartQuery, GetCartQueryVariables>({
+        variables: { checkoutId: cartId },
+        ...GetCart,
+      }, {
+        headers,
+      })
+      : await storefront.query<CreateCartMutation, CreateCartMutationVariables>(
+        {
+          ...CreateCart,
+        },
+        {
+          headers,
+        },
+      );
+  } catch (error: unknown) {
+    handleAuthError(error, "load cart");
+  }
 
   const checkoutId = data.checkout?.checkoutId;
 
@@ -46,3 +55,6 @@ const loader = async (
 };
 
 export default loader;
+
+// User-specific cart data; must not be cached/shared.
+export const cache = "no-store";

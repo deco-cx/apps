@@ -19,10 +19,10 @@ export interface State extends Props {
 export type AppContext = FnContext<State, Manifest>;
 
 /**
- * @name Reflect
+ * @appName reflect
  * @title Reflect
- * @description Reflect is an end-to-end encrypted note-taking app for capturing, organizing, and connecting your ideas.
- * @logo https://yt3.googleusercontent.com/ltMW3jdIUgobZAOc9MCaKJqzcfze2gREUPKxx3nyQ63C7dzXCeB3g1TnfbuI1rlZeZxHkVjJI8Y=s900-c-k-c0x00ffffff-no-rj
+ * @description Capture and organize your thoughts in a connected notes app.
+ * @logo https://assets.decocache.com/mcp/dede3890-36bb-4cd4-a574-2c10fed1fb85/Reflect.svg
  * @version 1.0.0
  */
 export default function App(props: Props): App<Manifest, State> {

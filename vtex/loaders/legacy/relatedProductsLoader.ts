@@ -5,7 +5,7 @@ import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { isFilterParam, toSegmentParams } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
-import { pickSku } from "../../utils/transform.ts";
+import { pickSku, toProduct } from "../../utils/transform.ts";
 import type { CrossSellingType } from "../../utils/types.ts";
 import productList from "./productList.ts";
 
@@ -34,8 +34,8 @@ export interface Props {
 }
 
 /**
- * @title VTEX Integration - Related Products
- * @description Related Products loader
+ * @title Related Products
+ * @description List related products, commonly used for additional shelves, features like: show similars or buy together.
  */
 async function loader(
   props: Props,
@@ -95,6 +95,24 @@ async function loader(
     );
   }
 
+  const inStock = (p: Product) =>
+    p.offers?.offers.find((o) =>
+      o.availability === "https://schema.org/InStock"
+    );
+
+  if (ctx.advancedConfigs?.doNotFetchVariantsForRelatedProducts) {
+    const toProducts = products.slice(0, count).map((p) =>
+      toProduct(p, p.items[0], 0, {
+        baseUrl: req.url,
+        priceCurrency: segment?.payload?.currencyCode ?? "BRL",
+      })
+    );
+    if (hideUnavailableItems) {
+      return toProducts.filter(inStock);
+    }
+    return toProducts;
+  }
+
   // unique Ids
   const relatedIds = [...new Set(
     products.slice(0, count).map((p) => pickSku(p).itemId),
@@ -103,6 +121,9 @@ async function loader(
   /** Batch fetches due to VTEX API limits */
   const batchedIds = batch(relatedIds, 50);
 
+  // this new API call is necessary if you want to fetch variants
+  // the related products API call does not return all variants, only one
+  // use advancedConfigs?.doNotFetchVariantsForRelatedProducts to avoid this call
   const relatedProductsResults = await Promise.allSettled(
     batchedIds.map((ids) =>
       productList({ props: { similars: false, ids } }, req, ctx)
@@ -127,11 +148,6 @@ async function loader(
     });
 
   if (hideUnavailableItems && relatedProducts) {
-    const inStock = (p: Product) =>
-      p.offers?.offers.find((o) =>
-        o.availability === "https://schema.org/InStock"
-      );
-
     return relatedProducts.filter(inStock);
   }
 

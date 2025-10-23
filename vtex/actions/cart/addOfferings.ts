@@ -11,6 +11,10 @@ export interface Props {
   expectedOrderFormSections?: string[];
 }
 
+/**
+ * @title Add Offerings to Cart
+ * @description Add offerings to the cart
+ */
 const action = async (
   props: Props,
   req: Request,

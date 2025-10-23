@@ -20,6 +20,8 @@ export interface Props {
 
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/items
+ * @title Add Items to Cart
+ * @description Add items to the cart
  */
 const action = async (
   props: Props,

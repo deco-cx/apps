@@ -32,6 +32,7 @@ import type {
   PageType,
   RangeFacet,
   SelectedFacet,
+  SimulationBehavior,
   Sort,
 } from "../../utils/types.ts";
 import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
@@ -148,9 +149,17 @@ export interface Props {
    * @description Further change loader behaviour
    */
   advancedConfigs?: AdvancedLoaderConfig;
+  /**
+   * @title Simulation Behavior
+   * @description Defines the simulation behavior.
+   */
+  simulationBehavior?: SimulationBehavior;
 }
 const searchArgsOf = (props: Props, url: URL) => {
   const hideUnavailableItems = props.hideUnavailableItems;
+  const simulationBehavior =
+    url.searchParams.get("simulationBehavior") as SimulationBehavior ||
+    props.simulationBehavior || "default";
   const countFromSearchParams = url.searchParams.get("PS");
   const count = Number(countFromSearchParams ?? props.count ?? 12);
   const query = props.query ?? url.searchParams.get("q") ?? "";
@@ -180,6 +189,7 @@ const searchArgsOf = (props: Props, url: URL) => {
     count,
     hideUnavailableItems,
     selectedFacets,
+    simulationBehavior,
   };
 };
 const PAGE_TYPE_TO_MAP_PARAM = {
@@ -251,8 +261,8 @@ const selectPriceFacet = (facets: Facet[], selectedFacets: SelectedFacet[]) => {
   return facets;
 };
 /**
- * @title VTEX Integration - Intelligent Search
- * @description Product Listing Page loader
+ * @title Product Listing Page - Intelligent Search
+ * @description List a product listing page, with products, filters, sort and SEO data, commonly used for category, search, brand and collection pages.
  */
 const loader = async (
   props: Props,
@@ -443,6 +453,11 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
       ).join("\\"),
     ],
     ["segment", segment],
+    [
+      "simulationBehavior",
+      url.searchParams.get("simulationBehavior") || props.simulationBehavior ||
+      "default",
+    ],
   ]);
   url.searchParams.forEach((value, key) => {
     if (!ALLOWED_PARAMS.has(key.toLowerCase()) && !isFilterParam(key)) {

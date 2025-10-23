@@ -19,10 +19,10 @@ export interface State extends Props {
 export type AppContext = FnContext<State, Manifest>;
 
 /**
- * @name Grain
+ * @appName grain
  * @title Grain
- * @description grain.com is an AI Notetaker for your meeting
- * @logo https://images.ctfassets.net/9haz2glq4wt0/36OjNsjfRZpaR1QtYtPucU/391ae8f9716fa000508b11583fcc9ebb/Grain_AI_Logo.png
+ * @description Capture and summarize meetings with AI-powered transcriptions.
+ * @logo https://assets.decocache.com/mcp/1bfc7176-e7be-487c-83e6-4b9e970a8e10/Grain.svg
  * @version 1.0.0
  */
 export default function App(props: Props): App<Manifest, State> {

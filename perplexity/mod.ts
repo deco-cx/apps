@@ -28,10 +28,11 @@ export interface State {
 }
 
 /**
- * @name Perplexity
- * @description Integrate with Perplexity AI's powerful chat completion models
+ * @title Perplexity
+ * @appName perplexity
+ * @description Ask natural language questions and get grounded, web-backed answers.
  * @category AI and Machine Learning
- * @logo https://substackcdn.com/image/fetch/f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F25175a25-0287-48d2-b577-ac6f3f00a522_400x400.jpeg
+ * @logo https://assets.decocache.com/mcp/1b3b7880-e7a5-413b-8db2-601e84b22bcd/Perplexity.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { apiKey, defaultModel = "sonar" } = props;

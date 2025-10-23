@@ -8,6 +8,8 @@ import { forceHttpsOnAssets } from "../utils/transform.ts";
 
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pub/orderForm
+ * @title Get Cart
+ * @description Get the cart from the user logged in
  */
 const loader = async (
   _props: unknown,

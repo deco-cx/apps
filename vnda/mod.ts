@@ -49,9 +49,10 @@ export interface State extends Props {
 export const color = 0x0C29D0;
 /**
  * @title VNDA
- * @description Loaders, actions and workflows for adding VNDA Commerce Platform to your website.
+ * @appName vnda
+ * @description Manage your e-commerce catalog and sales using VNDA by Olist.
  * @category Ecommmerce
- * @logo https://raw.githubusercontent.com/deco-cx/apps/main/vnda/logo.png
+ * @logo https://assets.decocache.com/mcp/d15a3dfb-145f-4d13-8bdf-a9568b5a33a1/VNDA.svg
  */
 export default function VNDA(props: Props): App<Manifest, State> {
   const { authToken, publicUrl, sandbox } = props;

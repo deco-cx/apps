@@ -35,6 +35,9 @@ export default async function getFileComponents(
   ctx: AppContext,
 ): Promise<FigmaResponse<FigmaFile>> {
   const { fileKey, version, depth, branch_data } = props;
+  if (!ctx.figma) {
+    throw new Error("Figma client not found");
+  }
   const response = await ctx.figma.getFile(fileKey, {
     version,
     depth,

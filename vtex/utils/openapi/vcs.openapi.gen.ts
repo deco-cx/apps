@@ -17876,7 +17876,51 @@ ClosingTime?: string
  * This request can be used to implement auto complete functionality when a customer needs to fill in an address.
  */
 "GET /api/checkout/pub/postal-code/:countryCode/:postalCode": {
-
+/**
+ * Address.
+ */
+response: {
+/**
+ * Postal code.
+ */
+postalCode?: string
+/**
+ * City.
+ */
+city?: string
+/**
+ * State.
+ */
+state?: string
+/**
+ * Country.
+ */
+country?: string
+/**
+ * Street.
+ */
+street?: string
+/**
+ * Number.
+ */
+number?: string
+/**
+ * Neighborhood.
+ */
+neighborhood?: string
+/**
+ * Complement to the shipping address, in case it applies.
+ */
+complement?: (null | string)
+/**
+ * Reference.
+ */
+reference?: string
+/**
+ * Geo coordinates.
+ */
+geoCoordinates?: number[]
+}
 }
 /**
  * This endpoint places an order from an existing `orderForm` object, meaning an existing cart.
@@ -19537,6 +19581,155 @@ page: string
 per_page: string
 }
 response: Userorderslist
+}
+/**
+ * Retrieves information from a previously created sesssion.
+ * 
+ * >⚠️ The Session Manager API uses the `vtex_session` and `vtex_segment` cookies to store the data required to identify the user and the session. These cookies are stored in the user's browser when the session is created and sent automatically in every request to that domain. You will have to reproduce that by sending these cookies as headers to Session Manager API in order for it to work outside of a browser environment.
+ * 
+ * ## Permissions
+ * 
+ * This endpoint does not require [authentication](https://developers.vtex.com/docs/guides/authentication) or [permissions](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3).
+ */
+"GET /api/sessions": {
+searchParams: {
+/**
+ * Items are the keys of the values you wish to get. They follow the format `namespace1.key1,namespace2.key2`.
+ * 
+ * If you wish to recover the data sent on [Create new session](https://developers.vtex.com/docs/api-reference/session-manager-api#post-/api/sessions), it should be `public.{key}`, replacing `{key}` with the name of the custom property you created. Following the example request presented in [Create new session](https://developers.vtex.com/docs/api-reference/session-manager-api#post-/api/sessions), it would be `public.variable1,public.variable2`.
+ * 
+ * If you want to retrieve all keys from Session Manager, you can use the wildcard operator (`*`) as a value for this query parameter.
+ */
+items: string
+}
+response: GetSessionResponse
+}
+/**
+ * Creates a new session and returns a session token and a segment token. Also stores `vtex_session` and `vtex_segment` cookies, with the same values returned in the response.
+ * 
+ * All parameters in the body that are not within the public namespace will be ignored. Query string items will automatically be added to the public namespace.
+ * 
+ * >⚠️ The Session Manager API uses the `vtex_session` and `vtex_segment` cookies to store the data required to identify the user and the session. These cookies are stored in the user's browser when the session is created and sent automatically in every request to that domain. You will have to reproduce that by sending these cookies as headers in other requests to Session Manager API in order for it to work outside of a browser environment.
+ * 
+ * ## Permissions
+ * 
+ * This endpoint does not require [authentication](https://developers.vtex.com/docs/guides/authentication) or [permissions](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3).
+ */
+"POST /api/sessions": {
+body: CreateEditSessionRequest
+response: CreateEditSessionResponse
+}
+/**
+ * Edits information from a previously created sesssion.
+ * 
+ * This endpoint works the same way as the [Create new session](https://developers.vtex.com/docs/api-reference/session-manager-api#post-/api/sessions) endpoint, but when the request is sent with a `vtex_session` and the `vtex_segment` cookies in the header, it retrieves the session first and then applies the changes instead of generating a new one.
+ * 
+ * Only keys inside the `public` namespace in the request body are considered, and query parameters are automatically added to the public namespace.
+ * 
+ * >⚠️ The Session Manager API uses the `vtex_session` and `vtex_segment` cookies to store the data required to identify the user and the session. These cookies are stored in the user's browser when the session is created and sent automatically in every request to that domain. You will have to reproduce that by sending these cookies as headers to Session Manager API in order for it to work outside of a browser environment.
+ * 
+ * ## Permissions
+ * 
+ * This endpoint does not require [authentication](https://developers.vtex.com/docs/guides/authentication) or [permissions](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3).
+ */
+"PATCH /api/sessions": {
+body: CreateEditSessionRequest
+response: CreateEditSessionResponse
+}
+/**
+ * Cancels an order using its identification code (`orderId`). A common scenario is when the seller has a problem fulfilling the order and requests the marketplace to cancel it. 
+ * 
+ * ## Orders that cannot be canceled 
+ * 
+ * The following situations do not allow order cancellation: 
+ * 
+ * - **Partial invoices:** [Partially invoiced](https://help.vtex.com/en/tracks/orders--2xkTisx4SXOWXQel8Jg8sa/q9GPspTb9cHlMeAZfdEUe) orders cannot be canceled. However, the customer can [change the order](https://developers.vtex.com/docs/guides/change-order) to replace or remove items from it. 
+ * 
+ * - **Invoiced status:** Orders with `invoiced` [status](https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196) cannot be canceled. If the order has already been invoiced, you can use the [Order invoice notification](https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/invoice) endpoint to generate a return invoice. 
+ * 
+ * - **Incomplete orders:** [Incomplete orders](https://help.vtex.com/en/tutorial/how-incomplete-orders-work--tutorials_294) cannot be canceled. 
+ * 
+ * ## Declining order cancelation 
+ * 
+ * The order flow has a cancellation window (grace period) in which the customer can automatically cancel the order. Except for that period, the seller can [decline an order cancellation request](https://help.vtex.com/en/tutorial/declining-order-cancelation--F2n0h1TeQ5td540Gjyff4), regardless of whether the customer or the marketplace initiated it. 
+ * 
+ * For more information, see [Order canceling improvements](https://developers.vtex.com/docs/guides/order-canceling-improvements). 
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | OMS | OMS access | **Cancel order** | 
+ * 
+ * You can [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) with that resource or use one of the following [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy):
+ * 
+ * | **Role** | **Resource** | 
+ * | --------------- | ----------------- | 
+ * | OMS - Full access | Cancel order |
+ * | IntegrationProfile - Fulfillment Oms | Cancel order |
+ * 
+ * >❗ Assigning a [predefined role](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) to users or application keys usually grants permission to multiple [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3). If some of these permissions are not necessary, consider creating a custom role instead. For more information regarding security, see [Best practices for using application keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm). 
+ * 
+ * To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ */
+"POST /api/oms/pvt/orders/:orderId/cancel": {
+body: {
+/**
+ * Reason for cancelling the order.
+ */
+reason?: string
+}
+response: {
+/**
+ * Date and time when the notification was received.
+ */
+date?: string
+/**
+ * Identification of the order in the seller.
+ */
+orderId?: string
+/**
+ * Protocol code generated by the update. It may be `null`.
+ */
+receipt?: string
+}
+}
+/**
+ * Lists all details from an order, through the perspective of the customer who placed the order. 
+ * 
+ * > You can only access information from orders created in the last two years, and that same period is valid for customers through [My Account](https://help.vtex.com/en/tutorial/how-my-account-works--2BQ3GiqhqGJTXsWVuio3Xh). 
+ * 
+ * > Note that this request should be made by an [user](https://developers.vtex.com/docs/guides/user-authentication-and-login) or [an appKey / appToken pair](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) that is associated with the [Call center operator](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy#call-center-operator) role. Otherwise, it will return only orders from the same email informed in the `clientEmail` query parameter. 
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | OMS | OMS access | **View order** |
+ * 
+ * You can [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) with that resource or use one of the following [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy):
+ * 
+ * | **Role** | **Resource** | 
+ * | --------------- | ----------------- | 
+ * | Call center operator | View order |
+ * | OMS - Read only | View order |
+ * 
+ * >❗ Assigning a [predefined role](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) to users or application keys usually grants permission to multiple [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3). If some of these permissions are not necessary, consider creating a custom role instead. For more information regarding security, see [Best practices for using application keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm). 
+ * 
+ * To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ */
+"GET /api/oms/user/orders/:orderId": {
+searchParams: {
+/**
+ * Customer email.
+ */
+clientEmail: string
+}
+response: Userorderdetails
 }
 }
 /**
@@ -21976,4 +22169,1416 @@ SumOfSquares: number
 Facets: {
 
 }
+}
+/**
+ * Session information.
+ */
+export interface GetSessionResponse {
+/**
+ * Session ID.
+ */
+id?: string
+/**
+ * Object with namespaces, each containing a set of information about the session.
+ */
+namespaces?: {
+/**
+ * Account information related to the session.
+ */
+account?: {
+/**
+ * VTEX account ID.
+ */
+id?: {
+/**
+ * Value of the VTEX account ID.
+ */
+value?: string
+/**
+ * Determines whether or not the connection should be kept alive.
+ */
+keepAlive?: boolean
+}
+/**
+ * VTEX account name.
+ */
+accountName?: {
+/**
+ * Value of the VTEX account name.
+ */
+value?: string
+}
+}
+/**
+ * Store information related to the session.
+ */
+store?: {
+/**
+ * [Trade policy](https://help.vtex.com/en/tutorial/how-trade-policies-work--6Xef8PZiFm40kg2STrMkMV) ID.
+ */
+channel?: {
+/**
+ * Value of the [Trade policy](https://help.vtex.com/en/tutorial/how-trade-policies-work--6Xef8PZiFm40kg2STrMkMV) ID.
+ */
+value?: string
+}
+/**
+ * Country code.
+ */
+countryCode?: {
+/**
+ * Value of the country code.
+ */
+value?: string
+}
+/**
+ * Locale that provides culture-specific information, such as the language, sublanguage, country/region, calendar, and conventions associated with a particular culture. Read [this documentation](https://learn.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo?view=net-7.0#culture-names-and-identifiers) for more details.
+ */
+cultureInfo?: {
+/**
+ * Value of the `cultureInfo` property.
+ */
+value?: string
+}
+/**
+ * Currency code.
+ */
+currencyCode?: {
+/**
+ * Value of the currency code.
+ */
+value?: string
+}
+/**
+ * Currency symbol.
+ */
+currencySymbol?: {
+/**
+ * Value of the currency symbol.
+ */
+value?: string
+}
+/**
+ * Defines whether or not the channel is private.
+ */
+channelPrivacy?: {
+/**
+ * Value containing the channel's privacy option.
+ */
+value?: string
+}
+}
+/**
+ * Public and editable information related to the session.
+ */
+public?: {
+/**
+ * Custom property.
+ */
+[k: string]: {
+/**
+ * Value of the custom property.
+ */
+value?: string
+}
+}
+/**
+ * Checkout information related to the session.
+ */
+checkout?: {
+/**
+ * ID of the session's region.
+ */
+regionId?: {
+/**
+ * Value of the Region ID.
+ */
+value?: string
+}
+}
+}
+}
+/**
+ * Session information.
+ */
+export interface CreateEditSessionRequest {
+public: Public
+}
+/**
+ * Public information.
+ */
+export interface Public {
+/**
+ * Custom property.
+ */
+additionalProperties?: {
+/**
+ * Value of the custom property.
+ */
+value?: string
+}
+[k: string]: any
+}
+/**
+ * Object containing session token and segment token.
+ */
+export interface CreateEditSessionResponse {
+/**
+ * Token that identifies the user's individual session.
+ */
+sessionToken?: string
+/**
+ * Token that identifies the user's segment, shared with other users with similar navigation parameters.
+ */
+segmentToken?: string
+}
+export interface Userorderdetails {
+/**
+ * Order ID is a unique code that identifies an order.
+ */
+orderId: string
+/**
+ * Sequence is a six-digit string that follows the order ID. For example, in order `1268540501456-01 (501456)`, the sequence is `501456`.
+ */
+sequence: string
+/**
+ * Marketplace order ID.
+ */
+marketplaceOrderId: string
+/**
+ * Marketplace services endpoint.
+ */
+marketplaceServicesEndpoint: string
+/**
+ * ID of the seller related to the order. It can be a VTEX seller or an external seller.
+ */
+sellerOrderId: string
+/**
+ * Order's [origin in the order flow](https://developers.vtex.com/docs/guides/orders-overview#understanding-order-flow-types), which can be `Marketplace`, `Fulfillment` or `Chain`.
+ */
+origin: string
+/**
+ * Corresponds to the three-digit [affiliate](https://help.vtex.com/en/tutorial/configuring-affiliates--tutorials_187) identification code of the seller responsible for the order.
+ */
+affiliateId: string
+/**
+ * Sales channel (or [trade policy](https://help.vtex.com/tutorial/how-trade-policies-work--6Xef8PZiFm40kg2STrMkMV)) ID related to the order.
+ */
+salesChannel: string
+/**
+ * Name of the merchant.
+ */
+merchantName: string
+/**
+ * Order [status](https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196).
+ */
+status: string
+/**
+ * @deprecated
+ * `Deprecated`. Status description which is displayed on the Admin panel. This field is obsolete and may not return any value.
+ */
+statusDescription: string
+/**
+ * Order's total amount.
+ */
+value: number
+/**
+ * Order's creation date.
+ */
+creationDate: string
+/**
+ * Order's last change date.
+ */
+lastChange: string
+/**
+ * Order's group ID.
+ */
+orderGroup: string
+/**
+ * List with details about orders' totals.
+ */
+totals: Total[]
+/**
+ * Information about order's items.
+ */
+items: Item[]
+/**
+ * Marketplace details object.
+ */
+marketplaceItems: string[]
+clientProfileData: ClientProfileData
+/**
+ * Information about gift list, when it applies.
+ */
+giftRegistryData: string
+/**
+ * Information about promotions and marketing. For example, coupon tracking information and internal or external UTMs.
+ */
+marketingData: {
+/**
+ * Object ID which expected value is `marketingData`.
+ */
+id: string
+/**
+ * Value of the `utm_source` parameter of the URL that led to the request.
+ */
+utmSource: string
+/**
+ * UTM Source Parameters.
+ */
+utmPartner: string
+/**
+ * Value of the `utm_medium` parameter of the URL that led to the request.
+ */
+utmMedium: string
+/**
+ * Value of the `utm_campaign` parameter of the URL that led to the request.
+ */
+utmCampaign: string
+/**
+ * Coupon's code information.
+ */
+coupon: string
+/**
+ * Internal UTM value `utmi_cp`.
+ */
+utmiCampaign: string
+/**
+ * Internal UTM value `utmi_p`.
+ */
+utmipage: string
+/**
+ * Internal UTM value `utmi_pc`.
+ */
+utmiPart: string
+/**
+ * Marketing tags information. This field can be used to register campaign data or informative tags regarding promotions.
+ */
+marketingTags: string[]
+}
+ratesAndBenefitsData: RatesAndBenefitsData
+shippingData: ShippingData
+paymentData: PaymentData
+packageAttachment: PackageAttachment
+/**
+ * List of all sellers associated with the order.
+ */
+sellers: Seller[]
+/**
+ * Call center operator responsible for the order.
+ */
+callCenterOperatorData: string
+/**
+ * Email of the store's employee responsible for managing the order.
+ */
+followUpEmail: string
+/**
+ * Last sent transactional message.
+ */
+lastMessage: string
+/**
+ * Account Hostname registered in License Manager.
+ */
+hostname: string
+/**
+ * Information pertinent to the order's invoice.
+ */
+invoiceData: {
+
+}
+changesAttachment: ChangesAttachment
+/**
+ * Optional field with order's additional information. This field must be filled in using the following format: 
+ * ```
+ * {
+ *     "fieldExample": "ValueExample"
+ *   }
+ * ```
+ * .
+ */
+openTextField: string
+/**
+ * Rounding error total amount, if it applies. For example, in orders with a discount over non-integer multiplier items, the rounding price is performed per item, not after the sum of all items. That can cause a difference in the total discount amount, which is informed in this field.
+ */
+roundingError: number
+/**
+ * [Order form](https://developers.vtex.com/docs/guides/orderform-fields) ID.
+ */
+orderFormId: string
+/**
+ * Information about commercial conditions.
+ */
+commercialConditionData: string
+/**
+ * When set as `true`, the order's payment has been settled, and when set as `false`, it has not been settled yet.
+ */
+isCompleted: boolean
+/**
+ * Custom information in the order. This field is useful for storing data not included in other fields, for example, a message for a gift or a name to be printed in a shirt.
+ */
+customData: string
+storePreferencesData: StorePreferencesData
+/**
+ * When set as `true`, the order can be canceled, and when set as `false`, it is no longer possible to cancel the order.
+ */
+allowCancellation: boolean
+/**
+ * When set as `true`, the order can be edited, and when set as `false`, it is no longer possible to edit the order.
+ */
+allowEdition: boolean
+/**
+ * This field is set `true` when the order was made via inStore and `false` when it was not.
+ */
+isCheckedIn: boolean
+marketplace: Marketplace
+/**
+ * Authorized order date.
+ */
+authorizedDate: string
+/**
+ * Order's invoice date.
+ */
+invoicedDate: string
+/**
+ * Reason for order cancellation.
+ */
+cancelReason: string
+/**
+ * Metadata information about the order's items.
+ */
+itemMetadata: {
+/**
+ * Metadata items.
+ */
+Items: {
+/**
+ * Item's SKU ID, which is a unique numerical identifier.
+ */
+Id: string
+/**
+ * Seller ID that identifies the seller the item belongs to.
+ */
+Seller: string
+/**
+ * Name of the item as displayed to customers in the storefront.
+ */
+Name: string
+/**
+ * Name of the SKU corresponding to the item.
+ */
+SkuName: string
+/**
+ * ID of the Product associated with the item.
+ */
+ProductId: string
+/**
+ * Item's reference ID.
+ */
+RefId: string
+/**
+ * EAN of the item.
+ */
+Ean: string
+/**
+ * Item's SKU image URL.
+ */
+ImageUrl: string
+/**
+ * URL slug of the item.
+ */
+DetailUrl: string
+/**
+ * Displays information about [assembly options](https://help.vtex.com/en/tutorial/assembly-options--5x5FhNr4f5RUGDEGWzV1nH) related to the item, if there are any.
+ */
+AssemblyOptions: {
+/**
+ * ID of the attachment related to the order.
+ */
+Id: string
+/**
+ * Name of the attachment related to the order.
+ */
+Name: string
+/**
+ * If this field is set as `true`, when the customer purchases the item sending the attachment is required, and when set as `false`, sending the attachment is optional.
+ */
+Required: boolean
+/**
+ * Displays the attachment's content.
+ */
+InputValues: {
+
+}
+/**
+ * Displays the attachment's composition.
+ */
+Composition: {
+
+}
+}[]
+}[]
+}
+/**
+ * Information about [subscriptions](https://help.vtex.com/tutorial/how-subscriptions-work--frequentlyAskedQuestions_4453).
+ */
+subscriptionData: {
+/**
+ * ID of the subscription's group. If this field returns `null` and the `executionCount` is `0`, the order is the first one with subscriptions.
+ */
+SubscriptionGroupId: string
+/**
+ * List with subscriptions and their details.
+ */
+Subscriptions: {
+/**
+ * Position of the order in the subscription cycle. The first order will have the value `0`, the second will have the value `1`, and so on.
+ */
+ExecutionCount: number
+/**
+ * @deprecated
+ * Price of the order when the customer signed up for subscriptions. Subscriptions created from Admin UI or APIs do not have an original order, so the field returns `0.0`. This field was valid only for Subscriptions v2 and is deprecated in Subscriptions v3.
+ */
+PriceAtSubscriptionDate: number
+/**
+ * Each item in the subscriptions' order is identified by an index. The position starts in`0`, followed by `1`, `2`, and so on.
+ */
+ItemIndex: number
+/**
+ * Information about the subscription's validility and frequency.
+ */
+Plan: {
+/**
+ * Type of plan.
+ */
+type: string
+/**
+ * Information about subscriptions' recurrence.
+ */
+frequency: {
+/**
+ * Defines the subscriptions recurrence period. The possible values are `DAILY`,`WEEKLY`, `MONTHLY` and `YEARLY`.
+ */
+periodicity: string
+/**
+ * Number of the time interval configured between subscription orders, which depends on the periodicity. For a `DAILY` periodicity, the field's value will correspond to days, for `MONTHLY` to months, and so on.
+ */
+interval: number
+}
+/**
+ * Information about the period during which the subscription will be valid.
+ */
+validity: {
+/**
+ * Subscriptions' beginning date with the format `yyyy-mm-ddThh:mm:ss`.
+ */
+begin: string
+/**
+ * Subscriptions' ending date with the format `yyyy-mm-ddThh:mm:ss`.
+ */
+end: string
+}
+}
+}[]
+}
+/**
+ * Order's tax information.
+ */
+taxData: {
+/**
+ * If the taxes were designated by the marketplace (`true`) or not (`false`).
+ */
+areTaxesDesignatedByMarketplace: boolean
+/**
+ * Array with taxes' details.
+ */
+taxInfoCollection: {
+/**
+ * Item's indexing number.
+ */
+itemIndex: number
+/**
+ * Alphanumeric sequence that identifies an SKU.
+ */
+sku: string
+/**
+ * Price tag information.
+ */
+priceTags: {
+/**
+ * If the tax is a percentage (`true`) or note (`false`).
+ */
+isPercentual: boolean
+/**
+ * Name that identifies the tax.
+ */
+name: string
+/**
+ * The amount that corresponds to the tax.
+ */
+rawValue: string
+}[]
+}[]
+}
+/**
+ * If the field `isCheckedIn` is set as `true`, the `checkedInPickupPointId` will retrieve the ID of the physical store where the order was made.
+ */
+checkedInPickupPointId: string
+/**
+ * Information about order cancellation, when it applies.
+ */
+cancellationData: {
+/**
+ * If the order cancellation was requested by the costumer (`true`) or not (`false`).
+ */
+RequestedByUser: boolean
+/**
+ * If the order cancellation was made by the system (`true`) or not (`false`). This type of order cancellation happens in [incomplete orders](https://help.vtex.com/en/tutorial/how-incomplete-orders-work--tutorials_294), for example.
+ */
+RequestedBySystem: boolean
+/**
+ * If the order cancellation was requested by the seller (`true`) or not (`false`).
+ */
+RequestedBySellerNotification: boolean
+/**
+ * If the order cancellation was requested by the payment gateway (`true`) or not (`false`).
+ */
+RequestedByPaymentNotification: boolean
+/**
+ * The reason why the order was cancelled.
+ */
+Reason: string
+/**
+ * The date when the order was cancelled.
+ */
+CancellationDate: string
+}
+/**
+ * Information about customer's preferences.
+ */
+clientPreferencesData: {
+/**
+ * Customer's prefered language while accessing the store.
+ */
+locale: string
+/**
+ * When set as `true`, this field indicates customers opted to receive the newsletters, and when set as `false`, it means they did not.
+ */
+optinNewsLetter: boolean
+}
+minItems?: 0
+}
+/**
+ * Object about order's totals.
+ */
+export interface Total {
+/**
+ * Code that identifies if the information is about `Items`, `Discounts`, `Shipping`, `Tax` or `Change`.
+ */
+id: string
+/**
+ * Name of `Items`, `Discounts`, `Shipping`, `Tax` or `Change`.
+ */
+name: string
+/**
+ * Total amount of `Items`, `Discounts`, `Shipping`, `Tax` or `Change`.
+ */
+value: number
+}
+export interface Item {
+/**
+ * The SKU ID.
+ */
+id: string
+/**
+ * The quantity of items of this specific SKU in the cart to be simulated.
+ */
+quantity: number
+/**
+ * The ID of the seller responsible for this SKU. This ID can be found in your VTEX Admin.
+ */
+seller: string
+}
+/**
+ * Object with information on the client's profile.
+ */
+export interface ClientProfileData {
+/**
+ * Object ID, the expected value is `clientProfileData`.
+ */
+id: string
+/**
+ * Customer's email.
+ */
+email: string
+/**
+ * Customer's first name.
+ */
+firstName: string
+/**
+ * Customer's last name.
+ */
+lastName: string
+/**
+ * Type of the document informed by the customer.
+ */
+documentType: string
+/**
+ * Document identification code informed by the customer.
+ */
+document: string
+/**
+ * Customers's phone number.
+ */
+phone: string
+/**
+ * If the customer is a legal entity, here goes the corporate name.
+ */
+corporateName: string
+/**
+ * If the customer is a legal entity, here goes the trade name.
+ */
+tradeName: string
+/**
+ * If the customer is a legal entity, here goes the corporate document.
+ */
+corporateDocument: string
+/**
+ * If the customer is a legal entity, here goes the state inscription.
+ */
+stateInscription: string
+/**
+ * If the customer is a legal entity, here goes the corpany's phone number.
+ */
+corporatePhone: string
+/**
+ * The value is `true` when the customer is a legal entity and `false` when not.
+ */
+isCorporate: boolean
+/**
+ * Customer user profile ID.
+ */
+userProfileId: string
+/**
+ * Identification of the class the customer belongs to.
+ */
+customerClass: string
+}
+/**
+ * Information on promotions and taxes that apply to the order.
+ */
+export interface RatesAndBenefitsData {
+/**
+ * ID of the rate or benefit.
+ */
+id: string
+/**
+ * Information about order's promotions and taxes identifiers.
+ */
+rateAndBenefitsIdentifiers: string[]
+}
+/**
+ * Object containing shipping data.
+ */
+export interface ShippingData {
+/**
+ * Object ID, the expected value is `shippingData`.
+ */
+id: string
+address: Address
+/**
+ * Array of objects containing item's logistics information.
+ */
+logisticsInfo: LogisticsInfo[]
+trackingHints: string
+/**
+ * Information about selected adresses.
+ */
+selectedAddresses: SelectedAddress[]
+}
+/**
+ * Shipping address details.
+ */
+export interface Address {
+/**
+ * Type of address. For example, `Residential` or `Pickup`, among others.
+ */
+addressType: string
+/**
+ * Name of the person who is going to receive the order.
+ */
+receiverName: string
+/**
+ * Shipping address ID.
+ */
+addressId: string
+/**
+ * Shipping address version ID.
+ */
+versionId: string
+/**
+ * Shipping address entity ID.
+ */
+entityId: string
+/**
+ * Postal code of the shipping address.
+ */
+postalCode: string
+/**
+ * City of the shipping address.
+ */
+city: string
+/**
+ * State of the shipping address.
+ */
+state: string
+/**
+ * Three letters ISO code of the country of the shipping address (ISO 3166 ALPHA-3).
+ */
+country: string
+/**
+ * Street of the shipping address.
+ */
+street: string
+/**
+ * Number of the building, house or apartment in the shipping address.
+ */
+number: string
+/**
+ * Neighborhood of the shipping address.
+ */
+neighborhood: string
+/**
+ * Complement to the shipping address when it applies.
+ */
+complement: string
+/**
+ * Complement to help locate the shipping address, in case of delivery.
+ */
+reference: string
+/**
+ * Array with two numbers with geocoordinates, first longitude then latitude.
+ */
+geoCoordinates: number[]
+}
+export interface LogisticsInfo {
+/**
+ * Index of the item starting from 0.
+ */
+itemIndex: number
+/**
+ * Selected shipping option.
+ */
+selectedSla: string
+/**
+ * Logistics [reservation](https://help.vtex.com/en/tutorial/how-does-reservation-work--tutorials_92) waiting time.
+ */
+lockTTL: string
+/**
+ * Shipping price for the item in cents. Does not account for the whole order's shipping price.
+ */
+price: number
+/**
+ * SKU's optional price for a specific trade policy.
+ */
+listPrice: number
+/**
+ * Item's selling price.
+ */
+sellingPrice: number
+/**
+ * [Scheduled delivery](https://help.vtex.com/tutorial/scheduled-delivery--22g3HAVCGLFiU7xugShOBi) window information, if it applies to the item.
+ */
+deliveryWindow: string
+/**
+ * [Carrier](https://help.vtex.com/en/tutorial/transportadoras-na-vtex--7u9duMD5UQa2QQwukAWMcE) company's name.
+ */
+deliveryCompany: string
+/**
+ * Total shipping estimate time in days. For instance, three business days is represented `3bd`.
+ */
+shippingEstimate: string
+/**
+ * Shipping estimate date. It is defined only after the confirmation of the order.
+ */
+shippingEstimateDate: string
+/**
+ * Information on Service Level Agreement (SLA), corresponding to [shipping policies](https://help.vtex.com/tutorial/shipping-policy--tutorials_140).
+ */
+slas: Sla[]
+/**
+ * Three letters ISO code of the country of the shipping address (ISO 3166 ALPHA-3).
+ */
+shipsTo: string[]
+/**
+ * Information about delivery IDs.
+ */
+deliveryIds: DeliveryId[]
+/**
+ * List of delivery channels associated with the trade policy.
+ */
+deliveryChannels: {
+/**
+ * Delivery channel's shipping type, which can be `delivery` or `pickup-in-point`.
+ */
+id: string
+/**
+ * Stock check for an SKU availability.
+ */
+stockBalance: number
+}[]
+/**
+ * If the delivery channel is `delivery` or `pickup-in-point`.
+ */
+deliveryChannel: string
+pickupStoreInfo: PickupStoreInfo
+/**
+ * Address ID.
+ */
+addressId: string
+/**
+ * Shipping address version ID.
+ */
+versionId: string
+/**
+ * Shipping address entity ID.
+ */
+entityId: string
+/**
+ * Name of the [polygon](https://help.vtex.com/en/tutorial/registering-geolocation/) associated with the shipping policy.
+ */
+polygonName: string
+/**
+ * [Pickup point](https://help.vtex.com/en/tutorial/pickup-points--2fljn6wLjn8M4lJHA6HP3R)'s ID.
+ */
+pickupPointId: string
+/**
+ * Duration in business days of the time the carrier takes in transit to fulfill the order. For example, three business days is represented `3bd`.
+ */
+transitTime: string
+}
+export interface Sla {
+/**
+ * ID of the shipping method used in the [shipping policy](https://help.vtex.com/en/tutorial/shipping-policy--tutorials_140).
+ */
+id: string
+/**
+ * Name of the shipping policy.
+ */
+name: string
+/**
+ * Total shipping estimate time in days. For instance, three business days is represented `3bd`.
+ */
+shippingEstimate: string
+/**
+ * [Scheduled delivery window](https://help.vtex.com/tutorial/scheduled-delivery--22g3HAVCGLFiU7xugShOBi) information, if it applies to the item.
+ */
+deliveryWindow: string
+/**
+ * Shipping price for the item in cents. Does not account for the whole order's shipping price.
+ */
+price: number
+/**
+ * If the delivery channel is `delivery` or `pickup-in-point`.
+ */
+deliveryChannel: string
+pickupStoreInfo: PickupStoreInfo
+/**
+ * Name of the [polygon](https://help.vtex.com/en/tutorial/registering-geolocation/) associated with the shipping policy.
+ */
+polygonName: string
+/**
+ * Logistics [reservation](https://help.vtex.com/en/tutorial/how-does-reservation-work--tutorials_92) waiting time of the SLA.
+ */
+lockTTL: string
+/**
+ * [Pickup point](https://help.vtex.com/en/tutorial/pickup-points--2fljn6wLjn8M4lJHA6HP3R) ID related to the SLA.
+ */
+pickupPointId: string
+/**
+ * Duration in business days of the time the carrier takes in transit to fulfill the order. For example, three business days is represented `3bd`.
+ */
+transitTime: string
+/**
+ * Distance in kilometers between the pickup point and the customer's address. The distance is measured as a straight line.
+ */
+pickupDistance: number
+}
+/**
+ * Detailed information about a [pickup point](https://help.vtex.com/en/tutorial/pickup-points--2fljn6wLjn8M4lJHA6HP3R).
+ */
+export interface PickupStoreInfo {
+/**
+ * Additional information about the pickup point.
+ */
+additionalInfo: string
+/**
+ * Pickup point's address.
+ */
+address: string
+/**
+ * ID of the [loading dock](https://help.vtex.com/pt/tutorial/doca--5DY8xHEjOLYDVL41Urd5qj) related to the delivery or the pickup point.
+ */
+dockId: string
+/**
+ * Name of the pickup point displayed at checkout.
+ */
+friendlyName: string
+/**
+ * If this field is set `true`, it means the type of shipping is pickup, and if set as `false`, it is not.
+ */
+isPickupStore: boolean
+}
+/**
+ * Information about delivery IDs.
+ */
+export interface DeliveryId {
+/**
+ * [Carrier](https://help.vtex.com/en/tutorial/transportadoras-na-vtex--7u9duMD5UQa2QQwukAWMcE)'s ID.
+ */
+courierId: string
+/**
+ * Carrier's name.
+ */
+courierName: string
+/**
+ * ID of the [loading dock](https://help.vtex.com/pt/tutorial/doca--5DY8xHEjOLYDVL41Urd5qj).
+ */
+dockId: string
+/**
+ * Quantity of items.
+ */
+quantity: number
+/**
+ * ID of the [warehouse](https://help.vtex.com/tutorial/warehouse--6oIxvsVDTtGpO7y6zwhGpb).
+ */
+warehouseId: string
+/**
+ * Name of the account's [carrier](https://help.vtex.com/en/tutorial/transportadoras-na-vtex--7u9duMD5UQa2QQwukAWMcE).
+ */
+accountCarrierName: string
+/**
+ * Information about [kits](https://help.vtex.com/tutorial/what-is-a-kit--5ov5s3eHM4AqAAgqWwoc28), if there are any.
+ */
+kitItemDetails: string[]
+}
+export interface SelectedAddress {
+/**
+ * Selected address ID.
+ */
+addressId: string
+/**
+ * Shipping address version ID of the selected address.
+ */
+versionId: string
+/**
+ * Shipping address entity ID  of the selected address.
+ */
+entityId: string
+/**
+ * Selected adress's shipping type, which can be `pickup`, `residential`, `invoice`, `search`, `inStore`, `commercial` or `giftRegistry`.
+ */
+addressType: string
+/**
+ * Name of the person who is going to receive the order in the selected address.
+ */
+receiverName: string
+/**
+ * Street of the selected address.
+ */
+street: string
+/**
+ * Number of the building, house or apartment of the selected address.
+ */
+number: string
+/**
+ * Complement to the selected address if it applies.
+ */
+complement: string
+/**
+ * Neighborhood of the selected address.
+ */
+neighborhood: string
+/**
+ * Postal code of the selected address.
+ */
+postalCode: string
+/**
+ * City of the selected address.
+ */
+city: string
+/**
+ * State of the selected address.
+ */
+state: string
+/**
+ * Three letters ISO code of the country of the selected address (ISO 3166 ALPHA-3).
+ */
+country: string
+/**
+ * Complement to help locate the selected address.
+ */
+reference: string
+/**
+ * Array with two numbers with the selected address's geocoordinates, first longitude then latitude.
+ */
+geoCoordinates: number[]
+}
+/**
+ * Object with information about the payment.
+ */
+export interface PaymentData {
+/**
+ * Array with information about Gift Cards.
+ */
+giftCards?: string[]
+/**
+ * Information about financial transactions.
+ */
+transactions: Transaction[]
+}
+/**
+ * Financial transaction details.
+ */
+export interface Transaction {
+/**
+ * When this field is set as `true`, the payment is active, and when it is `false`, the payment is inactive.
+ */
+isActive: boolean
+/**
+ * ID of the transaction.
+ */
+transactionId: string
+/**
+ * Name of the merchant that will receive the payment.
+ */
+merchantName: string
+/**
+ * Detailed information about payment.
+ */
+payments: Payment[]
+}
+/**
+ * Payment details.
+ */
+export interface Payment {
+/**
+ * VTEX payment ID that can be used as unique identifier.
+ */
+id: string
+/**
+ * Payment system's ID.
+ */
+paymentSystem: string
+/**
+ * Payment system's name.
+ */
+paymentSystemName: string
+/**
+ * Payment's final amount in cents.
+ */
+value: number
+/**
+ * Number of payment installments.
+ */
+installments: number
+/**
+ * Payment's reference value in cents.
+ */
+referenceValue: number
+/**
+ * Name of the person who owns the card.
+ */
+cardHolder: string
+/**
+ * Numeric sequence of the card used in the transaction.
+ */
+cardNumber: string
+/**
+ * Fist digits of the card used in the transaction.
+ */
+firstDigits: string
+/**
+ * Last digits of the card used in the transaction.
+ */
+lastDigits: string
+/**
+ * Card Verification Value (CVV2) is a security code used by payment processors to reduce fraudulent credit and debit card transactions.
+ */
+cvv2: string
+/**
+ * Expire month of the card used in the transaction (2-digits).
+ */
+expireMonth: string
+/**
+ * Expire year of the card used in the transaction (4-digits).
+ */
+expireYear: string
+/**
+ * Payment's URL.
+ */
+url: string
+/**
+ * Gift Card's ID.
+ */
+giftCardId: string
+/**
+ * Gift Card's name.
+ */
+giftCardName: string
+/**
+ * Gift Card's caption.
+ */
+giftCardCaption: string
+/**
+ * Code for the customer to use the Gift Card.
+ */
+redemptionCode: string
+/**
+ * Name of the collection the Gift Card belongs to.
+ */
+group: string
+/**
+ * Provider's unique identifier for the transaction.
+ */
+tid: string
+/**
+ * Payment due date, with the format `yyyy-mm-dd`.
+ */
+dueDate: string
+/**
+ * Information about the connector responses.
+ */
+connectorResponses: {
+/**
+ * Provider's unique identifier for the transaction.
+ */
+Tid: string
+/**
+ * Provider's operation/error code to be logged.
+ */
+ReturnCode: string
+/**
+ * Provider's operation/error message to be logged.
+ */
+Message: string
+/**
+ * Connector's authorization ID.
+ */
+authId: string
+}
+/**
+ * Gift Card provider's ID.
+ */
+giftCardProvider: string
+/**
+ * When this field is set as `true`, the Gift Card is a discount over the price, and when set as `false`, it is not a discount.
+ */
+giftCardAsDiscount: boolean
+/**
+ * Payment's account ID.
+ */
+koinUrl: string
+/**
+ * Payment's account ID.
+ */
+accountId: string
+/**
+ * This field retrieves the main account if the payment was made in a subaccount.
+ */
+parentAccountId: string
+/**
+ * Numeric sequence that identifies the bank issued invoice.
+ */
+bankIssuedInvoiceIdentificationNumber: string
+/**
+ * Bank issued invoice ID formatted.
+ */
+bankIssuedInvoiceIdentificationNumberFormatted: string
+/**
+ * Number of the bank issued invoice bar code.
+ */
+bankIssuedInvoiceBarCodeNumber: string
+/**
+ * Type of the bank issued invoice bar code.
+ */
+bankIssuedInvoiceBarCodeType: string
+/**
+ * Billing address information.
+ */
+billingAddress: {
+
+}
+}
+/**
+ * Package object populated after order invoiced.
+ */
+export interface PackageAttachment {
+/**
+ * Packages details.
+ */
+packages: string[]
+}
+/**
+ * Information about the seller associated with the order.
+ */
+export interface Seller {
+/**
+ * Seller ID that identifies the seller.
+ */
+id: string
+/**
+ * Seller's name.
+ */
+name: string
+/**
+ * URL of the seller's logo.
+ */
+logo: string
+/**
+ * URL of the endpoint for fulfillment of seller's orders.
+ */
+fulfillmentEndpoint: string
+}
+/**
+ * Information about changes in the order.
+ */
+export interface ChangesAttachment {
+/**
+ * Object ID, the expect value is `changeAttachment`.
+ */
+id: string
+/**
+ * Order change details.
+ */
+changesData: ChangesDatum[]
+}
+export interface ChangesDatum {
+/**
+ * Text explaining why there was a change in the order. This information may be shown to the customer in the UI or transactional emails.
+ */
+reason: string
+/**
+ * Order change discount value.
+ */
+discountValue: number
+/**
+ * Order change increment value.
+ */
+incrementValue: number
+/**
+ * List of items added to the order.
+ */
+itemsAdded: string[]
+/**
+ * List of items removed from the order.
+ */
+itemsRemoved: ItemsRemoved[]
+receipt: Receipt
+}
+export interface ItemsRemoved {
+/**
+ * SKU ID of the item removed from the order.
+ */
+id: string
+/**
+ * Name of the item removed from the order.
+ */
+name: string
+/**
+ * Quantity of items removed from the order.
+ */
+quantity: number
+/**
+ * Total amount of items removed from the order.
+ */
+price: number
+/**
+ * Unit multiplier of the item removed from the order.
+ */
+unitMultiplier: string
+}
+/**
+ * Information about the receipt for modified orders.
+ */
+export interface Receipt {
+/**
+ * Date when the receipt was created.
+ */
+date: string
+/**
+ * ID of the order.
+ */
+orderId: string
+/**
+ * Receipt's unique identifier code.
+ */
+receipt: string
+}
+/**
+ * Object with data from the store's configuration - stored in VTEX's License Manager.
+ */
+export interface StorePreferencesData {
+/**
+ * Three letters ISO code of the country (ISO 3166 ALPHA-3).
+ */
+countryCode: string
+/**
+ * Currency code in ISO 4217. For example, `BRL`.
+ */
+currencyCode: string
+currencyFormatInfo: CurrencyFormatInfo
+/**
+ * Currency Locale Code in LCID in decimal.
+ */
+currencyLocale: number
+/**
+ * Currency symbol.
+ */
+currencySymbol: string
+/**
+ * Time zone from where the order was made.
+ */
+timeZone: string
+}
+/**
+ * Object with currency format details.
+ */
+export interface CurrencyFormatInfo {
+/**
+ * Quantity of currency decimal digits.
+ */
+CurrencyDecimalDigits: number
+/**
+ * Defines what currency decimal separator will be applied.
+ */
+CurrencyDecimalSeparator: string
+/**
+ * Defines what currency group separator will be applied.
+ */
+CurrencyGroupSeparator: string
+/**
+ * Defines how many characters will be grouped.
+ */
+CurrencyGroupSize: number
+/**
+ * Defines if all prices will be initiated with the currency symbol (`true`) or not (`false`).
+ */
+StartsWithCurrencySymbol: boolean
+}
+/**
+ * Details about the marketplace related to the order.
+ */
+export interface Marketplace {
+/**
+ * Marketplace base URL.
+ */
+baseURL: string
+/**
+ * If is a certified marketplace.
+ */
+isCertified: string
+/**
+ * Name of the marketplace.
+ */
+name: string
 }

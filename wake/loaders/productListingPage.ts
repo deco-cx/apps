@@ -1,6 +1,7 @@
 import type { ProductListingPage } from "../../commerce/types.ts";
 import { SortOption } from "../../commerce/types.ts";
 import { capitalize } from "../../utils/capitalize.ts";
+import { handleAuthError } from "../utils/authError.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import type { AppContext } from "../mod.ts";
 import {
@@ -243,24 +244,34 @@ const searchLoader = async (
     partnerAccessToken,
   };
 
-  if (!query && !isHotsite && !partnerAccessToken) return null;
+  if (!query && !isHotsite && !partnerAccessToken) {
+    console.warn(
+      "ProductListingPage: No search query, hotsite, or partner token provided - returning null",
+    );
+    return null;
+  }
 
-  const data = isHotsite
-    ? await storefront.query<HotsiteQuery, HotsiteQueryVariables>({
-      variables: {
-        ...commonParams,
-        url: url.pathname,
-      },
-      ...Hotsite,
-    })
-    : await storefront.query<SearchQuery, SearchQueryVariables>({
-      variables: {
-        ...commonParams,
-        query,
-        operation,
-      },
-      ...Search,
-    });
+  let data: SearchQuery | HotsiteQuery | undefined;
+  try {
+    data = isHotsite
+      ? await storefront.query<HotsiteQuery, HotsiteQueryVariables>({
+        variables: {
+          ...commonParams,
+          url: url.pathname,
+        },
+        ...Hotsite,
+      }, { headers })
+      : await storefront.query<SearchQuery, SearchQueryVariables>({
+        variables: {
+          ...commonParams,
+          query,
+          operation,
+        },
+        ...Search,
+      }, { headers });
+  } catch (error: unknown) {
+    handleAuthError(error, "load products");
+  }
 
   const products = data?.result?.productsByOffset?.items ?? [];
 
@@ -335,6 +346,43 @@ const searchLoader = async (
         return toProduct(variant, { base: url }, productVariations);
       }),
   };
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
+  const url = new URL(props.pageHref || req.url);
+
+  // Don't cache search queries to ensure freshness
+  if (url.searchParams.get("q") || url.searchParams.get("query")) {
+    return null;
+  }
+
+  // Avoid cross-tenant cache bleed when a partner token is present
+  if (getPartnerCookie(req.headers)) {
+    return null;
+  }
+
+  const params = new URLSearchParams([
+    ["limit", (props.limit || 12).toString()],
+    ["page", (props.page || 0).toString()],
+    ["sort", props.sort || ""],
+    ["pageOffset", (props.pageOffset || 0).toString()],
+  ]);
+
+  // Add any filter parameters
+  url.searchParams.forEach((value, key) => {
+    if (
+      key === "filtro" || key === "q" || key === "sort" ||
+      key === "page"
+    ) {
+      params.append(key, value);
+    }
+  });
+
+  params.sort();
+  url.search = params.toString();
+  return url.href;
 };
 
 export default searchLoader;

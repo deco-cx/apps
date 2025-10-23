@@ -22,10 +22,11 @@ export interface State {
 }
 
 /**
- * @name Readwise
- * @description Integrate with the Readwise API to fetch and save your reading highlights
+ * @title Readwise
+ * @appName readwise
+ * @description Access highlights and notes synced from your favorite reading sources.
  * @category Productivity
- * @logo https://s3.amazonaws.com/readwiseio/2020/11/Group-58.png
+ * @logo https://assets.decocache.com/mcp/609eb29f-fa70-4170-ae1c-4108f3a42ea0/Readwise.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { token } = props;

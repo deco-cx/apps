@@ -20218,8 +20218,86 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "CategoryFilter",
+          "description": "A filter used to view a subset of products in a collection matching a specific category value.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "The id of the category to filter on.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "MetafieldFilter",
           "description": "A filter used to view a subset of products in a collection matching a specific metafield value.\n\nOnly the following metafield types are currently supported:\n- `number_integer`\n- `number_decimal`\n- `single_line_text_field`\n- `boolean` as of 2022-04.\n",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "key",
+              "description": "The key of the metafield to filter on.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "namespace",
+              "description": "The namespace of the metafield to filter on.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "value",
+              "description": "The value of the metafield.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "TaxonomyMetafieldFilter",
+          "description": "A filter used to view a subset of products in a collection matching a specific taxonomy metafield value.",
           "fields": null,
           "inputFields": [
             {
@@ -27010,6 +27088,16 @@
               "defaultValue": null
             },
             {
+              "name": "category",
+              "description": "A product category to filter on.",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "CategoryFilter",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "price",
               "description": "A range of prices to filter with-in.",
               "type": {
@@ -27055,6 +27143,16 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "taxonomyMetafield",
+              "description": "A standard product attribute metafield to filter on.",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "TaxonomyMetafieldFilter",
                 "ofType": null
               },
               "defaultValue": null

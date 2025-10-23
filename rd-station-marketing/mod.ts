@@ -21,10 +21,11 @@ export interface State {
 }
 
 /**
- * @name RD Station Marketing
- * @description Integration with RD Station Marketing API for managing contacts and segmentations
+ * @title RD Station Marketing
+ * @appName rd-station-marketing
+ * @description Manage contacts, segments, and campaigns in RD Station.
  * @category Marketing
- * @logo https://rdstation.com/favicon.ico
+ * @logo https://assets.decocache.com/mcp/ed2e7962-6774-4ed9-9275-e22f7f1f267a/RD-Station.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { token } = props;

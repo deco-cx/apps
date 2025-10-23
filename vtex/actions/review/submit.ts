@@ -15,6 +15,10 @@ export interface Props {
 
 // docs https://developers.vtex.com/docs/api-reference/reviews-and-ratings-api#post-/reviews-and-ratings/api/review?endpoint=post-/reviews-and-ratings/api/review
 
+/**
+ * @title Submit Review
+ * @description Submit a review
+ */
 const action = async (
   props: Props,
   req: Request,

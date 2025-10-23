@@ -28,10 +28,11 @@ export interface State {
 }
 
 /**
- * @name Turso DB
- * @description Run SQL queries on Turso SQLite databases
+ * @title TursoDB
+ * @appName turso-db
+ * @description Run fast SQL queries on distributed SQLite databases.
  * @category Databases
- * @logo https://images.saasworthy.com/turso_45912_logo_1698482949_utu4o.jpg
+ * @logo https://assets.decocache.com/mcp/3ebbc3e0-59d3-41b3-8cbc-3649b7ba8052/Turso-DB.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { token, databaseUrl } = props;

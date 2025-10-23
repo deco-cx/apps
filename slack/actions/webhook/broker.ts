@@ -15,7 +15,6 @@ export default function webhookPayload(
   req: Request,
   ctx: AppContext,
 ): Promise<{ challenge: string }> {
-  console.log("webhookPayload", props, ctx.webhookUrl);
   const response = Promise.resolve({ challenge: props.challenge });
   if (!ctx.webhookUrl) {
     return response;
@@ -34,7 +33,7 @@ export default function webhookPayload(
     method: "POST",
     body: JSON.stringify(props),
     headers: {
-      "content-type": "application/json",
+      "Content-Type": "application/json",
     },
   });
   return response;
