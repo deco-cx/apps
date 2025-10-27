@@ -143,7 +143,10 @@ export class BotRouter {
    * @returns A deep copy of the routing configuration
    */
   getConfig(): BotRoutingConfig {
-    return structuredClone(this.config);
+    // Deno/Node >=17 have structuredClone; otherwise JSON round-trip.
+    return typeof structuredClone === "function"
+      ? structuredClone(this.config)
+      : JSON.parse(JSON.stringify(this.config));
   }
 
   /**
