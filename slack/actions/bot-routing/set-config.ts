@@ -1,4 +1,5 @@
 import type { AppContext } from "../../mod.ts";
+import type { ChannelBotConfig } from "../../types/bot-routing.ts";
 import { validateBotConfig } from "../../utils/bot-router.ts";
 
 export interface Props {
@@ -108,6 +109,9 @@ export default async function setChannelBotConfig(
   // Check if bot configuration already exists
   const { botRouter } = ctx;
   const existingBot = botRouter.hasChannelBot(channelId);
+  const existingBotConfig = existingBot
+    ? botRouter.getAllChannelBots()[channelId]
+    : null;
 
   if (existingBot && !forceUpdate) {
     return {
@@ -119,10 +123,10 @@ export default async function setChannelBotConfig(
 
   try {
     const now = new Date().toISOString();
-    const botId = `bot-${channelId}-${Date.now()}`;
+    const botId = existingBotConfig?.id || `bot-${channelId}-${Date.now()}`;
 
     // Create new bot configuration
-    const newBotConfig = {
+    const newBotConfig: ChannelBotConfig = {
       id: botId,
       channelId,
       botName,
@@ -133,11 +137,9 @@ export default async function setChannelBotConfig(
       clientId,
       clientSecret,
       isActive,
-      createdAt: existingBot
-        ? botRouter.getAllChannelBots()[channelId]?.createdAt || now
-        : now,
+      createdAt: existingBotConfig?.createdAt || now,
       updatedAt: now,
-      createdBy: undefined, // Could be extracted from request context
+      createdBy: existingBotConfig?.createdBy, // Could be extracted from request context
       metadata,
     };
 

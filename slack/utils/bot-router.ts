@@ -45,10 +45,14 @@ export class BotRouter {
    * @param config The bot configuration
    */
   setChannelBot(channelId: string, config: ChannelBotConfig): void {
+    const existingBot = this.config.channelBots[channelId];
+    const now = new Date().toISOString();
+
     this.config.channelBots[channelId] = {
       ...config,
       channelId,
-      updatedAt: new Date().toISOString(),
+      createdAt: existingBot?.createdAt || config.createdAt || now,
+      updatedAt: now,
     };
   }
 
@@ -92,8 +96,14 @@ export class BotRouter {
    * @returns Array of all bot configurations
    */
   listAllConfigurations(): ChannelBotConfig[] {
-    const configurations = [this.config.defaultBot];
+    const configurations: ChannelBotConfig[] = [];
 
+    // Only include default bot if it exists and is active
+    if (this.config.defaultBot && this.config.defaultBot.isActive) {
+      configurations.push(this.config.defaultBot);
+    }
+
+    // Include channel bots that are active
     Object.values(this.config.channelBots).forEach((config) => {
       if (config.isActive) {
         configurations.push(config);

@@ -453,8 +453,6 @@ If you're upgrading from a previous version that only supported a single bot con
 
 ## Troubleshooting
 
-## Troubleshooting
-
 ### Bot Routing Issues
 
 1. **Wrong bot responding in channel**:
