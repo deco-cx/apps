@@ -116,8 +116,17 @@ export interface ResolvedBotConfig {
 /**
  * @description Public bot configuration that omits sensitive fields
  */
-export interface PublicChannelBotConfig
-  extends Omit<ChannelBotConfig, "botToken" | "clientSecret"> {}
+export interface PublicChannelBotConfig extends
+  Omit<
+    ChannelBotConfig,
+    "botToken" | "clientSecret" | "clientId" | "metadata"
+  > {
+  // Presence flags for sensitive fields
+  hasClientId: boolean;
+  hasMetadata: boolean;
+  // Curated public metadata (safe subset)
+  publicMetadata?: Record<string, string | number | boolean>;
+}
 
 /**
  * @description Public bot configuration with presence flags for sensitive fields
@@ -133,11 +142,15 @@ export interface PublicBotConfigWithFlags {
   createdAt: string;
   updatedAt: string;
   createdBy?: string;
-  metadata?: Record<string, unknown>;
+
+  // Curated public metadata (safe subset)
+  publicMetadata?: Record<string, string | number | boolean>;
 
   // Presence flags for sensitive fields
   hasBotToken: boolean;
   hasClientSecret: boolean;
+  hasClientId: boolean;
+  hasMetadata: boolean;
 }
 
 /**

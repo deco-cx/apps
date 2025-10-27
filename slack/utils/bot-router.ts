@@ -32,8 +32,20 @@ export class BotRouter {
     }
 
     // Fall back to default bot configuration
+    const defaultBot = this.config.defaultBot;
+
+    if (!defaultBot) {
+      throw new Error("No default bot configuration available");
+    }
+
+    if (!defaultBot.isActive) {
+      throw new Error(
+        "Default bot configuration is inactive and cannot be used",
+      );
+    }
+
     return {
-      config: this.config.defaultBot,
+      config: defaultBot,
       isDefault: true,
       channelId,
     };
@@ -128,10 +140,10 @@ export class BotRouter {
 
   /**
    * @description Gets the current routing configuration
-   * @returns The complete routing configuration
+   * @returns A deep copy of the routing configuration
    */
   getConfig(): BotRoutingConfig {
-    return { ...this.config };
+    return structuredClone(this.config);
   }
 
   /**

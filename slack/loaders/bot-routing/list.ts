@@ -40,11 +40,31 @@ export default function listBotConfigurations(
   const redactBotConfig = (
     config: ChannelBotConfig,
   ): PublicBotConfigWithFlags => {
-    const { botToken, clientSecret, ...publicFields } = config;
+    const { botToken, clientSecret, clientId, metadata, ...publicFields } =
+      config;
+
+    // Extract safe metadata subset (only string, number, boolean values)
+    const publicMetadata: Record<string, string | number | boolean> = {};
+    if (metadata && typeof metadata === "object") {
+      for (const [key, value] of Object.entries(metadata)) {
+        if (
+          typeof value === "string" || typeof value === "number" ||
+          typeof value === "boolean"
+        ) {
+          publicMetadata[key] = value;
+        }
+      }
+    }
+
     return {
       ...publicFields,
+      publicMetadata: Object.keys(publicMetadata).length > 0
+        ? publicMetadata
+        : undefined,
       hasBotToken: Boolean(botToken),
       hasClientSecret: Boolean(clientSecret),
+      hasClientId: Boolean(clientId),
+      hasMetadata: Boolean(metadata && Object.keys(metadata).length > 0),
     };
   };
 
