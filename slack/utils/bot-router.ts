@@ -101,10 +101,10 @@ export class BotRouter {
 
   /**
    * @description Gets the default bot configuration
-   * @returns The default bot configuration
+   * @returns A deep copy of the default bot configuration
    */
   getDefaultBot(): ChannelBotConfig {
-    return this.config.defaultBot;
+    return structuredClone(this.config.defaultBot);
   }
 
   /**
@@ -154,7 +154,7 @@ export class BotRouter {
    * @param config The new routing configuration
    */
   updateConfig(config: BotRoutingConfig): void {
-    this.config = config;
+    this.config = structuredClone(config);
   }
 }
 
