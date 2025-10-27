@@ -1,5 +1,8 @@
 import type { AppContext } from "../../mod.ts";
-import { ChannelBotConfig } from "../../types/bot-routing.ts";
+import {
+  ChannelBotConfig,
+  PublicBotConfigWithFlags,
+} from "../../types/bot-routing.ts";
 
 export interface Props {
   /**
@@ -13,30 +16,9 @@ export interface Props {
   includeInactive?: boolean;
 }
 
-/**
- * @description Public bot configuration that omits sensitive fields and includes presence flags
- */
-export interface PublicBotConfig {
-  id: string;
-  channelId: string;
-  botName: string;
-  displayName?: string;
-  avatar?: string;
-  description?: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  createdBy?: string;
-  metadata?: Record<string, unknown>;
-
-  // Presence flags for sensitive fields
-  hasBotToken: boolean;
-  hasClientSecret: boolean;
-}
-
 export interface BotConfigListResponse {
-  defaultBot: PublicBotConfig;
-  channelBots: PublicBotConfig[];
+  defaultBot: PublicBotConfigWithFlags;
+  channelBots: PublicBotConfigWithFlags[];
   totalConfigs: number;
   teamId: string;
 }
@@ -55,7 +37,9 @@ export default function listBotConfigurations(
   const { botRouter, teamId } = ctx;
 
   // Helper function to redact sensitive fields and add presence flags
-  const redactBotConfig = (config: ChannelBotConfig): PublicBotConfig => {
+  const redactBotConfig = (
+    config: ChannelBotConfig,
+  ): PublicBotConfigWithFlags => {
     const { botToken, clientSecret, ...publicFields } = config;
     return {
       ...publicFields,

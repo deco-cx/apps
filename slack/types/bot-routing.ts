@@ -114,6 +114,53 @@ export interface ResolvedBotConfig {
 }
 
 /**
+ * @description Public bot configuration that omits sensitive fields
+ */
+export interface PublicChannelBotConfig
+  extends Omit<ChannelBotConfig, "botToken" | "clientSecret"> {}
+
+/**
+ * @description Public bot configuration with presence flags for sensitive fields
+ */
+export interface PublicBotConfigWithFlags {
+  id: string;
+  channelId: string;
+  botName: string;
+  displayName?: string;
+  avatar?: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: string;
+  metadata?: Record<string, unknown>;
+
+  // Presence flags for sensitive fields
+  hasBotToken: boolean;
+  hasClientSecret: boolean;
+}
+
+/**
+ * @description Public resolved bot config that omits sensitive fields
+ */
+export interface PublicResolvedBotConfig {
+  /**
+   * @description The bot configuration to use (without sensitive fields)
+   */
+  config: PublicChannelBotConfig;
+
+  /**
+   * @description Whether this is the default bot or channel-specific
+   */
+  isDefault: boolean;
+
+  /**
+   * @description Channel ID this was resolved for
+   */
+  channelId: string;
+}
+
+/**
  * @description Request to create or update a bot configuration
  */
 export interface BotConfigRequest {

@@ -69,9 +69,13 @@ export class BotRouter {
    * @param config The new default bot configuration
    */
   setDefaultBot(config: ChannelBotConfig): void {
+    const existingDefaultBot = this.config.defaultBot;
+    const now = new Date().toISOString();
+
     this.config.defaultBot = {
       ...config,
-      updatedAt: new Date().toISOString(),
+      createdAt: existingDefaultBot?.createdAt || config.createdAt || now,
+      updatedAt: now,
     };
   }
 

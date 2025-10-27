@@ -1,6 +1,8 @@
 import type { AppContext } from "../../mod.ts";
 import {
   ChannelBotConfig,
+  PublicChannelBotConfig,
+  PublicResolvedBotConfig,
   ResolvedBotConfig,
 } from "../../types/bot-routing.ts";
 
@@ -9,32 +11,6 @@ export interface Props {
    * @description Array of channel IDs to compare configurations for
    */
   channelIds: string[];
-}
-
-/**
- * @description Public bot configuration that omits sensitive fields
- */
-export interface PublicChannelBotConfig
-  extends Omit<ChannelBotConfig, "botToken" | "clientSecret"> {}
-
-/**
- * @description Public resolved bot config that omits sensitive fields
- */
-export interface PublicResolvedBotConfig {
-  /**
-   * @description The bot configuration to use (without sensitive fields)
-   */
-  config: PublicChannelBotConfig;
-
-  /**
-   * @description Whether this is the default bot or channel-specific
-   */
-  isDefault: boolean;
-
-  /**
-   * @description Channel ID this was resolved for
-   */
-  channelId: string;
 }
 
 export interface ChannelComparisonResult {

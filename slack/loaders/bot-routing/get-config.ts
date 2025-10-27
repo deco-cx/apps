@@ -1,5 +1,10 @@
 import type { AppContext } from "../../mod.ts";
-import { ResolvedBotConfig } from "../../types/bot-routing.ts";
+import {
+  ChannelBotConfig,
+  PublicChannelBotConfig,
+  PublicResolvedBotConfig,
+  ResolvedBotConfig,
+} from "../../types/bot-routing.ts";
 
 export interface Props {
   /**
@@ -17,9 +22,31 @@ export default function getChannelBotConfig(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): ResolvedBotConfig {
+): PublicResolvedBotConfig {
   const { channelId } = props;
   const { botRouter } = ctx;
 
-  return botRouter.resolveForChannel(channelId);
+  // Helper function to redact sensitive fields from bot config
+  const redactBotConfig = (
+    config: ChannelBotConfig,
+  ): PublicChannelBotConfig => {
+    const {
+      botToken: _botToken,
+      clientSecret: _clientSecret,
+      ...publicConfig
+    } = config;
+    return publicConfig;
+  };
+
+  // Helper function to redact resolved config
+  const redactResolvedConfig = (
+    resolved: ResolvedBotConfig,
+  ): PublicResolvedBotConfig => ({
+    config: redactBotConfig(resolved.config),
+    isDefault: resolved.isDefault,
+    channelId: resolved.channelId,
+  });
+
+  const resolvedConfig = botRouter.resolveForChannel(channelId);
+  return redactResolvedConfig(resolvedConfig);
 }
