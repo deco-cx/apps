@@ -130,11 +130,11 @@ export class BotRouter {
   }
 
   /**
-   * @description Checks if a channel has a specific bot configuration
+   * @description Checks if a channel has an active bot configuration
    * @param channelId The channel ID to check
-   * @returns True if channel has specific configuration
+   * @returns True if channel has an active bot configuration
    */
-  hasChannelBot(channelId: string): boolean {
+  hasActiveChannelBot(channelId: string): boolean {
     return !!this.config.channelBots[channelId]?.isActive;
   }
 
@@ -214,6 +214,22 @@ export function validateBotConfig(config: Partial<ChannelBotConfig>): {
 
   if (config.description && config.description.length > 250) {
     errors.push("Description must be 250 characters or less");
+  }
+
+  if (config.isActive !== undefined && typeof config.isActive !== "boolean") {
+    errors.push("isActive must be a boolean");
+  }
+
+  if (config.id !== undefined && (!config.id || config.id.trim() === "")) {
+    errors.push("id must be a non-empty string");
+  }
+
+  // Validate OAuth credentials consistency
+  if (
+    (config.clientId && !config.clientSecret) ||
+    (!config.clientId && config.clientSecret)
+  ) {
+    errors.push("clientId and clientSecret must be provided together");
   }
 
   return {

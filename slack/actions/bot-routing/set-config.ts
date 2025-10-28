@@ -108,7 +108,7 @@ export default async function setChannelBotConfig(
 
   // Check if bot configuration already exists
   const { botRouter } = ctx;
-  const existingBot = botRouter.hasChannelBot(channelId);
+  const existingBot = botRouter.hasActiveChannelBot(channelId);
   const existingBotConfig = existingBot
     ? botRouter.getAllChannelBots()[channelId]
     : null;

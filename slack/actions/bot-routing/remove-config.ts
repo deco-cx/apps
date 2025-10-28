@@ -35,7 +35,7 @@ export default async function removeChannelBotConfig(
     const { botRouter } = ctx;
 
     // Check if bot configuration exists
-    if (!botRouter.hasChannelBot(channelId)) {
+    if (!botRouter.hasActiveChannelBot(channelId)) {
       return {
         success: false,
         message: `No bot configuration found for channel ${channelId}`,
