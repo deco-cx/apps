@@ -116,13 +116,13 @@ export class BotRouter {
 
     // Only include default bot if it exists and is active
     if (this.config.defaultBot && this.config.defaultBot.isActive) {
-      configurations.push(this.config.defaultBot);
+      configurations.push(structuredClone(this.config.defaultBot));
     }
 
     // Include channel bots that are active
     Object.values(this.config.channelBots).forEach((config) => {
       if (config.isActive) {
-        configurations.push(config);
+        configurations.push(structuredClone(config));
       }
     });
 
