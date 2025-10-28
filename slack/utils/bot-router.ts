@@ -92,11 +92,11 @@ export class BotRouter {
   }
 
   /**
-   * @description Gets all channel-specific bot configurations
-   * @returns Record of channel ID to bot configuration
+   * @description Gets all channel bot configurations
+   * @returns A deep copy of all channel bot configurations
    */
   getAllChannelBots(): Record<string, ChannelBotConfig> {
-    return { ...this.config.channelBots };
+    return structuredClone(this.config.channelBots);
   }
 
   /**
