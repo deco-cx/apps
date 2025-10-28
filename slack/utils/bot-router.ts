@@ -11,7 +11,7 @@ export class BotRouter {
   private config: BotRoutingConfig;
 
   constructor(config: BotRoutingConfig) {
-    this.config = config;
+    this.config = structuredClone(config);
   }
 
   /**
