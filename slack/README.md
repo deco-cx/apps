@@ -114,6 +114,7 @@ Configure your own Slack app for advanced use cases:
 2. Add the following OAuth scopes under "Bot Token Scopes":
    - `channels:read` - View basic information about public channels
    - `chat:write` - Send messages as the app
+   - `chat:write.customize` - Customize bot username and avatar per message
    - `reactions:write` - Add and edit emoji reactions
    - `channels:history` - View messages and content in public channels
    - `users:read` - View people in the workspace

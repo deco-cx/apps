@@ -106,6 +106,12 @@ export interface Props {
   customBotName?: string;
 
   /**
+   * @title Custom Bot Avatar
+   * @description Custom avatar for the bot (emoji like :robot: or image URL)
+   */
+  customBotAvatar?: string;
+
+  /**
    * @title Bot Routing Configuration
    * @description Configuration for channel-specific bot routing
    */
@@ -184,6 +190,8 @@ export default function App(
     return new SlackClient(
       props.tokens?.access_token || props.botToken || "",
       client,
+      props.customBotName,
+      props.customBotAvatar,
     );
   };
 
@@ -198,7 +206,8 @@ export default function App(
       botToken: config.botToken || appProps.botToken,
       clientId: config.clientId || appProps.clientId,
       clientSecret: config.clientSecret || appProps.clientSecret,
-      customBotName: config.botName,
+      customBotName: config.displayName || config.botName,
+      customBotAvatar: config.avatar,
     };
 
     return slackClientFor(channelProps);

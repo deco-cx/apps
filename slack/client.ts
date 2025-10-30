@@ -269,16 +269,22 @@ export interface SlackCompleteUploadResponse {
 export class SlackClient {
   private botHeaders: { Authorization: string; "Content-Type": string };
   private oauthClient?: OAuthClients<SlackApiClient, SlackAuthClient>;
+  private customBotName?: string;
+  private customBotAvatar?: string;
 
   constructor(
     botToken: string,
     oauthClient?: OAuthClients<SlackApiClient, SlackAuthClient>,
+    customBotName?: string,
+    customBotAvatar?: string,
   ) {
     this.botHeaders = {
       Authorization: `Bearer ${botToken}`,
       "Content-Type": "application/json; charset=utf-8",
     };
     this.oauthClient = oauthClient;
+    this.customBotName = customBotName;
+    this.customBotAvatar = customBotAvatar;
   }
 
   /**
@@ -373,6 +379,29 @@ export class SlackClient {
       text: text,
       ...opts,
     };
+
+    // Apply custom bot name if configured
+    if (this.customBotName) {
+      payload.as_user = false;
+      payload.username = this.customBotName;
+    }
+
+    // Apply custom avatar (emoji or image URL) if configured
+    if (this.customBotAvatar) {
+      payload.as_user = false;
+      if (
+        this.customBotAvatar.startsWith(":") &&
+        this.customBotAvatar.endsWith(":")
+      ) {
+        payload.icon_emoji = this.customBotAvatar;
+      } else if (this.customBotAvatar.startsWith("http")) {
+        payload.icon_url = this.customBotAvatar;
+      } else {
+        // Assume it's an emoji name without colons
+        payload.icon_emoji = `:${this.customBotAvatar}:`;
+      }
+    }
+
     // Remove text if blocks are provided and text is empty (Slack requires at least one of them)
     if (opts.blocks && opts.blocks.length > 0 && !text) {
       delete payload.text;
