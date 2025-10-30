@@ -380,24 +380,25 @@ export class SlackClient {
       ...opts,
     };
 
-    // Apply custom bot name and avatar if configured
+    // Apply custom bot name if configured
     if (this.customBotName) {
       payload.as_user = false;
       payload.username = this.customBotName;
+    }
 
-      // Apply custom avatar (emoji or image URL)
-      if (this.customBotAvatar) {
-        if (
-          this.customBotAvatar.startsWith(":") &&
-          this.customBotAvatar.endsWith(":")
-        ) {
-          payload.icon_emoji = this.customBotAvatar;
-        } else if (this.customBotAvatar.startsWith("http")) {
-          payload.icon_url = this.customBotAvatar;
-        } else {
-          // Assume it's an emoji name without colons
-          payload.icon_emoji = `:${this.customBotAvatar}:`;
-        }
+    // Apply custom avatar (emoji or image URL) if configured
+    if (this.customBotAvatar) {
+      payload.as_user = false;
+      if (
+        this.customBotAvatar.startsWith(":") &&
+        this.customBotAvatar.endsWith(":")
+      ) {
+        payload.icon_emoji = this.customBotAvatar;
+      } else if (this.customBotAvatar.startsWith("http")) {
+        payload.icon_url = this.customBotAvatar;
+      } else {
+        // Assume it's an emoji name without colons
+        payload.icon_emoji = `:${this.customBotAvatar}:`;
       }
     }
 
