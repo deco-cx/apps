@@ -400,7 +400,6 @@ export class SlackClient {
         }
       }
 
-      console.log(`📤 Sending message as custom bot: ${this.customBotName}`);
     }
 
     // Remove text if blocks are provided and text is empty (Slack requires at least one of them)
