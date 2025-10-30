@@ -399,7 +399,6 @@ export class SlackClient {
           payload.icon_emoji = `:${this.customBotAvatar}:`;
         }
       }
-
     }
 
     // Remove text if blocks are provided and text is empty (Slack requires at least one of them)
