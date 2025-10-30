@@ -25,7 +25,7 @@ export class BotRouter {
 
     if (channelBot && channelBot.isActive) {
       return {
-        config: channelBot,
+        config: structuredClone(channelBot),
         isDefault: false,
         channelId,
       };
@@ -45,7 +45,7 @@ export class BotRouter {
     }
 
     return {
-      config: defaultBot,
+      config: structuredClone(defaultBot),
       isDefault: true,
       channelId,
     };
