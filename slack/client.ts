@@ -269,16 +269,22 @@ export interface SlackCompleteUploadResponse {
 export class SlackClient {
   private botHeaders: { Authorization: string; "Content-Type": string };
   private oauthClient?: OAuthClients<SlackApiClient, SlackAuthClient>;
+  private customBotName?: string;
+  private customBotEmoji?: string;
 
   constructor(
     botToken: string,
     oauthClient?: OAuthClients<SlackApiClient, SlackAuthClient>,
+    customBotName?: string,
+    customBotEmoji?: string,
   ) {
     this.botHeaders = {
       Authorization: `Bearer ${botToken}`,
       "Content-Type": "application/json; charset=utf-8",
     };
     this.oauthClient = oauthClient;
+    this.customBotName = customBotName;
+    this.customBotEmoji = customBotEmoji;
   }
 
   /**
@@ -373,6 +379,16 @@ export class SlackClient {
       text: text,
       ...opts,
     };
+
+    // Apply custom bot name if configured
+    if (this.customBotName) {
+      payload.as_user = false;
+      payload.username = this.customBotName;
+      if (this.customBotEmoji) {
+        payload.icon_emoji = this.customBotEmoji;
+      }
+    }
+
     // Remove text if blocks are provided and text is empty (Slack requires at least one of them)
     if (opts.blocks && opts.blocks.length > 0 && !text) {
       delete payload.text;
@@ -410,14 +426,25 @@ export class SlackClient {
   ): Promise<
     SlackResponse<{ channel: string; ts: string; message: SlackMessage }>
   > {
+    const payload: Record<string, unknown> = {
+      channel: channelId,
+      thread_ts: threadTs,
+      text: text,
+    };
+
+    // Apply custom bot name if configured
+    if (this.customBotName) {
+      payload.as_user = false;
+      payload.username = this.customBotName;
+      if (this.customBotEmoji) {
+        payload.icon_emoji = this.customBotEmoji;
+      }
+    }
+
     const response = await fetch("https://slack.com/api/chat.postMessage", {
       method: "POST",
       headers: this.botHeaders,
-      body: JSON.stringify({
-        channel: channelId,
-        thread_ts: threadTs,
-        text: text,
-      }),
+      body: JSON.stringify(payload),
     });
 
     const result = await response.json();
