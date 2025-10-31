@@ -31,7 +31,8 @@ const loader = async (
     created: props.created,
     branch: props.branch,
   });
-  return await response.json();
+  const data = await response.json();
+  return { data };
 };
 
 export default loader;

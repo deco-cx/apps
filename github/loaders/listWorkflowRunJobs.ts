@@ -26,7 +26,8 @@ const loader = async (
       per_page: props.per_page,
       page: props.page,
     });
-  return await response.json();
+  const data = await response.json();
+  return { data };
 };
 
 export default loader;

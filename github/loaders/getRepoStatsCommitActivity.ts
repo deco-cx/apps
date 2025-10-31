@@ -20,7 +20,8 @@ const loader = async (
   if (response.status === 202) {
     return { status: 202 };
   }
-  return await response.json();
+  const data = await response.json();
+  return { data };
 };
 
 export default loader;

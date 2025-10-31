@@ -14,11 +14,12 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<GistSimple[]> => {
+): Promise<{ data: GistSimple[] }> => {
   const response = await ctx.client["GET /gists/public"]({
     ...props,
   });
-  return await response.json();
+  const data = await response.json();
+  return { data };
 };
 
 export default loader;

@@ -16,11 +16,12 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<Repository[]> => {
+): Promise<{ data: Repository[] }> => {
   const response = await ctx.client["GET /user/repos"]({
     ...props,
   });
-  return await response.json();
+  const data = await response.json();
+  return { data };
 };
 
 export default loader;

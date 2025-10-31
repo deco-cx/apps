@@ -42,7 +42,7 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<GithubIssueClean[] | { error: true; message: string }> => {
+): Promise<{ data: GithubIssueClean[] } | { error: true; message: string }> => {
   const { repoIdentify, issueFilters } = props;
   const { url } = repoIdentify;
   const { state, per_page, page, labels, issueNumber } = issueFilters;
@@ -87,7 +87,7 @@ const loader = async (
           message: `Issue number ${issueNumber} not found in this repository.`,
         };
       }
-      return mapIssues([issue]);
+      return { data: mapIssues([issue]) };
     }
 
     const response = await ctx.client["GET /repos/:owner/:repo/issues"]({
@@ -107,7 +107,7 @@ const loader = async (
           "This page contains only pull requests (no real issues). Try another page or adjust your filters.",
       };
     }
-    return mapped;
+    return { data: mapped };
   } catch (err: unknown) {
     if (
       typeof err === "object" &&
