@@ -57,10 +57,7 @@ export default async function uploadFile(
   }>
 > {
   try {
-    // Use channel-specific Slack client to get the right bot configuration
-    const slackClient = ctx.slackClientForChannel(props.channels);
-
-    return await slackClient.uploadFileV2({
+    return await ctx.slack.uploadFileV2({
       channels: props.channels,
       file: props.file,
       filename: props.filename,
