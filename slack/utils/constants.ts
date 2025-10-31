@@ -4,7 +4,6 @@ export const SCOPES = [
   "channels:join",
   "channels:read",
   "chat:write",
-  "chat:write.customize",
   "files:read",
   "files:write",
   "groups:read",

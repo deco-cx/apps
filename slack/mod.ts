@@ -9,9 +9,7 @@ import { createOAuthHttpClient } from "../mcp/utils/httpClient.ts";
 import { OAuthProvider, OAuthTokens } from "../mcp/utils/types.ts";
 import { SlackClient } from "./client.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { BotRoutingConfig } from "./types/bot-routing.ts";
 import { SlackApiClient, SlackAuthClient } from "./utils/client.ts";
-import { BotRouter, createDefaultBotRouting } from "./utils/bot-router.ts";
 import {
   API_URL,
   OAUTH_URL,
@@ -106,18 +104,6 @@ export interface Props {
   customBotName?: string;
 
   /**
-   * @title Custom Bot Avatar
-   * @description Custom avatar for the bot (emoji like :robot: or image URL)
-   */
-  customBotAvatar?: string;
-
-  /**
-   * @title Bot Routing Configuration
-   * @description Configuration for channel-specific bot routing
-   */
-  botRouting?: BotRoutingConfig;
-
-  /**
    * @description Callbacks for the slack binding
    */
   callbacks?: Callbacks;
@@ -126,8 +112,6 @@ export interface Props {
 export interface State extends Props {
   slack: SlackClient;
   slackClientFor: (p: Props) => SlackClient;
-  slackClientForChannel: (channelId: string) => SlackClient;
-  botRouter: BotRouter;
   cb: {
     forTeam: (teamId: string, channel: string) => string;
   };
@@ -146,15 +130,8 @@ export default function App(
   _req: Request,
   ctx?: McpContext<Props>,
 ) {
-  // Initialize bot routing configuration
-  const teamId = appProps.teamId || "";
-  const defaultBotName = appProps.customBotName || "deco.chat";
-
-  const botRouting = appProps.botRouting ||
-    createDefaultBotRouting(teamId, defaultBotName);
-  const botRouter = new BotRouter(botRouting);
-
   // Create OAuth client or fallback to direct token
+
   const slackClientFor = (props: Props) => {
     const { tokens, clientId, clientSecret } = props;
 
@@ -190,36 +167,13 @@ export default function App(
     return new SlackClient(
       props.tokens?.access_token || props.botToken || "",
       client,
-      props.customBotName,
-      props.customBotAvatar,
     );
-  };
-
-  // Create channel-specific Slack client
-  const slackClientForChannel = (channelId: string) => {
-    const resolvedBot = botRouter.resolveForChannel(channelId);
-    const config = resolvedBot.config;
-
-    // Create props for this specific bot configuration
-    const channelProps: Props = {
-      ...appProps,
-      botToken: config.botToken || appProps.botToken,
-      clientId: config.clientId || appProps.clientId,
-      clientSecret: config.clientSecret || appProps.clientSecret,
-      customBotName: config.displayName || config.botName,
-      customBotAvatar: config.avatar,
-    };
-
-    return slackClientFor(channelProps);
   };
 
   const state: State = {
     ...appProps,
     slack: slackClientFor(appProps),
     slackClientFor,
-    slackClientForChannel,
-    botRouter,
-    botRouting,
     cb: {
       forTeam: (teamId: string, channel: string) => {
         return `${teamId}-${channel}`;
