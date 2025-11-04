@@ -9,6 +9,14 @@ export interface Props {
   channelId: string;
 }
 
+export interface PinnedMessagesResponse {
+  /**
+   * @title Messages
+   * @description Mensagens fixadas do canal
+   */
+  messages: DiscordMessage[];
+}
+
 /**
  * @title Get Pinned Messages
  * @description Get all pinned messages from a Discord channel using Bot Token
@@ -17,7 +25,7 @@ export default async function getPinnedMessages(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<DiscordMessage[]> {
+): Promise<PinnedMessagesResponse> {
   const { channelId } = props;
   const { client } = ctx;
 
@@ -35,5 +43,5 @@ export default async function getPinnedMessages(
   }
 
   const messages = await response.json();
-  return messages;
+  return { messages };
 }
