@@ -354,7 +354,10 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
   const url = new URL(props.pageHref || req.url);
 
   // Don't cache search queries to ensure freshness
-  if (url.searchParams.get("q") || url.searchParams.get("query") || url.searchParams.get("busca")) {
+  if (
+    url.searchParams.get("q") || url.searchParams.get("query") ||
+    url.searchParams.get("busca")
+  ) {
     return null;
   }
 

@@ -9,6 +9,14 @@ export interface Props {
   guildId: string;
 }
 
+export interface GuildRolesResponse {
+  /**
+   * @title Roles
+   * @description Lista de roles do servidor
+   */
+  roles: DiscordRole[];
+}
+
 /**
  * @title Get Guild Roles
  * @description Get all roles from a Discord server using Bot Token
@@ -17,7 +25,7 @@ export default async function getGuildRoles(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<DiscordRole[]> {
+): Promise<GuildRolesResponse> {
   const { guildId } = props;
   const { client } = ctx;
 
@@ -35,5 +43,5 @@ export default async function getGuildRoles(
   }
 
   const roles = await response.json();
-  return roles;
+  return { roles };
 }
