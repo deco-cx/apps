@@ -44,7 +44,7 @@ export default function App({
   },
   emailTo,
   subject = "Contato via app resend",
-}: State) {
+}: Props) {
   const apiKeyToken = typeof apiKey === "string"
     ? apiKey
     : apiKey?.get?.() ?? "";
