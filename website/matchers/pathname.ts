@@ -5,6 +5,12 @@ interface BaseCase {
    * @description Must start with "/"
    */
   pathname?: string;
+  /**
+   * @title Negate
+   * @description Inverts the match result (NOT)
+   * @default false
+   */
+  negate?: boolean;
 }
 /**
  * @title Equals
@@ -61,6 +67,7 @@ const MatchPathname = (props: Props, { request }: MatchContext) => {
   if (!props.case.pathname) {
     return false;
   }
-  return operations[props.case.type](pathname, props.case.pathname);
+  const result = operations[props.case.type](pathname, props.case.pathname);
+  return props.case.negate ? !result : result;
 };
 export default MatchPathname;
