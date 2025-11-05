@@ -23,11 +23,19 @@ interface Includes extends BaseCase {
    */
   type: "Includes";
 }
+
+interface Template extends BaseCase {
+  /**
+   * @readonly
+   * @hide true
+   */
+  type: "Template";
+}
 export interface Props {
   /**
    * @title Operation
    */
-  case: Equals | Includes;
+  case: Equals | Includes | Template;
 }
 const operations: Record<
   Props["case"]["type"],
@@ -35,6 +43,12 @@ const operations: Record<
 > = Object.freeze({
   Equals: (pathname, value) => pathname === value,
   Includes: (pathname, value) => pathname.includes(value),
+  Template: (pathname, template) => {
+    // Convert template like "/:slug/p" to regex pattern
+    const pattern = template.replace(/:[^/]+/g, "([^/]+)");
+    const regex = new RegExp(`^${pattern}$`);
+    return regex.test(pathname);
+  },
 });
 /**
  * @title Pathname
