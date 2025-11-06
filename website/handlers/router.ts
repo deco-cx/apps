@@ -193,14 +193,20 @@ export default function RoutesSelection(
         pathTemplate: "/_d/assets/*",
         handler: {
           value: {
-            __resolveType: "website/handlers/image.ts"
-          }
-        }
+            __resolveType: "website/handlers/image.ts",
+          },
+        },
       },
       ...routes,
-    ]
+    ];
 
-    const server = router(routesToServe, hrefRoutes, ctx.get, { monitoring }, url);
+    const server = router(
+      routesToServe,
+      hrefRoutes,
+      ctx.get,
+      { monitoring },
+      url,
+    );
     timing?.end();
     return await server(req, connInfo);
   };
