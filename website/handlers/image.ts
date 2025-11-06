@@ -1,9 +1,11 @@
+import { PATH } from "../components/Image.tsx";
+
 const AWS_BUCKET_URL = "https://deco-sites-assets.s3.sa-east-1.amazonaws.com";
 
 export default function Image() {
   return async (req: Request) => {
     const url = new URL(req.url);
-    const imageUrl = url.pathname.split("/_d/assets/")[1];
+    const imageUrl = url.pathname.split(PATH)[1];
 
     if (imageUrl.startsWith("http")) {
       const loaderUrl =

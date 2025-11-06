@@ -1,9 +1,9 @@
 import { Head, IS_BROWSER } from "$fresh/runtime.ts";
 import type { JSX } from "preact";
 import { forwardRef } from "preact/compat";
-import { Manifest } from "../manifest.gen.ts";
 
-export const PATH: `/_d/assets/` = "/_d/assets/";
+export const PATH = "/_d/assets/";
+const DECO_CACHE_URL = "https://assets.decocache.com";
 
 export type SetEarlyHint = (hint: string) => void;
 export type Props =
@@ -134,8 +134,8 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   params.set("width", `${width}`);
   height && params.set("height", `${height}`);
 
-  if (originalSrc.startsWith("https://assets.decocache.com")) {
-    const onlyPath = originalSrc.split("assets.decocache.com")[1];
+  if (originalSrc.startsWith(DECO_CACHE_URL)) {
+    const onlyPath = originalSrc.split(DECO_CACHE_URL)[1];
     return `${PATH}${onlyPath}?${params}`;
   }
 

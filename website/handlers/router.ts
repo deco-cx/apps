@@ -38,6 +38,16 @@ const rankRoute = (pattern: string): number =>
       return acc + 3;
     }, 0);
 const urlPatternCache: Record<string, URLPattern> = {};
+const STATIC_SYSTEM_ROUTES = [
+  {
+    pathTemplate: "/_d/assets/*",
+    handler: {
+      value: {
+        __resolveType: "website/handlers/image.ts",
+      },
+    },
+  },
+];
 export const router = (
   routes: Route[],
   hrefRoutes: Record<string, Resolvable<Handler>> = {},
@@ -189,14 +199,7 @@ export default function RoutesSelection(
     } = routerCache.getValue(routerId);
 
     const routesToServe = [
-      {
-        pathTemplate: "/_d/assets/*",
-        handler: {
-          value: {
-            __resolveType: "website/handlers/image.ts",
-          },
-        },
-      },
+      ...STATIC_SYSTEM_ROUTES,
       ...routes,
     ];
 
