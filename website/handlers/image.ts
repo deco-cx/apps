@@ -13,7 +13,7 @@ export default function Image() {
       const response = await fetch(loaderUrl);
       return new Response(response.body, response);
     }
-    const response = await fetch(`${AWS_BUCKET_URL}${imageUrl}`);
+    const response = await fetch(`${AWS_BUCKET_URL}/${imageUrl}`);
     return new Response(response.body, response);
   };
 }
