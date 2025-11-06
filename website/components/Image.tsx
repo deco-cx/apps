@@ -135,8 +135,10 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   height && params.set("height", `${height}`);
 
   if (originalSrc.startsWith(DECO_CACHE_URL)) {
-    const onlyPath = originalSrc.split(DECO_CACHE_URL)[1];
-    return `${PATH}/${onlyPath}?${params}`;
+    // const onlyPath = originalSrc.split(DECO_CACHE_URL)[1];
+    // return `${PATH}/${onlyPath}?${params}`;
+    const onlyPath = originalSrc.substring(DECO_CACHE_URL.length);
+    return `${PATH}${onlyPath}?${params}`;
   }
 
   return `${PATH}${encodeURIComponent(originalSrc)}?${params}`;
