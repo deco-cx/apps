@@ -3,7 +3,7 @@ import type { JSX } from "preact";
 import { forwardRef } from "preact/compat";
 
 export const PATH = "/_d/assets/";
-const DECO_CACHE_URL = "https://assets.decocache.com";
+const DECO_CACHE_URL = "https://assets.decocache.com/";
 
 export type SetEarlyHint = (hint: string) => void;
 export type Props =
@@ -136,7 +136,7 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
 
   if (originalSrc.startsWith(DECO_CACHE_URL)) {
     const onlyPath = originalSrc.split(DECO_CACHE_URL)[1];
-    return `${PATH}${onlyPath}?${params}`;
+    return `${PATH}/${onlyPath}?${params}`;
   }
 
   return `${PATH}${encodeURIComponent(originalSrc)}?${params}`;
