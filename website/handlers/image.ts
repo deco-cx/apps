@@ -10,10 +10,10 @@ export default function Image() {
     if (imageUrl.startsWith("http")) {
       const loaderUrl =
         `${url.protocol}//${url.host}/live/invoke/website/loaders/image.ts?src=${imageUrl}&${url.searchParams.toString()}`;
-      return await fetch(loaderUrl);
+      const response = await fetch(loaderUrl);
+      return new Response(response.body, response);
     }
-    return await fetch(
-      `${AWS_BUCKET_URL}${imageUrl}`,
-    );
+    const response = await fetch(`${AWS_BUCKET_URL}${imageUrl}`);
+    return new Response(response.body, response);
   };
 }
