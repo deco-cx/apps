@@ -1,3 +1,5 @@
+const AWS_BUCKET_URL = "https://deco-sites-assets.s3.sa-east-1.amazonaws.com";
+
 export default function Image() {
   return async (req: Request) => {
     const url = new URL(req.url);
@@ -6,13 +8,10 @@ export default function Image() {
     if (imageUrl.startsWith("http")) {
       const loaderUrl =
         `${url.protocol}//${url.host}/live/invoke/website/loaders/image.ts?src=${imageUrl}&${url.searchParams.toString()}`;
-      const response = await fetch(loaderUrl);
-      return new Response(response.body, response);
+      return await fetch(loaderUrl);
     }
-
-    const response = await fetch(
-      `https://deco-sites-assets.s3.sa-east-1.amazonaws.com${imageUrl}`,
+    return await fetch(
+      `${AWS_BUCKET_URL}${imageUrl}`,
     );
-    return new Response(response.body, response);
   };
 }
