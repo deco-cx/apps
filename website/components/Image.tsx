@@ -3,8 +3,8 @@ import type { JSX } from "preact";
 import { forwardRef } from "preact/compat";
 import { Manifest } from "../manifest.gen.ts";
 
-export const PATH: `/live/invoke/${keyof Manifest["loaders"]}` =
-  "/live/invoke/website/loaders/image.ts";
+export const PATH: `/_d/assets/` =
+  "/_d/assets/";
 
 export type SetEarlyHint = (hint: string) => void;
 export type Props =
@@ -131,12 +131,11 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
 
   const params = new URLSearchParams();
 
-  params.set("src", originalSrc);
   params.set("fit", fit);
   params.set("width", `${width}`);
   height && params.set("height", `${height}`);
 
-  return `${PATH}?${params}`;
+  return `${PATH}${encodeURIComponent(originalSrc)}?${params}`;
 };
 
 export const getSrcSet = (

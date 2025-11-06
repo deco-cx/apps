@@ -187,7 +187,20 @@ export default function RoutesSelection(
       routes: Route[];
       hrefRoutes: Record<string, Resolvable<Handler>>;
     } = routerCache.getValue(routerId);
-    const server = router(routes, hrefRoutes, ctx.get, { monitoring }, url);
+
+    const routesToServe = [
+      {
+        pathTemplate: "/_d/assets/*",
+        handler: {
+          value: {
+            __resolveType: "website/handlers/image.ts"
+          }
+        }
+      },
+      ...routes,
+    ]
+
+    const server = router(routesToServe, hrefRoutes, ctx.get, { monitoring }, url);
     timing?.end();
     return await server(req, connInfo);
   };
