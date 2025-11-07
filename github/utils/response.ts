@@ -94,10 +94,23 @@ export function createSingleObjectResponse<T>(
 
 /**
  * Extracts the has_next_page indicator from the Link header
- * GitHub API includes a "Link" header with pagination info when there are more pages
- * Example: <https://api.github.com/...?page=2>; rel="next", <https://api.github.com/...?page=5>; rel="last"
- * @param linkHeader The Link header value from the response
- * @returns true if a rel="next" link is present, false otherwise
+ *
+ * GitHub API includes a "Link" header with pagination info when there are more pages.
+ * This header is the most reliable source for detecting pagination, as it correctly
+ * handles edge cases like the last page being exactly full (per_page items).
+ *
+ * Example Link header:
+ * <https://api.github.com/...?page=2>; rel="next", <https://api.github.com/...?page=5>; rel="last"
+ *
+ * Behavior:
+ * - Returns true if rel="next" is present (more pages available)
+ * - Returns undefined if Link header is absent (cannot determine reliably)
+ *
+ * Note: Callers should provide a fallback logic (e.g., array.length === per_page)
+ * if the Link header is not available, as some older API responses may omit it.
+ *
+ * @param linkHeader The Link header value from the response (optional)
+ * @returns true if a rel="next" relation is present; undefined if header is absent
  */
 export function hasNextPageFromLinkHeader(
   linkHeader?: string | null,

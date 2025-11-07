@@ -22,6 +22,11 @@ interface TeamMember {
  * @title List Team Members
  * @ignore
  * @description List members for a team in an organization.
+ *
+ * Pagination: Uses HTTP Link header to detect next page availability,
+ * which correctly handles the edge case where the final page is exactly full.
+ * Falls back to undefined if Link header is absent, allowing consumers to
+ * implement appropriate fallback logic if needed.
  */
 const loader = async (
   props: Props,
