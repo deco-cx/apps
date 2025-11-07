@@ -7,6 +7,10 @@ export interface ResponseMetadata {
    */
   total_count?: number;
   /**
+   * Unique count of items (e.g., unique clones, unique views)
+   */
+  uniques?: number;
+  /**
    * Current page number
    */
   page?: number;
@@ -63,6 +67,7 @@ export function createStandardResponse<T>(
       page: metadata.page,
       per_page: metadata.per_page,
       total_count: metadata.total_count,
+      uniques: metadata.uniques,
       has_next_page: metadata.has_next_page,
     },
   };
@@ -81,7 +86,22 @@ export function createSingleObjectResponse<T>(
       page: metadata.page,
       per_page: metadata.per_page,
       total_count: metadata.total_count,
+      uniques: metadata.uniques,
       has_next_page: metadata.has_next_page,
     },
   };
+}
+
+/**
+ * Extracts the has_next_page indicator from the Link header
+ * GitHub API includes a "Link" header with pagination info when there are more pages
+ * Example: <https://api.github.com/...?page=2>; rel="next", <https://api.github.com/...?page=5>; rel="last"
+ * @param linkHeader The Link header value from the response
+ * @returns true if a rel="next" link is present, false otherwise
+ */
+export function hasNextPageFromLinkHeader(
+  linkHeader?: string | null,
+): boolean | undefined {
+  if (!linkHeader) return undefined;
+  return /rel="next"/i.test(linkHeader);
 }
