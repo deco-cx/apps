@@ -5,7 +5,10 @@ import type {
   GithubIssueClean,
   GithubIssueLabel,
 } from "../utils/types.ts";
-import { StandardResponse, hasNextPageFromLinkHeader } from "../utils/response.ts";
+import {
+  hasNextPageFromLinkHeader,
+  StandardResponse,
+} from "../utils/response.ts";
 
 interface RepoIdentify {
   owner?: string;

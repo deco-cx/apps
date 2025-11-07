@@ -1,6 +1,9 @@
 import { AppContext } from "../mod.ts";
 import type { Client } from "../utils/client.ts";
-import { ResponseMetadata, hasNextPageFromLinkHeader } from "../utils/response.ts";
+import {
+  hasNextPageFromLinkHeader,
+  ResponseMetadata,
+} from "../utils/response.ts";
 
 export interface Props {
   owner: string;
