@@ -5,7 +5,7 @@ import type {
   GithubIssueClean,
   GithubIssueLabel,
 } from "../utils/types.ts";
-import { StandardResponse } from "../utils/response.ts";
+import { StandardResponse, hasNextPageFromLinkHeader } from "../utils/response.ts";
 
 interface RepoIdentify {
   owner?: string;
@@ -117,12 +117,17 @@ const loader = async (
           "This page contains only pull requests (no real issues). Try another page or adjust your filters.",
       };
     }
+    // Use Link header for reliable pagination info; fall back to raw issues array length
+    // (which includes PRs) to detect if more pages exist, not the filtered mapped array
+    const linkHeader = response.headers.get("link");
+    const hasNextPage = hasNextPageFromLinkHeader(linkHeader) ??
+      (per_page ? issues.length === per_page : undefined);
     return {
       data: mapped,
       metadata: {
         page,
         per_page,
-        has_next_page: per_page ? mapped.length === per_page : undefined,
+        has_next_page: hasNextPage,
       },
     };
   } catch (err: unknown) {
