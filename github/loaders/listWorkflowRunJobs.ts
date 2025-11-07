@@ -1,4 +1,5 @@
 import { AppContext } from "../mod.ts";
+import { StandardResponse } from "../utils/response.ts";
 
 interface Props {
   owner: string;
@@ -7,6 +8,8 @@ interface Props {
   per_page?: number;
   page?: number;
 }
+
+type WorkflowJob = Record<string, unknown>;
 
 /**
  * @name LIST_WORKFLOW_RUN_JOBS
@@ -17,7 +20,7 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-) => {
+): Promise<StandardResponse<WorkflowJob>> => {
   const response = await ctx.client
     ["GET /repos/:owner/:repo/actions/runs/:run_id/jobs"]({
       owner: props.owner,
@@ -26,7 +29,17 @@ const loader = async (
       per_page: props.per_page,
       page: props.page,
     });
-  return await response.json();
+  const result = await response.json() as { jobs: Record<string, unknown>[]; total_count: number };
+  
+  return {
+    data: result.jobs,
+    metadata: {
+      page: props.page,
+      per_page: props.per_page,
+      total_count: result.total_count,
+      has_next_page: props.per_page ? result.jobs.length === props.per_page : undefined,
+    },
+  };
 };
 
 export default loader;

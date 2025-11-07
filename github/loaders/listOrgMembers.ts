@@ -1,9 +1,19 @@
 import { AppContext } from "../mod.ts";
+import { StandardResponse } from "../utils/response.ts";
 
 interface Props {
   org: string;
   per_page?: number;
   page?: number;
+}
+
+interface OrgMember {
+  login: string;
+  id: number;
+  node_id: string;
+  avatar_url: string;
+  type: string;
+  site_admin: boolean;
 }
 
 /**
@@ -15,13 +25,22 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-) => {
+): Promise<StandardResponse<OrgMember>> => {
   const response = await ctx.client["GET /orgs/:org/members"]({
     org: props.org,
     per_page: props.per_page,
     page: props.page,
   });
-  return await response.json();
+  const data = await response.json();
+  
+  return {
+    data,
+    metadata: {
+      page: props.page,
+      per_page: props.per_page,
+      has_next_page: props.per_page ? data.length === props.per_page : undefined,
+    },
+  };
 };
 
 export default loader;

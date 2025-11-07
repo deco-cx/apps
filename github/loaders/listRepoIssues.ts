@@ -5,6 +5,7 @@ import type {
   GithubIssueClean,
   GithubIssueLabel,
 } from "../utils/types.ts";
+import { StandardResponse } from "../utils/response.ts";
 
 interface RepoIdentify {
   owner?: string;
@@ -42,7 +43,7 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<GithubIssueClean[] | { error: true; message: string }> => {
+): Promise<StandardResponse<GithubIssueClean> | { error: true; message: string }> => {
   const { repoIdentify, issueFilters } = props;
   const { url } = repoIdentify;
   const { state, per_page, page, labels, issueNumber } = issueFilters;
@@ -87,7 +88,14 @@ const loader = async (
           message: `Issue number ${issueNumber} not found in this repository.`,
         };
       }
-      return mapIssues([issue]);
+      const mapped = mapIssues([issue]);
+      return {
+        data: mapped,
+        metadata: {
+          page,
+          per_page,
+        },
+      };
     }
 
     const response = await ctx.client["GET /repos/:owner/:repo/issues"]({
@@ -107,7 +115,14 @@ const loader = async (
           "This page contains only pull requests (no real issues). Try another page or adjust your filters.",
       };
     }
-    return mapped;
+    return {
+      data: mapped,
+      metadata: {
+        page,
+        per_page,
+        has_next_page: per_page ? mapped.length === per_page : undefined,
+      },
+    };
   } catch (err: unknown) {
     if (
       typeof err === "object" &&

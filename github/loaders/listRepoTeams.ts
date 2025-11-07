@@ -1,4 +1,5 @@
 import { AppContext } from "../mod.ts";
+import { StandardResponse } from "../utils/response.ts";
 
 interface Props {
   owner: string;
@@ -7,23 +8,45 @@ interface Props {
   page?: number;
 }
 
+interface RepoTeam {
+  id?: number;
+  node_id?: string;
+  name?: string;
+  slug?: string;
+  description?: string | null;
+  privacy?: string;
+  permission?: string;
+  url?: string;
+  [key: string]: unknown;
+}
+
 /**
  * @name LIST_REPO_TEAMS
  * @title List Repository Teams
+ * @ignore 
  * @description List teams with access to a repository.
  */
 const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-) => {
+): Promise<StandardResponse<RepoTeam>> => {
   const response = await ctx.client["GET /repos/:owner/:repo/teams"]({
     owner: props.owner,
     repo: props.repo,
     per_page: props.per_page,
     page: props.page,
   });
-  return await response.json();
+  const data = await response.json();
+  
+  return {
+    data,
+    metadata: {
+      page: props.page,
+      per_page: props.per_page,
+      has_next_page: props.per_page ? data.length === props.per_page : undefined,
+    },
+  };
 };
 
 export default loader;
