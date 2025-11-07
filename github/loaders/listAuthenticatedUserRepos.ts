@@ -1,6 +1,6 @@
 import { AppContext } from "../mod.ts";
 import type { Repository } from "../utils/types.ts";
-import { StandardResponse } from "../utils/response.ts";
+import { StandardResponse, hasNextPageFromLinkHeader } from "../utils/response.ts";
 
 interface Props {
   visibility?: "all" | "public" | "private";
@@ -23,15 +23,14 @@ const loader = async (
     ...props,
   });
   const data = await response.json();
+  const linkHeader = response.headers.get("link");
 
   return {
     data,
     metadata: {
       page: props.page,
       per_page: props.per_page,
-      has_next_page: props.per_page
-        ? data.length === props.per_page
-        : undefined,
+      has_next_page: hasNextPageFromLinkHeader(linkHeader),
     },
   };
 };

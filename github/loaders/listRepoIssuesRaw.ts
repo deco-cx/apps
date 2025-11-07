@@ -1,6 +1,6 @@
 import { AppContext } from "../mod.ts";
 import type { Client } from "../utils/client.ts";
-import { ResponseMetadata } from "../utils/response.ts";
+import { ResponseMetadata, hasNextPageFromLinkHeader } from "../utils/response.ts";
 
 export interface Props {
   owner: string;
@@ -32,15 +32,14 @@ const loader = async (
 ): Promise<{ data: IssuesResponse; metadata: ResponseMetadata }> => {
   const response = await ctx.client["GET /repos/:owner/:repo/issues"](props);
   const data = await response.json();
+  const linkHeader = response.headers.get("link");
 
   return {
     data,
     metadata: {
       page: props.page,
       per_page: props.per_page,
-      has_next_page: props.per_page
-        ? data.length === props.per_page
-        : undefined,
+      has_next_page: hasNextPageFromLinkHeader(linkHeader),
     },
   };
 };
