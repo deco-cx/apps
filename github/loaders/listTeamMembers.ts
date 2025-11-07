@@ -20,7 +20,7 @@ interface TeamMember {
 /**
  * @name LIST_TEAM_MEMBERS
  * @title List Team Members
- * @ignore 
+ * @ignore
  * @description List members for a team in an organization.
  */
 const loader = async (
@@ -35,13 +35,15 @@ const loader = async (
     page: props.page,
   });
   const data = await response.json();
-  
+
   return {
     data,
     metadata: {
       page: props.page,
       per_page: props.per_page,
-      has_next_page: props.per_page ? data.length === props.per_page : undefined,
+      has_next_page: props.per_page
+        ? data.length === props.per_page
+        : undefined,
     },
   };
 };

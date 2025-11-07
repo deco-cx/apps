@@ -30,7 +30,7 @@ const loader = async (
     uniques: number;
     views: ViewData[];
   };
-  
+
   return {
     data: result.views,
     metadata: {

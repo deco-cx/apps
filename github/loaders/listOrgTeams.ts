@@ -22,7 +22,7 @@ interface Team {
 /**
  * @name LIST_ORG_TEAMS
  * @title List Organization Teams
- * @ignore 
+ * @ignore
  * @description List teams for an organization.
  */
 const loader = async (
@@ -36,13 +36,15 @@ const loader = async (
     page: props.page,
   });
   const data = await response.json();
-  
+
   return {
     data,
     metadata: {
       page: props.page,
       per_page: props.per_page,
-      has_next_page: props.per_page ? data.length === props.per_page : undefined,
+      has_next_page: props.per_page
+        ? data.length === props.per_page
+        : undefined,
     },
   };
 };

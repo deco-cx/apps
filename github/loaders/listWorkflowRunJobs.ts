@@ -29,15 +29,20 @@ const loader = async (
       per_page: props.per_page,
       page: props.page,
     });
-  const result = await response.json() as { jobs: Record<string, unknown>[]; total_count: number };
-  
+  const result = await response.json() as {
+    jobs: Record<string, unknown>[];
+    total_count: number;
+  };
+
   return {
     data: result.jobs,
     metadata: {
       page: props.page,
       per_page: props.per_page,
       total_count: result.total_count,
-      has_next_page: props.per_page ? result.jobs.length === props.per_page : undefined,
+      has_next_page: props.per_page
+        ? result.jobs.length === props.per_page
+        : undefined,
     },
   };
 };

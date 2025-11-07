@@ -26,9 +26,9 @@ const loader = async (
   const { owner, repo } = props;
   const ref = props.ref ?? "";
   const format = props.format ?? "tarball";
-  
+
   let archiveData: ArchiveLink;
-  
+
   if (format === "zipball") {
     const response = await ctx.client["GET /repos/:owner/:repo/zipball/:ref"]({
       owner,
@@ -44,7 +44,7 @@ const loader = async (
     });
     archiveData = { url: response.url, format };
   }
-  
+
   return {
     data: archiveData,
     metadata: {},

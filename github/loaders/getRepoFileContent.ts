@@ -38,7 +38,7 @@ const loader = async (
   if (fileData.content && fileData.encoding === "base64") {
     result.decoded_content = atob(fileData.content.replace(/\n/g, ""));
   }
-  
+
   return {
     data: result,
     metadata: {},

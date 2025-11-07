@@ -26,7 +26,7 @@ const loader = async (
   const response = await ctx.client
     ["GET /repos/:owner/:repo/traffic/popular/paths"](props);
   const data = await response.json();
-  
+
   return {
     data,
     metadata: {},

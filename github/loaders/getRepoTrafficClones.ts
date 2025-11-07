@@ -30,7 +30,7 @@ const loader = async (
     uniques: number;
     clones: CloneData[];
   };
-  
+
   return {
     data: result.clones,
     metadata: {

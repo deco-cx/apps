@@ -43,7 +43,9 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<StandardResponse<GithubIssueClean> | { error: true; message: string }> => {
+): Promise<
+  StandardResponse<GithubIssueClean> | { error: true; message: string }
+> => {
   const { repoIdentify, issueFilters } = props;
   const { url } = repoIdentify;
   const { state, per_page, page, labels, issueNumber } = issueFilters;

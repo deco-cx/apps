@@ -26,7 +26,7 @@ const loader = async (
       branch: props.branch,
     });
   const data = await response.json();
-  
+
   return {
     data,
     metadata: {},

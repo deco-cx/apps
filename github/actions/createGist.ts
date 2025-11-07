@@ -20,7 +20,7 @@ const action = async (
 ): Promise<SingleObjectResponse<GistSimple>> => {
   const response = await ctx.client["POST /gists"]({}, { body: props });
   const data = await response.json();
-  
+
   return {
     data,
     metadata: {},

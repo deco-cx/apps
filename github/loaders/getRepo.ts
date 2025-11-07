@@ -35,7 +35,7 @@ const loader = async (
 ): Promise<SingleObjectResponse<RepoDetails>> => {
   const response = await ctx.client["GET /repos/:owner/:repo"](props);
   const data = await response.json();
-  
+
   return {
     data,
     metadata: {},

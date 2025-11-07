@@ -34,15 +34,20 @@ const loader = async (
     created: props.created,
     branch: props.branch,
   });
-  const result = await response.json() as { workflow_runs: Record<string, unknown>[]; total_count: number };
-  
+  const result = await response.json() as {
+    workflow_runs: Record<string, unknown>[];
+    total_count: number;
+  };
+
   return {
     data: result.workflow_runs,
     metadata: {
       page: props.page,
       per_page: props.per_page,
       total_count: result.total_count,
-      has_next_page: props.per_page ? result.workflow_runs.length === props.per_page : undefined,
+      has_next_page: props.per_page
+        ? result.workflow_runs.length === props.per_page
+        : undefined,
     },
   };
 };

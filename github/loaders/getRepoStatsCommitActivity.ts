@@ -28,7 +28,7 @@ const loader = async (
     return { status: 202 };
   }
   const data = await response.json();
-  
+
   return {
     data,
     metadata: {},

@@ -21,7 +21,7 @@ const loader = async (
   }
   const response = await ctx.client["GET /user"]({}, opts);
   const data = await response.json();
-  
+
   return {
     data,
     metadata: {},

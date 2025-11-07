@@ -18,7 +18,7 @@ const loader = async (
 ): Promise<StandardResponse<string>> => {
   const response = await ctx.client["GET /repos/:owner/:repo/topics"](props);
   const result = await response.json() as { names: string[] };
-  
+
   return {
     data: result.names,
     metadata: {},

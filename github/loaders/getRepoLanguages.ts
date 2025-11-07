@@ -18,7 +18,7 @@ const loader = async (
 ): Promise<SingleObjectResponse<Record<string, number>>> => {
   const response = await ctx.client["GET /repos/:owner/:repo/languages"](props);
   const data = await response.json();
-  
+
   return {
     data,
     metadata: {},

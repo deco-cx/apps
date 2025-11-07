@@ -32,13 +32,15 @@ const loader = async (
 ): Promise<{ data: IssuesResponse; metadata: ResponseMetadata }> => {
   const response = await ctx.client["GET /repos/:owner/:repo/issues"](props);
   const data = await response.json();
-  
+
   return {
     data,
     metadata: {
       page: props.page,
       per_page: props.per_page,
-      has_next_page: props.per_page ? data.length === props.per_page : undefined,
+      has_next_page: props.per_page
+        ? data.length === props.per_page
+        : undefined,
     },
   };
 };

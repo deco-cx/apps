@@ -25,7 +25,7 @@ const loader = async (
   const response = await ctx.client
     ["GET /repos/:owner/:repo/traffic/popular/referrers"](props);
   const data = await response.json();
-  
+
   return {
     data,
     metadata: {},

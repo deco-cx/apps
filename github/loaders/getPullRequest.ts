@@ -22,7 +22,7 @@ const loader = async (
   const response = await ctx.client
     ["GET /repos/:owner/:repo/pulls/:pull_number"](props);
   const data = await response.json();
-  
+
   return {
     data,
     metadata: {},

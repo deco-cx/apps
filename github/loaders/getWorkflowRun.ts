@@ -26,7 +26,7 @@ const loader = async (
       run_id: props.run_id,
     });
   const data = await response.json();
-  
+
   return {
     data,
     metadata: {},

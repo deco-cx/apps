@@ -15,7 +15,7 @@ const loader = async (
 ): Promise<SingleObjectResponse<RateLimitInfo>> => {
   const response = await ctx.client["GET /rate_limit"]({});
   const data = await response.json();
-  
+
   return {
     data,
     metadata: {},

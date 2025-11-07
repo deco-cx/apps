@@ -28,15 +28,20 @@ const loader = async (
     per_page: props.per_page,
     page: props.page,
   });
-  const result = await response.json() as { items: Record<string, unknown>[]; total_count: number };
-  
+  const result = await response.json() as {
+    items: Record<string, unknown>[];
+    total_count: number;
+  };
+
   return {
     data: result.items,
     metadata: {
       page: props.page,
       per_page: props.per_page,
       total_count: result.total_count,
-      has_next_page: props.per_page ? result.items.length === props.per_page : undefined,
+      has_next_page: props.per_page
+        ? result.items.length === props.per_page
+        : undefined,
     },
   };
 };
