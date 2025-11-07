@@ -1,8 +1,16 @@
 import { AppContext } from "../mod.ts";
+import { StandardResponse } from "../utils/response.ts";
 
 interface Props {
   owner: string;
   repo: string;
+}
+
+interface PopularPath {
+  path: string;
+  title: string;
+  count: number;
+  uniques: number;
 }
 
 /**
@@ -14,10 +22,15 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-) => {
+): Promise<StandardResponse<PopularPath>> => {
   const response = await ctx.client
     ["GET /repos/:owner/:repo/traffic/popular/paths"](props);
-  return await response.json();
+  const data = await response.json();
+
+  return {
+    data,
+    metadata: {},
+  };
 };
 
 export default loader;

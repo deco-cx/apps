@@ -44,7 +44,7 @@ export default async function callback(
   const account = await ctx.invoke.github.loaders.getAuthenticatedUser({
     accessToken: authResponse.access_token,
   })
-    .then((user) => user.login)
+    .then((user) => user.data.login)
     .catch(console.error) || undefined;
 
   return {

@@ -1,14 +1,15 @@
 import { AppContext } from "../mod.ts";
+import { StandardResponse } from "../utils/response.ts";
 
 interface Props {
   owner: string;
   repo: string;
 }
 
-interface ClonesResponse {
+interface CloneData {
+  timestamp: string;
   count: number;
   uniques: number;
-  clones: Array<{ timestamp: string; count: number; uniques: number }>;
 }
 
 /**
@@ -20,11 +21,23 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<ClonesResponse> => {
+): Promise<StandardResponse<CloneData>> => {
   const response = await ctx.client["GET /repos/:owner/:repo/traffic/clones"]({
     ...props,
   });
-  return await response.json();
+  const result = await response.json() as {
+    count: number;
+    uniques: number;
+    clones: CloneData[];
+  };
+
+  return {
+    data: result.clones,
+    metadata: {
+      total_count: result.count,
+      uniques: result.uniques,
+    },
+  };
 };
 
 export default loader;

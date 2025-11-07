@@ -1,5 +1,6 @@
 import { AppContext } from "../mod.ts";
 import type { Client } from "../utils/client.ts";
+import { SingleObjectResponse } from "../utils/response.ts";
 
 interface Props {
   owner: string;
@@ -25,19 +26,23 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<RepoFileContent> => {
+): Promise<SingleObjectResponse<RepoFileContent>> => {
   const { owner, repo, path } = props;
   const response = await ctx.client["GET /repos/:owner/:repo/contents/:path"]({
     owner,
     repo,
     path,
   });
-  const data = await response.json();
-  const result: RepoFileContent = { ...data };
-  if (data.content && data.encoding === "base64") {
-    result.decoded_content = atob(data.content.replace(/\n/g, ""));
+  const fileData = await response.json();
+  const result: RepoFileContent = { ...fileData };
+  if (fileData.content && fileData.encoding === "base64") {
+    result.decoded_content = atob(fileData.content.replace(/\n/g, ""));
   }
-  return result;
+
+  return {
+    data: result,
+    metadata: {},
+  };
 };
 
 export default loader;

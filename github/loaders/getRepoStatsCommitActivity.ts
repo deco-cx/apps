@@ -1,8 +1,15 @@
 import { AppContext } from "../mod.ts";
+import { StandardResponse } from "../utils/response.ts";
 
 interface Props {
   owner: string;
   repo: string;
+}
+
+interface WeeklyCommitActivity {
+  days: number[];
+  total: number;
+  week: number;
 }
 
 /**
@@ -14,13 +21,18 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-) => {
+): Promise<StandardResponse<WeeklyCommitActivity> | { status: 202 }> => {
   const response = await ctx.client
     ["GET /repos/:owner/:repo/stats/commit_activity"](props);
   if (response.status === 202) {
     return { status: 202 };
   }
-  return await response.json();
+  const data = await response.json();
+
+  return {
+    data,
+    metadata: {},
+  };
 };
 
 export default loader;
