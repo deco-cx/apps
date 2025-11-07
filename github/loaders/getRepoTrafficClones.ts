@@ -35,6 +35,7 @@ const loader = async (
     data: result.clones,
     metadata: {
       total_count: result.count,
+      uniques: result.uniques,
     },
   };
 };
