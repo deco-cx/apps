@@ -20,6 +20,12 @@ interface OrgMember {
  * @name LIST_ORG_MEMBERS
  * @title List Organization Members
  * @description List members for an organization.
+ *
+ * Pagination: Uses HTTP Link header to detect pagination reliably.
+ * The has_next_page is set to true ONLY when GitHub advertises a rel="next" link,
+ * ensuring clients only fetch additional pages when explicitly provided by the API.
+ * This avoids false positives when the final page is exactly per_page items.
+ * Missing Link header safely returns undefined, signaling no guaranteed next page.
  */
 const loader = async (
   props: Props,
