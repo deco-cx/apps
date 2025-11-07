@@ -1,5 +1,5 @@
 import { AppContext } from "../mod.ts";
-import { StandardResponse } from "../utils/response.ts";
+import { StandardResponse, hasNextPageFromLinkHeader } from "../utils/response.ts";
 
 interface Props {
   owner: string;
@@ -33,6 +33,7 @@ const loader = async (
     jobs: Record<string, unknown>[];
     total_count: number;
   };
+  const linkHeader = response.headers.get("link");
 
   return {
     data: result.jobs,
@@ -40,9 +41,7 @@ const loader = async (
       page: props.page,
       per_page: props.per_page,
       total_count: result.total_count,
-      has_next_page: props.per_page
-        ? result.jobs.length === props.per_page
-        : undefined,
+      has_next_page: hasNextPageFromLinkHeader(linkHeader),
     },
   };
 };
