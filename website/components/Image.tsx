@@ -128,18 +128,20 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     }
   }
 
+  if (originalSrc.startsWith(DECO_CACHE_URL)) {
+    const onlyPath = originalSrc.substring(DECO_CACHE_URL.length);
+    // Generate IMS-compatible URL for Azion Image Optimization
+    const imsParam = height
+      ? `ims=${width}x${height}/filters:quality(80)`
+      : `ims=${width}x${width}/filters:quality(80)`;
+    return `${PATH}${onlyPath}?${imsParam}`;
+  }
+
   const params = new URLSearchParams();
 
   params.set("fit", fit);
   params.set("width", `${width}`);
   height && params.set("height", `${height}`);
-
-  if (originalSrc.startsWith(DECO_CACHE_URL)) {
-    // const onlyPath = originalSrc.split(DECO_CACHE_URL)[1];
-    // return `${PATH}/${onlyPath}?${params}`;
-    const onlyPath = originalSrc.substring(DECO_CACHE_URL.length);
-    return `${PATH}${onlyPath}?${params}`;
-  }
 
   return `${PATH}${encodeURIComponent(originalSrc)}?${params}`;
 };
