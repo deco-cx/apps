@@ -7,20 +7,23 @@ import {
   usePageContext as useDecoPageContext,
   useRouterContext,
 } from "@deco/deco";
-import {
-  type ComponentFunc,
-  type ComponentMetadata,
-  type Page,
-  type Section,
+import { useScriptAsDataURI } from "@deco/deco/hooks";
+import type {
+  ComponentFunc,
+  ComponentMetadata,
+  Page as DecoPage,
+  Section,
 } from "@deco/deco/blocks";
 import { logger } from "@deco/deco/o11y";
-import { Component, JSX } from "preact";
+import { Component } from "preact";
+import type { JSX } from "preact";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
 import OneDollarStats from "../components/OneDollarStats.tsx";
 import Events from "../components/Events.tsx";
-import { SEOSection } from "../components/Seo.tsx";
+import type { SEOSection } from "../components/Seo.tsx";
 import LiveControls from "../components/_Controls.tsx";
-import { AppContext } from "../mod.ts";
+import type { AppContext } from "../mod.ts";
+import debugOverlay from "../utils/debugOverlay.ts";
 
 const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
 
@@ -53,6 +56,7 @@ export interface Props {
   /** @hide true */
   unindexedDomain?: boolean;
 }
+type DebuggableAppContext = AppContext & { debugEnabled?: boolean };
 export function renderSection(section: Props["sections"][number]) {
   if (section === undefined || section === null) {
     return <div></div>;
@@ -61,12 +65,10 @@ export function renderSection(section: Props["sections"][number]) {
   return <Component {...props} />;
 }
 class ErrorBoundary extends Component<{
-  // deno-lint-ignore no-explicit-any
-  fallback: ComponentFunc<any>;
+  fallback: ComponentFunc<Error | null>;
 }> {
   override state = { error: null as Error | null };
-  // deno-lint-ignore no-explicit-any
-  static override getDerivedStateFromError(error: any) {
+  static override getDerivedStateFromError(error: Error) {
     return { error };
   }
   render() {
@@ -111,11 +113,44 @@ function Page(
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
+  const debugActive = devMode || !context.isDeploy;
+  const showPageMeta = debugActive && deco.page.id !== PAGE_NOT_FOUND;
   return (
     <>
-      {unindexedDomain && (
+      {debugActive && (
+        <div
+          data-deco-page-block-id={String(deco.page.id)}
+          data-deco-page-path-template={deco.page.pathTemplate ?? ""}
+          class="deco-debug-page-info"
+          aria-hidden="true"
+          style="display: none"
+        >
+          {`deco:page-block-id=${deco.page.id ?? "unknown"}${
+            deco.page.pathTemplate
+              ? ` | deco:page-path-template=${deco.page.pathTemplate}`
+              : ""
+          }`}
+        </div>
+      )}
+      {(unindexedDomain || showPageMeta) && (
         <Head>
-          <meta name="robots" content="noindex, nofollow" />
+          {unindexedDomain && (
+            <meta name="robots" content="noindex, nofollow" />
+          )}
+          {showPageMeta && (
+            <>
+              <meta
+                name="deco:page-block-id"
+                content={String(deco.page.id)}
+              />
+              {deco.page.pathTemplate && (
+                <meta
+                  name="deco:page-path-template"
+                  content={deco.page.pathTemplate}
+                />
+              )}
+            </>
+          )}
         </Head>
       )}
       <ErrorBoundary
@@ -140,6 +175,10 @@ function Page(
           {...deco}
         />
         <Events deco={deco} />
+        {/* Client-side debug overlay (dev mode or __d) */}
+        {debugActive && (
+          <script defer src={useScriptAsDataURI(debugOverlay)} />
+        )}
         {ONEDOLLAR_ENABLED && (
           <OneDollarStats
             collectorAddress={ONEDOLLAR_COLLECTOR}
@@ -158,7 +197,8 @@ export const loader = async (
   ctx: AppContext,
 ) => {
   const url = new URL(req.url);
-  const devMode = url.searchParams.has("__d");
+  const debugEnabled = (ctx as DebuggableAppContext).debugEnabled === true;
+  const devMode = debugEnabled || url.searchParams.has("__d");
   const unindexedDomain = noIndexedDomains.some((domain) =>
     url.origin.includes(domain)
   );
@@ -177,7 +217,7 @@ export const loader = async (
   return {
     ...restProps,
     sections: [...globalSections, ...(Array.isArray(sections) ? sections : [])],
-    errorPage: isDeferred<Page>(ctx.errorPage)
+    errorPage: isDeferred<DecoPage>(ctx.errorPage)
       ? await ctx.errorPage()
       : undefined,
     devMode,
