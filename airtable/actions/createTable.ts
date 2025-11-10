@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { CreateTableBody, Table, MCPResponse } from "../utils/types.ts";
+import type { CreateTableBody, MCPResponse, Table } from "../utils/types.ts";
 import { mapTableFields } from "../utils/helpers.ts";
 
 // Tipos específicos de campo que o Airtable aceita
@@ -178,7 +178,9 @@ const action = async (
     };
   } catch (err) {
     return {
-      error: `Error creating table: ${err instanceof Error ? err.message : String(err)}`,
+      error: `Error creating table: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
       status: 500,
     };
   }

@@ -77,7 +77,8 @@ const action = async (
         errorData.error?.type === "DUPLICATE_OR_EMPTY_FIELD_NAME"
       ) {
         return {
-          error: `Field name "${name}" already exists in this table or is empty. Please choose a different name.`,
+          error:
+            `Field name "${name}" already exists in this table or is empty. Please choose a different name.`,
           status: 422,
           details: { type: "DUPLICATE_OR_EMPTY_FIELD_NAME" },
         };
@@ -95,7 +96,9 @@ const action = async (
     };
   } catch (err) {
     return {
-      error: `Error creating field: ${err instanceof Error ? err.message : String(err)}`,
+      error: `Error creating field: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
       status: 500,
     };
   }

@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { Table, UpdateTableBody, MCPResponse } from "../utils/types.ts";
+import type { MCPResponse, Table, UpdateTableBody } from "../utils/types.ts";
 
 interface Props {
   /**
@@ -71,7 +71,8 @@ const action = async (
 
   if (Object.keys(body).length === 0) {
     return {
-      error: "No updates provided for the table. Please specify name, description, or primaryFieldId.",
+      error:
+        "No updates provided for the table. Please specify name, description, or primaryFieldId.",
       status: 400,
     };
   }
@@ -96,7 +97,9 @@ const action = async (
     };
   } catch (err) {
     return {
-      error: `Error updating table: ${err instanceof Error ? err.message : String(err)}`,
+      error: `Error updating table: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
       status: 500,
     };
   }

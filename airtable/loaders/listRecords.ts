@@ -1,9 +1,9 @@
 import type { AppContext } from "../mod.ts";
 import type {
   ListRecordsResponse,
+  MCPResponse,
   ValidationFilterResult,
   ValidationResult,
-  MCPResponse,
 } from "../utils/types.ts";
 
 interface Props extends Record<string, unknown> {
@@ -118,7 +118,9 @@ const loader = async (
     };
   } catch (err) {
     return {
-      error: `Error listing records: ${err instanceof Error ? err.message : String(err)}`,
+      error: `Error listing records: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
       status: 500,
     };
   }

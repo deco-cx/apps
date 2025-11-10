@@ -1,9 +1,9 @@
 import type { AppContext } from "../mod.ts";
 import type {
   BaseSchemaResponse,
+  MCPResponse,
   ValidationFilterResult,
   ValidationResult,
-  MCPResponse,
 } from "../utils/types.ts";
 
 interface Props extends Record<string, unknown> {
@@ -88,14 +88,17 @@ const loader = async (
 
     const responseFilterResult =
       responseValidationResult as ValidationFilterResult;
-    const filteredData = (responseFilterResult.filteredResponse || data) as BaseSchemaResponse;
-    
+    const filteredData =
+      (responseFilterResult.filteredResponse || data) as BaseSchemaResponse;
+
     return {
       data: filteredData,
     };
   } catch (err) {
     return {
-      error: `Error getting base schema: ${err instanceof Error ? err.message : String(err)}`,
+      error: `Error getting base schema: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
       status: 500,
     };
   }

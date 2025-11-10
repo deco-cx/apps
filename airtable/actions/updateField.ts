@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { Field, UpdateFieldBody, MCPResponse } from "../utils/types.ts";
+import type { Field, MCPResponse, UpdateFieldBody } from "../utils/types.ts";
 
 // Props will be UpdateFieldBody plus baseId, tableId, and fieldId
 interface Props extends UpdateFieldBody {
@@ -63,7 +63,8 @@ const action = async (
 
   if (Object.keys(body).length === 0) {
     return {
-      error: "No updates provided for the field. Please specify name or description.",
+      error:
+        "No updates provided for the field. Please specify name or description.",
       status: 400,
     };
   }
@@ -85,7 +86,8 @@ const action = async (
         errorData.error?.type === "DUPLICATE_OR_EMPTY_FIELD_NAME"
       ) {
         return {
-          error: `Field name "${name}" already exists in this table or is empty. Please choose a different name.`,
+          error:
+            `Field name "${name}" already exists in this table or is empty. Please choose a different name.`,
           status: 422,
           details: { type: "DUPLICATE_OR_EMPTY_FIELD_NAME" },
         };
@@ -103,7 +105,9 @@ const action = async (
     };
   } catch (err) {
     return {
-      error: `Error updating field: ${err instanceof Error ? err.message : String(err)}`,
+      error: `Error updating field: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
       status: 500,
     };
   }

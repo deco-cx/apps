@@ -70,7 +70,9 @@ const action = async (
   const invalidIds = recordIds.filter((id) => !id.startsWith("rec"));
   if (invalidIds.length > 0) {
     return {
-      error: `Invalid record IDs (must start with 'rec'): ${invalidIds.join(", ")}`,
+      error: `Invalid record IDs (must start with 'rec'): ${
+        invalidIds.join(", ")
+      }`,
       status: 400,
     };
   }
@@ -94,7 +96,9 @@ const action = async (
     };
   } catch (err) {
     return {
-      error: `Error deleting records: ${err instanceof Error ? err.message : String(err)}`,
+      error: `Error deleting records: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
       status: 500,
     };
   }

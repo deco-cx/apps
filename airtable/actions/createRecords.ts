@@ -1,9 +1,9 @@
 import type { AppContext } from "../mod.ts";
 import type {
   AirtableRecord,
+  CreateRecordBody,
   FieldSet,
   MCPResponse,
-  CreateRecordBody,
 } from "../utils/types.ts";
 
 interface RecordToCreate {
@@ -107,7 +107,9 @@ const action = async (
 
     const response = await ctx.client["POST /v0/:baseId/:tableId"](
       { baseId, tableId },
-      { body } as unknown as Parameters<typeof ctx.client["POST /v0/:baseId/:tableId"]>[1],
+      { body } as unknown as Parameters<
+        typeof ctx.client["POST /v0/:baseId/:tableId"]
+      >[1],
     );
 
     if (!response.ok) {
@@ -124,11 +126,12 @@ const action = async (
     };
   } catch (err) {
     return {
-      error: `Error creating records: ${err instanceof Error ? err.message : String(err)}`,
+      error: `Error creating records: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
       status: 500,
     };
   }
 };
 
 export default action;
-

@@ -1,9 +1,9 @@
 import type { AppContext } from "../mod.ts";
 import type {
   ListBasesResponse,
+  MCPResponse,
   ValidationFilterResult,
   ValidationResult,
-  MCPResponse,
 } from "../utils/types.ts";
 
 interface Props {
@@ -61,14 +61,17 @@ const loader = async (
     }
 
     const filterResult = validationResult as ValidationFilterResult;
-    const filteredData = (filterResult.filteredResponse || data) as ListBasesResponse;
-    
+    const filteredData =
+      (filterResult.filteredResponse || data) as ListBasesResponse;
+
     return {
       data: filteredData,
     };
   } catch (err) {
     return {
-      error: `Error listing bases: ${err instanceof Error ? err.message : String(err)}`,
+      error: `Error listing bases: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
       status: 500,
     };
   }

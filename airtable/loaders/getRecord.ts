@@ -46,7 +46,9 @@ const loader = async (
         tableIdOrName: props.tableId,
       });
 
-    if ("hasPermission" in validationResult && !validationResult.hasPermission) {
+    if (
+      "hasPermission" in validationResult && !validationResult.hasPermission
+    ) {
       return {
         error: validationResult.message || "Access denied",
         status: 403,
@@ -70,7 +72,9 @@ const loader = async (
     };
   } catch (err) {
     return {
-      error: `Error getting record: ${err instanceof Error ? err.message : String(err)}`,
+      error: `Error getting record: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
       status: 500,
     };
   }

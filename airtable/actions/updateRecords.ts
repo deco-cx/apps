@@ -2,8 +2,8 @@ import type { AppContext } from "../mod.ts";
 import type {
   AirtableRecord,
   FieldSet,
-  UpdateRecordsBody,
   MCPResponse,
+  UpdateRecordsBody,
 } from "../utils/types.ts";
 
 interface RecordToUpdate {
@@ -131,7 +131,9 @@ const action = async (
     };
   } catch (err) {
     return {
-      error: `Error updating records: ${err instanceof Error ? err.message : String(err)}`,
+      error: `Error updating records: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
       status: 500,
     };
   }
