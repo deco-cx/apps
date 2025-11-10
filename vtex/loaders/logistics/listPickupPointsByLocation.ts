@@ -51,12 +51,3 @@ export default async function loader(
     })
   ) ?? [];
 }
-
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (props: Props, _req: Request, _ctx: AppContext) => {
-  const geo = (props.geoCoordinates ?? []).join(",");
-  const postal = props.postalCode ?? "";
-  const country = props.countryCode ?? "";
-  return `pickup-points-${geo}-${postal}-${country}`;
-};

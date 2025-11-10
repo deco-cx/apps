@@ -86,13 +86,5 @@ async function loader(
   return profile;
 }
 
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
-  const { payload } = parseCookie(req.headers, ctx.account);
-  const userId = payload?.userId ?? payload?.sub ?? "";
-  return `current-profile-${userId}-${(props.customFields ?? []).join(",")}`;
-};
-
 export const defaultVisibility = "private";
 export default loader;

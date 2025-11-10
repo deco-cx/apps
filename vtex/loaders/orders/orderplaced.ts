@@ -53,17 +53,3 @@ export default async function loader(
 
   return [order];
 }
-
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
-  const cookies = Object.fromEntries(
-    Object.entries(getCookies(req.headers)).filter(([key]) =>
-      key.startsWith(VTEX_ID_CLIENT_COOKIE) ||
-      key === CHECKOUT_DATA_ACCESS_COOKIE ||
-      key === VTEX_CHKO_AUTH
-    ),
-  );
-  const cookie = stringify(cookies);
-  return `order-placed-${props.orderId}-${cookie}`;
-};

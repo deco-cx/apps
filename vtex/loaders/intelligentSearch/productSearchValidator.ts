@@ -1,5 +1,5 @@
 import { AppContext } from "../../mod.ts";
-import { FacetsProps, Props, cacheKey as productListCacheKey } from "./productList.ts";
+import { FacetsProps, Props } from "./productList.ts";
 import type { Product } from "../../../commerce/types.ts";
 
 /**
@@ -45,20 +45,3 @@ function isFacetsProps(object: any): object is FacetsProps {
 }
 
 export default loader;
-
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (
-  expandedProps: Props,
-  req: Request,
-  ctx: AppContext,
-) => {
-  const key = productListCacheKey(expandedProps, req, ctx);
-  if (!key) {
-    return null;
-  }
-  const url = new URL(key);
-  url.searchParams.append("validator", "true");
-  url.search = url.searchParams.toString();
-  return `${key}`;
-};

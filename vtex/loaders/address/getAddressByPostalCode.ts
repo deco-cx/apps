@@ -46,9 +46,3 @@ export default async function loader(
     longitude: addressByPostalCode.geoCoordinates?.[1] || undefined,
   };
 }
-
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (props: Props, _req: Request, _ctx: AppContext) => {
-  return `${props.countryCode}-${props.postalCode}`;
-};

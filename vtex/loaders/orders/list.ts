@@ -39,9 +39,3 @@ export default async function loader(
 
   return ordersList;
 }
-
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (props: Props) => {
-  return `orders-${JSON.stringify(props)}`;
-};

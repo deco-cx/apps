@@ -52,14 +52,5 @@ async function loader(
   return profile?.addresses?.map(toPostalAddress) || [];
 }
 
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (_props: unknown, req: Request, ctx: AppContext) => {
-  const { payload } = parseCookie(req.headers, ctx.account);
-  const userId = payload?.userId ?? payload?.sub ?? "";
-  
-  return `user-addresses-${userId}`;
-};
-
 export const defaultVisibility = "private";
 export default loader;
