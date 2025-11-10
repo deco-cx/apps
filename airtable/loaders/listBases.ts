@@ -3,6 +3,7 @@ import type {
   ListBasesResponse,
   ValidationFilterResult,
   ValidationResult,
+  MCPResponse,
 } from "../utils/types.ts";
 
 interface Props {
@@ -22,35 +23,55 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<ListBasesResponse | Response> => {
+): Promise<MCPResponse<ListBasesResponse>> => {
   const { offset } = props;
 
   if (!ctx.client) {
-    return new Response("OAuth authentication is required", { status: 401 });
+    return {
+      error: "OAuth authentication is required",
+      status: 401,
+    };
   }
 
-  const response = await ctx.client["GET /v0/meta/bases"](
-    offset ? { offset: offset } : {},
-  );
+  try {
+    const response = await ctx.client["GET /v0/meta/bases"](
+      offset ? { offset: offset } : {},
+    );
 
-  if (!response.ok) {
-    throw new Error(`Error listing bases: ${response.statusText}`);
+    if (!response.ok) {
+      return {
+        error: `Error listing bases: ${response.statusText}`,
+        status: response.status,
+      };
+    }
+
+    const data = await response.json();
+
+    const validationResult: ValidationResult = await ctx.invoke["airtable"]
+      .loaders.permissioning.validatePermissions({
+        mode: "filter",
+        response: data,
+      });
+
+    if ("error" in validationResult && validationResult.error) {
+      return {
+        error: validationResult.error,
+        status: 403,
+      };
+    }
+
+    const filterResult = validationResult as ValidationFilterResult;
+    const filteredData = (filterResult.filteredResponse || data) as ListBasesResponse;
+    
+    return {
+      data: filteredData,
+    };
+  } catch (err) {
+    return {
+      error: `Error listing bases: ${err instanceof Error ? err.message : String(err)}`,
+      status: 500,
+    };
   }
-
-  const data = await response.json();
-
-  const validationResult: ValidationResult = await ctx.invoke["airtable"]
-    .loaders.permissioning.validatePermissions({
-      mode: "filter",
-      response: data,
-    });
-
-  if ("error" in validationResult && validationResult.error) {
-    return new Response(validationResult.error, { status: 403 });
-  }
-
-  const filterResult = validationResult as ValidationFilterResult;
-  return (filterResult.filteredResponse || data) as ListBasesResponse;
 };
 
 export default loader;

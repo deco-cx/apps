@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { Field, UpdateFieldBody } from "../utils/types.ts";
+import type { Field, UpdateFieldBody, MCPResponse } from "../utils/types.ts";
 
 // Props will be UpdateFieldBody plus baseId, tableId, and fieldId
 interface Props extends UpdateFieldBody {
@@ -29,9 +29,12 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<Field | Response> => {
+): Promise<MCPResponse<Field>> => {
   if (!ctx.client) {
-    return new Response("OAuth authentication is required", { status: 401 });
+    return {
+      error: "OAuth authentication is required",
+      status: 401,
+    };
   }
 
   const validationResult = await ctx.invoke["airtable"].loaders.permissioning
@@ -42,9 +45,10 @@ const action = async (
     });
 
   if ("hasPermission" in validationResult && !validationResult.hasPermission) {
-    return new Response(validationResult.message || "Access denied", {
+    return {
+      error: validationResult.message || "Access denied",
       status: 403,
-    });
+    };
   }
 
   const { baseId, tableId, fieldId, name, description } = props;
@@ -58,52 +62,51 @@ const action = async (
   }
 
   if (Object.keys(body).length === 0) {
-    throw new Error(
-      "No updates provided for the field. Please specify name or description.",
-    );
+    return {
+      error: "No updates provided for the field. Please specify name or description.",
+      status: 400,
+    };
   }
 
-  const response = await ctx.client
-    ["PATCH /v0/meta/bases/:baseId/tables/:tableId/fields/:fieldId"](
-      { baseId, tableId, fieldId },
-      { body },
-    );
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({})) as {
-      error?: { type?: string };
-    };
-
-    if (
-      response.status === 422 &&
-      errorData.error?.type === "DUPLICATE_OR_EMPTY_FIELD_NAME"
-    ) {
-      return new Response(
-        JSON.stringify({
-          error:
-            `Field name "${name}" already exists in this table or is empty. Please choose a different name.`,
-          type: "DUPLICATE_OR_EMPTY_FIELD_NAME",
-        }),
-        {
-          status: 422,
-          headers: { "Content-Type": "application/json" },
-        },
+  try {
+    const response = await ctx.client
+      ["PATCH /v0/meta/bases/:baseId/tables/:tableId/fields/:fieldId"](
+        { baseId, tableId, fieldId },
+        { body },
       );
-    }
 
-    return new Response(
-      JSON.stringify({
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({})) as {
+        error?: { type?: string };
+      };
+
+      if (
+        response.status === 422 &&
+        errorData.error?.type === "DUPLICATE_OR_EMPTY_FIELD_NAME"
+      ) {
+        return {
+          error: `Field name "${name}" already exists in this table or is empty. Please choose a different name.`,
+          status: 422,
+          details: { type: "DUPLICATE_OR_EMPTY_FIELD_NAME" },
+        };
+      }
+
+      return {
         error: `Error updating field: ${response.statusText}`,
         status: response.status,
-      }),
-      {
-        status: response.status,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
-  }
+      };
+    }
 
-  return response.json();
+    const data = await response.json();
+    return {
+      data,
+    };
+  } catch (err) {
+    return {
+      error: `Error updating field: ${err instanceof Error ? err.message : String(err)}`,
+      status: 500,
+    };
+  }
 };
 
 export default action;

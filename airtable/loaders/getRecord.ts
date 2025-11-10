@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { AirtableRecord } from "../utils/types.ts";
+import type { AirtableRecord, MCPResponse } from "../utils/types.ts";
 
 interface Props extends Record<string, unknown> {
   /**
@@ -30,33 +30,50 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<AirtableRecord | Response> => {
+): Promise<MCPResponse<AirtableRecord>> => {
   if (!ctx.client) {
-    return new Response("OAuth authentication is required", { status: 401 });
+    return {
+      error: "OAuth authentication is required",
+      status: 401,
+    };
   }
 
-  const validationResult = await ctx.invoke["airtable"].loaders.permissioning
-    .validatePermissions({
-      mode: "check",
-      baseId: props.baseId,
-      tableIdOrName: props.tableId,
-    });
+  try {
+    const validationResult = await ctx.invoke["airtable"].loaders.permissioning
+      .validatePermissions({
+        mode: "check",
+        baseId: props.baseId,
+        tableIdOrName: props.tableId,
+      });
 
-  if ("hasPermission" in validationResult && !validationResult.hasPermission) {
-    return new Response(validationResult.message || "Access denied", {
-      status: 403,
-    });
+    if ("hasPermission" in validationResult && !validationResult.hasPermission) {
+      return {
+        error: validationResult.message || "Access denied",
+        status: 403,
+      };
+    }
+
+    const response = await ctx.client["GET /v0/:baseId/:tableId/:recordId"](
+      props,
+    );
+
+    if (!response.ok) {
+      return {
+        error: `Error getting record: ${response.statusText}`,
+        status: response.status,
+      };
+    }
+
+    const data = await response.json();
+    return {
+      data,
+    };
+  } catch (err) {
+    return {
+      error: `Error getting record: ${err instanceof Error ? err.message : String(err)}`,
+      status: 500,
+    };
   }
-
-  const response = await ctx.client["GET /v0/:baseId/:tableId/:recordId"](
-    props,
-  );
-
-  if (!response.ok) {
-    throw new Error(`Error getting record: ${response.statusText}`);
-  }
-
-  return await response.json();
 };
 
 export default loader;

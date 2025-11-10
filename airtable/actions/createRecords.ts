@@ -2,6 +2,8 @@ import type { AppContext } from "../mod.ts";
 import type {
   AirtableRecord,
   FieldSet,
+  MCPResponse,
+  CreateRecordBody,
 } from "../utils/types.ts";
 
 interface RecordToCreate {
@@ -43,9 +45,12 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<{ records: AirtableRecord[] } | Response> => {
+): Promise<MCPResponse<{ records: AirtableRecord[] }>> => {
   if (!ctx.client) {
-    return new Response("OAuth authentication is required", { status: 401 });
+    return {
+      error: "OAuth authentication is required",
+      status: 401,
+    };
   }
 
   const validationResult = await ctx.invoke["airtable"].loaders.permissioning
@@ -56,50 +61,73 @@ const action = async (
     });
 
   if ("hasPermission" in validationResult && !validationResult.hasPermission) {
-    return new Response(validationResult.message || "Access denied", {
+    return {
+      error: validationResult.message || "Access denied",
       status: 403,
-    });
+    };
   }
 
   const { baseId, tableId, records, typecast } = props;
 
   if (!records || records.length === 0) {
-    return new Response("At least one record is required", { status: 400 });
+    return {
+      error: "At least one record is required",
+      status: 400,
+    };
   }
 
   if (records.length > 10) {
-    return new Response("Maximum 10 records can be created at once", {
+    return {
+      error: "Maximum 10 records can be created at once",
       status: 400,
-    });
+    };
   }
 
   const invalidRecords = records.filter((record) =>
     !record.fields || typeof record.fields !== "object"
   );
   if (invalidRecords.length > 0) {
-    return new Response("All records must have a valid 'fields' object", {
+    return {
+      error: "All records must have a valid 'fields' object",
       status: 400,
-    });
+    };
   }
 
-  const body: { records: RecordToCreate[]; typecast?: boolean } = {
-    records,
-  };
-  if (typecast !== undefined) {
-    body.typecast = typecast;
+  try {
+    const recordsToCreate: CreateRecordBody[] = records.map((record) => ({
+      fields: record.fields,
+    }));
+
+    const body: { records: CreateRecordBody[]; typecast?: boolean } = {
+      records: recordsToCreate,
+    };
+    if (typecast !== undefined) {
+      body.typecast = typecast;
+    }
+
+    const response = await ctx.client["POST /v0/:baseId/:tableId"](
+      { baseId, tableId },
+      { body } as unknown as Parameters<typeof ctx.client["POST /v0/:baseId/:tableId"]>[1],
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return {
+        error: `Error creating records: ${errorText}`,
+        status: response.status,
+      };
+    }
+
+    const responseData = await response.json() as unknown;
+    return {
+      data: responseData as { records: AirtableRecord[] },
+    };
+  } catch (err) {
+    return {
+      error: `Error creating records: ${err instanceof Error ? err.message : String(err)}`,
+      status: 500,
+    };
   }
-
-  const response = await ctx.client["POST /v0/:baseId/:tableId"](
-    { baseId, tableId },
-    { body },
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Error creating records: ${errorText}`);
-  }
-
-  return response.json();
 };
 
 export default action;

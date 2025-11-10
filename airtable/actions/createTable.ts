@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { CreateTableBody, Table } from "../utils/types.ts";
+import type { CreateTableBody, Table, MCPResponse } from "../utils/types.ts";
 import { mapTableFields } from "../utils/helpers.ts";
 
 // Tipos específicos de campo que o Airtable aceita
@@ -99,9 +99,12 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<Table | Response> => {
+): Promise<MCPResponse<Table>> => {
   if (!ctx.client) {
-    return new Response("OAuth authentication is required", { status: 401 });
+    return {
+      error: "OAuth authentication is required",
+      status: 401,
+    };
   }
 
   const validationResult = await ctx.invoke["airtable"].loaders.permissioning
@@ -111,19 +114,26 @@ const action = async (
     });
 
   if ("hasPermission" in validationResult && !validationResult.hasPermission) {
-    return new Response(validationResult.message || "Access denied", {
+    return {
+      error: validationResult.message || "Access denied",
       status: 403,
-    });
+    };
   }
 
   const { baseId, name, description, fields } = props;
 
   if (!name || name.trim() === "") {
-    throw new Error("Table name is required");
+    return {
+      error: "Table name is required",
+      status: 400,
+    };
   }
 
   if (!fields || fields.length === 0) {
-    throw new Error("At least one field is required");
+    return {
+      error: "At least one field is required",
+      status: 400,
+    };
   }
 
   const mappedFields = mapTableFields(fields);
@@ -137,29 +147,41 @@ const action = async (
     body.description = description.trim();
   }
 
-  const response = await ctx.client["POST /v0/meta/bases/:baseId/tables"](
-    { baseId },
-    { body },
-  );
+  try {
+    const response = await ctx.client["POST /v0/meta/bases/:baseId/tables"](
+      { baseId },
+      { body },
+    );
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Error creating table: ${errorText}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      return {
+        error: `Error creating table: ${errorText}`,
+        status: response.status,
+      };
+    }
+
+    const table = await response.json();
+
+    await ctx.invoke["airtable"].actions.permissioning.addNewPermitions({
+      tables: [
+        {
+          id: table.id,
+          name: table.name,
+          baseId: baseId,
+        },
+      ],
+    });
+
+    return {
+      data: table,
+    };
+  } catch (err) {
+    return {
+      error: `Error creating table: ${err instanceof Error ? err.message : String(err)}`,
+      status: 500,
+    };
   }
-
-  const table = await response.json();
-
-  await ctx.invoke["airtable"].actions.permissioning.addNewPermitions({
-    tables: [
-      {
-        id: table.id,
-        name: table.name,
-        baseId: baseId,
-      },
-    ],
-  });
-
-  return table;
 };
 
 export default action;

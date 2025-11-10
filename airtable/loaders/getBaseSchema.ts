@@ -3,6 +3,7 @@ import type {
   BaseSchemaResponse,
   ValidationFilterResult,
   ValidationResult,
+  MCPResponse,
 } from "../utils/types.ts";
 
 interface Props extends Record<string, unknown> {
@@ -28,53 +29,76 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<BaseSchemaResponse | Response> => {
+): Promise<MCPResponse<BaseSchemaResponse>> => {
   if (!ctx.client) {
-    return new Response("OAuth authentication is required", { status: 401 });
+    return {
+      error: "OAuth authentication is required",
+      status: 401,
+    };
   }
 
-  const propsValidationResult: ValidationResult = await ctx.invoke["airtable"]
-    .loaders.permissioning.validatePermissions({
-      mode: "filter",
-      props: props,
-    });
+  try {
+    const propsValidationResult: ValidationResult = await ctx.invoke["airtable"]
+      .loaders.permissioning.validatePermissions({
+        mode: "filter",
+        props: props,
+      });
 
-  if ("error" in propsValidationResult && propsValidationResult.error) {
-    return new Response(propsValidationResult.error, { status: 403 });
+    if ("error" in propsValidationResult && propsValidationResult.error) {
+      return {
+        error: propsValidationResult.error,
+        status: 403,
+      };
+    }
+
+    const propsFilterResult = propsValidationResult as ValidationFilterResult;
+    const { baseId, offset } =
+      (propsFilterResult.filteredProps || props) as Props;
+
+    const params: { baseId: string; offset?: string } = { baseId };
+    if (offset) {
+      params.offset = offset;
+    }
+
+    const response = await ctx.client["GET /v0/meta/bases/:baseId/tables"](
+      params,
+    );
+
+    if (!response.ok) {
+      return {
+        error: `Error getting base schema: ${response.statusText}`,
+        status: response.status,
+      };
+    }
+
+    const data = await response.json();
+
+    const responseValidationResult: ValidationResult = await ctx
+      .invoke["airtable"].loaders.permissioning.validatePermissions({
+        mode: "filter",
+        response: data,
+      });
+
+    if ("error" in responseValidationResult && responseValidationResult.error) {
+      return {
+        error: responseValidationResult.error,
+        status: 403,
+      };
+    }
+
+    const responseFilterResult =
+      responseValidationResult as ValidationFilterResult;
+    const filteredData = (responseFilterResult.filteredResponse || data) as BaseSchemaResponse;
+    
+    return {
+      data: filteredData,
+    };
+  } catch (err) {
+    return {
+      error: `Error getting base schema: ${err instanceof Error ? err.message : String(err)}`,
+      status: 500,
+    };
   }
-
-  const propsFilterResult = propsValidationResult as ValidationFilterResult;
-  const { baseId, offset } =
-    (propsFilterResult.filteredProps || props) as Props;
-
-  const params: { baseId: string; offset?: string } = { baseId };
-  if (offset) {
-    params.offset = offset;
-  }
-
-  const response = await ctx.client["GET /v0/meta/bases/:baseId/tables"](
-    params,
-  );
-
-  if (!response.ok) {
-    throw new Error(`Error getting base schema: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-
-  const responseValidationResult: ValidationResult = await ctx
-    .invoke["airtable"].loaders.permissioning.validatePermissions({
-      mode: "filter",
-      response: data,
-    });
-
-  if ("error" in responseValidationResult && responseValidationResult.error) {
-    return new Response(responseValidationResult.error, { status: 403 });
-  }
-
-  const responseFilterResult =
-    responseValidationResult as ValidationFilterResult;
-  return (responseFilterResult.filteredResponse || data) as BaseSchemaResponse;
 };
 
 export default loader;

@@ -3,6 +3,7 @@ import type {
   ListRecordsResponse,
   ValidationFilterResult,
   ValidationResult,
+  MCPResponse,
 } from "../utils/types.ts";
 
 interface Props extends Record<string, unknown> {
@@ -75,33 +76,52 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<ListRecordsResponse | Response> => {
+): Promise<MCPResponse<ListRecordsResponse>> => {
   if (!ctx.client) {
-    return new Response("OAuth authentication is required", { status: 401 });
+    return {
+      error: "OAuth authentication is required",
+      status: 401,
+    };
   }
 
-  const propsValidationResult: ValidationResult = await ctx.invoke["airtable"]
-    .loaders.permissioning.validatePermissions({
-      mode: "filter",
-      props: { ...props, tableIdOrName: props.tableId },
-    });
+  try {
+    const propsValidationResult: ValidationResult = await ctx.invoke["airtable"]
+      .loaders.permissioning.validatePermissions({
+        mode: "filter",
+        props: { ...props, tableIdOrName: props.tableId },
+      });
 
-  if ("error" in propsValidationResult && propsValidationResult.error) {
-    return new Response(propsValidationResult.error, { status: 403 });
+    if ("error" in propsValidationResult && propsValidationResult.error) {
+      return {
+        error: propsValidationResult.error,
+        status: 403,
+      };
+    }
+
+    const filterResult = propsValidationResult as ValidationFilterResult;
+    const validatedProps = (filterResult.filteredProps || props) as Props;
+
+    const response = await ctx.client["GET /v0/:baseId/:tableId"](
+      validatedProps,
+    );
+
+    if (!response.ok) {
+      return {
+        error: `Error listing records: ${response.statusText}`,
+        status: response.status,
+      };
+    }
+
+    const data = await response.json();
+    return {
+      data,
+    };
+  } catch (err) {
+    return {
+      error: `Error listing records: ${err instanceof Error ? err.message : String(err)}`,
+      status: 500,
+    };
   }
-
-  const filterResult = propsValidationResult as ValidationFilterResult;
-  const validatedProps = (filterResult.filteredProps || props) as Props;
-
-  const response = await ctx.client["GET /v0/:baseId/:tableId"](
-    validatedProps,
-  );
-
-  if (!response.ok) {
-    throw new Error(`Error listing records: ${response.statusText}`);
-  }
-
-  return await response.json();
 };
 
 export default loader;

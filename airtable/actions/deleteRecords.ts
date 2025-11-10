@@ -1,4 +1,5 @@
 import type { AppContext } from "../mod.ts";
+import type { MCPResponse } from "../utils/types.ts";
 
 interface Props {
   /**
@@ -28,9 +29,12 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<{ records: { id: string; deleted: boolean }[] } | Response> => {
+): Promise<MCPResponse<{ records: { id: string; deleted: boolean }[] }>> => {
   if (!ctx.client) {
-    return new Response("OAuth authentication is required", { status: 401 });
+    return {
+      error: "OAuth authentication is required",
+      status: 401,
+    };
   }
 
   const validationResult = await ctx.invoke["airtable"].loaders.permissioning
@@ -41,41 +45,59 @@ const action = async (
     });
 
   if ("hasPermission" in validationResult && !validationResult.hasPermission) {
-    return new Response(validationResult.message || "Access denied", {
+    return {
+      error: validationResult.message || "Access denied",
       status: 403,
-    });
+    };
   }
 
   const { baseId, tableId, recordIds } = props;
 
   if (!recordIds || recordIds.length === 0) {
-    return new Response("At least one record ID is required", { status: 400 });
+    return {
+      error: "At least one record ID is required",
+      status: 400,
+    };
   }
 
   if (recordIds.length > 10) {
-    return new Response("Maximum 10 records can be deleted at once", {
+    return {
+      error: "Maximum 10 records can be deleted at once",
       status: 400,
-    });
+    };
   }
 
   const invalidIds = recordIds.filter((id) => !id.startsWith("rec"));
   if (invalidIds.length > 0) {
-    return new Response(
-      `Invalid record IDs (must start with 'rec'): ${invalidIds.join(", ")}`,
-      { status: 400 },
+    return {
+      error: `Invalid record IDs (must start with 'rec'): ${invalidIds.join(", ")}`,
+      status: 400,
+    };
+  }
+
+  try {
+    const response = await ctx.client["DELETE /v0/:baseId/:tableId"](
+      { baseId, tableId, "records[]": recordIds },
     );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return {
+        error: `Error deleting records: ${errorText}`,
+        status: response.status,
+      };
+    }
+
+    const data = await response.json();
+    return {
+      data,
+    };
+  } catch (err) {
+    return {
+      error: `Error deleting records: ${err instanceof Error ? err.message : String(err)}`,
+      status: 500,
+    };
   }
-
-  const response = await ctx.client["DELETE /v0/:baseId/:tableId"](
-    { baseId, tableId, "records[]": recordIds },
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Error deleting records: ${errorText}`);
-  }
-
-  return response.json();
 };
 
 export default action;

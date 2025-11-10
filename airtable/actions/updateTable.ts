@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { Table, UpdateTableBody } from "../utils/types.ts";
+import type { Table, UpdateTableBody, MCPResponse } from "../utils/types.ts";
 
 interface Props {
   /**
@@ -40,9 +40,12 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<Table | Response> => {
+): Promise<MCPResponse<Table>> => {
   if (!ctx.client) {
-    return new Response("OAuth authentication is required", { status: 401 });
+    return {
+      error: "OAuth authentication is required",
+      status: 401,
+    };
   }
 
   const validationResult = await ctx.invoke["airtable"].loaders.permissioning
@@ -53,9 +56,10 @@ const action = async (
     });
 
   if ("hasPermission" in validationResult && !validationResult.hasPermission) {
-    return new Response(validationResult.message || "Access denied", {
+    return {
+      error: validationResult.message || "Access denied",
       status: 403,
-    });
+    };
   }
 
   const { baseId, tableId, name, description, primaryFieldId } = props;
@@ -66,22 +70,36 @@ const action = async (
   if (primaryFieldId) body.primaryFieldId = primaryFieldId;
 
   if (Object.keys(body).length === 0) {
-    throw new Error(
-      "No updates provided for the table. Please specify name, description, or primaryFieldId.",
-    );
+    return {
+      error: "No updates provided for the table. Please specify name, description, or primaryFieldId.",
+      status: 400,
+    };
   }
 
-  const response = await ctx.client
-    ["PATCH /v0/meta/bases/:baseId/tables/:tableId"](
-      { baseId, tableId },
-      { body },
-    );
+  try {
+    const response = await ctx.client
+      ["PATCH /v0/meta/bases/:baseId/tables/:tableId"](
+        { baseId, tableId },
+        { body },
+      );
 
-  if (!response.ok) {
-    throw new Error(`Error updating table: ${response.statusText}`);
+    if (!response.ok) {
+      return {
+        error: `Error updating table: ${response.statusText}`,
+        status: response.status,
+      };
+    }
+
+    const data = await response.json();
+    return {
+      data,
+    };
+  } catch (err) {
+    return {
+      error: `Error updating table: ${err instanceof Error ? err.message : String(err)}`,
+      status: 500,
+    };
   }
-
-  return response.json();
 };
 
 export default action;
