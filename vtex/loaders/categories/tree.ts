@@ -26,3 +26,9 @@ export default async function loader(
     }, { ...STALE, headers: withSegmentCookie(getSegmentFromBag(ctx)) })
     .then((res) => res.json());
 }
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props) => {
+  return `category-tree-${props.categoryLevels ?? 1}`;
+};

@@ -39,5 +39,11 @@ export async function loader(
   return data;
 }
 
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props) => {
+  return `profile-${props.email}-${props.ensureComplete ?? false}`;
+};
+
 export const defaultVisibility = "private";
 export default loader;

@@ -31,3 +31,9 @@ export default async function loader(
 
   return order;
 }
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props) => {
+  return `order-${props.orderId}`;
+};

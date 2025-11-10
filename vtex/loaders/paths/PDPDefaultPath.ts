@@ -41,4 +41,10 @@ const loader = async (
   };
 };
 
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, _req: Request, _ctx: AppContext) => {
+  return `pdp-default-path-${props.count ?? 5}`;
+};
+
 export default loader;
