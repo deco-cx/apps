@@ -432,7 +432,9 @@ const loader = async (
 export const cache = "stale-while-revalidate";
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(props.pageHref || req.url);
-  if (url.searchParams.has("q")) {
+  const searchTerm = url.searchParams.get("q");
+  const cachedSearchTerms = ctx.cachedSearchTerms ?? [];
+  if (searchTerm && !cachedSearchTerms.includes(searchTerm)) {
     return null;
   }
   const segment = getSegmentFromBag(ctx)?.token ?? "";

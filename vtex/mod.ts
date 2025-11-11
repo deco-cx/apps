@@ -87,6 +87,12 @@ export interface Props {
   advancedConfigs?: {
     doNotFetchVariantsForRelatedProducts?: boolean;
   };
+
+  /**
+   * @title Cached Search Terms
+   * @description List of search terms that should be cached. By default, search results are not cached.
+   */
+  cachedSearchTerms?: string[];
 }
 export const color = 0xf71963;
 /**
@@ -175,6 +181,7 @@ export default function VTEX(
     api,
     vpay,
     sub,
+    cachedSearchTerms: props.cachedSearchTerms ?? [],
   };
   const app: A<Manifest, typeof state, [
     ReturnType<typeof workflow>,
