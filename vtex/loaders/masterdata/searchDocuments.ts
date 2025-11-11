@@ -68,10 +68,4 @@ export default async function loader(
   return documents;
 }
 
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (props: Props) => {
-  return `masterdata-${JSON.stringify(props)}`;
-};
-
 export const defaultVisibility = "private";
