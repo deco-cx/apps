@@ -46,4 +46,11 @@ const loader = async (props: Props, req: Request, ctx: AppContext) => {
 
   return suggestionsArray;
 };
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, _req: Request, _ctx: AppContext) => {
+  return `product-id-by-term-${props.term ?? ""}`;
+};
+
 export default loader;

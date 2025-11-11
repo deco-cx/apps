@@ -22,3 +22,12 @@ export default async function (
     }, { ...STALE, headers: withSegmentCookie(getSegmentFromBag(ctx)) })
     .then((res) => res.json());
 }
+
+export const cache = {
+  maxAge: 60 * 60, // 1 hour
+};
+
+export const cacheKey = (_props: unknown, _req: Request, ctx: AppContext) => {
+  const segment = getSegmentFromBag(ctx)?.token ?? "";
+  return `topsearches-${segment}`;
+};

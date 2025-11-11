@@ -24,3 +24,9 @@ export default async function loader(
 
   return salesChannel;
 }
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, _req: Request, _ctx: AppContext) => {
+  return `sales-channel-${props.id}`;
+};
