@@ -37,9 +37,3 @@ export default async function loader(
 
   return promotionById;
 }
-
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (props: Props) => {
-  return `promotion-${props.idCalculatorConfiguration}`;
-};
