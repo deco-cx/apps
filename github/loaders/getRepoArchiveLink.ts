@@ -1,10 +1,16 @@
 import { AppContext } from "../mod.ts";
+import { SingleObjectResponse } from "../utils/response.ts";
 
 interface Props {
   owner: string;
   repo: string;
   ref?: string;
   format?: "tarball" | "zipball";
+}
+
+interface ArchiveLink {
+  url: string;
+  format: "tarball" | "zipball";
 }
 
 /**
@@ -16,24 +22,33 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<{ url: string; format: "tarball" | "zipball" }> => {
+): Promise<SingleObjectResponse<ArchiveLink>> => {
   const { owner, repo } = props;
   const ref = props.ref ?? "";
   const format = props.format ?? "tarball";
+
+  let archiveData: ArchiveLink;
+
   if (format === "zipball") {
     const response = await ctx.client["GET /repos/:owner/:repo/zipball/:ref"]({
       owner,
       repo,
       ref,
     });
-    return { url: response.url, format };
+    archiveData = { url: response.url, format };
+  } else {
+    const response = await ctx.client["GET /repos/:owner/:repo/tarball/:ref"]({
+      owner,
+      repo,
+      ref,
+    });
+    archiveData = { url: response.url, format };
   }
-  const response = await ctx.client["GET /repos/:owner/:repo/tarball/:ref"]({
-    owner,
-    repo,
-    ref,
-  });
-  return { url: response.url, format };
+
+  return {
+    data: archiveData,
+    metadata: {},
+  };
 };
 
 export default loader;

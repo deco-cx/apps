@@ -3,7 +3,7 @@ import { AppContext } from "../mod.ts";
 
 type ConnInfo = Deno.ServeHandlerInfo;
 const BASE_SITEMAP_URL =
-  "https://p-general-prod-public.s3.sa-east-1.amazonaws.com/Sitemap";
+  "https://p-general-sitemap-public.s3.us-east-2.amazonaws.com/Sitemap";
 
 const xmlHeader =
   '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';

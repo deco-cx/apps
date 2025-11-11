@@ -1,14 +1,15 @@
 import { AppContext } from "../mod.ts";
+import { StandardResponse } from "../utils/response.ts";
 
 interface Props {
   owner: string;
   repo: string;
 }
 
-interface ViewsResponse {
+interface ViewData {
+  timestamp: string;
   count: number;
   uniques: number;
-  views: Array<{ timestamp: string; count: number; uniques: number }>;
 }
 
 /**
@@ -20,11 +21,23 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<ViewsResponse> => {
+): Promise<StandardResponse<ViewData>> => {
   const response = await ctx.client["GET /repos/:owner/:repo/traffic/views"]({
     ...props,
   });
-  return await response.json();
+  const result = await response.json() as {
+    count: number;
+    uniques: number;
+    views: ViewData[];
+  };
+
+  return {
+    data: result.views,
+    metadata: {
+      total_count: result.count,
+      uniques: result.uniques,
+    },
+  };
 };
 
 export default loader;

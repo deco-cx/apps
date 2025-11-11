@@ -33,6 +33,14 @@ export interface Props {
   around?: string;
 }
 
+export interface ChannelMessagesResponse {
+  /**
+   * @title Messages
+   * @description Lista de mensagens do canal
+   */
+  messages: DiscordMessage[];
+}
+
 /**
  * @title Get Channel Messages
  * @description Get messages from a Discord channel using Bot Token
@@ -41,7 +49,7 @@ export default async function getChannelMessages(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<DiscordMessage[]> {
+): Promise<ChannelMessagesResponse> {
   const { channelId, limit = 50, before, after, around } = props;
   const { client } = ctx;
 
@@ -66,5 +74,5 @@ export default async function getChannelMessages(
   }
 
   const messages = await response.json();
-  return messages;
+  return { messages };
 }

@@ -64,6 +64,14 @@ export interface WebhookInfo {
   url?: string;
 }
 
+export interface WebhooksResponse {
+  /**
+   * @title Webhooks
+   * @description Lista de webhooks
+   */
+  webhooks: WebhookInfo[];
+}
+
 /**
  * @title List Webhooks
  * @description List webhooks from a Discord channel or guild using Bot Token
@@ -72,7 +80,7 @@ export default async function listWebhooks(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<WebhookInfo[]> {
+): Promise<WebhooksResponse> {
   const { channelId, guildId } = props;
   const { client } = ctx;
 
@@ -101,5 +109,5 @@ export default async function listWebhooks(
   }
 
   const webhooks = await response.json();
-  return webhooks;
+  return { webhooks };
 }

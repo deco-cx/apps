@@ -9,6 +9,14 @@ export interface Props {
   guildId: string;
 }
 
+export interface GuildChannelsResponse {
+  /**
+   * @title Channels
+   * @description Lista de canais do servidor
+   */
+  channels: DiscordChannel[];
+}
+
 /**
  * @title List Guild Channels
  * @description List all channels from a specific Discord guild using Bot Token
@@ -17,7 +25,7 @@ export default async function getGuildChannels(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<DiscordChannel[]> {
+): Promise<GuildChannelsResponse> {
   const { guildId } = props;
   const { client } = ctx;
 
@@ -35,5 +43,5 @@ export default async function getGuildChannels(
   }
 
   const channels = await response.json();
-  return channels;
+  return { channels };
 }

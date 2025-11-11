@@ -1,5 +1,9 @@
 import { AppContext } from "../mod.ts";
 import type { Client } from "../utils/client.ts";
+import {
+  hasNextPageFromLinkHeader,
+  ResponseMetadata,
+} from "../utils/response.ts";
 
 export interface Props {
   owner: string;
@@ -17,6 +21,8 @@ export interface Props {
   milestone?: string | number;
 }
 
+type IssuesResponse = Client["GET /repos/:owner/:repo/issues"]["response"];
+
 /**
  * @name LIST_REPO_ISSUES_RAW
  * @title Repository Issues (and Pull Requests)
@@ -26,10 +32,19 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<{ data: Client["GET /repos/:owner/:repo/issues"]["response"] }> => {
+): Promise<{ data: IssuesResponse; metadata: ResponseMetadata }> => {
   const response = await ctx.client["GET /repos/:owner/:repo/issues"](props);
   const data = await response.json();
-  return { data };
+  const linkHeader = response.headers.get("link");
+
+  return {
+    data,
+    metadata: {
+      page: props.page,
+      per_page: props.per_page,
+      has_next_page: hasNextPageFromLinkHeader(linkHeader),
+    },
+  };
 };
 
 export default loader;

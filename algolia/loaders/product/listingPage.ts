@@ -51,6 +51,11 @@ interface Props {
    * @default 0
    */
   startingPage?: 0 | 1;
+
+  /**
+   * @description Index Name
+   */
+  indexName?: string;
 }
 
 const getPageInfo = (
@@ -174,7 +179,7 @@ const loader = async (
 ): Promise<ProductListingPage | null> => {
   const url = new URL(req.url);
   const { client } = ctx;
-  const indexName = getIndex(url.searchParams.get("sort"));
+  const indexName = props?.indexName ?? getIndex(url.searchParams.get("sort"));
   const startingPage = props.startingPage ?? 0;
   const pageIndex = Number(url.searchParams.get("page")) || startingPage;
 
@@ -191,9 +196,11 @@ const loader = async (
   // different categories are split by an AND. e.g.:
   //
   // (department:"man" OR department:"woman") AND (brand:"deco") AND (available:"true")
-  const fFilters = facetFilters.map(([key, values]) =>
-    `(${values.map((value) => `${key}:"${value}"`).join(" OR ")})`
-  ).join(" AND ");
+  const fFilters = facetFilters
+    .map(([key, values]) =>
+      `(${values.map((value) => `${key}:"${value}"`).join(" OR ")})`
+    )
+    .join(" AND ");
 
   const { results } = await client.search([
     {

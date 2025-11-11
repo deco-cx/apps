@@ -159,7 +159,9 @@ export const cache = "stale-while-revalidate";
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(req.url);
 
-  if (url.searchParams.has("ft")) {
+  const searchTerm = url.searchParams.get("ft") || url.searchParams.get("q");
+  const cachedSearchTerms = ctx.cachedSearchTerms ?? [];
+  if (searchTerm && !cachedSearchTerms.includes(searchTerm)) {
     return null;
   }
 

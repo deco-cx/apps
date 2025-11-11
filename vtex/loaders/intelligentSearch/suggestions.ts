@@ -100,4 +100,11 @@ const loaders = async (
   };
 };
 
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, _req: Request, ctx: AppContext) => {
+  const segment = getSegmentFromBag(ctx)?.token ?? "";
+  return `suggestions-${props.query ?? ""}-${props.count ?? 4}-${segment}`;
+};
+
 export default loaders;

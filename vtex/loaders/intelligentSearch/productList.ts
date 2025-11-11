@@ -313,9 +313,12 @@ export const cacheKey = (
 
   const url = new URL(req.url);
 
+  const searchTerm = url.searchParams.get("q");
+  const cachedSearchTerms = ctx.cachedSearchTerms ?? [];
   if (
     // Avoid cache on loader call over call and on search pages
-    (!isQueryList(props) && url.searchParams.has("q")) || ctx.isInvoke
+    (!isQueryList(props) && searchTerm &&
+      !cachedSearchTerms.includes(searchTerm)) || ctx.isInvoke
   ) {
     return null;
   }
