@@ -174,7 +174,8 @@ export default async function VTEX(
       ["GET /api/io/_v/api/intelligent-search/top_searches"]({
         locale: "pt-BR",
       }).then((res) => res.json());
-  } catch (_error) {
+  } catch (error) {
+    console.error("Failed to fetch cached search terms:", error);
     cachedSearchTerms = { searches: [] };
   }
 
