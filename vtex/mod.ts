@@ -102,7 +102,7 @@ export const color = 0xf71963;
  * @category Ecommmerce
  * @logo https://assets.decocache.com/mcp/0d6e795b-cefd-4853-9a51-93b346c52c3f/VTEX.svg
  */
-export default function VTEX(
+export default async function VTEX(
   { appKey, appToken, account, publicUrl: _publicUrl, salesChannel, ...props }:
     Props,
 ) {
@@ -168,6 +168,17 @@ export default function VTEX(
     headers: headers,
   });
 
+  let cachedSearchTerms;
+  try {
+    cachedSearchTerms = await vcsDeprecated
+      ["GET /api/io/_v/api/intelligent-search/top_searches"]({
+        locale: "pt-BR",
+      }).then((res) => res.json());
+  } catch (error) {
+    console.error("Failed to fetch cached search terms:", error);
+    cachedSearchTerms = { searches: [] };
+  }
+
   const state = {
     ...props,
     salesChannel: salesChannel ?? "1",
@@ -181,7 +192,10 @@ export default function VTEX(
     api,
     vpay,
     sub,
-    cachedSearchTerms: props.cachedSearchTerms ?? [],
+    cachedSearchTerms: [
+      ...(props.cachedSearchTerms ?? []),
+      ...cachedSearchTerms?.searches?.map((search) => search.term),
+    ],
   };
   const app: A<Manifest, typeof state, [
     ReturnType<typeof workflow>,
