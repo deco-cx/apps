@@ -10,7 +10,7 @@ import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
 import { OpenAPI as MY } from "./utils/openapi/my.openapi.gen.ts";
 import { OpenAPI as VPAY } from "./utils/openapi/payments.openapi.gen.ts";
 import { OpenAPI as SUB } from "./utils/openapi/subscriptions.openapi.gen.ts";
-import { Segment } from "./utils/types.ts";
+import { Segment, Suggestion } from "./utils/types.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import { removeDirtyCookies } from "../utils/normalize.ts";
 import { Markdown } from "../decohub/components/Markdown.tsx";
@@ -92,7 +92,10 @@ export interface Props {
    * @title Cached Search Terms
    * @description List of search terms that should be cached. By default, search results are not cached.
    */
-  cachedSearchTerms?: string[];
+  cachedSearchTerms?: {
+    terms?: Suggestion;
+    extraPaths?: string[];
+  };
 }
 export const color = 0xf71963;
 /**
@@ -102,7 +105,7 @@ export const color = 0xf71963;
  * @category Ecommmerce
  * @logo https://assets.decocache.com/mcp/0d6e795b-cefd-4853-9a51-93b346c52c3f/VTEX.svg
  */
-export default async function VTEX(
+export default function VTEX(
   { appKey, appToken, account, publicUrl: _publicUrl, salesChannel, ...props }:
     Props,
 ) {
@@ -168,16 +171,10 @@ export default async function VTEX(
     headers: headers,
   });
 
-  let cachedSearchTerms;
-  try {
-    cachedSearchTerms = await vcsDeprecated
-      ["GET /api/io/_v/api/intelligent-search/top_searches"]({
-        locale: "pt-BR",
-      }).then((res) => res.json());
-  } catch (error) {
-    console.error("Failed to fetch cached search terms:", error);
-    cachedSearchTerms = { searches: [] };
-  }
+  const cachedSearchTerms = [
+    ...(props.cachedSearchTerms?.terms?.searches ?? []).map((search) => search.term),
+    ...(props.cachedSearchTerms?.extraPaths ?? []),
+  ];
 
   const state = {
     ...props,
@@ -192,10 +189,7 @@ export default async function VTEX(
     api,
     vpay,
     sub,
-    cachedSearchTerms: [
-      ...(props.cachedSearchTerms ?? []),
-      ...cachedSearchTerms?.searches?.map((search) => search.term),
-    ],
+    cachedSearchTerms,
   };
   const app: A<Manifest, typeof state, [
     ReturnType<typeof workflow>,
