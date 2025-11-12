@@ -3,7 +3,6 @@ import type {
   ListRecordsResponse,
   MCPResponse,
   ValidationFilterResult,
-  ValidationResult,
 } from "../utils/types.ts";
 
 interface Props extends Record<string, unknown> {
@@ -85,11 +84,27 @@ const loader = async (
   }
 
   try {
-    const propsValidationResult: ValidationResult = await ctx.invoke["airtable"]
-      .loaders.permissioning.validatePermissions({
+    const validationResponse = await ctx.invoke["airtable"].loaders
+      .permissioning.validatePermissions({
         mode: "filter",
         props: { ...props, tableIdOrName: props.tableId },
       });
+
+    // Desembrulhar o MCPResponse envelope
+    if ("error" in validationResponse) {
+      return {
+        error: validationResponse.error ?? "Access denied",
+        status: validationResponse.status ?? 403,
+      };
+    }
+
+    const propsValidationResult = validationResponse.data;
+    if (!propsValidationResult) {
+      return {
+        error: "Permission validation failed",
+        status: validationResponse.status ?? 500,
+      };
+    }
 
     if ("error" in propsValidationResult && propsValidationResult.error) {
       return {

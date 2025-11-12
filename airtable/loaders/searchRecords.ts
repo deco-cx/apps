@@ -103,14 +103,19 @@ const loader = async (
 
     const { searchTerm, searchFields, ...otherProps } = props;
 
+    // Escape backslashes and double quotes in searchTerm to prevent formula injection
+    const escapedSearchTerm = searchTerm
+      .replace(/\\/g, "\\\\")
+      .replace(/"/g, '\\"');
+
     let filterByFormula = "";
     if (searchFields && searchFields.length > 0) {
       const fieldFormulas = searchFields.map(
-        (field) => `SEARCH("${searchTerm}", {${field}})`,
+        (field) => `SEARCH("${escapedSearchTerm}", {${field}})`,
       );
       filterByFormula = `OR(${fieldFormulas.join(",")})`;
     } else {
-      filterByFormula = `SEARCH("${searchTerm}", {*})`;
+      filterByFormula = `SEARCH("${escapedSearchTerm}", {*})`;
     }
 
     const response = await ctx.client["GET /v0/:baseId/:tableId"]({

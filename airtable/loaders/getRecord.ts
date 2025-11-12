@@ -39,15 +39,26 @@ const loader = async (
   }
 
   try {
-    const validationResult = await ctx.invoke["airtable"].loaders.permissioning
-      .validatePermissions({
+    const validationResponse = await ctx.invoke["airtable"].loaders
+      .permissioning.validatePermissions({
         mode: "check",
         baseId: props.baseId,
         tableIdOrName: props.tableId,
       });
 
+    // Desembrulhar o MCPResponse envelope
+    if ("error" in validationResponse) {
+      return {
+        error: validationResponse.error,
+        status: validationResponse.status ?? 403,
+      };
+    }
+
+    const validationResult = validationResponse.data;
     if (
-      "hasPermission" in validationResult && !validationResult.hasPermission
+      validationResult &&
+      "hasPermission" in validationResult &&
+      !validationResult.hasPermission
     ) {
       return {
         error: validationResult.message || "Access denied",

@@ -53,14 +53,27 @@ const action = async (
     };
   }
 
-  const validationResult = await ctx.invoke["airtable"].loaders.permissioning
+  const validationResponse = await ctx.invoke["airtable"].loaders.permissioning
     .validatePermissions({
       mode: "check",
       baseId: props.baseId,
       tableIdOrName: props.tableId,
     });
 
-  if ("hasPermission" in validationResult && !validationResult.hasPermission) {
+  // Desembrulhar o MCPResponse envelope
+  if ("error" in validationResponse) {
+    return {
+      error: validationResponse.error ?? "Access denied",
+      status: validationResponse.status ?? 403,
+    };
+  }
+
+  const validationResult = validationResponse.data;
+  if (
+    validationResult &&
+    "hasPermission" in validationResult &&
+    !validationResult.hasPermission
+  ) {
     return {
       error: validationResult.message || "Access denied",
       status: 403,
@@ -94,9 +107,15 @@ const action = async (
   }
 
   try {
-    const recordsToCreate: CreateRecordBody[] = records.map((record) => ({
-      fields: record.fields,
-    }));
+    const recordsToCreate: CreateRecordBody[] = records.map((record) => {
+      const recordBody: CreateRecordBody = {
+        fields: record.fields,
+      };
+      if (record.typecast !== undefined) {
+        recordBody.typecast = record.typecast;
+      }
+      return recordBody;
+    });
 
     const body: { records: CreateRecordBody[]; typecast?: boolean } = {
       records: recordsToCreate,
