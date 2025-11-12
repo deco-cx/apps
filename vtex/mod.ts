@@ -93,8 +93,16 @@ export interface Props {
    * @description List of search terms that should be cached. By default, search results are not cached.
    */
   cachedSearchTerms?: {
+    /**
+     * @title Terms
+     * @description List of search terms that should be cached. Use the top searches loader to get the terms.
+     */
     terms?: Suggestion;
-    extraPaths?: string[];
+    /**
+     * @title Extra Paths
+     * @description List of extra terms that should be cached.
+     */
+    extraTerms?: string[];
   };
 }
 export const color = 0xf71963;
@@ -175,7 +183,7 @@ export default function VTEX(
     ...(props.cachedSearchTerms?.terms?.searches ?? []).map((search) =>
       search.term
     ),
-    ...(props.cachedSearchTerms?.extraPaths ?? []),
+    ...(props.cachedSearchTerms?.extraTerms ?? []),
   ];
 
   const state = {
