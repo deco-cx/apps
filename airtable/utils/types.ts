@@ -75,6 +75,11 @@ export interface CreateRecordBody {
   typecast?: boolean;
 }
 
+export interface CreateRecordsBody {
+  records: Array<{ fields: FieldSet; typecast?: boolean }>;
+  typecast?: boolean;
+}
+
 export interface UpdateRecordsBody {
   records: Array<{ id: string; fields: FieldSet }>;
   typecast?: boolean;
