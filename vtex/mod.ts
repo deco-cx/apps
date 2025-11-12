@@ -172,7 +172,9 @@ export default function VTEX(
   });
 
   const cachedSearchTerms = [
-    ...(props.cachedSearchTerms?.terms?.searches ?? []).map((search) => search.term),
+    ...(props.cachedSearchTerms?.terms?.searches ?? []).map((search) =>
+      search.term
+    ),
     ...(props.cachedSearchTerms?.extraPaths ?? []),
   ];
 
