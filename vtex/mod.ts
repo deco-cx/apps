@@ -22,7 +22,7 @@ import {
   type AppRuntime,
   type ManifestOf,
 } from "@deco/deco";
-export type App = ReturnType<typeof VTEX>;
+export type App = Awaited<ReturnType<typeof VTEX>>;
 export type AppContext = AC<App>;
 export type AppManifest = ManifestOf<App>;
 export type AppMiddlewareContext = AMC<App>;
