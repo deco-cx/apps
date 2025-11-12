@@ -11,8 +11,11 @@ export function debugOverlay() {
   const OVERLAY_CLASS = "deco-debug-on";
   const SECTION_CLASS = "deco-debug-section";
   const BADGE_CLASS = "deco-debug-badge";
+  const OVERLAY_PANEL_CLASS = "deco-debug-overlay-panel";
+  const SUMMARY_CLASS = "deco-debug-summary";
   const TOGGLE_ID = "deco-debug-toggle";
   const STYLE_ID = "deco-debug-style";
+  const SUMMARY_TOGGLE_ID = "deco-debug-summary-toggle";
 
   type LoaderSummary = {
     loader: string;
@@ -49,14 +52,7 @@ export function debugOverlay() {
   };
 
   const setBadgePalette = (badge: HTMLElement, color: string) => {
-    badge.style.background = color;
-    const rgb = hexToRgb(color);
-    if (!rgb) {
-      badge.style.color = "#f8fafc";
-      return;
-    }
-    const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-    badge.style.color = luminance > 0.6 ? "#0f172a" : "#f8fafc";
+    badge.style.setProperty("--deco-badge-accent", color);
   };
 
   const ensureStyleTag = () => {
@@ -69,61 +65,228 @@ export function debugOverlay() {
       html.${OVERLAY_CLASS} {
         scroll-behavior: auto;
       }
-      .${BADGE_CLASS} {
+      .${OVERLAY_PANEL_CLASS} {
         position: absolute;
-        top: 6px;
-        left: 6px;
+        inset: 0;
         z-index: 9999;
+        background: rgba(15, 23, 42, 0.08);
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 6px;
+        pointer-events: none;
+      }
+      .${BADGE_CLASS} {
+        position: relative;
+        z-index: 10000;
         display: flex;
         flex-direction: column;
-        gap: 4px;
-        padding: 8px 10px;
-        border-radius: 6px;
-        background: rgba(34, 47, 62, 0.92);
-        color: #fefefe;
-        font: 11px/1.4 "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-        max-width: min(320px, 90%);
+        gap: 10px;
+        padding: 12px 18px;
+        background: rgba(248, 250, 252, 0.96);
+        color: #0f172a;
+        font: 12px/1.45 "Inter", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+        border: 2px solid var(--deco-badge-accent, rgba(148, 163, 184, 0.35));
+        border-radius: 12px;
+        min-height: 48px;
+        min-width: 320px;
+        max-width: min(780px, 96vw);
         pointer-events: auto;
       }
       .${BADGE_CLASS}__title {
-        font-weight: 600;
-        font-size: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #0f172a;
+        white-space: nowrap;
       }
-      .${BADGE_CLASS}__meta {
+      .${BADGE_CLASS}__body {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        min-width: 0;
+      }
+      .${BADGE_CLASS}__tags {
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        opacity: 0.85;
+        width: 100%;
       }
-      .${BADGE_CLASS}__meta span {
+      .${BADGE_CLASS}__tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        background: rgba(15, 23, 42, 0.08);
+        color: #0f172a;
         white-space: nowrap;
       }
+      .${BADGE_CLASS}__tag-label {
+        font-size: 10px;
+        color: #475569;
+      }
+      .${BADGE_CLASS}__tag-value {
+        font-size: 11px;
+      }
+      .${BADGE_CLASS}__tag--good {
+        background: rgba(34, 197, 94, 0.18);
+        color: #14532d;
+      }
+      .${BADGE_CLASS}__tag--warn {
+        background: rgba(250, 204, 21, 0.22);
+        color: #854d0e;
+      }
+      .${BADGE_CLASS}__tag--bad {
+        background: rgba(248, 113, 113, 0.22);
+        color: #7f1d1d;
+      }
+      .${BADGE_CLASS}__tag--info {
+        background: rgba(59, 130, 246, 0.22);
+        color: #1d4ed8;
+      }
       .${BADGE_CLASS}__loaders {
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
-        margin-top: 4px;
-        padding-top: 4px;
-        display: grid;
-        gap: 2px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-height: 140px;
+        overflow-y: auto;
+        padding-right: 4px;
       }
       .${BADGE_CLASS}__loader-line {
         display: flex;
         justify-content: space-between;
-        gap: 6px;
+        gap: 12px;
+        padding: 6px 10px;
+        background: rgba(15, 23, 42, 0.08);
+        border-radius: 6px;
+        font-size: 11px;
         white-space: nowrap;
       }
       .${BADGE_CLASS}__loader-name {
-        font-weight: 500;
+        font-weight: 600;
+        color: #0f172a;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
       }
       .${BADGE_CLASS}__loader-info {
-        opacity: 0.7;
+        color: #475569;
+        white-space: nowrap;
+        font-size: 10px;
       }
       .${BADGE_CLASS}__empty {
-        opacity: 0.7;
+        opacity: 0.75;
+        font-style: italic;
+        color: #475569;
+        font-size: 10px;
+      }
+      .${SUMMARY_CLASS} .${BADGE_CLASS} {
+        background: rgba(13, 19, 33, 0.9);
+        color: #e2e8f0;
+        border-color: rgba(148, 163, 184, 0.4);
+      }
+      .${SUMMARY_CLASS} .${BADGE_CLASS}__tag {
+        background: rgba(148, 163, 184, 0.24);
+        color: #e2e8f0;
+      }
+      .${SUMMARY_CLASS} .${BADGE_CLASS}__tag-label {
+        color: #cbd5f5;
+      }
+      .${SUMMARY_CLASS} .${BADGE_CLASS}__loader-line {
+        background: rgba(148, 163, 184, 0.2);
+        color: #e2e8f0;
+      }
+      .${SUMMARY_CLASS} .${BADGE_CLASS}__loader-info {
+        color: #cbd5f5;
+      }
+      .${SUMMARY_CLASS} {
+        position: fixed;
+        bottom: 60px;
+        left: 16px;
+        right: 16px;
+        z-index: 10001;
+        padding: 16px 20px;
+        background: rgba(12, 19, 33, 0.95);
+        color: #f8fafc;
+        font: 11px/1.45 "Inter", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+        box-shadow: 0 16px 32px rgba(15, 23, 42, 0.45);
+        border-radius: 14px;
+        max-height: 360px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        pointer-events: auto;
+      }
+      .${SUMMARY_CLASS}__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .${SUMMARY_CLASS}__title {
+        font-weight: 700;
+        font-size: 12px;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      .${SUMMARY_CLASS}__hide {
+        background: rgba(148, 163, 184, 0.18);
+        border: 1px solid rgba(148, 163, 184, 0.38);
+        border-radius: 999px;
+        color: #e2e8f0;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 6px 12px;
+        cursor: pointer;
+      }
+      .${SUMMARY_CLASS}__hide:hover {
+        background: rgba(148, 163, 184, 0.32);
+      }
+      .${SUMMARY_CLASS}__list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow-y: auto;
+        padding-right: 6px;
+      }
+      .${SUMMARY_CLASS}__list .${BADGE_CLASS} {
+        max-width: 100%;
+      }
+      .${SUMMARY_CLASS}--hidden {
+        display: none;
+      }
+      #${SUMMARY_TOGGLE_ID} {
+        position: fixed;
+        bottom: 16px;
+        left: 16px;
+        z-index: 10002;
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: rgba(15, 23, 42, 0.9);
+        color: #e2e8f0;
+        font: 11px/1.4 "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.45);
+      }
+      #${SUMMARY_TOGGLE_ID}:hover {
+        background: rgba(15, 23, 42, 0.98);
       }
       html.${OVERLAY_CLASS} section[data-manifest-key] {
-        outline: 2px dashed var(--deco-debug-color, ${colors.default});
-        outline-offset: 2px;
+        outline: 2px solid var(--deco-debug-color, ${colors.default});
+        outline-offset: -2px;
       }
       html.${OVERLAY_CLASS} section[data-manifest-key].${SECTION_CLASS} {
         position: relative;
@@ -153,8 +316,16 @@ export function debugOverlay() {
 
   const removeBadges = () => {
     document
-      .querySelectorAll<HTMLElement>(`.${BADGE_CLASS}`)
-      .forEach((badge) => badge.remove());
+      .querySelectorAll<HTMLElement>(`.${OVERLAY_PANEL_CLASS}`)
+      .forEach((panel) => {
+        panel.remove();
+      });
+    document
+      .querySelectorAll<HTMLElement>(`.${SUMMARY_CLASS}`)
+      .forEach((summary) => {
+        summary.remove();
+      });
+    document.getElementById(SUMMARY_TOGGLE_ID)?.remove();
     document
       .querySelectorAll<HTMLElement>(
         `section[data-manifest-key].${SECTION_CLASS}`,
@@ -222,94 +393,266 @@ export function debugOverlay() {
     return `${latency.toFixed(1)}ms`;
   };
 
+  type BadgeInfo = {
+    title: string;
+    path?: string;
+    scope: string;
+    asyncMode: string;
+    cache: string;
+    source?: string;
+    host?: string;
+    loaderCount: number;
+    loaders: LoaderSummary[];
+    color: string;
+    pure: boolean;
+  };
+
+  const buildBadge = (info: BadgeInfo) => {
+    const badge = document.createElement("div");
+    badge.className = BADGE_CLASS;
+    setBadgePalette(badge, info.color);
+
+    const title = document.createElement("span");
+    title.className = `${BADGE_CLASS}__title`;
+    title.textContent = info.title;
+    badge.appendChild(title);
+
+    const body = document.createElement("div");
+    body.className = `${BADGE_CLASS}__body`;
+
+    const tags = document.createElement("div");
+    tags.className = `${BADGE_CLASS}__tags`;
+
+    type Tone = "neutral" | "good" | "warn" | "bad" | "info";
+    const appendTag = (
+      label: string,
+      value: string | undefined,
+      tone: Tone = "neutral",
+    ) => {
+      if (!value || value === "") {
+        return;
+      }
+      const tag = document.createElement("span");
+      tag.className = `${BADGE_CLASS}__tag`;
+      if (tone !== "neutral") {
+        tag.classList.add(`${BADGE_CLASS}__tag--${tone}`);
+      }
+
+      const labelSpan = document.createElement("span");
+      labelSpan.className = `${BADGE_CLASS}__tag-label`;
+      labelSpan.textContent = `${label}:`;
+
+      const valueSpan = document.createElement("span");
+      valueSpan.className = `${BADGE_CLASS}__tag-value`;
+      valueSpan.textContent = value;
+
+      tag.append(labelSpan, valueSpan);
+      tags.appendChild(tag);
+    };
+
+    const asyncModeNormalized = info.asyncMode?.toLowerCase?.() ?? "false";
+    const isAsync = !["false", "no", "sync"].includes(asyncModeNormalized);
+    const asyncDisplay = isAsync ? info.asyncMode : "no";
+    const syncDisplay = isAsync ? "no" : "yes";
+    const pureTone: Tone = info.pure ? "good" : "warn";
+    const asyncTone: Tone = isAsync ? "info" : "neutral";
+    const syncTone: Tone = isAsync ? "neutral" : "info";
+    const cacheTone: Tone = (() => {
+      switch (info.cache) {
+        case "none":
+        case "miss":
+        case "bypass":
+          return "bad";
+        case "stale":
+        case "mixed":
+          return "warn";
+        case "hit":
+          return "good";
+        default:
+          return "neutral";
+      }
+    })();
+    const loaderTone: Tone = info.loaderCount === 0 ? "good" : "info";
+
+    appendTag("PURE", info.pure ? "yes" : "no", pureTone);
+    appendTag("ASYNC", asyncDisplay, asyncTone);
+    appendTag("SYNC", syncDisplay, syncTone);
+    appendTag("CACHE", info.cache ?? "none", cacheTone);
+    appendTag("SCOPE", info.scope.toLowerCase());
+    appendTag("SOURCE", info.source);
+    appendTag("HOST", info.host);
+    appendTag("LOADERS", `${info.loaderCount}`, loaderTone);
+    appendTag("PATH", info.path ?? info.title);
+
+    body.appendChild(tags);
+
+    const loadersContainer = document.createElement("div");
+    loadersContainer.className = `${BADGE_CLASS}__loaders`;
+    if (info.loaders.length === 0) {
+      const empty = document.createElement("span");
+      empty.className = `${BADGE_CLASS}__empty`;
+      empty.textContent = "Pure section (no loaders)";
+      loadersContainer.appendChild(empty);
+    } else {
+      info.loaders.forEach((loader) => {
+        const chip = document.createElement("span");
+        chip.className = `${BADGE_CLASS}__loader-line`;
+
+        const name = document.createElement("span");
+        name.className = `${BADGE_CLASS}__loader-name`;
+        name.textContent = loader.loader ?? "loader";
+        chip.appendChild(name);
+
+        const detail = document.createElement("span");
+        detail.className = `${BADGE_CLASS}__loader-info`;
+        const parts = [
+          loader.status,
+          formatLatency(loader.latencyMs),
+          loader.cacheMode,
+          loader.cacheConfigured ? "cached" : "no-cache",
+        ];
+        detail.textContent = parts.join(" • ");
+        chip.appendChild(detail);
+
+        loadersContainer.appendChild(chip);
+      });
+    }
+    body.appendChild(loadersContainer);
+    badge.appendChild(body);
+    return badge;
+  };
+
   const applyOverlay = () => {
     removeBadges();
     const sections = document.querySelectorAll<HTMLElement>(
       "section[data-manifest-key]",
     );
+    const emptySections: BadgeInfo[] = [];
+
     sections.forEach((section) => {
-      const dataset = section.dataset;
-      const loaderSummaries = parseLoaders(dataset.loaders);
-      const isPure = dataset.pure === "true";
-      const cacheSummary = dataset.cacheSummary ?? "none";
-      const color = pickColor(isPure, cacheSummary, loaderSummaries);
+        const dataset = section.dataset;
+        const loaderSummaries = parseLoaders(dataset.loaders);
+        const isPure = dataset.pure === "true";
+        const cacheSummary = dataset.cacheSummary ?? "none";
+        const color = pickColor(isPure, cacheSummary, loaderSummaries);
 
-      section.classList.add(SECTION_CLASS);
-      section.style.setProperty("--deco-debug-color", color);
+        section.classList.add(SECTION_CLASS);
+        section.style.setProperty("--deco-debug-color", color);
 
-      const badge = document.createElement("div");
-      badge.className = BADGE_CLASS;
-      setBadgePalette(badge, color);
+        const asyncMode = dataset.async ?? "false";
+        const badgeInfo: BadgeInfo = {
+          title: dataset.blockDef ?? dataset.blockComponent ?? "Section",
+          path: dataset.blockComponent ?? dataset.blockDef ?? undefined,
+          scope: dataset.inline === "true" ? "inline" : "global",
+          asyncMode,
+          cache: cacheSummary,
+          source: dataset.sourceProp,
+          host: dataset.hostResolver,
+          loaderCount: loaderSummaries.length,
+          loaders: loaderSummaries,
+          color,
+          pure: loaderSummaries.length === 0,
+        };
 
-      const title = document.createElement("div");
-      title.className = `${BADGE_CLASS}__title`;
-      title.textContent = dataset.blockDef ??
-        dataset.blockComponent ??
-        "Section";
-      badge.appendChild(title);
+        const rect = section.getBoundingClientRect();
+        const hasVisibleSize = rect.width > 0 && rect.height > 0;
 
-      const meta = document.createElement("div");
-      meta.className = `${BADGE_CLASS}__meta`;
-      const metaItems = [
-        dataset.inline === "true" ? "inline" : "global",
-        dataset.async ? `async:${dataset.async}` : undefined,
-        cacheSummary ? `cache:${cacheSummary}` : undefined,
-      ].filter(Boolean) as string[];
-      metaItems.forEach((item) => {
-        const span = document.createElement("span");
-        span.textContent = item;
-        meta.appendChild(span);
+        if (!hasVisibleSize) {
+          emptySections.push(badgeInfo);
+          return;
+        }
+
+        // Create overlay panel with transparent background
+        const overlayPanel = document.createElement("div");
+        overlayPanel.className = OVERLAY_PANEL_CLASS;
+        const overlayRgb = hexToRgb(color);
+        if (overlayRgb) {
+          overlayPanel.style.background = `rgba(${overlayRgb.r}, ${overlayRgb.g}, ${overlayRgb.b}, 0.12)`;
+        } else {
+          overlayPanel.style.background = "rgba(15, 23, 42, 0.12)";
+        }
+
+        const badge = buildBadge(badgeInfo);
+        overlayPanel.appendChild(badge);
+        section.appendChild(overlayPanel);
       });
-      badge.appendChild(meta);
 
-      const host = dataset.hostResolver;
-      if (host) {
-        const hostLine = document.createElement("div");
-        hostLine.className = `${BADGE_CLASS}__meta`;
-        const label = document.createElement("span");
-        label.textContent = `host: ${host}`;
-        hostLine.appendChild(label);
-        badge.appendChild(hostLine);
-      }
+    const summaryEntries: BadgeInfo[] = [];
 
-      const loadersContainer = document.createElement("div");
-      loadersContainer.className = `${BADGE_CLASS}__loaders`;
-      if (loaderSummaries.length === 0) {
-        const empty = document.createElement("div");
-        empty.className = `${BADGE_CLASS}__empty`;
-        empty.textContent = isPure
-          ? "Pure section (no loaders)"
-          : "No loader telemetry";
-        loadersContainer.appendChild(empty);
-      } else {
-        loaderSummaries.forEach((loader) => {
-          const line = document.createElement("div");
-          line.className = `${BADGE_CLASS}__loader-line`;
+    const pageInfoEl = document.querySelector<HTMLElement>(
+      ".deco-debug-page-info",
+    );
+    if (pageInfoEl) {
+      const blockId = pageInfoEl.dataset.decoPageBlockId ?? "unknown";
+      const pathTemplate = pageInfoEl.dataset.decoPagePathTemplate ?? "";
+      summaryEntries.push({
+        title: `Page ${blockId}`,
+        path: pathTemplate || undefined,
+        scope: "page",
+        asyncMode: "false",
+        cache: "n/a",
+        source: blockId ? `block:${blockId}` : undefined,
+        host: undefined,
+        loaderCount: 0,
+        loaders: [],
+        color: colors.default,
+        pure: true,
+      });
+    }
 
-          const name = document.createElement("span");
-          name.className = `${BADGE_CLASS}__loader-name`;
-          name.textContent = loader.loader ?? "loader";
-          line.appendChild(name);
+    summaryEntries.push(...emptySections);
 
-          const info = document.createElement("span");
-          info.className = `${BADGE_CLASS}__loader-info`;
-          const parts = [
-            loader.status,
-            formatLatency(loader.latencyMs),
-            loader.cacheMode,
-            loader.cacheConfigured ? "cached" : "no-cache",
-          ];
-          info.textContent = parts.join(" • ");
-          line.appendChild(info);
+    // Create summary panel for non-visual sections and page info
+    if (summaryEntries.length > 0) {
+      const summary = document.createElement("div");
+      summary.className = SUMMARY_CLASS;
 
-          loadersContainer.appendChild(line);
-        });
-      }
-      badge.appendChild(loadersContainer);
+      const header = document.createElement("div");
+      header.className = `${SUMMARY_CLASS}__header`;
 
-      // Insert badge as first child to keep layout predictable
-      section.insertBefore(badge, section.firstChild);
-    });
+      const summaryTitle = document.createElement("div");
+      summaryTitle.className = `${SUMMARY_CLASS}__title`;
+      summaryTitle.textContent = `Debug summary${
+        emptySections.length
+          ? ` • Non-visual: ${emptySections.length}`
+          : ""
+      }`;
+      header.appendChild(summaryTitle);
+
+      const hideButton = document.createElement("button");
+      hideButton.type = "button";
+      hideButton.className = `${SUMMARY_CLASS}__hide`;
+      hideButton.textContent = "hide";
+      hideButton.addEventListener("click", () => {
+        summary.classList.add(`${SUMMARY_CLASS}--hidden`);
+        if (!document.getElementById(SUMMARY_TOGGLE_ID)) {
+          const toggle = document.createElement("button");
+          toggle.id = SUMMARY_TOGGLE_ID;
+          toggle.type = "button";
+          toggle.textContent = "show debug summary";
+          toggle.addEventListener("click", () => {
+            summary.classList.remove(`${SUMMARY_CLASS}--hidden`);
+            toggle.remove();
+          });
+          document.body.appendChild(toggle);
+        }
+      });
+      header.appendChild(hideButton);
+
+      summary.appendChild(header);
+
+      const list = document.createElement("div");
+      list.className = `${SUMMARY_CLASS}__list`;
+
+      summaryEntries.forEach((info) => {
+        list.appendChild(buildBadge(info));
+      });
+
+      summary.appendChild(list);
+
+      document.body.appendChild(summary);
+      document.getElementById(SUMMARY_TOGGLE_ID)?.remove();
+    }
   };
 
   const toggleOverlay = () => {
@@ -327,18 +670,6 @@ export function debugOverlay() {
     }
   };
 
-  const ensureObserver = () => {
-    const observer = new MutationObserver(() => {
-      if (document.documentElement.classList.contains(OVERLAY_CLASS)) {
-        applyOverlay();
-      }
-    });
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-  };
-
   const init = () => {
     if (document.getElementById(TOGGLE_ID)) {
       return;
@@ -351,7 +682,6 @@ export function debugOverlay() {
     button.textContent = "deco debug on";
     button.addEventListener("click", toggleOverlay);
     document.body.appendChild(button);
-    ensureObserver();
   };
 
   const ready = () => {
