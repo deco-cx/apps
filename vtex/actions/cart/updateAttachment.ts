@@ -28,6 +28,11 @@ const action = async (
     expectedOrderFormSections = DEFAULT_EXPECTED_SECTIONS,
   } = props;
   const { orderFormId } = parseCookie(req.headers);
+
+  if (!orderFormId || orderFormId === "") {
+    throw new Error("Order form ID is required");
+  }
+
   const cookie = req.headers.get("cookie") ?? "";
   const segment = getSegmentFromBag(ctx);
 
