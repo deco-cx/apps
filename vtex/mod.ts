@@ -10,7 +10,7 @@ import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
 import { OpenAPI as MY } from "./utils/openapi/my.openapi.gen.ts";
 import { OpenAPI as VPAY } from "./utils/openapi/payments.openapi.gen.ts";
 import { OpenAPI as SUB } from "./utils/openapi/subscriptions.openapi.gen.ts";
-import { Segment, Suggestion } from "./utils/types.ts";
+import { Segment } from "./utils/types.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import { removeDirtyCookies } from "../utils/normalize.ts";
 import { Markdown } from "../decohub/components/Markdown.tsx";
@@ -22,6 +22,7 @@ import {
   type AppRuntime,
   type ManifestOf,
 } from "@deco/deco";
+import { Suggestion } from "../commerce/types.ts";
 export type App = Awaited<ReturnType<typeof VTEX>>;
 export type AppContext = AC<App>;
 export type AppManifest = ManifestOf<App>;
