@@ -23,7 +23,7 @@ import {
   type ManifestOf,
 } from "@deco/deco";
 import { Suggestion } from "../commerce/types.ts";
-export type App = Awaited<ReturnType<typeof VTEX>>;
+export type App = ReturnType<typeof VTEX>;
 export type AppContext = AC<App>;
 export type AppManifest = ManifestOf<App>;
 export type AppMiddlewareContext = AMC<App>;
