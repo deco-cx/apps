@@ -1,3 +1,17 @@
+// MCP Standard Response Types
+export interface MCPErrorResponse {
+  error: string;
+  status?: number;
+  details?: Record<string, unknown>;
+}
+
+export interface MCPSuccessResponse<T> {
+  data: T;
+  error?: undefined;
+}
+
+export type MCPResponse<T> = MCPSuccessResponse<T> | MCPErrorResponse;
+
 export interface FieldSet {
   [key: string]: unknown; // Fields can be of various types
 }

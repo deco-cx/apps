@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { ListRecordsResponse } from "../utils/types.ts";
+import type { ListRecordsResponse, MCPResponse } from "../utils/types.ts";
 
 interface Props extends Record<string, unknown> {
   /**
@@ -76,46 +76,72 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<ListRecordsResponse | Response> => {
+): Promise<MCPResponse<ListRecordsResponse>> => {
   if (!ctx.client) {
-    return new Response("OAuth authentication is required", { status: 401 });
+    return {
+      error: "OAuth authentication is required",
+      status: 401,
+    };
   }
 
-  const validationResult = await ctx.invoke["airtable"].loaders.permissioning
-    .validatePermissions({
-      mode: "check",
-      baseId: props.baseId,
-      tableIdOrName: props.tableId,
+  try {
+    const validationResult = await ctx.invoke["airtable"].loaders.permissioning
+      .validatePermissions({
+        mode: "check",
+        baseId: props.baseId,
+        tableIdOrName: props.tableId,
+      });
+
+    if (
+      "hasPermission" in validationResult && !validationResult.hasPermission
+    ) {
+      return {
+        error: validationResult.message || "Access denied",
+        status: 403,
+      };
+    }
+
+    const { searchTerm, searchFields, ...otherProps } = props;
+
+    // Escape backslashes and double quotes in searchTerm to prevent formula injection
+    const escapedSearchTerm = searchTerm
+      .replace(/\\/g, "\\\\")
+      .replace(/"/g, '\\"');
+
+    let filterByFormula = "";
+    if (searchFields && searchFields.length > 0) {
+      const fieldFormulas = searchFields.map(
+        (field) => `SEARCH("${escapedSearchTerm}", {${field}})`,
+      );
+      filterByFormula = `OR(${fieldFormulas.join(",")})`;
+    } else {
+      filterByFormula = `SEARCH("${escapedSearchTerm}", {*})`;
+    }
+
+    const response = await ctx.client["GET /v0/:baseId/:tableId"]({
+      ...otherProps,
+      filterByFormula,
     });
 
-  if ("hasPermission" in validationResult && !validationResult.hasPermission) {
-    return new Response(validationResult.message || "Access denied", {
-      status: 403,
-    });
+    if (!response.ok) {
+      return {
+        error: `Error searching records: ${response.statusText}`,
+        status: response.status,
+      };
+    }
+
+    const data = await response.json();
+    return {
+      data,
+    };
+  } catch (err) {
+    return {
+      error: `Error searching records: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
+      status: 500,
+    };
   }
-
-  const { searchTerm, searchFields, ...otherProps } = props;
-
-  let filterByFormula = "";
-  if (searchFields && searchFields.length > 0) {
-    const fieldFormulas = searchFields.map(
-      (field) => `SEARCH("${searchTerm}", {${field}})`,
-    );
-    filterByFormula = `OR(${fieldFormulas.join(",")})`;
-  } else {
-    filterByFormula = `SEARCH("${searchTerm}", {*})`;
-  }
-
-  const response = await ctx.client["GET /v0/:baseId/:tableId"]({
-    ...otherProps,
-    filterByFormula,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Error searching records: ${response.statusText}`);
-  }
-
-  return await response.json();
 };
 
 export default loader;

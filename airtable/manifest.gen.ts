@@ -3,13 +3,14 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$$$$0 from "./actions/createField.ts";
-import * as $$$$$$$$$1 from "./actions/createTable.ts";
-import * as $$$$$$$$$2 from "./actions/deleteRecords.ts";
-import * as $$$$$$$$$3 from "./actions/oauth/callback.ts";
-import * as $$$$$$$$$4 from "./actions/permissioning/addNewPermitions.ts";
-import * as $$$$$$$$$5 from "./actions/updateField.ts";
-import * as $$$$$$$$$6 from "./actions/updateRecords.ts";
-import * as $$$$$$$$$7 from "./actions/updateTable.ts";
+import * as $$$$$$$$$1 from "./actions/createRecords.ts";
+import * as $$$$$$$$$2 from "./actions/createTable.ts";
+import * as $$$$$$$$$3 from "./actions/deleteRecords.ts";
+import * as $$$$$$$$$4 from "./actions/oauth/callback.ts";
+import * as $$$$$$$$$5 from "./actions/permissioning/addNewPermitions.ts";
+import * as $$$$$$$$$6 from "./actions/updateField.ts";
+import * as $$$$$$$$$7 from "./actions/updateRecords.ts";
+import * as $$$$$$$$$8 from "./actions/updateTable.ts";
 import * as $$$0 from "./loaders/getBaseSchema.ts";
 import * as $$$1 from "./loaders/getRecord.ts";
 import * as $$$2 from "./loaders/listBases.ts";
@@ -34,13 +35,14 @@ const manifest = {
   },
   "actions": {
     "airtable/actions/createField.ts": $$$$$$$$$0,
-    "airtable/actions/createTable.ts": $$$$$$$$$1,
-    "airtable/actions/deleteRecords.ts": $$$$$$$$$2,
-    "airtable/actions/oauth/callback.ts": $$$$$$$$$3,
-    "airtable/actions/permissioning/addNewPermitions.ts": $$$$$$$$$4,
-    "airtable/actions/updateField.ts": $$$$$$$$$5,
-    "airtable/actions/updateRecords.ts": $$$$$$$$$6,
-    "airtable/actions/updateTable.ts": $$$$$$$$$7,
+    "airtable/actions/createRecords.ts": $$$$$$$$$1,
+    "airtable/actions/createTable.ts": $$$$$$$$$2,
+    "airtable/actions/deleteRecords.ts": $$$$$$$$$3,
+    "airtable/actions/oauth/callback.ts": $$$$$$$$$4,
+    "airtable/actions/permissioning/addNewPermitions.ts": $$$$$$$$$5,
+    "airtable/actions/updateField.ts": $$$$$$$$$6,
+    "airtable/actions/updateRecords.ts": $$$$$$$$$7,
+    "airtable/actions/updateTable.ts": $$$$$$$$$8,
   },
   "name": "airtable",
   "baseUrl": import.meta.url,

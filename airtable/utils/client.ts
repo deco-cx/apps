@@ -61,14 +61,12 @@ export interface AirtableClient {
 
   /**
    * Create records
-   * NOTE: Airtable API allows creating multiple records (up to 10). This client method is for a single record for simplicity to match service layer.
-   * For batch creation, the service method `createRecord` would call this and wrap it in an array if needed, or a separate client method for batch could be made.
-   * Let's define it for creating a single record as per the IAirtableService.createRecord
+   * Airtable API allows creating multiple records (up to 10).
    * @see https://airtable.com/developers/web/api/create-records
    */
   "POST /v0/:baseId/:tableId": {
-    body: CreateRecordBody; // { fields: FieldSet, typecast?: boolean }
-    response: AirtableRecord;
+    body: { records: CreateRecordBody[]; typecast?: boolean };
+    response: { records: AirtableRecord[] };
   };
 
   /**
