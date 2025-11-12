@@ -10,7 +10,7 @@ import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
 import { OpenAPI as MY } from "./utils/openapi/my.openapi.gen.ts";
 import { OpenAPI as VPAY } from "./utils/openapi/payments.openapi.gen.ts";
 import { OpenAPI as SUB } from "./utils/openapi/subscriptions.openapi.gen.ts";
-import { Segment } from "./utils/types.ts";
+import { Segment, Suggestion } from "./utils/types.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import { removeDirtyCookies } from "../utils/normalize.ts";
 import { Markdown } from "../decohub/components/Markdown.tsx";
@@ -22,7 +22,7 @@ import {
   type AppRuntime,
   type ManifestOf,
 } from "@deco/deco";
-export type App = ReturnType<typeof VTEX>;
+export type App = Awaited<ReturnType<typeof VTEX>>;
 export type AppContext = AC<App>;
 export type AppManifest = ManifestOf<App>;
 export type AppMiddlewareContext = AMC<App>;
@@ -92,7 +92,18 @@ export interface Props {
    * @title Cached Search Terms
    * @description List of search terms that should be cached. By default, search results are not cached.
    */
-  cachedSearchTerms?: string[];
+  cachedSearchTerms?: {
+    /**
+     * @title Terms
+     * @description List of search terms that should be cached. Use the top searches loader to get the terms.
+     */
+    terms?: Suggestion;
+    /**
+     * @title Extra Paths
+     * @description List of extra terms that should be cached.
+     */
+    extraTerms?: string[];
+  };
 }
 export const color = 0xf71963;
 /**
@@ -102,7 +113,7 @@ export const color = 0xf71963;
  * @category Ecommmerce
  * @logo https://assets.decocache.com/mcp/0d6e795b-cefd-4853-9a51-93b346c52c3f/VTEX.svg
  */
-export default function VTEX(
+export default async function VTEX(
   { appKey, appToken, account, publicUrl: _publicUrl, salesChannel, ...props }:
     Props,
 ) {
@@ -168,6 +179,20 @@ export default function VTEX(
     headers: headers,
   });
 
+  const cachedTermsFromApi = await vcsDeprecated
+    ["GET /api/io/_v/api/intelligent-search/top_searches"]({
+      locale: props.defaultSegment?.cultureInfo ?? "pt-BR",
+    }).then((res) => res.json()).then((res) =>
+      res.searches.map((search) => search.term)
+    );
+
+  const cachedSearchTerms = [
+    ...(cachedTermsFromApi ?? []),
+    ...(props.cachedSearchTerms?.extraTerms ?? []),
+  ];
+
+  console.log(cachedSearchTerms);
+
   const state = {
     ...props,
     salesChannel: salesChannel ?? "1",
@@ -181,7 +206,7 @@ export default function VTEX(
     api,
     vpay,
     sub,
-    cachedSearchTerms: props.cachedSearchTerms ?? [],
+    cachedSearchTerms,
   };
   const app: A<Manifest, typeof state, [
     ReturnType<typeof workflow>,
