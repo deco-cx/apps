@@ -38,16 +38,6 @@ const rankRoute = (pattern: string): number =>
       return acc + 3;
     }, 0);
 const urlPatternCache: Record<string, URLPattern> = {};
-const STATIC_SYSTEM_ROUTES = [
-  {
-    pathTemplate: "/_d/assets/*",
-    handler: {
-      value: {
-        __resolveType: "website/handlers/image.ts",
-      },
-    },
-  },
-];
 export const router = (
   routes: Route[],
   hrefRoutes: Record<string, Resolvable<Handler>> = {},
@@ -197,19 +187,7 @@ export default function RoutesSelection(
       routes: Route[];
       hrefRoutes: Record<string, Resolvable<Handler>>;
     } = routerCache.getValue(routerId);
-
-    const routesToServe = [
-      ...STATIC_SYSTEM_ROUTES,
-      ...routes,
-    ];
-
-    const server = router(
-      routesToServe,
-      hrefRoutes,
-      ctx.get,
-      { monitoring },
-      url,
-    );
+    const server = router(routes, hrefRoutes, ctx.get, { monitoring }, url);
     timing?.end();
     return await server(req, connInfo);
   };

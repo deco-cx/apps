@@ -2,7 +2,6 @@ import { Head, IS_BROWSER } from "$fresh/runtime.ts";
 import type { JSX } from "preact";
 import { forwardRef } from "preact/compat";
 
-export const PATH = "/_d/assets/";
 const DECO_CACHE_URL = "https://assets.decocache.com/";
 const S3_URL = "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/";
 
@@ -139,6 +138,7 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   params.set("width", `${width}`);
   height && params.set("height", `${height}`);
 
+  // src is being passed separately to avoid URL encoding issues
   return `https://deco-assets.decoazn.com/image?${params}&src=${imageSource}`;
 };
 
