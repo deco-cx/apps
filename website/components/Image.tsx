@@ -128,10 +128,13 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     }
   }
 
-  const imageSource = originalSrc.replace(DECO_CACHE_URL, "").replace(
+  const imageSource = originalSrc
+  .replace(DECO_CACHE_URL, "")
+  .replace(
     S3_URL,
     "",
-  );
+  )
+  .split("?")[0];
 
   const params = new URLSearchParams();
   params.set("fit", fit);
