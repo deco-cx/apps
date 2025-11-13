@@ -1,11 +1,12 @@
 import { BlogPost } from "../types.ts";
 import { CSS } from "../static/css.ts";
+import { processMarkdown } from "../utils/markdown.ts";
 
 export interface Props {
   post: BlogPost | null;
 }
 
-export default function Template({ post }: Props) {
+export default async function Template({ post }: Props) {
   if (!post) return null;
 
   const {
@@ -16,6 +17,9 @@ export default function Template({ post }: Props) {
     image,
     alt,
   } = post;
+
+  // Process markdown with iframe support
+  const processedContent = await processMarkdown(content);
 
   return (
     <>
@@ -39,7 +43,7 @@ export default function Template({ post }: Props) {
             alt={alt ?? title}
           />
         )}
-        <div dangerouslySetInnerHTML={{ __html: content }} />
+        <div dangerouslySetInnerHTML={{ __html: processedContent }} />
       </div>
     </>
   );
