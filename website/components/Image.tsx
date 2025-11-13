@@ -4,6 +4,7 @@ import { forwardRef } from "preact/compat";
 
 export const PATH = "/_d/assets/";
 const DECO_CACHE_URL = "https://assets.decocache.com/";
+const S3_URL = "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/";
 
 export type SetEarlyHint = (hint: string) => void;
 export type Props =
@@ -128,22 +129,17 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     }
   }
 
-  if (originalSrc.startsWith(DECO_CACHE_URL)) {
-    const onlyPath = originalSrc.substring(DECO_CACHE_URL.length);
-    // Generate IMS-compatible URL for Azion Image Optimization
-    const imsParam = height
-      ? `ims=${width}x${height}/filters:quality(80)`
-      : `ims=${width}x${width}/filters:quality(80)`;
-    return `${PATH}${onlyPath}?${imsParam}`;
-  }
+  const imageSource = originalSrc.replace(DECO_CACHE_URL, "").replace(
+    S3_URL,
+    "",
+  );
 
   const params = new URLSearchParams();
-
   params.set("fit", fit);
   params.set("width", `${width}`);
   height && params.set("height", `${height}`);
 
-  return `${PATH}${encodeURIComponent(originalSrc)}?${params}`;
+  return `https://deco-assets.decoazn.com/image?${params}&src=${imageSource}`;
 };
 
 export const getSrcSet = (
