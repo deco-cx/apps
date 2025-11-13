@@ -1,10 +1,9 @@
 import { Head, IS_BROWSER } from "$fresh/runtime.ts";
 import type { JSX } from "preact";
 import { forwardRef } from "preact/compat";
-import { Manifest } from "../manifest.gen.ts";
 
-export const PATH: `/live/invoke/${keyof Manifest["loaders"]}` =
-  "/live/invoke/website/loaders/image.ts";
+const DECO_CACHE_URL = "https://assets.decocache.com/";
+const S3_URL = "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/";
 
 export type SetEarlyHint = (hint: string) => void;
 export type Props =
@@ -129,14 +128,21 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     }
   }
 
-  const params = new URLSearchParams();
+  const imageSource = originalSrc
+    .replace(DECO_CACHE_URL, "")
+    .replace(
+      S3_URL,
+      "",
+    )
+    .split("?")[0];
 
-  params.set("src", originalSrc);
+  const params = new URLSearchParams();
   params.set("fit", fit);
   params.set("width", `${width}`);
   height && params.set("height", `${height}`);
 
-  return `${PATH}?${params}`;
+  // src is being passed separately to avoid URL encoding issues
+  return `https://deco-assets.decoazn.com/image?${params}&src=${imageSource}`;
 };
 
 export const getSrcSet = (
