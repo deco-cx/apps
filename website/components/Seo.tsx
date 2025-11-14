@@ -78,17 +78,21 @@ function Component({
   const title = stripHTML(t);
   const description = stripHTML(desc || "");
 
-  const twitterTitle = stripHTML(twitterConfig?.title ?? t);
-  const twitterDescription = stripHTML(
-    twitterConfig?.description ?? desc ?? "",
-  );
   const twitterImage = twitterConfig?.image ?? image;
+  const twitterTitle = twitterConfig?.title
+    ? stripHTML(twitterConfig.title)
+    : title;
+  const twitterDescription = twitterConfig?.description
+    ? stripHTML(twitterConfig.description)
+    : description;
 
-  const openGraphTitle = stripHTML(openGraphConfig?.title ?? t);
-  const openGraphDescription = stripHTML(
-    openGraphConfig?.description ?? desc ?? "",
-  );
   const openGraphImage = openGraphConfig?.image ?? image;
+  const openGraphTitle = openGraphConfig?.title
+    ? stripHTML(openGraphConfig.title)
+    : title;
+  const openGraphDescription = openGraphConfig?.description
+    ? stripHTML(openGraphConfig.description)
+    : description;
 
   return (
     <Head>

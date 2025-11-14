@@ -43,7 +43,7 @@ const isAzionAssetsEnabled = () =>
   IS_BROWSER
     // deno-lint-ignore no-explicit-any
     ? (globalThis as any).DECO?.featureFlags?.azionAssets
-    : Deno.env.get("ENABLE_AZION_ASSETS") === "true";
+    : Deno.env.get("ENABLE_AZION_ASSETS") !== "false";
 
 const canShowWarning = () =>
   IS_BROWSER ? false : !Deno.env.get("DENO_DEPLOYMENT_ID");

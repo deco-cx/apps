@@ -434,7 +434,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(props.pageHref || req.url);
   const searchTerm = url.searchParams.get("q");
   const cachedSearchTerms = ctx.cachedSearchTerms ?? [];
-  if (searchTerm && !cachedSearchTerms.includes(searchTerm)) {
+  if (searchTerm && !cachedSearchTerms.includes(searchTerm.toLowerCase())) {
     return null;
   }
   const segment = getSegmentFromBag(ctx)?.token ?? "";
