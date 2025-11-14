@@ -32,7 +32,7 @@ declare global {
 }
 const ENABLE_IMAGE_OPTIMIZATION =
   Deno.env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
-const ENABLE_AZION_ASSETS = Deno.env.get("ENABLE_AZION_ASSETS") === "true";
+const ENABLE_AZION_ASSETS = Deno.env.get("ENABLE_AZION_ASSETS") !== "false";
 /**
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
