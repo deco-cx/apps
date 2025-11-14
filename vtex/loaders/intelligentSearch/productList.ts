@@ -318,7 +318,7 @@ export const cacheKey = (
   if (
     // Avoid cache on loader call over call and on search pages
     (!isQueryList(props) && searchTerm &&
-      !cachedSearchTerms.includes(searchTerm)) || ctx.isInvoke
+      !cachedSearchTerms.includes(searchTerm.toLowerCase())) || ctx.isInvoke
   ) {
     return null;
   }
