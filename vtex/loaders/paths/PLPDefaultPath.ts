@@ -56,4 +56,10 @@ const loader = async (
   };
 };
 
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, _req: Request, _ctx: AppContext) => {
+  return `plp-default-path-${props.level ?? 1}`;
+};
+
 export default loader;

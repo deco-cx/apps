@@ -1,5 +1,6 @@
 import { AppContext } from "../mod.ts";
 import type { GistSimple } from "../utils/types.ts";
+import { SingleObjectResponse } from "../utils/response.ts";
 
 interface Props {
   description?: string;
@@ -16,9 +17,14 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<GistSimple> => {
+): Promise<SingleObjectResponse<GistSimple>> => {
   const response = await ctx.client["POST /gists"]({}, { body: props });
-  return await response.json();
+  const data = await response.json();
+
+  return {
+    data,
+    metadata: {},
+  };
 };
 
 export default action;

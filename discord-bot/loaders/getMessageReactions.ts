@@ -34,6 +34,14 @@ export interface Props {
   limit?: number;
 }
 
+export interface MessageReactionsResponse {
+  /**
+   * @title Users
+   * @description Usuários que reagiram à mensagem
+   */
+  users: DiscordUser[];
+}
+
 /**
  * @title Get Message Reactions
  * @description Get users who reacted to a message with a specific emoji using Bot Token
@@ -42,7 +50,7 @@ export default async function getMessageReactions(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<DiscordUser[]> {
+): Promise<MessageReactionsResponse> {
   const { channelId, messageId, emoji, after, limit = 25 } = props;
   const { client } = ctx;
 
@@ -80,5 +88,5 @@ export default async function getMessageReactions(
   }
 
   const users = await response.json();
-  return users;
+  return { users };
 }

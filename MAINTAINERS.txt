@@ -11,3 +11,4 @@ lui-dias
 vibegui
 igorbrasileiro
 tlgimenes
+vibe-dex

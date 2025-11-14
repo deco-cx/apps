@@ -259,7 +259,8 @@ export default function Std(props: CommerceProps): App<Manifest, State, [
       ...props.commerce,
     };
     const { manifest, state: appState } = vtex(props.commerce);
-    state = { ...state, ...appState };
+    const { cachedSearchTerms: _cachedSearchTerms, ...restAppState } = appState;
+    state = { ...state, ...restAppState };
     targetApps["vtex"] = {
       importMap: buildImportMap(manifest),
       manifest,

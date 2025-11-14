@@ -37,3 +37,9 @@ export default async function loader(
   }));
   return stringList;
 }
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, _req: Request, _ctx: AppContext) => {
+  return `collections-${props.term ?? "all"}`;
+};

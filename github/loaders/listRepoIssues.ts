@@ -5,6 +5,10 @@ import type {
   GithubIssueClean,
   GithubIssueLabel,
 } from "../utils/types.ts";
+import {
+  hasNextPageFromLinkHeader,
+  StandardResponse,
+} from "../utils/response.ts";
 
 interface RepoIdentify {
   owner?: string;
@@ -42,7 +46,9 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<GithubIssueClean[] | { error: true; message: string }> => {
+): Promise<
+  StandardResponse<GithubIssueClean> | { error: true; message: string }
+> => {
   const { repoIdentify, issueFilters } = props;
   const { url } = repoIdentify;
   const { state, per_page, page, labels, issueNumber } = issueFilters;
@@ -87,7 +93,14 @@ const loader = async (
           message: `Issue number ${issueNumber} not found in this repository.`,
         };
       }
-      return mapIssues([issue]);
+      const mapped = mapIssues([issue]);
+      return {
+        data: mapped,
+        metadata: {
+          page,
+          per_page,
+        },
+      };
     }
 
     const response = await ctx.client["GET /repos/:owner/:repo/issues"]({
@@ -107,7 +120,19 @@ const loader = async (
           "This page contains only pull requests (no real issues). Try another page or adjust your filters.",
       };
     }
-    return mapped;
+    // Use Link header for reliable pagination info; fall back to raw issues array length
+    // (which includes PRs) to detect if more pages exist, not the filtered mapped array
+    const linkHeader = response.headers.get("link");
+    const hasNextPage = hasNextPageFromLinkHeader(linkHeader) ??
+      (per_page ? issues.length === per_page : undefined);
+    return {
+      data: mapped,
+      metadata: {
+        page,
+        per_page,
+        has_next_page: hasNextPage,
+      },
+    };
   } catch (err: unknown) {
     if (
       typeof err === "object" &&

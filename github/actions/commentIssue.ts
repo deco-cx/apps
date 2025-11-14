@@ -1,4 +1,5 @@
 import { AppContext } from "../mod.ts";
+import { SingleObjectResponse } from "../utils/response.ts";
 
 interface RepoIdentify {
   owner?: string;
@@ -12,7 +13,7 @@ export interface Props {
   body: string;
 }
 
-interface CommentResponse {
+interface CommentData {
   created: true;
   url: string;
   body: string;
@@ -44,7 +45,7 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<CommentResponse | ErrorResponse> => {
+): Promise<SingleObjectResponse<CommentData> | ErrorResponse> => {
   const { repoIdentify, issueNumber, body } = props;
   let owner = repoIdentify?.owner;
   let repo = repoIdentify?.repo;
@@ -81,8 +82,11 @@ const action = async (
         { owner, repo, issue_number: issueNumber },
         { body: { body } },
       );
-    const data: GithubIssueComment = await response.json();
-    return mapCommentResponse(data);
+    const commentData: GithubIssueComment = await response.json();
+    return {
+      data: mapCommentResponse(commentData),
+      metadata: {},
+    };
   } catch (err) {
     if (
       typeof err === "object" &&
@@ -105,7 +109,7 @@ const action = async (
   }
 };
 
-function mapCommentResponse(comment: GithubIssueComment): CommentResponse {
+function mapCommentResponse(comment: GithubIssueComment): CommentData {
   return {
     created: true,
     url: comment.html_url,

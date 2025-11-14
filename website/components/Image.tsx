@@ -5,6 +5,8 @@ import { Manifest } from "../manifest.gen.ts";
 
 export const PATH: `/live/invoke/${keyof Manifest["loaders"]}` =
   "/live/invoke/website/loaders/image.ts";
+const DECO_CACHE_URL = "https://assets.decocache.com/";
+const S3_URL = "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/";
 
 export type SetEarlyHint = (hint: string) => void;
 export type Props =
@@ -36,6 +38,12 @@ const isImageOptmizationEnabled = () =>
     // deno-lint-ignore no-explicit-any
     ? (globalThis as any).DECO?.featureFlags?.enableImageOptimization
     : Deno.env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
+
+const isAzionAssetsEnabled = () =>
+  IS_BROWSER
+    // deno-lint-ignore no-explicit-any
+    ? (globalThis as any).DECO?.featureFlags?.azionAssets
+    : Deno.env.get("ENABLE_AZION_ASSETS") !== "false";
 
 const canShowWarning = () =>
   IS_BROWSER ? false : !Deno.env.get("DENO_DEPLOYMENT_ID");
@@ -131,10 +139,23 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
 
   const params = new URLSearchParams();
 
-  params.set("src", originalSrc);
   params.set("fit", fit);
   params.set("width", `${width}`);
   height && params.set("height", `${height}`);
+
+  if (isAzionAssetsEnabled()) {
+    const imageSource = originalSrc
+      .replace(DECO_CACHE_URL, "")
+      .replace(
+        S3_URL,
+        "",
+      )
+      .split("?")[0];
+    // src is being passed separately to avoid URL encoding issues
+    return `https://deco-assets.decoazn.com/image?${params}&src=${imageSource}`;
+  }
+
+  params.set("src", originalSrc);
 
   return `${PATH}?${params}`;
 };
