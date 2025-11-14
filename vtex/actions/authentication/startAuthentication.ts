@@ -1,6 +1,7 @@
 import { AppContext } from "../../mod.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
 import { StartAuthentication } from "../../utils/types.ts";
+import { proxySetCookie } from "../../utils/cookies.ts";
 
 export interface Props {
   callbackUrl?: string;
@@ -18,7 +19,7 @@ export default async function action(
     returnUrl = "/",
     appStart = true,
   }: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<StartAuthentication> {
   const { vcsDeprecated, account } = ctx;
@@ -31,6 +32,8 @@ export default async function action(
       appStart,
       callbackUrl,
       returnUrl,
+    }, {
+      headers: { cookie: req.headers.get("cookie") || "" },
     });
 
   if (!response.ok) {
@@ -38,6 +41,8 @@ export default async function action(
       `Failed to start authentication. ${response.status} ${response.statusText}`,
     );
   }
+
+  proxySetCookie(response.headers, ctx.response.headers, req.url);
 
   const data = await response.json();
   return data;
