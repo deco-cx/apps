@@ -40,6 +40,21 @@ export interface Props {
    */
   noIndexing?: boolean;
 
+  /** @title Open Graph Config */
+  openGraphConfig?: {
+    title?: string;
+    description?: string;
+    image?: ImageWidget;
+    url?: string;
+  };
+
+  /** @title Twitter Config */
+  twitterConfig?: {
+    title?: string;
+    description?: string;
+    image?: ImageWidget;
+  };
+
   jsonLDs?: unknown[];
 }
 
@@ -54,11 +69,30 @@ function Component({
   themeColor,
   canonical,
   noIndexing,
+  openGraphConfig,
+  twitterConfig,
   jsonLDs = [],
 }: Props) {
   const twitterCard = type === "website" ? "summary" : "summary_large_image";
-  const description = stripHTML(desc || "");
+
   const title = stripHTML(t);
+  const description = stripHTML(desc || "");
+
+  const twitterImage = twitterConfig?.image ?? image;
+  const twitterTitle = twitterConfig?.title
+    ? stripHTML(twitterConfig.title)
+    : title;
+  const twitterDescription = twitterConfig?.description
+    ? stripHTML(twitterConfig.description)
+    : description;
+
+  const openGraphImage = openGraphConfig?.image ?? image;
+  const openGraphTitle = openGraphConfig?.title
+    ? stripHTML(openGraphConfig.title)
+    : title;
+  const openGraphDescription = openGraphConfig?.description
+    ? stripHTML(openGraphConfig.description)
+    : description;
 
   return (
     <Head>
@@ -71,17 +105,25 @@ function Component({
       <link rel="icon" href={favicon} />
 
       {/* Twitter tags */}
-      <meta property="twitter:title" content={title} />
-      <meta property="twitter:description" content={description} />
-      <meta property="twitter:image" content={image} />
+      <meta property="twitter:title" content={twitterTitle} />
+      <meta
+        property="twitter:description"
+        content={twitterDescription}
+      />
+      <meta property="twitter:image" content={twitterImage} />
       <meta property="twitter:card" content={twitterCard} />
 
       {/* OpenGraph tags */}
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
+      <meta property="og:title" content={openGraphTitle} />
+      <meta
+        property="og:description"
+        content={openGraphDescription}
+      />
       <meta property="og:type" content={type} />
-      <meta property="og:image" content={image} />
-      {canonical && <meta property="og:url" content={canonical} />}
+      <meta property="og:image" content={openGraphImage} />
+      {Boolean(openGraphConfig?.url || canonical) && (
+        <meta property="og:url" content={openGraphConfig?.url ?? canonical} />
+      )}
 
       {/* Link tags */}
       {canonical && <link rel="canonical" href={canonical} />}
