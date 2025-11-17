@@ -48,7 +48,7 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<DocumentResponse & { error: string }> => {
+): Promise<(DocumentResponse & { error?: string }) | { error: string }> => {
   const {
     documentId,
     includeTabsContent = false,
@@ -104,7 +104,7 @@ const loader = async (
     delete result.body;
   }
 
-  return { ...result, error: "" };
+  return result;
 };
 
 export default loader;
