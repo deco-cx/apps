@@ -8,19 +8,15 @@ import * as $$$$$$$$$2 from "./actions/oauth/callback.ts";
 import * as $$$$$$$$$3 from "./actions/updateDocumentContent.ts";
 import * as $$$0 from "./loaders/getDocument.ts";
 import * as $$$1 from "./loaders/getDocumentMetadata.ts";
-import * as $$$2 from "./loaders/listDocuments.ts";
-import * as $$$3 from "./loaders/listSharedDocuments.ts";
-import * as $$$4 from "./loaders/oauth/start.ts";
-import * as $$$5 from "./loaders/searchDocuments.ts";
+import * as $$$2 from "./loaders/listSharedDocuments.ts";
+import * as $$$3 from "./loaders/oauth/start.ts";
 
 const manifest = {
   "loaders": {
     "google-docs/loaders/getDocument.ts": $$$0,
     "google-docs/loaders/getDocumentMetadata.ts": $$$1,
-    "google-docs/loaders/listDocuments.ts": $$$2,
-    "google-docs/loaders/listSharedDocuments.ts": $$$3,
-    "google-docs/loaders/oauth/start.ts": $$$4,
-    "google-docs/loaders/searchDocuments.ts": $$$5,
+    "google-docs/loaders/listSharedDocuments.ts": $$$2,
+    "google-docs/loaders/oauth/start.ts": $$$3,
   },
   "actions": {
     "google-docs/actions/appendToDocument.ts": $$$$$$$$$0,
