@@ -41,7 +41,7 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<DocumentsListResponse> => {
+): Promise<DocumentsListResponse & { error: string }> => {
   const {
     pageSize = 10,
     pageToken,
@@ -50,50 +50,43 @@ const loader = async (
     includeShared = true,
   } = props;
 
-  try {
-    const searchParams: Record<string, string | number | boolean> = {
-      pageSize: Math.min(pageSize, 100),
-    };
+  const searchParams: Record<string, string | number | boolean> = {
+    pageSize: Math.min(pageSize, 100),
+  };
 
-    if (pageToken) {
-      searchParams.pageToken = pageToken;
-    }
-
-    if (query) {
-      searchParams.q = query;
-    }
-
-    if (orderBy) {
-      searchParams.orderBy = orderBy;
-    }
-
-    const response = await ctx.client["GET /v1/documents"](searchParams);
-
-    if (!response.ok) {
-      ctx.errorHandler.toHttpError(
-        response,
-        `Error listing documents: ${response.statusText}`,
-      );
-      throw new Error("Request failed");
-    }
-
-    const data = await response.json();
-
-    const filteredDocuments = includeShared
-      ? data.documents
-      : data.documents.filter((doc: { shared?: boolean }) => !doc.shared);
-
-    return {
-      documents: filteredDocuments,
-      nextPageToken: data.nextPageToken,
-    };
-  } catch (error) {
-    ctx.errorHandler.toHttpError(
-      error,
-      "Failed to list documents",
-    );
-    throw error;
+  if (pageToken) {
+    searchParams.pageToken = pageToken;
   }
+
+  if (query) {
+    searchParams.q = query;
+  }
+
+  if (orderBy) {
+    searchParams.orderBy = orderBy;
+  }
+
+  const response = await ctx.client["GET /v1/documents"](searchParams);
+
+  if (!response.ok) {
+    return {
+      documents: [],
+      nextPageToken: "",
+      error: `Error listing documents: ${response.statusText}`,
+    };
+  }
+
+  const data = await response.json();
+
+  const filteredDocuments = includeShared
+    ? data.documents
+    : data.documents.filter((doc: { shared?: boolean }) => !doc.shared);
+
+  return {
+    documents: filteredDocuments,
+    nextPageToken: data.nextPageToken,
+    error: "",
+  };
 };
 
 export default loader;

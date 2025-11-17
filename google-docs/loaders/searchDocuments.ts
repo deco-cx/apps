@@ -59,7 +59,7 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<DocumentsListResponse> => {
+): Promise<DocumentsListResponse & { error: string }> => {
   const {
     query,
     titleOnly = false,
@@ -72,87 +72,80 @@ const loader = async (
   } = props;
 
   if (!query || query.trim().length === 0) {
-    ctx.errorHandler.toHttpError(
-      new Error("Search query is required"),
-      "Search query is required",
-    );
-    throw new Error("Search query is required");
+    return {
+      documents: [],
+      nextPageToken: "",
+      error: "Search query is required",
+    };
   }
 
-  try {
-    let searchQuery = query.trim();
+  let searchQuery = query.trim();
+
+  if (titleOnly) {
+    searchQuery = `name contains '${searchQuery}'`;
+  } else {
+    searchQuery = `fullText contains '${searchQuery}'`;
+  }
+
+  if (ownerEmail) {
+    searchQuery += ` and '${ownerEmail}' in owners`;
+  }
+
+  if (modifiedAfter) {
+    const date = new Date(modifiedAfter).toISOString();
+    searchQuery += ` and modifiedTime > '${date}'`;
+  }
+
+  if (modifiedBefore) {
+    const date = new Date(modifiedBefore).toISOString();
+    searchQuery += ` and modifiedTime < '${date}'`;
+  }
+
+  if (!includeShared) {
+    searchQuery += ` and sharedWithMe = false`;
+  }
+
+  searchQuery += ` and mimeType = 'application/vnd.google-apps.document'`;
+
+  const searchParams: Record<string, string | number> = {
+    q: searchQuery,
+    pageSize: Math.min(maxResults, 100),
+    orderBy: "modifiedTime desc",
+  };
+
+  if (pageToken) {
+    searchParams.pageToken = pageToken;
+  }
+
+  const response = await ctx.client["GET /v1/documents"](searchParams);
+
+  if (!response.ok) {
+    return {
+      documents: [],
+      nextPageToken: "",
+      error: `Error searching documents: ${response.statusText}`,
+    };
+  }
+
+  const data = await response.json();
+
+  const filteredDocuments = data.documents.filter((doc: DocumentMetadata) => {
+    if (!includeShared && doc.shared) {
+      return false;
+    }
 
     if (titleOnly) {
-      searchQuery = `name contains '${searchQuery}'`;
-    } else {
-      searchQuery = `fullText contains '${searchQuery}'`;
+      return doc.title.toLowerCase().includes(query.toLowerCase());
     }
 
-    if (ownerEmail) {
-      searchQuery += ` and '${ownerEmail}' in owners`;
-    }
+    return true;
+  });
 
-    if (modifiedAfter) {
-      const date = new Date(modifiedAfter).toISOString();
-      searchQuery += ` and modifiedTime > '${date}'`;
-    }
-
-    if (modifiedBefore) {
-      const date = new Date(modifiedBefore).toISOString();
-      searchQuery += ` and modifiedTime < '${date}'`;
-    }
-
-    if (!includeShared) {
-      searchQuery += ` and sharedWithMe = false`;
-    }
-
-    searchQuery += ` and mimeType = 'application/vnd.google-apps.document'`;
-
-    const searchParams: Record<string, string | number> = {
-      q: searchQuery,
-      pageSize: Math.min(maxResults, 100),
-      orderBy: "modifiedTime desc",
-    };
-
-    if (pageToken) {
-      searchParams.pageToken = pageToken;
-    }
-
-    const response = await ctx.client["GET /v1/documents"](searchParams);
-
-    if (!response.ok) {
-      ctx.errorHandler.toHttpError(
-        response,
-        `Error searching documents: ${response.statusText}`,
-      );
-      throw new Error("Request failed");
-    }
-
-    const data = await response.json();
-
-    const filteredDocuments = data.documents.filter((doc: DocumentMetadata) => {
-      if (!includeShared && doc.shared) {
-        return false;
-      }
-
-      if (titleOnly) {
-        return doc.title.toLowerCase().includes(query.toLowerCase());
-      }
-
-      return true;
-    });
-
-    return {
-      documents: filteredDocuments,
-      nextPageToken: data.nextPageToken,
-    };
-  } catch (error) {
-    ctx.errorHandler.toHttpError(
-      error,
-      `Failed to search documents with query: ${query}`,
-    );
-    throw error;
-  }
+  return {
+    documents: filteredDocuments,
+    error: "",
+    nextPageToken: data.nextPageToken,
+  };
 };
 
 export default loader;
