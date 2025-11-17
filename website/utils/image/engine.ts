@@ -4,6 +4,7 @@ export interface Params {
   height: number;
   fit?: "cover" | "contain";
   quality?: number; // 0 - 100
+  disableims?: boolean;
 }
 
 export type Engine = {

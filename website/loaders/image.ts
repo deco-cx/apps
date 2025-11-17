@@ -21,7 +21,7 @@ function assert(expr: unknown, msg = ""): asserts expr {
 }
 
 const parseParams = (
-  { src, width, height, fit, quality }: Partial<Props>,
+  { src, width, height, fit, quality, disableims }: Partial<Props>,
 ): Props => {
   assert(src, "src is required");
   assert(width, "width is required");
@@ -33,6 +33,7 @@ const parseParams = (
     height: Number(height),
     quality: Number(quality) || undefined,
     fit: fit === "contain" ? "contain" : "cover",
+    disableims: disableims ? true : false,
   };
 };
 
