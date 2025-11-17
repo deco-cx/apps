@@ -12,10 +12,12 @@ import {
 
 interface Context {
   preload?: boolean;
+  disableImageOptimization?: boolean;
 }
 
 const Context = createContext<Context>({
   preload: false,
+  disableImageOptimization: false,
 });
 
 type SourceProps =
@@ -30,12 +32,13 @@ type SourceProps =
     preload?: boolean;
     /** @description Improves Web Vitals (LCP). Use high for LCP image. Auto for other images */
     fetchPriority?: "high" | "low" | "auto";
+
     setEarlyHint?: SetEarlyHint;
   };
 
 export const Source = forwardRef<HTMLSourceElement, SourceProps>(
   (props, ref) => {
-    const { preload } = useContext(Context);
+    const { preload, disableImageOptimization } = useContext(Context);
 
     const shouldSetEarlyHint = !!props.setEarlyHint && preload;
     const srcSet = getSrcSet(
@@ -44,6 +47,7 @@ export const Source = forwardRef<HTMLSourceElement, SourceProps>(
       props.height,
       undefined,
       shouldSetEarlyHint ? FACTORS.slice(-1) : FACTORS,
+      disableImageOptimization,
     );
     const linkProps = {
       imagesrcset: srcSet,
@@ -64,6 +68,7 @@ export const Source = forwardRef<HTMLSourceElement, SourceProps>(
           height: props.height,
           fetchpriority: props.fetchPriority,
           src: props.src,
+          disableImageOptimization,
         }),
       );
     }
@@ -96,11 +101,15 @@ export const Source = forwardRef<HTMLSourceElement, SourceProps>(
 type Props = Omit<JSX.IntrinsicElements["picture"], "preload"> & {
   children: ComponentChildren;
   preload?: boolean;
+  disableImageOptimization?: boolean;
 };
 
 export const Picture = forwardRef<HTMLPictureElement, Props>(
-  ({ children, preload, ...props }, ref) => {
-    const value = useMemo(() => ({ preload }), [preload]);
+  ({ children, preload, disableImageOptimization, ...props }, ref) => {
+    const value = useMemo(() => ({ preload, disableImageOptimization }), [
+      preload,
+      disableImageOptimization,
+    ]);
 
     return (
       <Context.Provider value={value}>

@@ -26,6 +26,8 @@ export type Props =
     fetchPriority?: "high" | "low" | "auto";
     /** @description Object-fit */
     fit?: FitOptions;
+    /** @description Disable image optimization */
+    disableImageOptimization?: boolean;
     setEarlyHint?: SetEarlyHint;
   };
 
@@ -54,6 +56,7 @@ interface OptimizationOptions {
   height?: number;
   factor: number;
   fit: FitOptions;
+  disableImageOptimization?: boolean;
 }
 
 const optmizeVNDA = (opts: OptimizationOptions) => {
@@ -102,7 +105,7 @@ const optimizeVTEX = (opts: OptimizationOptions) => {
 };
 
 export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
-  const { originalSrc, width, height, fit } = opts;
+  const { originalSrc, width, height, fit, disableImageOptimization } = opts;
 
   if (originalSrc.startsWith("data:")) {
     return originalSrc;
@@ -142,6 +145,7 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   params.set("fit", fit);
   params.set("width", `${width}`);
   height && params.set("height", `${height}`);
+  disableImageOptimization && params.set("disableims", "true");
 
   if (isAzionAssetsEnabled()) {
     const imageSource = originalSrc
@@ -166,6 +170,7 @@ export const getSrcSet = (
   height?: number,
   fit?: FitOptions,
   factors: number[] = FACTORS,
+  disableImageOptimization?: boolean,
 ) => {
   const srcSet = [];
 
@@ -180,6 +185,7 @@ export const getSrcSet = (
       height: h,
       factor,
       fit: fit || "cover",
+      disableImageOptimization,
     });
 
     if (src) {
@@ -196,6 +202,7 @@ export const getEarlyHintFromSrcProps = (srcProps: {
   fit?: FitOptions;
   width: number;
   height?: number;
+  disableImageOptimization?: boolean;
 }) => {
   const factor = FACTORS.at(-1)!;
   const src = getOptimizedMediaUrl({
@@ -204,6 +211,7 @@ export const getEarlyHintFromSrcProps = (srcProps: {
     height: srcProps.height && Math.trunc(srcProps.height * factor),
     fit: srcProps.fit || "cover",
     factor,
+    disableImageOptimization: srcProps.disableImageOptimization,
   });
   const earlyHintParts = [
     `<${src}>`,
@@ -235,6 +243,7 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
       props.height,
       props.fit,
       shouldSetEarlyHint ? FACTORS.slice(-1) : FACTORS,
+      props.disableImageOptimization,
     );
 
   const linkProps = srcSet &&
@@ -260,6 +269,7 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
         height: props.height,
         fetchpriority: props.fetchPriority,
         src: props.src,
+        disableImageOptimization: props.disableImageOptimization,
       }),
     );
   }
