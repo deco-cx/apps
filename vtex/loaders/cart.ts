@@ -85,7 +85,7 @@ const loader = async (
           headers: {
             accept: "application/json",
             "content-type": "application/json",
-            cookie,
+            cookie: withOrderFormIdCookie,
           },
         },
       );
