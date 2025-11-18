@@ -4,6 +4,18 @@ import { MarketingData } from "./types.ts";
 
 const VTEX_CHECKOUT_COOKIE = "checkout.vtex.com";
 
+export const getCheckoutVtexCookie = (headers: Headers) => {
+  const cookies = getCookies(headers);
+  return cookies[VTEX_CHECKOUT_COOKIE];
+};
+
+export const safelySetCheckoutVtexCookie = (cookieString: string, orderFormId: string) => {
+  if (cookieString.includes(VTEX_CHECKOUT_COOKIE)) {
+    return cookieString;
+  }
+  return `${cookieString}; ${VTEX_CHECKOUT_COOKIE}=${orderFormId}`;
+};
+
 export const parseCookie = (headers: Headers) => {
   const cookies = getCookies(headers);
   const ofidCookie = cookies[VTEX_CHECKOUT_COOKIE];

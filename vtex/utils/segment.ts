@@ -6,6 +6,7 @@ import { removeNonLatin1Chars } from "../../utils/normalize.ts";
 const SEGMENT_COOKIE_NAME = "vtex_segment";
 const SALES_CHANNEL_COOKIE = "VTEXSC";
 const SEGMENT = Symbol("segment");
+const ORDER_FORM_ID = Symbol("orderFormId");
 
 export interface WrappedSegment {
   payload: Partial<Segment>;
@@ -67,6 +68,14 @@ export const getSegmentFromBag = (
   ctx: AppContext,
 ): WrappedSegment => ctx?.bag?.get(SEGMENT);
 
+export const getOrderFormIdFromBag = (
+  ctx: AppContext,
+): Promise<string | undefined> | undefined => ctx?.bag?.get(ORDER_FORM_ID);
+
+export const setOrderFormIdInBag = (
+  ctx: AppContext,
+  orderFormId: Promise<string | undefined>,
+) => ctx?.bag?.set(ORDER_FORM_ID, orderFormId);
 /**
  * Stable serialization.
  *
