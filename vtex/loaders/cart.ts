@@ -5,7 +5,6 @@ import {
   hasDifferentMarketingData,
   parseCookie,
 } from "../utils/orderForm.ts";
-
 import {
   getOrderFormIdFromBag as getCheckoutVtexCookieFromBag,
   getSegmentFromBag,
@@ -15,6 +14,45 @@ import type { MarketingData, OrderForm } from "../utils/types.ts";
 import { DEFAULT_EXPECTED_SECTIONS } from "../actions/cart/removeItemAttachment.ts";
 import { forceHttpsOnAssets } from "../utils/transform.ts";
 import { safelySetCheckoutVtexCookie } from "../utils/orderForm.ts";
+import { getCookies } from "std/http/mod.ts";
+import { logger } from "@deco/deco/o11y";
+
+const logMismatchedCart = (cart: OrderForm, req: Request) => {
+  const email = cart?.clientProfileData?.email;
+  const cookies = getCookies(req.headers);
+
+  const userFromCookie = cookies["VtexIdclientAutCookie_lojafarm"];
+
+  let emailFromCookie = "";
+  let userIdFromCookie = "";
+  if (userFromCookie) {
+    try {
+      emailFromCookie = JSON.parse(atob(userFromCookie.split(".")[1])).sub;
+      userIdFromCookie = JSON.parse(atob(userFromCookie.split(".")[1])).userId;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  if ((emailFromCookie && email) && emailFromCookie !== email) {
+    const headersDenyList = new Set(["cookie", "cache-control"]);
+
+    logger.warn(`Cookie cart mismatch`, {
+      OrderFormId: cart?.orderFormId,
+      OrderFormIdFromRequest: cookies["checkout.vtex.com"]?.split("=").at(1),
+      EmailFromCookie: emailFromCookie,
+      EmailFromOrderForm: email,
+      UserIdFromCookie: userIdFromCookie,
+      UserIdFromOrderForm: cart?.userProfileId,
+      reqUrl: req.url,
+      reqHeaders: Object.fromEntries(
+        Array.from(req.headers.entries()).filter(([key]) =>
+          !headersDenyList.has(key)
+        ),
+      ),
+    });
+  }
+};
 
 export const cache = "no-store";
 /**
@@ -47,12 +85,15 @@ const loader = async (
 
   const response = await responsePromise;
 
-  const result = response.json();
+  const cart = await response.json() as OrderForm;
+
+  // Temporary logging to check for cart mismatch
+  logMismatchedCart(cart, req);
 
   proxySetCookie(response.headers, ctx.response.headers, req.url);
 
   if (!segment?.payload) {
-    return forceHttpsOnAssets((await result) as OrderForm);
+    return forceHttpsOnAssets(cart);
   }
 
   const {
@@ -66,7 +107,6 @@ const loader = async (
     },
   } = segment;
 
-  const cart = await result;
   const hasUtm = utm_campaign || utm_source || utm_medium || utmi_campaign ||
     utmi_page || utmi_part;
 
@@ -107,7 +147,7 @@ const loader = async (
     }
   }
 
-  return forceHttpsOnAssets((await result) as OrderForm);
+  return forceHttpsOnAssets(cart);
 };
 
 export default loader;
