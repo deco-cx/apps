@@ -1,11 +1,22 @@
 import { AppContext } from "../mod.ts";
 import { proxySetCookie } from "../utils/cookies.ts";
-import { hasDifferentMarketingData, parseCookie } from "../utils/orderForm.ts";
-import { getSegmentFromBag } from "../utils/segment.ts";
+import {
+  getCheckoutVtexCookie,
+  hasDifferentMarketingData,
+  parseCookie,
+} from "../utils/orderForm.ts";
+
+import {
+  getOrderFormIdFromBag as getCheckoutVtexCookieFromBag,
+  getSegmentFromBag,
+  setOrderFormIdInBag as setCheckoutVtexCookieInBag,
+} from "../utils/segment.ts";
 import type { MarketingData, OrderForm } from "../utils/types.ts";
 import { DEFAULT_EXPECTED_SECTIONS } from "../actions/cart/removeItemAttachment.ts";
 import { forceHttpsOnAssets } from "../utils/transform.ts";
+import { safelySetCheckoutVtexCookie } from "../utils/orderForm.ts";
 
+export const cache = "no-store";
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pub/orderForm
  * @title Get Cart
@@ -19,11 +30,22 @@ const loader = async (
   const { vcsDeprecated } = ctx;
   const { cookie } = parseCookie(req.headers);
   const segment = getSegmentFromBag(ctx);
-
-  const response = await vcsDeprecated["POST /api/checkout/pub/orderForm"](
+  const maybeOrderFormId = getCheckoutVtexCookieFromBag(ctx);
+  const orderFormId = maybeOrderFormId ? await maybeOrderFormId : undefined;
+  const withOrderFormIdCookie = orderFormId
+    ? safelySetCheckoutVtexCookie(cookie, orderFormId)
+    : cookie;
+  const responsePromise = vcsDeprecated["POST /api/checkout/pub/orderForm"](
     { sc: segment?.payload?.channel },
-    { headers: { cookie } },
+    { headers: { cookie: withOrderFormIdCookie } },
   );
+
+  setCheckoutVtexCookieInBag(
+    ctx,
+    responsePromise.then((response) => getCheckoutVtexCookie(response.headers)),
+  );
+
+  const response = await responsePromise;
 
   const result = response.json();
 
@@ -77,7 +99,7 @@ const loader = async (
             headers: {
               accept: "application/json",
               "content-type": "application/json",
-              cookie,
+              cookie: withOrderFormIdCookie,
             },
           },
         );
