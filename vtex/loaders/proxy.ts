@@ -77,6 +77,12 @@ const buildProxyRoutes = (
         includeScriptsToBody,
         removeDirtyCookies: true,
         pathsThatRequireSameReferer: VTEX_PATHS_THAT_REQUIRES_SAME_REFERER,
+        customHeaders: [
+          {
+            key: "Vary",
+            value: "Cookie, Accept-Encoding",
+          },
+        ],
       };
 
       return ({
