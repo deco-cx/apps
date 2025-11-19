@@ -9,7 +9,6 @@ import {
   CountryCode,
   HasMetafieldsMetafieldsArgs,
   LanguageCode,
-  Product as ProductShopify,
   ProductConnection,
   ProductFragment,
   QueryRoot,
