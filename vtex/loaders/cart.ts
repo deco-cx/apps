@@ -1,12 +1,20 @@
 import { AppContext } from "../mod.ts";
 import { proxySetCookie } from "../utils/cookies.ts";
-import { getCheckoutVtexCookie, hasDifferentMarketingData, parseCookie } from "../utils/orderForm.ts";
+import {
+  getCheckoutVtexCookie,
+  hasDifferentMarketingData,
+  parseCookie,
+} from "../utils/orderForm.ts";
 
-import { getOrderFormIdFromBag as getCheckoutVtexCookieFromBag, getSegmentFromBag, setOrderFormIdInBag as setCheckoutVtexCookieInBag } from "../utils/segment.ts";
+import {
+  getOrderFormIdFromBag as getCheckoutVtexCookieFromBag,
+  getSegmentFromBag,
+  setOrderFormIdInBag as setCheckoutVtexCookieInBag,
+} from "../utils/segment.ts";
 import type { MarketingData, OrderForm } from "../utils/types.ts";
 import { DEFAULT_EXPECTED_SECTIONS } from "../actions/cart/removeItemAttachment.ts";
 import { forceHttpsOnAssets } from "../utils/transform.ts";
-import { safelySetCheckoutVtexCookie } from '../utils/orderForm.ts';
+import { safelySetCheckoutVtexCookie } from "../utils/orderForm.ts";
 
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pub/orderForm
@@ -23,13 +31,18 @@ const loader = async (
   const segment = getSegmentFromBag(ctx);
   const maybeOrderFormId = getCheckoutVtexCookieFromBag(ctx);
   const orderFormId = maybeOrderFormId ? await maybeOrderFormId : undefined;
-  const withOrderFormIdCookie = orderFormId ? safelySetCheckoutVtexCookie(cookie, orderFormId) : cookie;
+  const withOrderFormIdCookie = orderFormId
+    ? safelySetCheckoutVtexCookie(cookie, orderFormId)
+    : cookie;
   const responsePromise = vcsDeprecated["POST /api/checkout/pub/orderForm"](
     { sc: segment?.payload?.channel },
     { headers: { cookie: withOrderFormIdCookie } },
   );
 
-  setCheckoutVtexCookieInBag(ctx, responsePromise.then((response) => getCheckoutVtexCookie(response.headers)));
+  setCheckoutVtexCookieInBag(
+    ctx,
+    responsePromise.then((response) => getCheckoutVtexCookie(response.headers)),
+  );
 
   const response = await responsePromise;
 
@@ -74,21 +87,21 @@ const loader = async (
     ) {
       const expectedOrderFormSections = DEFAULT_EXPECTED_SECTIONS;
       const result = await vcsDeprecated
-      ["POST /api/checkout/pub/orderForm/:orderFormId/attachments/:attachment"](
-        {
-          orderFormId: cart.orderFormId,
-          attachment: "marketingData",
-          sc: segment?.payload.channel,
-        },
-        {
-          body: { expectedOrderFormSections, ...marketingData },
-          headers: {
-            accept: "application/json",
-            "content-type": "application/json",
-            cookie: withOrderFormIdCookie,
+        ["POST /api/checkout/pub/orderForm/:orderFormId/attachments/:attachment"](
+          {
+            orderFormId: cart.orderFormId,
+            attachment: "marketingData",
+            sc: segment?.payload.channel,
           },
-        },
-      );
+          {
+            body: { expectedOrderFormSections, ...marketingData },
+            headers: {
+              accept: "application/json",
+              "content-type": "application/json",
+              cookie: withOrderFormIdCookie,
+            },
+          },
+        );
       return forceHttpsOnAssets((await result.json()) as OrderForm);
     }
   }

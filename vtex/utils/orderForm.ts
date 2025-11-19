@@ -9,7 +9,10 @@ export const getCheckoutVtexCookie = (headers: Headers) => {
   return cookies.find((cookie) => cookie.name === VTEX_CHECKOUT_COOKIE)?.value;
 };
 
-export const safelySetCheckoutVtexCookie = (cookieString: string, orderFormId: string) => {
+export const safelySetCheckoutVtexCookie = (
+  cookieString: string,
+  orderFormId: string,
+) => {
   if (cookieString.includes(VTEX_CHECKOUT_COOKIE)) {
     return cookieString;
   }
