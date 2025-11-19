@@ -77,12 +77,12 @@ const buildProxyRoutes = (
         includeScriptsToBody,
         removeDirtyCookies: true,
         pathsThatRequireSameReferer: VTEX_PATHS_THAT_REQUIRES_SAME_REFERER,
-        customHeaders: [
+        customHeaders: pathTemplate.includes("/checkout") ? [
           {
             key: "Vary",
             value: "Cookie, Accept-Encoding",
           },
-        ],
+        ] : [],
       };
 
       return ({
