@@ -1,12 +1,12 @@
-import { Cookie, getCookies } from "std/http/mod.ts";
+import { Cookie, getCookies, getSetCookies } from "std/http/mod.ts";
 import { stringify } from "./cookies.ts";
 import { MarketingData } from "./types.ts";
 
 const VTEX_CHECKOUT_COOKIE = "checkout.vtex.com";
 
 export const getCheckoutVtexCookie = (headers: Headers) => {
-  const cookies = getCookies(headers);
-  return cookies[VTEX_CHECKOUT_COOKIE];
+  const cookies = getSetCookies(headers);
+  return cookies.find((cookie) => cookie.name === VTEX_CHECKOUT_COOKIE)?.value;
 };
 
 export const safelySetCheckoutVtexCookie = (cookieString: string, orderFormId: string) => {
