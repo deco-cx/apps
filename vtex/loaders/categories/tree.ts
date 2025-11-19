@@ -10,6 +10,11 @@ export interface Props {
    */
   categoryLevels?: number;
 }
+
+/**
+ * @title Get Category Tree
+ * @description Get the category tree
+ */
 export default async function loader(
   { categoryLevels }: Props,
   _req: Request,
@@ -21,3 +26,11 @@ export default async function loader(
     }, { ...STALE, headers: withSegmentCookie(getSegmentFromBag(ctx)) })
     .then((res) => res.json());
 }
+
+export const cache = {
+  maxAge: 60 * 60, // 1 hour
+};
+
+export const cacheKey = (props: Props) => {
+  return `category-tree-${props.categoryLevels ?? 1}`;
+};

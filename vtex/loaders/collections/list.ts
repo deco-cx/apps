@@ -4,6 +4,10 @@ import { allowCorsFor } from "@deco/deco";
 export interface Props {
   term?: string;
 }
+/**
+ * @title Get Collection List
+ * @description Get the list of collections
+ */
 export default async function loader(
   { term }: Props,
   req: Request,
@@ -33,3 +37,9 @@ export default async function loader(
   }));
   return stringList;
 }
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, _req: Request, _ctx: AppContext) => {
+  return `collections-${props.term ?? "all"}`;
+};

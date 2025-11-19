@@ -11,6 +11,10 @@ export interface Props {
   expectedOrderFormSections?: string[];
 }
 
+/**
+ * @title Remove Offering from Cart
+ * @description Remove an offering from an item in the cart
+ */
 const action = async (
   props: Props,
   req: Request,

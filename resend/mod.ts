@@ -12,7 +12,7 @@ export interface EmailFrom {
 }
 export interface Props {
   /**@title API KEY Resend  */
-  apiKey?: Secret;
+  apiKey?: string | Secret;
   /**
    * @title Sender Options | Default
    */
@@ -44,7 +44,7 @@ export default function App({
   },
   emailTo,
   subject = "Contato via app resend",
-}: State): App<Manifest, State> {
+}: Props) {
   const apiKeyToken = typeof apiKey === "string"
     ? apiKey
     : apiKey?.get?.() ?? "";
@@ -69,7 +69,7 @@ export default function App({
   };
   return app;
 }
-export type AppContext = AC<ReturnType<typeof App>>;
+export type AppContext = AC<App<Manifest, State>>;
 export const preview = async () => {
   const markdownContent = await Markdown(
     new URL("./README.md", import.meta.url).href,

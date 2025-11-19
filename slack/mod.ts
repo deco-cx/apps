@@ -41,6 +41,19 @@ export interface SlackWebhookPayload {
   };
 }
 
+export interface SlackPermission {
+  workspace?: {
+    id: string;
+    name: string;
+  };
+  channels?: Array<{
+    id: string;
+    name: string;
+    is_private?: boolean;
+  }>;
+  allCurrentAndFutureChannels?: boolean;
+}
+
 export interface Props {
   tokens?: OAuthTokens;
   clientSecret?: string;
@@ -65,6 +78,30 @@ export interface Props {
    * @description An url that new messages will be sent to
    */
   webhookUrl?: string;
+
+  /**
+   * @title Permission
+   * @description Permission to access the Slack API and selected workspace and channels
+   */
+  permission?: SlackPermission;
+
+  /**
+   * @title Account
+   * @description The connected Slack account/workspace name
+   */
+  account?: string;
+
+  /**
+   * @title Debug Mode
+   * @description Enable debug mode for additional logging
+   */
+  debugMode?: boolean;
+
+  /**
+   * @title Custom Bot Name
+   * @description Custom name for the bot in messages
+   */
+  customBotName?: string;
 
   /**
    * @description Callbacks for the slack binding

@@ -48,7 +48,7 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<DocumentResponse> => {
+): Promise<(DocumentResponse & { error?: string }) | { error: string }> => {
   const {
     documentId,
     includeTabsContent = false,
@@ -57,65 +57,54 @@ const loader = async (
   } = props;
 
   if (!documentId) {
-    ctx.errorHandler.toHttpError(
-      new Error("Document ID is required"),
-      "Document ID is required",
-    );
+    return {
+      error: "Document ID is required",
+    };
   }
 
   if (!validateDocumentId(documentId)) {
-    ctx.errorHandler.toHttpError(
-      new Error("Invalid document ID format"),
-      "Invalid document ID format",
-    );
-  }
-
-  try {
-    const searchParams: Record<string, string | boolean> = {
-      includeTabsContent,
-      suggestionsViewMode,
+    return {
+      error: "Invalid document ID format",
     };
-
-    const response = await ctx.client["GET /v1/documents/:documentId"]({
-      documentId,
-      ...searchParams,
-    });
-
-    if (!response.ok) {
-      ctx.errorHandler.toHttpError(
-        response,
-        `Error retrieving document: ${response.statusText}`,
-      );
-    }
-
-    const document = await response.json();
-
-    const result: DocumentResponse = { ...document };
-
-    if (contentFormat === "TEXT_ONLY" || contentFormat === "FULL") {
-      const textContent = extractTextFromDocument(document);
-      result.textContent = textContent;
-
-      if (textContent) {
-        result.wordCount = textContent.split(/\s+/).filter((word) =>
-          word.length > 0
-        ).length;
-        result.characterCount = textContent.length;
-      }
-    }
-
-    if (contentFormat === "METADATA_ONLY") {
-      delete result.body;
-    }
-
-    return result;
-  } catch (error) {
-    ctx.errorHandler.toHttpError(
-      error,
-      `Failed to retrieve document: ${documentId}`,
-    );
-    throw error;
   }
+
+  const searchParams: Record<string, string | boolean> = {
+    includeTabsContent,
+    suggestionsViewMode,
+  };
+
+  const response = await ctx.client["GET /v1/documents/:documentId"]({
+    documentId,
+    ...searchParams,
+  });
+
+  if (!response.ok) {
+    return {
+      error: `Error retrieving document: ${response.statusText}`,
+    };
+  }
+
+  const document = await response.json();
+
+  const result: DocumentResponse = { ...document };
+
+  if (contentFormat === "TEXT_ONLY" || contentFormat === "FULL") {
+    const textContent = extractTextFromDocument(document);
+    result.textContent = textContent;
+
+    if (textContent) {
+      result.wordCount = textContent.split(/\s+/).filter((word) =>
+        word.length > 0
+      ).length;
+      result.characterCount = textContent.length;
+    }
+  }
+
+  if (contentFormat === "METADATA_ONLY") {
+    delete result.body;
+  }
+
+  return result;
 };
 
 export default loader;

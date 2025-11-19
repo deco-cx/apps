@@ -26,7 +26,10 @@ const withPage = (url: URL, page: number) => {
   return `?${params}`;
 };
 
-/** @title VTEX Integration - Wishlist */
+/**
+ * @title List Wishlist Products
+ * @description List wishlist products
+ */
 const loader = async (
   { count: recordPerPage, offset = 0 }: Props,
   req: Request,

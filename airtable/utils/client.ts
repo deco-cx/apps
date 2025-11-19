@@ -3,6 +3,7 @@ import type {
   BaseSchemaResponse,
   CreateFieldBody,
   CreateRecordBody,
+  CreateRecordsBody,
   CreateTableBody,
   Field,
   ListBasesResponse,
@@ -14,6 +15,10 @@ import type {
   UpdateTableBody,
   WhoamiResponse,
 } from "./types.ts";
+
+// Type helper to allow both single and batch record creation
+type CreateRecordPayload = CreateRecordBody | CreateRecordsBody;
+type CreateRecordResponse = AirtableRecord | { records: AirtableRecord[] };
 
 export interface AirtableClient {
   /**
@@ -61,14 +66,12 @@ export interface AirtableClient {
 
   /**
    * Create records
-   * NOTE: Airtable API allows creating multiple records (up to 10). This client method is for a single record for simplicity to match service layer.
-   * For batch creation, the service method `createRecord` would call this and wrap it in an array if needed, or a separate client method for batch could be made.
-   * Let's define it for creating a single record as per the IAirtableService.createRecord
+   * NOTE: Airtable API allows creating multiple records (up to 10). This can accept both single and batch creation.
    * @see https://airtable.com/developers/web/api/create-records
    */
   "POST /v0/:baseId/:tableId": {
-    body: CreateRecordBody; // { fields: FieldSet, typecast?: boolean }
-    response: AirtableRecord;
+    body: CreateRecordPayload; // Single or multiple records
+    response: CreateRecordResponse;
   };
 
   /**

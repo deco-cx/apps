@@ -6,6 +6,10 @@ export interface Props {
   count: number;
 }
 
+/**
+ * @title PDP Default Path
+ * @description Get paths for product details page
+ */
 const loader = async (
   props: unknown,
   req: Request,
@@ -35,6 +39,12 @@ const loader = async (
   return {
     possiblePaths: defaultPaths as string[],
   };
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, _req: Request, _ctx: AppContext) => {
+  return `pdp-default-path-${props.count ?? 5}`;
 };
 
 export default loader;

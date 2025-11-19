@@ -201,8 +201,8 @@ const preferredSKU = (items: Item[], { props }: Props) => {
 };
 
 /**
- * @title VTEX Integration - Intelligent Search
- * @description Product List loader
+ * @title Product List Intelligent Search
+ * @description List a product list, commonly used for product shelves
  */
 const loader = async (
   expandedProps: Props,
@@ -313,9 +313,12 @@ export const cacheKey = (
 
   const url = new URL(req.url);
 
+  const searchTerm = url.searchParams.get("q");
+  const cachedSearchTerms = ctx.cachedSearchTerms ?? [];
   if (
     // Avoid cache on loader call over call and on search pages
-    (!isQueryList(props) && url.searchParams.has("q")) || ctx.isInvoke
+    (!isQueryList(props) && searchTerm &&
+      !cachedSearchTerms.includes(searchTerm.toLowerCase())) || ctx.isInvoke
   ) {
     return null;
   }

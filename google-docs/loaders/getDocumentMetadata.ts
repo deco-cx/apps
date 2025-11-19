@@ -8,13 +8,6 @@ export interface Props {
    * @title Document ID
    */
   documentId: string;
-
-  /**
-   * @description Include detailed permissions information
-   * @title Include Permissions
-   */
-  includePermissions?: boolean;
-
   /**
    * @description Include revision history summary
    * @title Include Revisions
@@ -49,7 +42,6 @@ const loader = async (
 ): Promise<DocumentMetadataResponse> => {
   const {
     documentId,
-    includePermissions = false,
     includeRevisions = false,
   } = props;
 
@@ -101,24 +93,6 @@ const loader = async (
       permissions: [],
       size: "0",
     };
-
-    if (includePermissions) {
-      try {
-        const permissionsResponse = await ctx.client
-          ["GET /v1/documents/:documentId/permissions"]({
-            documentId: documentId as never,
-          });
-
-        if (permissionsResponse.ok) {
-          const permissionsData = await permissionsResponse.json();
-          metadata.permissions = permissionsData.permissions || [];
-          metadata.shared = metadata.permissions.length > 1;
-        }
-      } catch (permissionError) {
-        console.warn("Could not fetch permissions:", permissionError);
-        metadata.permissions = [];
-      }
-    }
 
     if (includeRevisions) {
       metadata.revisionsCount = 1;

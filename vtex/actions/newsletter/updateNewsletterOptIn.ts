@@ -13,6 +13,10 @@ interface Props {
   subscribe: boolean;
 }
 
+/**
+ * @title Update Newsletter Opt In
+ * @description Update the newsletter opt in
+ */
 async function loader(
   props: Props,
   req: Request,

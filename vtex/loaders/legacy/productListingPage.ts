@@ -171,8 +171,8 @@ const getTermFallback = (url: URL, isPage: boolean, hasFilters: boolean) => {
 };
 
 /**
- * @title VTEX Integration - Legacy Search
- * @description Product Listing Page loader
+ * @title Product Listing Page Legacy
+ * @description List a product listing page, with products, filters, sort and SEO data. commonly used for category, search, brand and collection pages.
  */
 const loader = async (
   props: Props,
@@ -444,7 +444,9 @@ export const cache = "stale-while-revalidate";
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(props.pageHref || req.url);
 
-  if (url.searchParams.has("ft")) {
+  const searchTerm = url.searchParams.get("ft") || url.searchParams.get("q");
+  const cachedSearchTerms = ctx.cachedSearchTerms ?? [];
+  if (searchTerm && !cachedSearchTerms.includes(searchTerm.toLowerCase())) {
     return null;
   }
   const fq = [

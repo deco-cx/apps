@@ -12,7 +12,7 @@ interface Props {
 }
 
 /**
- * @title VTEX - Get Order Placed Order Details
+ * @title Get Order Placed Order Details
  * @description Should be used on order placed page, the user must be authenticated or have access to the order through permissions or cookies
  */
 export default async function loader(

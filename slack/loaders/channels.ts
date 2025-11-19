@@ -1,4 +1,4 @@
-import type { ChannelType, SlackChannel } from "../client.ts";
+import type { ChannelType, SlackChannel, SlackResponse } from "../client.ts";
 import type { AppContext } from "../mod.ts";
 
 export interface Props {
@@ -27,8 +27,8 @@ export default async function listChannels(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<{ channels: SlackChannel[] }> {
-  const { limit, cursor, types } = props;
+): Promise<SlackResponse<{ channels: SlackChannel[] }>> {
+  const { limit = 100, cursor, types } = props;
   const teamId = ctx.teamId;
 
   if (!teamId) {
@@ -39,7 +39,7 @@ export default async function listChannels(
 
   if (!limit) {
     // fetch all channels in loop
-    const allChannels = [];
+    const allChannels: SlackChannel[] = [];
     let nextCursor = cursor;
     while (true) {
       try {
@@ -49,16 +49,32 @@ export default async function listChannels(
           nextCursor,
           types,
         );
-        allChannels.push(...response.channels);
+
+        if (!response.ok) {
+          return {
+            ok: false,
+            error: response.error || "Failed to fetch channels",
+            data: { channels: [] },
+          };
+        }
+
+        allChannels.push(...response.data.channels);
         nextCursor = response.response_metadata?.next_cursor;
-        if (!nextCursor || response.channels.length === 0) {
+        if (!nextCursor || response.data.channels.length === 0) {
           break;
         }
-      } catch {
-        break;
+      } catch (error) {
+        return {
+          ok: false,
+          error: error instanceof Error ? error.message : "Unknown error",
+          data: { channels: [] },
+        };
       }
     }
-    return { channels: allChannels };
+    return {
+      ok: true,
+      data: { channels: allChannels },
+    };
   }
 
   return await ctx.slack.getChannels(teamId, limit, cursor, types);

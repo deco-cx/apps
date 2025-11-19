@@ -10,7 +10,7 @@ export interface Props {
 export type SendEmailVerificationResult = boolean;
 
 /**
- * @title VTEX Integration - Send Email Verification
+ * @title Send Email Verification
  * @description Sends an email verification request via VTEX API
  */
 export default async function action(

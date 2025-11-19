@@ -34,8 +34,8 @@ export interface Props {
 }
 
 /**
- * @title VTEX Integration - Related Products
- * @description Related Products loader
+ * @title Related Products
+ * @description List related products, commonly used for additional shelves, features like: show similars or buy together.
  */
 async function loader(
   props: Props,
@@ -159,7 +159,9 @@ export const cache = "stale-while-revalidate";
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(req.url);
 
-  if (url.searchParams.has("ft")) {
+  const searchTerm = url.searchParams.get("ft") || url.searchParams.get("q");
+  const cachedSearchTerms = ctx.cachedSearchTerms ?? [];
+  if (searchTerm && !cachedSearchTerms.includes(searchTerm.toLowerCase())) {
     return null;
   }
 

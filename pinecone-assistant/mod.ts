@@ -28,6 +28,8 @@ export interface State extends Props {
 
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
+const PINECONE_API_VERSION = "2025-10";
+
 /**
  * @title Pinecone Assistant
  * @appName pinecone-assistant
@@ -48,7 +50,7 @@ export default function App(
     base: props.host,
     headers: new Headers({
       "Api-Key": apiKey ?? "",
-      "X-Pinecone-API-Version": "2025-01-01",
+      "X-Pinecone-API-Version": PINECONE_API_VERSION,
     }),
   });
 

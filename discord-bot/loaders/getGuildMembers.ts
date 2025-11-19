@@ -21,6 +21,14 @@ export interface Props {
   after?: string;
 }
 
+export interface GuildMembersResponse {
+  /**
+   * @title Members
+   * @description Lista de membros do servidor
+   */
+  members: DiscordGuildMember[];
+}
+
 /**
  * @title Get Guild Members
  * @description List members of a Discord guild using Bot Token
@@ -29,7 +37,7 @@ export default async function getGuildMembers(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<DiscordGuildMember[]> {
+): Promise<GuildMembersResponse> {
   const { guildId, limit = 1, after } = props;
   const { client } = ctx;
 
@@ -52,5 +60,5 @@ export default async function getGuildMembers(
   }
 
   const members = await response.json();
-  return members;
+  return { members };
 }

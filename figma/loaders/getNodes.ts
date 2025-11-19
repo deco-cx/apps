@@ -57,6 +57,9 @@ export default async function getFileNodes(
   ctx: AppContext,
 ): Promise<FigmaResponse<FileNodesResponse>> {
   const { fileKey, nodeIds, version, depth, geometry } = props;
+  if (!ctx.figma) {
+    throw new Error("Figma client not found");
+  }
   return await ctx.figma.getFileNodes(fileKey, nodeIds, {
     version,
     depth,

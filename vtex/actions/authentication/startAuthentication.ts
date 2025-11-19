@@ -9,7 +9,7 @@ export interface Props {
 }
 
 /**
- * @title VTEX Integration - Start Authentication
+ * @title Start Authentication
  * @description Initiates the authentication process with VTEX.
  */
 export default async function action(

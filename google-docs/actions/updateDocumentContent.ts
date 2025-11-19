@@ -67,15 +67,42 @@ const action = async (
   }
 
   try {
+    // First, get the document to find its actual length
+    const documentResponse = await ctx.client["GET /v1/documents/:documentId"]({
+      documentId,
+    });
+
+    if (!documentResponse.ok) {
+      ctx.errorHandler.toHttpError(
+        documentResponse,
+        `Error retrieving document: ${documentResponse.statusText}`,
+      );
+    }
+
+    const document = await documentResponse.json();
+
+    // Calculate the actual end index of the document
+    // Find the last element in the document body
+    const bodyContent = document.body?.content || [];
+    let documentLength = 1; // Default to 1 if no content
+
+    if (bodyContent.length > 0) {
+      const lastElement = bodyContent[bodyContent.length - 1];
+      if (lastElement.endIndex) {
+        documentLength = lastElement.endIndex - 1; // endIndex is exclusive, so subtract 1
+      }
+    }
+
     const sanitizedContent = sanitizeText(content);
 
     const requests = [];
 
+    // Delete all content from index 1 to the end of the document
     requests.push({
       deleteContentRange: {
         range: {
           startIndex: 1,
-          endIndex: -1,
+          endIndex: documentLength,
         },
       },
     });
@@ -98,13 +125,13 @@ const action = async (
         : undefined,
     };
 
-    // TODO: Our HTTP client doesn't support Google endpoints that use colon notation like :batchUpdate
-    // deno-lint-ignore no-explicit-any
-    const response = await (ctx.client as any)
-      ["POST /v1/documents/:documentId:batchUpdate"]({
-        documentId,
+    const response = await ctx.client
+      ["POST /v1/documents/$documentId:batchUpdate"]({
+        "documentId:batchUpdate": `${documentId}:batchUpdate`,
       }, {
         body: updateRequest,
+        templateMarker: "$",
+        excludeFromSearchParams: ["documentId:batchUpdate"],
       });
 
     if (!response.ok) {

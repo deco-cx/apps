@@ -10,6 +10,10 @@ interface DynamicOptionsReturn {
   image?: string;
 }
 
+/**
+ * @title Product ID by Term
+ * @description List a product ID by term
+ */
 const loader = async (props: Props, req: Request, ctx: AppContext) => {
   Object.entries(allowCorsFor(req)).map(([name, value]) => {
     ctx.response.headers.set(name, value);
@@ -42,4 +46,11 @@ const loader = async (props: Props, req: Request, ctx: AppContext) => {
 
   return suggestionsArray;
 };
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, _req: Request, _ctx: AppContext) => {
+  return `product-id-by-term-${props.term ?? ""}`;
+};
+
 export default loader;

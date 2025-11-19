@@ -28,6 +28,14 @@ export interface Props {
   withCounts?: boolean;
 }
 
+export interface BotGuildsResponse {
+  /**
+   * @title Guilds
+   * @description Lista de servidores onde o bot está presente
+   */
+  guilds: DiscordGuild[];
+}
+
 /**
  * @title List Bot Guilds
  * @description List all guilds where the bot is present using Bot Token
@@ -36,7 +44,7 @@ export default async function listBotGuilds(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<DiscordGuild[]> {
+): Promise<BotGuildsResponse> {
   const { limit = 100, before, after, withCounts = false } = props;
   const { botToken } = ctx;
 
@@ -72,5 +80,5 @@ export default async function listBotGuilds(
   }
 
   const guilds = await response.json();
-  return guilds;
+  return { guilds };
 }

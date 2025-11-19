@@ -15,6 +15,10 @@ interface User {
   businessPhone?: string;
 }
 
+/**
+ * @title Get User
+ * @description Get the user logged in
+ */
 async function loader(
   _props: unknown,
   req: Request,

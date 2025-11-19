@@ -25,6 +25,8 @@ export class HttpError extends Error {
 }
 export interface TypedRequestInit<T> extends Omit<RequestInit, "body"> {
   body: T;
+  excludeFromSearchParams?: string[];
+  templateMarker?: string;
 }
 export interface TypedResponse<T> extends Response {
   json: () => Promise<T>;
@@ -157,20 +159,27 @@ export const createHttpClient = <T>(
       }
       return (
         params: Record<string, string | number | string[] | number[]>,
-        init?: RequestInit,
+        init?: RequestInit & {
+          excludeFromSearchParams?: string[];
+          templateMarker?: string;
+        },
       ) => {
         const mapped = new Map(Object.entries(params));
-
+        const marker = init?.templateMarker ?? ":";
         const compiled = path
           .split("/")
           .flatMap((segment) => {
-            const isTemplate = segment.at(0) === ":" || segment.at(0) === "*";
+            const isTemplate = segment.at(0) === marker ||
+              segment.at(0) === "*";
             const isRequired = segment.at(-1) !== "?";
             if (!isTemplate) {
               return segment;
             }
 
-            const name = segment.slice(1, !isRequired ? -1 : undefined);
+            const name = segment.slice(
+              marker.length,
+              !isRequired ? -1 : undefined,
+            );
 
             const param = mapped.get(name);
             if (param === undefined && isRequired) {
@@ -193,7 +202,11 @@ export const createHttpClient = <T>(
             return;
           }
           const arrayed = Array.isArray(value) ? value : [value];
-          arrayed.forEach((item) => url.searchParams.append(key, `${item}`));
+          arrayed.forEach((item) => {
+            if (!(init?.excludeFromSearchParams || []).includes(key)) {
+              url.searchParams.append(key, `${item}`);
+            }
+          });
         });
 
         const isJSON = init?.body != null &&

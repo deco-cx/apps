@@ -30,8 +30,8 @@ export interface Props {
 }
 
 /**
- * @title VTEX Integration - Legacy Search
- * @description Product Details Page loader
+ * @title Product Details Page Legacy
+ * @description List a product details page, with product and SEO data. commonly used for product pages.
  */
 async function loader(
   props: Props,

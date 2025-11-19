@@ -1,5 +1,6 @@
 import { AppContext } from "../mod.ts";
 import type { GithubIssue, GithubIssueLabel } from "../utils/types.ts";
+import { SingleObjectResponse } from "../utils/response.ts";
 
 interface RepoIdentify {
   owner?: string;
@@ -14,7 +15,7 @@ export interface Props {
   labels?: string[];
 }
 
-interface IssueCreateResponse {
+interface IssueData {
   created: true;
   number: number;
   url: string;
@@ -40,7 +41,7 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<IssueCreateResponse | ErrorResponse> => {
+): Promise<SingleObjectResponse<IssueData> | ErrorResponse> => {
   const { repoIdentify, title, body, labels } = props;
   let owner = repoIdentify?.owner;
   let repo = repoIdentify?.repo;
@@ -73,8 +74,11 @@ const action = async (
       { owner, repo },
       { body: { title, body, labels } },
     );
-    const data = await response.json();
-    return mapIssueCreateResponse(data);
+    const issueData = await response.json();
+    return {
+      data: mapIssueCreateResponse(issueData),
+      metadata: {},
+    };
   } catch (err) {
     if (
       typeof err === "object" &&
@@ -97,7 +101,7 @@ const action = async (
   }
 };
 
-function mapIssueCreateResponse(issue: GithubIssue): IssueCreateResponse {
+function mapIssueCreateResponse(issue: GithubIssue): IssueData {
   return {
     created: true,
     number: issue.number,

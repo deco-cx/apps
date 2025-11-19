@@ -8,6 +8,10 @@ interface Props {
   skuId: number;
 }
 
+/**
+ * @title List Stock
+ * @description List stock by SKU
+ */
 export default async function loader(
   props: Props,
   _req: Request,
@@ -30,3 +34,9 @@ export default async function loader(
     return [];
   }
 }
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, _req: Request, _ctx: AppContext) => {
+  return `stock-${props.skuId}`;
+};

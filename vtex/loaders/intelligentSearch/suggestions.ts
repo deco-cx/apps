@@ -32,8 +32,8 @@ export interface Props {
 }
 
 /**
- * @title VTEX Integration - Intelligent Search
- * @description Product Suggestion loader
+ * @title Suggestions Intelligent Search
+ * @description List a product suggestion, with products and SEO data. commonly used for search suggestions and autocomplete.
  */
 const loaders = async (
   props: Props,
@@ -98,6 +98,13 @@ const loaders = async (
     ),
     hits: recordsFiltered,
   };
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, _req: Request, ctx: AppContext) => {
+  const segment = getSegmentFromBag(ctx)?.token ?? "";
+  return `suggestions-${props.query ?? ""}-${props.count ?? 4}-${segment}`;
 };
 
 export default loaders;

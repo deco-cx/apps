@@ -12,6 +12,7 @@ interface EventsAPI {
 }
 interface FeatureFlags {
   enableImageOptimization: boolean;
+  azionAssets: boolean;
 }
 declare global {
   interface Window {
@@ -31,6 +32,7 @@ declare global {
 }
 const ENABLE_IMAGE_OPTIMIZATION =
   Deno.env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
+const ENABLE_AZION_ASSETS = Deno.env.get("ENABLE_AZION_ASSETS") !== "false";
 /**
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
@@ -97,6 +99,7 @@ function Events({ deco }: {
           segmentCookie: DECO_SEGMENT,
           featureFlags: {
             enableImageOptimization: ENABLE_IMAGE_OPTIMIZATION,
+            azionAssets: ENABLE_AZION_ASSETS,
           },
         })}
       />

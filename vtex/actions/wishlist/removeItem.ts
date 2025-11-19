@@ -5,6 +5,10 @@ import { parseCookie } from "../../utils/vtexId.ts";
 
 export type Props = { id: string };
 
+/**
+ * @title Remove Item from Wishlist
+ * @description Remove an item from the wishlist
+ */
 const action = async (
   props: Props,
   req: Request,

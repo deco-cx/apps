@@ -48,6 +48,8 @@ export type Props =
 
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/items
+ * @title Send Analytics Event
+ * @description Send an analytics event
  */
 const action = async (
   props: Props,

@@ -18,7 +18,8 @@ export interface Props {
 }
 
 /**
- * @title VTEX Integration - Legacy
+ * @title Suggestions Legacy
+ * @description List suggestions, commonly used for search suggestions and autocomplete.
  */
 const loaders = async (
   props: Props,
@@ -79,6 +80,15 @@ const loaders = async (
     searches,
     products,
   };
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, _req: Request, ctx: AppContext) => {
+  const segment = getSegmentFromBag(ctx)?.token ?? "";
+  return `legacy-suggestions-${props.query ?? ""}-${
+    props.count ?? 4
+  }-${segment}`;
 };
 
 export default loaders;

@@ -5,6 +5,10 @@ interface Props {
   id: string;
 }
 
+/**
+ * @title Get Sales Channel by ID
+ * @description Get a sales channel by its ID
+ */
 export default async function loader(
   props: Props,
   _req: Request,
@@ -20,3 +24,9 @@ export default async function loader(
 
   return salesChannel;
 }
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, _req: Request, _ctx: AppContext) => {
+  return `sales-channel-${props.id}`;
+};

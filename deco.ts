@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("data-for-seo"),
     app("discord-user"),
     app("discord-bot"),
     app("pncp"),

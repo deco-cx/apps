@@ -1,3 +1,5 @@
+import { SingleObjectResponse } from "../utils/response.ts";
+
 export interface Props {
   owner: string;
   repo: string;
@@ -12,7 +14,7 @@ export interface Props {
 const loader = async (
   props: Props,
   _req: Request,
-): Promise<{ diff: string }> => {
+): Promise<SingleObjectResponse<{ diff: string }>> => {
   const { owner, repo, pull_number } = props;
 
   const diffUrl =
@@ -28,7 +30,10 @@ const loader = async (
 
   const diff = await response.text();
 
-  return { diff };
+  return {
+    data: { diff },
+    metadata: {},
+  };
 };
 
 export default loader;

@@ -1,5 +1,5 @@
 import { AppContext } from "../mod.ts";
-import { ActorRun } from "../utils/types.ts";
+import { ActorRunResponse } from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -13,6 +13,12 @@ export interface Props {
    * @description The ID of the actor run
    */
   runId: string;
+
+  /**
+   * @title Include Dataset Items
+   * @description If true, include dataset items in the response
+   */
+  includeDatasetItems?: boolean;
 }
 
 /**
@@ -24,7 +30,7 @@ export default async function getActorRun(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<ActorRun | { error: string }> {
+): Promise<ActorRunResponse | { error: string }> {
   try {
     const { actorId, runId } = props;
 
@@ -37,7 +43,18 @@ export default async function getActorRun(
       runId,
     });
 
-    return response.json();
+    const result = await response.json() as ActorRunResponse;
+
+    if (props.includeDatasetItems && result.data.defaultDatasetId) {
+      const datasetItemsResponse = await ctx.api
+        ["GET /v2/datasets/:datasetId/items"]({
+          datasetId: result.data.defaultDatasetId,
+          format: "json",
+        });
+      result.data.results = await datasetItemsResponse.json(); // Place dataset items in the response.
+    }
+
+    return result;
   } catch (error) {
     console.error("Error getting actor run:", error);
     return ctx.errorHandler.toHttpError(error, "Error getting actor run");

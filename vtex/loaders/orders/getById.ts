@@ -6,7 +6,7 @@ interface Props {
 }
 
 /**
- * @title VTEX - Get User Order By Id
+ * @title Get User Order By Id
  * @description The user must be authenticated or have OMS permissions to access this endpoint
  */
 export default async function loader(

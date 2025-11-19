@@ -1,5 +1,6 @@
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import { SlackOAuthResponse } from "../../utils/client.ts";
+import { generateSelectionPage } from "../../utils/ui-templates/page-generator.ts";
 
 export interface Props {
   code: string;
@@ -7,6 +8,37 @@ export interface Props {
   clientId: string;
   clientSecret: string;
   redirectUri: string;
+  state?: string;
+  queryParams?: Record<string, string | boolean | undefined>;
+}
+
+interface StateProvider {
+  original_state?: string;
+}
+
+interface State {
+  appName: string;
+  installId: string;
+  invokeApp: string;
+  returnUrl?: string | null;
+  redirectUri?: string | null;
+  original_state?: string;
+}
+
+function decodeState(state: string): State & StateProvider {
+  try {
+    const decoded = atob(decodeURIComponent(state));
+    const parsed = JSON.parse(decoded) as State & StateProvider;
+
+    if (parsed.original_state) {
+      return decodeState(parsed.original_state);
+    }
+
+    return parsed;
+  } catch (error) {
+    console.error("Error decoding state:", error);
+    return {} as State & StateProvider;
+  }
 }
 
 /**
@@ -15,10 +47,11 @@ export interface Props {
  * @description Exchanges the authorization code for access tokens
  */
 export default async function callback(
-  { code, installId, clientId, clientSecret, redirectUri }: Props,
+  { code, installId, clientId, clientSecret, redirectUri, state, queryParams }:
+    Props,
   req: Request,
   ctx: AppContext,
-): Promise<{ installId: string; name: string }> {
+): Promise<{ installId: string; name: string } | Response> {
   const finalRedirectUri = redirectUri ||
     new URL("/oauth/callback", req.url).href;
 
@@ -28,6 +61,7 @@ export default async function callback(
     client_secret: clientSecret,
     redirect_uri: finalRedirectUri.replace("http://", "https://"),
   });
+
   // Exchange code for tokens using Slack's oauth.v2.access endpoint
   const tokenResponse = await fetch("https://slack.com/api/oauth.v2.access", {
     method: "POST",
@@ -55,6 +89,10 @@ export default async function callback(
     teamId: tokenData.team.id,
     clientSecret: clientSecret,
     clientId: clientId,
+    permission: {
+      allCurrentAndFutureChannels: true,
+    },
+    account: tokenData.team.name,
     tokens: {
       access_token: tokenData.access_token,
       scope: tokenData.scope,
@@ -62,6 +100,53 @@ export default async function callback(
       tokenObtainedAt: currentTime,
     },
   });
+
+  if (state) {
+    const stateData = decodeState(state);
+    if (queryParams?.savePermission || queryParams?.continue) {
+      const { savePermission, continue: continueQueryParam } = queryParams ||
+        {};
+
+      if (continueQueryParam) {
+        return {
+          installId: stateData.installId,
+          name: `Slack | ${tokenData.team.name}`,
+        };
+      }
+
+      // Check if savePermission is a confirming value (boolean true or string "true")
+      const isConfirmingSavePermission = savePermission === true ||
+        (typeof savePermission === "string" && savePermission === "true");
+
+      if (isConfirmingSavePermission) {
+        return {
+          installId: stateData.installId,
+          name: `Slack | ${tokenData.team.name}`,
+        };
+      }
+
+      const callbackUrl = new URL(req.url);
+      callbackUrl.searchParams.set("savePermission", "true");
+
+      const html = generateSelectionPage({
+        workspace: {
+          id: tokenData.team.id,
+          name: tokenData.team.name,
+        },
+        user: {
+          id: tokenData.authed_user.id,
+          name: tokenData.authed_user.id,
+        },
+        callbackUrl: callbackUrl.toString(),
+      });
+
+      return new Response(html, {
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+        },
+      });
+    }
+  }
 
   return { installId, name: `Slack | ${tokenData.team.name}` };
 }

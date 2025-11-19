@@ -11,6 +11,7 @@ import {
   LanguageCode,
   Product,
   ProductConnection,
+  ProductFragment,
   QueryRoot,
   QueryRootCollectionArgs,
   QueryRootSearchArgs,
@@ -200,7 +201,13 @@ const loader = async (
   // it in here
   const products = shopifyProducts?.nodes?.map((
     p,
-  ) => toProduct(p as Product, (p as Product).variants.nodes[0], url));
+  ) =>
+    toProduct(
+      p as ProductFragment,
+      (p as ProductFragment).variants.nodes[0],
+      url,
+    )
+  );
 
   const nextPage = new URLSearchParams(url.searchParams);
   const previousPage = new URLSearchParams(url.searchParams);

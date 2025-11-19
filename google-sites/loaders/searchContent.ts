@@ -7,7 +7,7 @@ import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.43/deno-dom-wasm.ts
 export interface Props {
   /**
    * @title URL pública do Google Sites
-   * @description URL completa do site (ex.: https://sites.google.com/view/<slug>/home)
+   * @description URL completa do site
    */
   siteUrl?: string;
   /**
@@ -26,6 +26,11 @@ export interface Props {
    * @default 10
    */
   pageSize?: number;
+  /**
+   * @title Search Application ID (opcional)
+   * @description Caso o ID do contexto esteja ausente/inválido, você pode informar aqui (ex.: searchapplications/1234567890). Se não informado, tentaremos o valor 'default'.
+   */
+  searchApplicationId?: string;
 }
 
 /**
@@ -596,7 +601,16 @@ async function searchWithCloudSearch(
   siteUrl?: string,
   start: number = 0,
   pageSize: number = 10,
-): Promise<{ results: SearchResult[]; total: number; unavailable?: boolean }> {
+  // Novo: permitir override vindo do prompt do loader
+  overrideSearchApplicationId?: string,
+): Promise<
+  {
+    results: SearchResult[];
+    total: number;
+    unavailable?: boolean;
+    info?: string;
+  }
+> {
   try {
     const body: {
       query: string;
@@ -607,10 +621,38 @@ async function searchWithCloudSearch(
           name: string;
         };
       }>;
+      requestOptions?: {
+        searchApplicationId?: string;
+        timeZone?: string;
+      };
     } = {
       query,
       pageSize,
       start,
+    };
+
+    // Determinar o ID efetivo seguindo a prioridade: contexto -> prompt -> 'default'
+    const ctxSearchApplicationId =
+      (ctx as unknown as { searchApplicationId?: string })?.searchApplicationId;
+
+    let effectiveSearchApplicationId =
+      ctxSearchApplicationId && ctxSearchApplicationId.trim()
+        ? ctxSearchApplicationId.trim()
+        : undefined;
+
+    if (!effectiveSearchApplicationId) {
+      if (overrideSearchApplicationId && overrideSearchApplicationId.trim()) {
+        effectiveSearchApplicationId = overrideSearchApplicationId.trim();
+      } else {
+        // fallback final requerido
+        effectiveSearchApplicationId = "default";
+      }
+    }
+
+    // Define requestOptions com o ID efetivo e fuso horário
+    body.requestOptions = {
+      searchApplicationId: effectiveSearchApplicationId,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     };
 
     // Se temos URL do site, adicionar restrição de domínio
@@ -633,14 +675,38 @@ async function searchWithCloudSearch(
         message?: string;
         status?: string;
       };
+
+      // Mensagem padrão de orientação
+      const infoMsg =
+        "Não foi possível usar o Google Cloud Search porque o Search Application ID está ausente ou inválido. " +
+        "Peça ao time de TI/Admin do Google Workspace para enviar esse ID (Admin Console > Cloud Search > Search applications). " +
+        "Você pode informar este valor no prompt deste loader usando o campo searchApplicationId: 'searchapplications/1234567890' " +
+        "ou configurar no app. Observação: tentamos automaticamente o valor 'default' quando o ID não é informado.";
+
       // Cloud Search não disponível para contas pessoais (Google Workspace required)
       if (
         err.code === 403 &&
         (err.message?.includes("only available to G Suite users") ||
           err.status === "PERMISSION_DENIED")
       ) {
-        return { results: [], total: 0, unavailable: true };
+        return { results: [], total: 0, unavailable: true, info: infoMsg };
       }
+
+      // Tratar erros de ID faltando/ inválido / não encontrado
+      const msg = (err.message || "").toLowerCase();
+      const isMissingId = err.code === 400 &&
+        (msg.includes("search application id is required") ||
+          msg.includes("required for the request"));
+      const isInvalidOrNotFound = (err.code === 400 || err.code === 404) &&
+        (msg.includes("invalid") ||
+          msg.includes("not found") ||
+          msg.includes("search application"));
+
+      if (isMissingId || isInvalidOrNotFound) {
+        console.warn("[CloudSearch] ID inválido/ausente:", err.message);
+        return { results: [], total: 0, unavailable: true, info: infoMsg };
+      }
+
       throw new Error(`Cloud Search API Error: ${err.message}`);
     }
 
@@ -655,7 +721,7 @@ async function searchWithCloudSearch(
     return { results, total };
   } catch (error) {
     console.error("Cloud Search Error:", error);
-    return { results: [], total: 0 };
+    return { results: [], total: 0, unavailable: true };
   }
 }
 
@@ -674,9 +740,12 @@ const loader = async (
   pageSize: number;
   info?: string;
 }> => {
-  const { siteUrl, query, page = 1, pageSize = 10 } = props;
+  const { siteUrl, query, page = 1, pageSize = 10, searchApplicationId } =
+    props;
 
   const siteUrlNorm = normalize(siteUrl);
+
+  console.log("siteUrlNorm", siteUrlNorm);
 
   // Exigir pelo menos um identificador ou termo de busca
   if (!query.trim()) {
@@ -690,6 +759,7 @@ const loader = async (
   }
 
   const start = (page - 1) * pageSize;
+
   let searchResults: {
     results: SearchResult[];
     total: number;
@@ -697,22 +767,30 @@ const loader = async (
   };
   let info: string | undefined;
 
-  // Tentar primeiro com Custom Search API
-  searchResults = await searchWithCustomSearch(
-    query,
-    siteUrlNorm || "",
-    start + 1,
-    pageSize,
-  );
-
-  if ("invalidSite" in searchResults && searchResults.invalidSite) {
-    return {
+  if (siteUrlNorm === "") {
+    searchResults = {
       results: [],
       total: 0,
-      page,
-      pageSize,
-      info: "Site inválido. Verifique se a URL está correta.",
+      isPrivate: true,
     };
+  } else {
+    // Tentar primeiro com Custom Search API
+    searchResults = await searchWithCustomSearch(
+      query,
+      siteUrlNorm || "",
+      start + 1,
+      pageSize,
+    );
+
+    if ("invalidSite" in searchResults && searchResults.invalidSite) {
+      return {
+        results: [],
+        total: 0,
+        page,
+        pageSize,
+        info: "Site inválido. Verifique se a URL está correta.",
+      };
+    }
   }
 
   // Se Custom Search indicar site privado ou não retornar resultados, tentar Cloud Search
@@ -726,6 +804,7 @@ const loader = async (
       siteUrlNorm,
       start, // Cloud Search usa 0-based indexing
       pageSize,
+      searchApplicationId, // Novo: override vindo do prompt do loader
     );
 
     searchResults = {
@@ -734,7 +813,7 @@ const loader = async (
     };
 
     if (cloudSearchResults.unavailable) {
-      info =
+      info = cloudSearchResults.info ??
         "Cloud Search API não está disponível para contas pessoais. É necessário usar uma conta Google Workspace com o serviço Cloud Search habilitado e permissões de consulta.";
     } else if (cloudSearchResults.results.length > 0) {
       info = "Resultados obtidos via Cloud Search API (site privado)";
