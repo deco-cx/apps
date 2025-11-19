@@ -32,14 +32,14 @@ const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
   const userFromCookie = cookies[`VtexIdclientAutCookie_${ctx.account}`];
 
   if (!userFromCookie) {
-    return;
+    return { shouldClearCartCookie: false };
   }
 
   const [jwtPayload, error] = safeParseJwt(userFromCookie);
 
   if (error) {
     console.error("Error parsing JWT", error);
-    return;
+    return { shouldClearCartCookie: false } ;
   }
 
   const emailFromCookie = jwtPayload?.sub;
@@ -66,7 +66,11 @@ const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
         ),
       ),
     });
+
+    return { shouldClearCartCookie: true };
   }
+
+  return { shouldClearCartCookie: false };
 };
 
 export const cache = "no-store";
@@ -103,9 +107,11 @@ const loader = async (
   const cart = await response.json() as OrderForm;
 
   // Temporary logging to check for cart mismatch
-  logMismatchedCart(cart, req, ctx);
+  const { shouldClearCartCookie } = logMismatchedCart(cart, req, ctx);
 
-  proxySetCookie(response.headers, ctx.response.headers, req.url);
+  proxySetCookie(response.headers, ctx.response.headers, req.url, {
+    shouldClearCartCookie,
+  });
 
   if (!segment?.payload) {
     return forceHttpsOnAssets(cart);
