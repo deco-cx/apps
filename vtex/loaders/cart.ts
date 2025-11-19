@@ -16,6 +16,7 @@ import { DEFAULT_EXPECTED_SECTIONS } from "../actions/cart/removeItemAttachment.
 import { forceHttpsOnAssets } from "../utils/transform.ts";
 import { safelySetCheckoutVtexCookie } from "../utils/orderForm.ts";
 
+export const cache = "no-store";
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pub/orderForm
  * @title Get Cart
