@@ -296,7 +296,7 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
 
   const params = new URLSearchParams([
     ["count", (props.count || url.searchParams.get("count") || 12).toString()],
-    ["sort", props.sort ?? url.searchParams.get("sort") ?? ""],
+    ["sort", url.searchParams.get("sort") ?? props.sort ?? ""],
     ["type_tags", typeTags],
     ["tags", props?.tags?.join("\\") ?? ""],
     [
