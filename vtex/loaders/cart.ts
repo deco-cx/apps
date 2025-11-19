@@ -17,24 +17,39 @@ import { safelySetCheckoutVtexCookie } from "../utils/orderForm.ts";
 import { getCookies } from "std/http/mod.ts";
 import { logger } from "@deco/deco/o11y";
 
-const logMismatchedCart = (cart: OrderForm, req: Request) => {
+const safeParseJwt = (cookie: string) => {
+  try {
+    return [JSON.parse(atob(cookie.split(".")[1])), null];
+  } catch (e) {
+    return [null, e];
+  }
+};
+
+const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
   const email = cart?.clientProfileData?.email;
   const cookies = getCookies(req.headers);
 
-  const userFromCookie = cookies["VtexIdclientAutCookie_lojafarm"];
+  const userFromCookie = cookies[`VtexIdclientAutCookie_${ctx.account}`];
 
-  let emailFromCookie = "";
-  let userIdFromCookie = "";
-  if (userFromCookie) {
-    try {
-      emailFromCookie = JSON.parse(atob(userFromCookie.split(".")[1])).sub;
-      userIdFromCookie = JSON.parse(atob(userFromCookie.split(".")[1])).userId;
-    } catch (e) {
-      console.error(e);
-    }
+  if (!userFromCookie) {
+    return;
   }
 
-  if ((emailFromCookie && email) && emailFromCookie !== email) {
+  const [jwtPayload, error] = safeParseJwt(userFromCookie);
+
+  if (error) {
+    console.error("Error parsing JWT", error);
+    return;
+  }
+
+  const emailFromCookie = jwtPayload?.sub;
+  const userIdFromCookie = jwtPayload?.userId;
+
+  if (
+    typeof emailFromCookie === "string" &&
+    typeof email === "string" &&
+    emailFromCookie !== email
+  ) {
     const headersDenyList = new Set(["cookie", "cache-control"]);
 
     logger.warn(`Cookie cart mismatch`, {
@@ -88,7 +103,7 @@ const loader = async (
   const cart = await response.json() as OrderForm;
 
   // Temporary logging to check for cart mismatch
-  logMismatchedCart(cart, req);
+  logMismatchedCart(cart, req, ctx);
 
   proxySetCookie(response.headers, ctx.response.headers, req.url);
 
