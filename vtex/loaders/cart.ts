@@ -39,15 +39,15 @@ const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
 
   if (error) {
     console.error("Error parsing JWT", error);
-    return { shouldClearCartCookie: false } ;
+    return { shouldClearCartCookie: false };
   }
 
   const emailFromCookie = jwtPayload?.sub;
   const userIdFromCookie = jwtPayload?.userId;
 
   if (
-    typeof emailFromCookie === "string" &&
-    typeof email === "string" &&
+    emailFromCookie &&
+    email &&
     emailFromCookie !== email
   ) {
     const headersDenyList = new Set(["cookie", "cache-control"]);
