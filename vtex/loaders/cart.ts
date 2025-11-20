@@ -54,10 +54,12 @@ const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
 
     const hasTwoCookies = req.headers.get("cookie")?.split("checkout.vtex.com")?.length === 3;
 
+    const orderFormIdFromRequest = cookies["checkout.vtex.com"]?.split("=").at(1);
+
     logger.warn(`Cookie cart mismatch`, {
       hasTwoCookies,
       OrderFormId: cart?.orderFormId,
-      OrderFormIdFromRequest: cookies["checkout.vtex.com"]?.split("=").at(1),
+      OrderFormIdFromRequest: orderFormIdFromRequest,
       EmailFromCookie: emailFromCookie,
       EmailFromOrderForm: email,
       UserIdFromCookie: userIdFromCookie,
@@ -69,6 +71,12 @@ const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
         ),
       ),
     });
+
+    const orderFormIdsToClear = Deno.env.get("ORDER_FORM_IDS_TO_CLEAR")?.split(",");
+
+    if (orderFormIdFromRequest && orderFormIdsToClear?.includes(orderFormIdFromRequest)) {
+      return { shouldClearCartCookie: true };
+    }
 
     return { shouldClearCartCookie: false };
   }
