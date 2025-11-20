@@ -52,7 +52,10 @@ const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
   ) {
     const headersDenyList = new Set(["cookie", "cache-control"]);
 
+    const hasTwoCookies = req.headers.get("cookie")?.split("checkout.vtex.com")?.length === 3;
+
     logger.warn(`Cookie cart mismatch`, {
+      hasTwoCookies,
       OrderFormId: cart?.orderFormId,
       OrderFormIdFromRequest: cookies["checkout.vtex.com"]?.split("=").at(1),
       EmailFromCookie: emailFromCookie,
@@ -67,7 +70,7 @@ const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
       ),
     });
 
-    return { shouldClearCartCookie: true };
+    return { shouldClearCartCookie: false };
   }
 
   return { shouldClearCartCookie: false };
