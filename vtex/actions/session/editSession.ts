@@ -1,40 +1,52 @@
+import { getSetCookies } from "std/http/cookie.ts";
 import type { AppContext } from "../../mod.ts";
-import { proxySetCookie } from "../../utils/cookies.ts";
-import type { CreateEditSessionResponse } from "../../utils/openapi/vcs.openapi.gen.ts";
-import { parseCookie } from "../../utils/vtexId.ts";
-
-interface Props {
-  publicProperties: Record<string, { value: string }>;
-}
+import { buildCookieJar, setCookiesFromSession } from "../../utils/cookies.ts";
+import { defaultItems } from "../../utils/session.ts";
+import { Session, SessionProps } from "../../utils/types.ts";
 
 /**
  * @title Edit Session
  * @description Edit a session
  */
 async function action(
-  props: Props,
+  {
+    publicProperties,
+    items,
+  }: SessionProps,
   req: Request,
   ctx: AppContext,
-): Promise<CreateEditSessionResponse> {
+): Promise<Session> {
   const { vcs } = ctx;
-  const { cookie } = parseCookie(req.headers, ctx.account);
+  const setCookiesSoFar = getSetCookies(ctx.response.headers);
+  const { header: cookie } = buildCookieJar(req.headers, setCookiesSoFar);
 
-  const response = await vcs["PATCH /api/sessions"]({}, {
-    body: {
-      public: {
-        ...props.publicProperties,
+  const url = new URL(req.url);
+  const searchParams = new URLSearchParams(url.search);
+  searchParams.set("items", items?.join(",") || defaultItems);
+
+  const response = await vcs["PATCH /api/sessions"](
+    Object.fromEntries(searchParams.entries()),
+    {
+      body: {
+        public: {
+          ...publicProperties,
+        },
       },
+      headers: { cookie },
     },
-    headers: { cookie },
-  });
+  );
 
   if (!response.ok) {
     throw new Error(`Failed to edit session: ${response.status}`);
   }
 
-  proxySetCookie(response.headers, ctx.response.headers, req.url);
+  setCookiesFromSession({
+    from: response.headers,
+    req,
+    ctx,
+  });
 
-  return await response.json();
+  return (await response.json()) as Session;
 }
 
 export default action;
