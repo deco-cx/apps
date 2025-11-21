@@ -25,6 +25,8 @@ const safeParseJwt = (cookie: string) => {
   }
 };
 
+const orderFormIdsToClear = Deno.env.get("ORDER_FORM_IDS_TO_CLEAR")?.split(",");
+
 const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
   const email = cart?.clientProfileData?.email;
   const cookies = getCookies(req.headers);
@@ -72,8 +74,6 @@ const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
       ),
     });
   }
-
-  const orderFormIdsToClear = Deno.env.get("ORDER_FORM_IDS_TO_CLEAR")?.split(",");
 
   if (orderFormIdFromRequest && orderFormIdsToClear?.includes(orderFormIdFromRequest)) {
     logger.warn(`Clearing cart cookie `, {
