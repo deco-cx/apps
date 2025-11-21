@@ -45,6 +45,8 @@ const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
   const emailFromCookie = jwtPayload?.sub;
   const userIdFromCookie = jwtPayload?.userId;
 
+  const orderFormIdFromRequest = cookies["checkout.vtex.com"]?.split("=").at(1);
+
   if (
     typeof emailFromCookie === "string" &&
     typeof email === "string" &&
@@ -53,8 +55,6 @@ const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
     const headersDenyList = new Set(["cookie", "cache-control"]);
 
     const hasTwoCookies = req.headers.get("cookie")?.split("checkout.vtex.com")?.length === 3;
-
-    const orderFormIdFromRequest = cookies["checkout.vtex.com"]?.split("=").at(1);
 
     logger.warn(`Cookie cart mismatch`, {
       hasTwoCookies,
@@ -71,14 +71,17 @@ const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
         ),
       ),
     });
+  }
 
-    const orderFormIdsToClear = Deno.env.get("ORDER_FORM_IDS_TO_CLEAR")?.split(",");
+  const orderFormIdsToClear = Deno.env.get("ORDER_FORM_IDS_TO_CLEAR")?.split(",");
 
-    if (orderFormIdFromRequest && orderFormIdsToClear?.includes(orderFormIdFromRequest)) {
-      return { shouldClearCartCookie: true };
-    }
-
-    return { shouldClearCartCookie: false };
+  if (orderFormIdFromRequest && orderFormIdsToClear?.includes(orderFormIdFromRequest)) {
+    logger.warn(`Clearing cart cookie `, {
+      orderFormIdFromRequest,
+      EmailFromCookie: emailFromCookie,
+      EmailFromOrderForm: email,
+    })
+    return { shouldClearCartCookie: true };
   }
 
   return { shouldClearCartCookie: false };
