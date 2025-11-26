@@ -8,6 +8,7 @@ import {
   RouteContext,
 } from "@deco/deco";
 import { isAwaitable } from "@deco/deco/utils";
+import { extname } from "@std/path/extname";
 import { weakcache } from "../../utils/weakcache.ts";
 import { Route, Routes } from "../flags/audience.ts";
 import { isFreshCtx } from "../handlers/fresh.ts";
@@ -39,10 +40,7 @@ const rankRoute = (pattern: string): number =>
       return acc + 3;
     }, 0);
 const urlPatternCache: Record<string, URLPattern> = {};
-const hasFileExtension = (pathname: string): boolean => {
-  const lastSegment = pathname.split("/").pop() || "";
-  return lastSegment.includes(".") && !lastSegment.startsWith(".");
-};
+
 export const router = (
   routes: Route[],
   hrefRoutes: Record<string, Resolvable<Handler>> = {},
@@ -86,10 +84,8 @@ export const router = (
       const { pathTemplate: routePath, handler, supportedExtensions } of routes
     ) {
       // Skip catch-all routes for paths with file extensions
-      if (
-        hasFileExtension(url.pathname) &&
-        !supportedExtensions?.includes(url.pathname.split(".").pop() || "")
-      ) {
+      const ext = extname(url.pathname).slice(1);
+      if (ext && !supportedExtensions?.includes(ext)) {
         continue;
       }
       const pattern = urlPatternCache[routePath] ??= (() => {
