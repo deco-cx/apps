@@ -38,10 +38,6 @@ const rankRoute = (pattern: string): number =>
       return acc + 3;
     }, 0);
 const urlPatternCache: Record<string, URLPattern> = {};
-const hasFileExtension = (pathname: string): boolean => {
-  const lastSegment = pathname.split("/").pop() || "";
-  return lastSegment.includes(".") && !lastSegment.startsWith(".");
-};
 export const router = (
   routes: Route[],
   hrefRoutes: Record<string, Resolvable<Handler>> = {},
@@ -82,10 +78,6 @@ export const router = (
       return route(handler, `${url.pathname}${url.search || ""}`);
     }
     for (const { pathTemplate: routePath, handler } of routes) {
-      // Skip catch-all routes for paths with file extensions
-      if (routePath.endsWith("*") && hasFileExtension(url.pathname)) {
-        continue;
-      }
       const pattern = urlPatternCache[routePath] ??= (() => {
         let url;
         if (URL.canParse(routePath)) {

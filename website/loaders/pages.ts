@@ -3,7 +3,7 @@ import { Route } from "../flags/audience.ts";
 import { AppContext } from "../mod.ts";
 import Page from "../pages/Page.tsx";
 
-async function getAllPages(ctx: AppContext): Promise<Route[]> {
+async function getAllPages(ctx: AppContext, props: Props): Promise<Route[]> {
   const allPages = await ctx.get<
     Record<string, Parameters<typeof Page>[0]>
   >({
@@ -27,6 +27,7 @@ async function getAllPages(ctx: AppContext): Promise<Route[]> {
           page: {
             __resolveType: pageId,
           },
+          supportedExtensions: props.supportedExtensions,
         },
       },
     });
@@ -45,6 +46,12 @@ export interface Props {
    * @description Deco routes that will ignore the previous rule. If the same route exists on other routes loader, the deco page will be used.
    */
   alwaysVisiblePages?: SiteRoute[];
+
+  /**
+   * @title Supported extensions
+   * @description Extensions that will be supported by pages routes.
+   */
+  supportedExtensions?: string[];
 }
 
 /**
@@ -58,7 +65,7 @@ export default async function Pages(
   const allPages = await ctx.get<
     Route[]
   >({
-    func: () => getAllPages(ctx),
+    func: () => getAllPages(ctx, props),
     __resolveType: "once",
   });
 

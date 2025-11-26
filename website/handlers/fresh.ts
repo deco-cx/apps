@@ -20,6 +20,11 @@ type ConnInfo = Deno.ServeHandlerInfo;
  */
 export interface FreshConfig {
   page: Page;
+  /**
+   * @title Supported extensions
+   * @description Extensions that will be supported by the page.
+   */
+  supportedExtensions?: string[];
 }
 export const isFreshCtx = <TState>(
   ctx: ConnInfo | HandlerContext<unknown, TState>,
@@ -109,6 +114,21 @@ export default function Fresh(
     const timing = appContext?.monitoring?.timings?.start?.("load-data");
     let didFinish = false;
     const url = new URL(req.url);
+    
+    const lastPathname = url.pathname.split("/").pop();
+    const extension = lastPathname?.includes(".") ? lastPathname?.split(".").pop() : undefined;
+
+    // Only check if there's an extension
+    if (extension) {
+      const supportedExtensions = freshConfig.supportedExtensions ?? [];
+      
+      // If no extensions are configured, block all extensions (default behavior)
+      // If extensions are configured, only allow those
+      if (!supportedExtensions.includes(extension)) {
+        return new Response(null, { status: 404 });
+      }
+    }
+    
     const startedAt = Date.now();
     const asJson = url.searchParams.get("asJson");
     const delayFromProps = appContext.firstByteThresholdMS ? 1 : 0;
