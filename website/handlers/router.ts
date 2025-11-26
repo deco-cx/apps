@@ -82,9 +82,14 @@ export const router = (
     if (handler) {
       return route(handler, `${url.pathname}${url.search || ""}`);
     }
-    for (const { pathTemplate: routePath, handler, supportedExtensions } of routes) {
+    for (
+      const { pathTemplate: routePath, handler, supportedExtensions } of routes
+    ) {
       // Skip catch-all routes for paths with file extensions
-      if (hasFileExtension(url.pathname) && !supportedExtensions?.includes(url.pathname.split(".").pop() || "")) {
+      if (
+        hasFileExtension(url.pathname) &&
+        !supportedExtensions?.includes(url.pathname.split(".").pop() || "")
+      ) {
         continue;
       }
       const pattern = urlPatternCache[routePath] ??= (() => {
@@ -119,12 +124,21 @@ export const buildRoutes = (audiences: Routes[]): [
   // We should tackle this problem elsewhere
   // check if the audience matches with the given context considering the `isMatch` provided by the cookies.
   for (const audience of audiences.filter(Boolean).flat()) {
-    const { pathTemplate, isHref, highPriority, handler: { value: handler }, supportedExtensions } =
-      audience;
+    const {
+      pathTemplate,
+      isHref,
+      highPriority,
+      handler: { value: handler },
+      supportedExtensions,
+    } = audience;
     if (isHref) {
       hrefRoutes[pathTemplate] = handler;
     } else {
-      routeMap[pathTemplate] = { func: handler, highPriority, supportedExtensions };
+      routeMap[pathTemplate] = {
+        func: handler,
+        highPriority,
+        supportedExtensions,
+      };
     }
   }
   return [routeMap, hrefRoutes];

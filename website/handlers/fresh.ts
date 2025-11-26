@@ -109,7 +109,7 @@ export default function Fresh(
     const timing = appContext?.monitoring?.timings?.start?.("load-data");
     let didFinish = false;
     const url = new URL(req.url);
-    
+
     const startedAt = Date.now();
     const asJson = url.searchParams.get("asJson");
     const delayFromProps = appContext.firstByteThresholdMS ? 1 : 0;
