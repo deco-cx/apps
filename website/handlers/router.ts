@@ -19,6 +19,7 @@ export interface SelectionConfig {
 }
 interface MaybePriorityHandler {
   func: Resolvable<Handler>;
+  supportedExtensions?: string[];
   highPriority?: boolean;
 }
 const HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE = 1000;
@@ -38,6 +39,10 @@ const rankRoute = (pattern: string): number =>
       return acc + 3;
     }, 0);
 const urlPatternCache: Record<string, URLPattern> = {};
+const hasFileExtension = (pathname: string): boolean => {
+  const lastSegment = pathname.split("/").pop() || "";
+  return lastSegment.includes(".") && !lastSegment.startsWith(".");
+};
 export const router = (
   routes: Route[],
   hrefRoutes: Record<string, Resolvable<Handler>> = {},
@@ -77,7 +82,11 @@ export const router = (
     if (handler) {
       return route(handler, `${url.pathname}${url.search || ""}`);
     }
-    for (const { pathTemplate: routePath, handler } of routes) {
+    for (const { pathTemplate: routePath, handler, supportedExtensions } of routes) {
+      // Skip catch-all routes for paths with file extensions
+      if (hasFileExtension(url.pathname) && !supportedExtensions?.includes(url.pathname.split(".").pop() || "")) {
+        continue;
+      }
       const pattern = urlPatternCache[routePath] ??= (() => {
         let url;
         if (URL.canParse(routePath)) {
@@ -110,12 +119,12 @@ export const buildRoutes = (audiences: Routes[]): [
   // We should tackle this problem elsewhere
   // check if the audience matches with the given context considering the `isMatch` provided by the cookies.
   for (const audience of audiences.filter(Boolean).flat()) {
-    const { pathTemplate, isHref, highPriority, handler: { value: handler } } =
+    const { pathTemplate, isHref, highPriority, handler: { value: handler }, supportedExtensions } =
       audience;
     if (isHref) {
       hrefRoutes[pathTemplate] = handler;
     } else {
-      routeMap[pathTemplate] = { func: handler, highPriority };
+      routeMap[pathTemplate] = { func: handler, highPriority, supportedExtensions };
     }
   }
   return [routeMap, hrefRoutes];
@@ -155,6 +164,7 @@ const prepareRoutes = (audiences: Routes[], ctx: AppContext) => {
     routes: builtRoutes.map((route) => ({
       pathTemplate: route[0],
       handler: { value: route[1].func },
+      supportedExtensions: route[1].supportedExtensions,
     })),
     hrefRoutes,
   };

@@ -21,13 +21,13 @@ async function getAllPages(ctx: AppContext, props: Props): Promise<Route[]> {
     }
     routes.push({
       pathTemplate,
+      supportedExtensions: props.supportedExtensions,
       handler: {
         value: {
           __resolveType: "website/handlers/fresh.ts",
           page: {
             __resolveType: pageId,
           },
-          supportedExtensions: props.supportedExtensions,
         },
       },
     });
