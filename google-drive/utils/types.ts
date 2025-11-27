@@ -246,3 +246,17 @@ export interface SearchFilesParams {
    */
   includeItemsFromAllDrives?: boolean;
 }
+
+export interface DownloadFileParams {
+  fileId: string;
+  outputFormat?: "link" | "base64" | "blob";
+}
+
+export interface DownloadFileResult {
+  fileId: string;
+  fileName?: string;
+  mimeType?: string;
+  size?: string;
+  format: "link" | "base64" | "blob";
+  content: string | ArrayBuffer;
+}
