@@ -25,36 +25,35 @@ const safeParseJwt = (cookie: string) => {
   }
 };
 
+const orderFormIdsToClear = Deno.env.get("ORDER_FORM_IDS_TO_CLEAR")?.split(",");
+
 const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
   const email = cart?.clientProfileData?.email;
   const cookies = getCookies(req.headers);
 
   const userFromCookie = cookies[`VtexIdclientAutCookie_${ctx.account}`];
 
-  if (!userFromCookie) {
-    return;
-  }
-
-  const [jwtPayload, error] = safeParseJwt(userFromCookie);
-
-  if (error) {
-    console.error("Error parsing JWT", error);
-    return;
-  }
+  const [jwtPayload, _error] = userFromCookie ? safeParseJwt(userFromCookie) : [null, null];
 
   const emailFromCookie = jwtPayload?.sub;
   const userIdFromCookie = jwtPayload?.userId;
 
+  const orderFormIdFromRequest = cookies["checkout.vtex.com"]?.split("=").at(1);
+
   if (
+    userFromCookie &&
     typeof emailFromCookie === "string" &&
     typeof email === "string" &&
     emailFromCookie !== email
   ) {
     const headersDenyList = new Set(["cookie", "cache-control"]);
 
+    const hasTwoCookies = req.headers.get("cookie")?.split("checkout.vtex.com")?.length === 3;
+
     logger.warn(`Cookie cart mismatch`, {
+      hasTwoCookies,
       OrderFormId: cart?.orderFormId,
-      OrderFormIdFromRequest: cookies["checkout.vtex.com"]?.split("=").at(1),
+      OrderFormIdFromRequest: orderFormIdFromRequest,
       EmailFromCookie: emailFromCookie,
       EmailFromOrderForm: email,
       UserIdFromCookie: userIdFromCookie,
@@ -67,6 +66,17 @@ const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
       ),
     });
   }
+
+  if (orderFormIdFromRequest && orderFormIdsToClear?.includes(orderFormIdFromRequest)) {
+    logger.warn(`Clearing cart cookie `, {
+      orderFormIdFromRequest,
+      EmailFromCookie: emailFromCookie,
+      EmailFromOrderForm: email,
+    })
+    return { shouldClearCartCookie: true };
+  }
+
+  return { shouldClearCartCookie: false };
 };
 
 export const cache = "no-store";
@@ -103,9 +113,11 @@ const loader = async (
   const cart = await response.json() as OrderForm;
 
   // Temporary logging to check for cart mismatch
-  logMismatchedCart(cart, req, ctx);
+  const { shouldClearCartCookie } = logMismatchedCart(cart, req, ctx);
 
-  proxySetCookie(response.headers, ctx.response.headers, req.url);
+  proxySetCookie(response.headers, ctx.response.headers, req.url, {
+    shouldClearCartCookie,
+  });
 
   if (!segment?.payload) {
     return forceHttpsOnAssets(cart);
