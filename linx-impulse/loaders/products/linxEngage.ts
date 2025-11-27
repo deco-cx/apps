@@ -43,6 +43,11 @@ export interface Props {
    * @description Used to sync user data with linx impulse
    */
   user: Person | null;
+  /**
+   * @title Force Source
+   * @description Force the source of the request
+   */
+  forceSource?: "desktop" | "mobile";
 
   /**
    * @ignore
@@ -123,10 +128,16 @@ const loader = async (
     return null;
   }
 
-  const { resultsPerPage, allowRedirect, showOnlyAvailable, user } = props;
+  const {
+    resultsPerPage,
+    allowRedirect,
+    showOnlyAvailable,
+    user,
+    forceSource,
+  } = props;
   const { apiKey, salesChannel, api, cdn } = ctx;
   const deviceId = getDeviceIdFromBag(ctx);
-  const source = getSource(ctx);
+  const source = forceSource ?? getSource(ctx);
   const url = new URL(req.url);
 
   const origin = url.searchParams.get("origin") || undefined;
