@@ -128,7 +128,13 @@ const loader = async (
     return null;
   }
 
-  const { resultsPerPage, allowRedirect, showOnlyAvailable, user, forceSource } = props;
+  const {
+    resultsPerPage,
+    allowRedirect,
+    showOnlyAvailable,
+    user,
+    forceSource,
+  } = props;
   const { apiKey, salesChannel, api, cdn } = ctx;
   const deviceId = getDeviceIdFromBag(ctx);
   const source = forceSource ?? getSource(ctx);
