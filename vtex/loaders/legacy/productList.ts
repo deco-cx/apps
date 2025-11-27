@@ -133,9 +133,10 @@ const fromProps = ({ props }: Props) => {
   };
 
   if (isSKUIDProps(props)) {
-    const skuIds = props.ids || [];
+    const skuIds = (props.ids || [])
+      .filter((skuId) => skuId && /^\d+$/.test(skuId.trim()));
 
-    skuIds.forEach((skuId) => params.fq.push(`skuId:${skuId}`));
+    skuIds.forEach((skuId) => params.fq.push(`skuId:${skuId.trim()}`));
     params._from = 0;
     params._to = Math.max(skuIds.length - 1, 0);
 
@@ -143,9 +144,10 @@ const fromProps = ({ props }: Props) => {
   }
 
   if (isProductIDProps(props)) {
-    const productIds = props.productIds || [];
+    const productIds = (props.productIds || [])
+      .filter((productId) => productId && /^\d+$/.test(productId.trim()));
 
-    productIds.forEach((productId) => params.fq.push(`productId:${productId}`));
+    productIds.forEach((productId) => params.fq.push(`productId:${productId.trim()}`));
     params._from = 0;
     params._to = Math.max(productIds.length - 1, 0);
 
