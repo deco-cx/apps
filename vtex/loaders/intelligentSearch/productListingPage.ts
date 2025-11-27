@@ -171,10 +171,12 @@ const searchArgsOf = (props: Props, url: URL) => {
         : 0,
       VTEX_MAX_PAGES - currentPageoffset,
     );
-  const sort = (url.searchParams.get("sort") as Sort) ??
+  const sort = (url.searchParams.get("sort")) ??
     LEGACY_TO_IS[url.searchParams.get("O") ?? ""] ??
     props.sort ??
     sortOptions[0].value;
+
+  const isSortValid = sortOptions.some((option) => option.value === sort);
   const selectedFacets = mergeFacets(
     props.selectedFacets ?? [],
     filtersFromURL(url),
@@ -185,7 +187,7 @@ const searchArgsOf = (props: Props, url: URL) => {
     query,
     fuzzy,
     page,
-    sort,
+    sort: isSortValid ? (sort as Sort) : sortOptions[0].value as Sort,
     count,
     hideUnavailableItems,
     selectedFacets,
