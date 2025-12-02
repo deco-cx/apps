@@ -15,6 +15,7 @@ import type {
   AdvancedLoaderConfig,
   PageType,
   Product as VTEXProduct,
+  SimulationBehavior,
 } from "../../utils/types.ts";
 import PDPDefaultPath from "../paths/PDPDefaultPath.ts";
 
@@ -35,6 +36,11 @@ export interface Props {
    * @description Further change loader behaviour
    */
   advancedConfigs?: AdvancedLoaderConfig;
+  /**
+   * @title Simulation Behavior
+   * @description Defines the simulation behavior.
+   */
+  simulationBehavior?: SimulationBehavior;
 }
 
 /**
@@ -101,8 +107,12 @@ const loader = async (
   }
 
   const facets = withDefaultFacets([], ctx);
-  const params = withDefaultParams({ query, count: 1, locale });
-
+  const params = withDefaultParams({
+    query,
+    count: 1,
+    locale,
+    simulationBehavior: props.simulationBehavior ?? "default",
+  });
   const { products: [product] } = await vcsDeprecated
     ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
       ...params,
@@ -122,6 +132,7 @@ const loader = async (
     const params = withDefaultParams({
       query: `sku:${sku.kitItems.join(";")}`,
       count: sku.kitItems.length,
+      simulationBehavior: props.simulationBehavior ?? "default",
     });
 
     const result = await vcsDeprecated
