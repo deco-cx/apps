@@ -118,6 +118,12 @@ const isFQProps = (p: any): p is FQProps => isValidArrayProp(p.fq);
 // deno-lint-ignore no-explicit-any
 const isTermProps = (p: any): p is TermProps => typeof p.term === "string";
 
+const sanitizeNumericIds = (ids: string[] | undefined): string[] => {
+  return (ids || [])
+    .filter((id) => id && /^\d+$/.test(id.trim()))
+    .map((id) => id.trim());
+};
+
 const preferredSKU = (items: LegacyItem[], { props }: Props) => {
   const fetchedSkus = new Set((props as SkuIDProps).ids ?? []);
   return items.find((item) => fetchedSkus.has(item.itemId)) || items[0];
@@ -133,10 +139,9 @@ const fromProps = ({ props }: Props) => {
   };
 
   if (isSKUIDProps(props)) {
-    const skuIds = (props.ids || [])
-      .filter((skuId) => skuId && /^\d+$/.test(skuId.trim()));
+    const skuIds = sanitizeNumericIds(props.ids);
 
-    skuIds.forEach((skuId) => params.fq.push(`skuId:${skuId.trim()}`));
+    skuIds.forEach((skuId) => params.fq.push(`skuId:${skuId}`));
     params._from = 0;
     params._to = Math.max(skuIds.length - 1, 0);
 
@@ -144,10 +149,11 @@ const fromProps = ({ props }: Props) => {
   }
 
   if (isProductIDProps(props)) {
-    const productIds = (props.productIds || [])
-      .filter((productId) => productId && /^\d+$/.test(productId.trim()));
+    const productIds = sanitizeNumericIds(props.productIds);
 
-    productIds.forEach((productId) => params.fq.push(`productId:${productId.trim()}`));
+    productIds.forEach((productId) =>
+      params.fq.push(`productId:${productId}`)
+    );
     params._from = 0;
     params._to = Math.max(productIds.length - 1, 0);
 
@@ -305,14 +311,12 @@ export const cacheKey = (
   ]);
 
   if (isSKUIDProps(props)) {
-    const skuIds = [...props.ids ?? []]?.sort();
+    const skuIds = sanitizeNumericIds(props.ids).sort();
     params.append("skuids", skuIds.join(","));
   }
 
-  if (
-    isProductIDProps(props)
-  ) {
-    const productIds = [props.productIds ?? []].sort();
+  if (isProductIDProps(props)) {
+    const productIds = sanitizeNumericIds(props.productIds).sort();
     params.append("productids", productIds.join(","));
   }
 
