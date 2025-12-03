@@ -9,9 +9,6 @@ export const proxySetCookie = (
   from: Headers,
   to: Headers,
   toDomain?: URL | string,
-  options?: {
-    shouldClearCartCookie?: boolean;
-  },
 ) => {
   const newDomain = toDomain && new URL(toDomain);
 
@@ -22,22 +19,8 @@ export const proxySetCookie = (
         domain: newDomain.hostname,
       }
       : cookie;
-      
-    if(cookie.name === "checkout.vtex.com" && options?.shouldClearCartCookie) {
-     
-      setCookie(to, {
-        name: "checkout.vtex.com",
-        value: "",
-        expires: new Date(0),
-        maxAge: 0,
-        path: "/",
-        secure: true,
-        httpOnly: true,
-        domain: newDomain ? newDomain?.hostname : "",
-      });
-    } else {
-      setCookie(to, newCookie);
-    }
+
+    setCookie(to, newCookie);
   }
 };
 

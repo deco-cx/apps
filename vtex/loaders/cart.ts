@@ -25,15 +25,15 @@ const safeParseJwt = (cookie: string) => {
   }
 };
 
-const orderFormIdsToClear = Deno.env.get("ORDER_FORM_IDS_TO_CLEAR")?.split(",");
-
 const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
   const email = cart?.clientProfileData?.email;
   const cookies = getCookies(req.headers);
 
   const userFromCookie = cookies[`VtexIdclientAutCookie_${ctx.account}`];
 
-  const [jwtPayload, _error] = userFromCookie ? safeParseJwt(userFromCookie) : [null, null];
+  const [jwtPayload, _error] = userFromCookie
+    ? safeParseJwt(userFromCookie)
+    : [null, null];
 
   const emailFromCookie = jwtPayload?.sub;
   const userIdFromCookie = jwtPayload?.userId;
@@ -48,7 +48,8 @@ const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
   ) {
     const headersDenyList = new Set(["cookie", "cache-control"]);
 
-    const hasTwoCookies = req.headers.get("cookie")?.split("checkout.vtex.com")?.length === 3;
+    const hasTwoCookies =
+      req.headers.get("cookie")?.split("checkout.vtex.com")?.length === 3;
 
     logger.warn(`Cookie cart mismatch`, {
       hasTwoCookies,
@@ -66,17 +67,6 @@ const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
       ),
     });
   }
-
-  if (orderFormIdFromRequest && orderFormIdsToClear?.includes(orderFormIdFromRequest)) {
-    logger.warn(`Clearing cart cookie `, {
-      orderFormIdFromRequest,
-      EmailFromCookie: emailFromCookie,
-      EmailFromOrderForm: email,
-    })
-    return { shouldClearCartCookie: true };
-  }
-
-  return { shouldClearCartCookie: false };
 };
 
 export const cache = "no-store";
@@ -113,11 +103,9 @@ const loader = async (
   const cart = await response.json() as OrderForm;
 
   // Temporary logging to check for cart mismatch
-  const { shouldClearCartCookie } = logMismatchedCart(cart, req, ctx);
+  logMismatchedCart(cart, req, ctx);
 
-  proxySetCookie(response.headers, ctx.response.headers, req.url, {
-    shouldClearCartCookie,
-  });
+  proxySetCookie(response.headers, ctx.response.headers, req.url);
 
   if (!segment?.payload) {
     return forceHttpsOnAssets(cart);
