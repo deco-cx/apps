@@ -151,9 +151,7 @@ const fromProps = ({ props }: Props) => {
   if (isProductIDProps(props)) {
     const productIds = sanitizeNumericIds(props.productIds);
 
-    productIds.forEach((productId) =>
-      params.fq.push(`productId:${productId}`)
-    );
+    productIds.forEach((productId) => params.fq.push(`productId:${productId}`));
     params._from = 0;
     params._to = Math.max(productIds.length - 1, 0);
 
