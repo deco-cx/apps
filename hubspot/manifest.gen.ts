@@ -40,6 +40,7 @@ import * as $$$$$$$$$34 from "./actions/oauth/refreshToken.ts";
 import * as $$$$$$$$$35 from "./actions/settings/createUser.ts";
 import * as $$$$$$$$$36 from "./actions/webhooks/createWebhook.ts";
 import * as $$$$$$$$$37 from "./actions/webhooks/deleteWebhook.ts";
+import * as $$$$$$$$$38 from "./actions/crm/updateTicket.ts";
 import * as $$$0 from "./loaders/automation/getWorkflows.ts";
 import * as $$$1 from "./loaders/cms/getPages.ts";
 import * as $$$2 from "./loaders/conversations/getChannelAccounts.ts";
@@ -193,6 +194,7 @@ const manifest = {
     "hubspot/actions/crm/updateContact.ts": $$$$$$$$$27,
     "hubspot/actions/crm/updateCustomObject.ts": $$$$$$$$$28,
     "hubspot/actions/crm/updateDeal.ts": $$$$$$$$$29,
+    "hubspot/actions/crm/updateTicket.ts": $$$$$$$$$38,
     "hubspot/actions/events/sendCustomEvent.ts": $$$$$$$$$30,
     "hubspot/actions/files/uploadFile.ts": $$$$$$$$$31,
     "hubspot/actions/marketing/sendTransactionalEmail.ts": $$$$$$$$$32,
