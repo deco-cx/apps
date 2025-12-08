@@ -17,6 +17,11 @@ export interface Props {
    * @description Used to sync user data with linx impulse
    */
   user?: Person | null;
+  /**
+   * @title Force Source
+   * @description Force the source of the request
+   */
+  forceSource?: "desktop" | "mobile";
 
   /**
    * @ignore
@@ -34,7 +39,7 @@ const loaders = async (
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
   const { api, apiKey, origin, cdn } = ctx;
-  const { query, count = 20, user, userId: _userId } = props;
+  const { query, count = 20, user, userId: _userId, forceSource } = props;
   const userId = _userId ?? user?.["@id"];
 
   if (!query) return null;
@@ -47,7 +52,7 @@ const loaders = async (
     resultsProducts: count,
     resultsQueries: count,
     salesChannel: ctx.salesChannel,
-    source: getSource(ctx),
+    source: forceSource ?? getSource(ctx),
     productFormat: "complete",
     userId,
   })

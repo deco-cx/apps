@@ -34,7 +34,7 @@ export class HubSpotClient {
     const url = new URL(endpoint, api.baseUrl);
     if (searchParams) {
       Object.entries(searchParams).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
+        if (value !== undefined && value !== null && value !== "") {
           url.searchParams.set(key, String(value));
         }
       });

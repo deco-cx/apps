@@ -6,9 +6,10 @@ import * as $$$$$$$$$0 from "./actions/docs/create.ts";
 import * as $$$$$$$$$1 from "./actions/files/copy.ts";
 import * as $$$$$$$$$2 from "./actions/files/create.ts";
 import * as $$$$$$$$$3 from "./actions/files/delete.ts";
-import * as $$$$$$$$$4 from "./actions/files/update.ts";
-import * as $$$$$$$$$5 from "./actions/oauth/callback.ts";
-import * as $$$$$$$$$6 from "./actions/slides/create.ts";
+import * as $$$$$$$$$4 from "./actions/files/download.ts";
+import * as $$$$$$$$$5 from "./actions/files/update.ts";
+import * as $$$$$$$$$6 from "./actions/oauth/callback.ts";
+import * as $$$$$$$$$7 from "./actions/slides/create.ts";
 import * as $$$0 from "./loaders/docs/get.ts";
 import * as $$$1 from "./loaders/docs/list.ts";
 import * as $$$2 from "./loaders/files/get.ts";
@@ -38,9 +39,10 @@ const manifest = {
     "google-drive/actions/files/copy.ts": $$$$$$$$$1,
     "google-drive/actions/files/create.ts": $$$$$$$$$2,
     "google-drive/actions/files/delete.ts": $$$$$$$$$3,
-    "google-drive/actions/files/update.ts": $$$$$$$$$4,
-    "google-drive/actions/oauth/callback.ts": $$$$$$$$$5,
-    "google-drive/actions/slides/create.ts": $$$$$$$$$6,
+    "google-drive/actions/files/download.ts": $$$$$$$$$4,
+    "google-drive/actions/files/update.ts": $$$$$$$$$5,
+    "google-drive/actions/oauth/callback.ts": $$$$$$$$$6,
+    "google-drive/actions/slides/create.ts": $$$$$$$$$7,
   },
   "name": "google-drive",
   "baseUrl": import.meta.url,

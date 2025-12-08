@@ -456,16 +456,18 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     ]),
   ].sort();
   const segment = getSegmentFromBag(ctx)?.token ?? "";
+  const sort = (url.searchParams.get("O") as LegacySort) ??
+    IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
+    url.searchParams.get("sort") ??
+    props.sort ?? "";
+  const isSortValid = sortOptions.some((option) => option.value === sort);
   const params = new URLSearchParams([
     ["term", props.term ?? url.pathname ?? ""],
     ["count", (props.count || url.searchParams.get("count") || 12).toString()],
     ["page", (props.page ?? url.searchParams.get("page") ?? 1).toString()],
     [
       "sort",
-      (url.searchParams.get("O") as LegacySort) ??
-        IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
-        url.searchParams.get("sort") ??
-        props.sort ?? "",
+      isSortValid ? sort : sortOptions[0].value,
     ],
     ["filters", props.filters ?? ""],
     ["fq", fq.join(",") ?? ""],

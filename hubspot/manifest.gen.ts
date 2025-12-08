@@ -32,14 +32,15 @@ import * as $$$$$$$$$26 from "./actions/crm/deleteContact.ts";
 import * as $$$$$$$$$27 from "./actions/crm/updateContact.ts";
 import * as $$$$$$$$$28 from "./actions/crm/updateCustomObject.ts";
 import * as $$$$$$$$$29 from "./actions/crm/updateDeal.ts";
-import * as $$$$$$$$$30 from "./actions/events/sendCustomEvent.ts";
-import * as $$$$$$$$$31 from "./actions/files/uploadFile.ts";
-import * as $$$$$$$$$32 from "./actions/marketing/sendTransactionalEmail.ts";
-import * as $$$$$$$$$33 from "./actions/marketing/updateCommunicationPreferences.ts";
-import * as $$$$$$$$$34 from "./actions/oauth/refreshToken.ts";
-import * as $$$$$$$$$35 from "./actions/settings/createUser.ts";
-import * as $$$$$$$$$36 from "./actions/webhooks/createWebhook.ts";
-import * as $$$$$$$$$37 from "./actions/webhooks/deleteWebhook.ts";
+import * as $$$$$$$$$30 from "./actions/crm/updateTicket.ts";
+import * as $$$$$$$$$31 from "./actions/events/sendCustomEvent.ts";
+import * as $$$$$$$$$32 from "./actions/files/uploadFile.ts";
+import * as $$$$$$$$$33 from "./actions/marketing/sendTransactionalEmail.ts";
+import * as $$$$$$$$$34 from "./actions/marketing/updateCommunicationPreferences.ts";
+import * as $$$$$$$$$35 from "./actions/oauth/refreshToken.ts";
+import * as $$$$$$$$$36 from "./actions/settings/createUser.ts";
+import * as $$$$$$$$$37 from "./actions/webhooks/createWebhook.ts";
+import * as $$$$$$$$$38 from "./actions/webhooks/deleteWebhook.ts";
 import * as $$$0 from "./loaders/automation/getWorkflows.ts";
 import * as $$$1 from "./loaders/cms/getPages.ts";
 import * as $$$2 from "./loaders/conversations/getChannelAccounts.ts";
@@ -193,14 +194,15 @@ const manifest = {
     "hubspot/actions/crm/updateContact.ts": $$$$$$$$$27,
     "hubspot/actions/crm/updateCustomObject.ts": $$$$$$$$$28,
     "hubspot/actions/crm/updateDeal.ts": $$$$$$$$$29,
-    "hubspot/actions/events/sendCustomEvent.ts": $$$$$$$$$30,
-    "hubspot/actions/files/uploadFile.ts": $$$$$$$$$31,
-    "hubspot/actions/marketing/sendTransactionalEmail.ts": $$$$$$$$$32,
-    "hubspot/actions/marketing/updateCommunicationPreferences.ts": $$$$$$$$$33,
-    "hubspot/actions/oauth/refreshToken.ts": $$$$$$$$$34,
-    "hubspot/actions/settings/createUser.ts": $$$$$$$$$35,
-    "hubspot/actions/webhooks/createWebhook.ts": $$$$$$$$$36,
-    "hubspot/actions/webhooks/deleteWebhook.ts": $$$$$$$$$37,
+    "hubspot/actions/crm/updateTicket.ts": $$$$$$$$$30,
+    "hubspot/actions/events/sendCustomEvent.ts": $$$$$$$$$31,
+    "hubspot/actions/files/uploadFile.ts": $$$$$$$$$32,
+    "hubspot/actions/marketing/sendTransactionalEmail.ts": $$$$$$$$$33,
+    "hubspot/actions/marketing/updateCommunicationPreferences.ts": $$$$$$$$$34,
+    "hubspot/actions/oauth/refreshToken.ts": $$$$$$$$$35,
+    "hubspot/actions/settings/createUser.ts": $$$$$$$$$36,
+    "hubspot/actions/webhooks/createWebhook.ts": $$$$$$$$$37,
+    "hubspot/actions/webhooks/deleteWebhook.ts": $$$$$$$$$38,
   },
   "name": "hubspot",
   "baseUrl": import.meta.url,

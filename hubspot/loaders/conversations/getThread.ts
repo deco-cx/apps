@@ -7,6 +7,16 @@ export interface Props {
    * @description The ID of the conversation thread to retrieve
    */
   threadId: string;
+  /**
+   * @title Archived
+   * @description Whether to return archived threads
+   */
+  archived?: boolean;
+  /**
+   * @title Associations
+   * @description Object types to retrieve associated IDs for
+   */
+  association?: "TICKET";
 }
 
 export interface ThreadAssociations {
@@ -118,12 +128,16 @@ export default async function getThread(
   _req: Request,
   ctx: AppContext,
 ): Promise<Thread> {
-  const { threadId } = props;
+  const { threadId, association, archived } = props;
 
   const client = new HubSpotClient(ctx);
 
   const response = await client.get<Thread>(
     `/conversations/v3/conversations/threads/${threadId}`,
+    {
+      association,
+      archived,
+    },
   );
 
   return response;

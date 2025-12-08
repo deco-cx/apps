@@ -82,4 +82,11 @@ export interface Client {
       parents?: string[];
     };
   };
+  "GET /files/:fileId/download": {
+    response: ArrayBuffer;
+    searchParams: {
+      alt?: "media";
+      fields?: string;
+    };
+  };
 }

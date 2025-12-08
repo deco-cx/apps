@@ -12,6 +12,11 @@ interface Props {
    */
   count?: number;
   categoryId?: string;
+  /**
+   * @title Force Source
+   * @description Force the source of the request
+   */
+  forceSource?: "desktop" | "mobile";
 }
 
 /**
@@ -24,7 +29,7 @@ const loaders = async (
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
   const { api, apiKey, origin, cdn } = ctx;
-  const { query = "", count = 20, categoryId } = props;
+  const { query = "", count = 20, categoryId, forceSource } = props;
 
   const search = await api["GET /engage/search/v3/autocompletes/products"]({
     terms: query,
@@ -34,7 +39,7 @@ const loaders = async (
     origin,
     deviceId: getDeviceIdFromBag(ctx),
     salesChannel: ctx.salesChannel,
-    source: getSource(ctx),
+    source: forceSource ?? getSource(ctx),
     productFormat: "complete",
   })
     .then((res) => res.json())
