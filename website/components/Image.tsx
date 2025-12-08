@@ -8,8 +8,8 @@ export const PATH: `/live/invoke/${keyof Manifest["loaders"]}` =
 const ASSET_URLS_TO_REPLACE = [
   "https://assets.decocache.com/",
   "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/",
-  "https://data.decoassets.com/"
-]
+  "https://data.decoassets.com/",
+];
 
 export type SetEarlyHint = (hint: string) => void;
 export type Props =
@@ -147,7 +147,10 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   height && params.set("height", `${height}`);
 
   if (isAzionAssetsEnabled()) {
-    const originalSrc = ASSET_URLS_TO_REPLACE.reduce((acc, url) => acc.replace(url, ""), opts.originalSrc);
+    const originalSrc = ASSET_URLS_TO_REPLACE.reduce(
+      (acc, url) => acc.replace(url, ""),
+      opts.originalSrc,
+    );
     const imageSource = originalSrc.split("?")[0];
     // src is being passed separately to avoid URL encoding issues
     return `https://deco-assets.decoazn.com/image?${params}&src=${imageSource}`;
