@@ -1,4 +1,4 @@
-import { getCookies } from "@std/http";
+import { getCookies } from "std/http/cookie.ts";
 import { AppContext } from "../../mod.ts";
 import {
   CHECKOUT_DATA_ACCESS_COOKIE,
