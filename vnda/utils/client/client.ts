@@ -15,7 +15,7 @@ export interface API {
   /** @docs https://developers.vnda.com.br/reference/get-api-v2-products-id */
   "GET /api/v2/products/:id": {
     response: ProductGroup;
-    searchParams: { include_images: boolean };
+    searchParams: { include_images: boolean; include_inventory_place: boolean };
   };
 
   /** @docs https://developers.vnda.com.br/reference/get-api-v2-products-product_id-price */

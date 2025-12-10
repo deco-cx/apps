@@ -16,6 +16,7 @@ import {
   ProductInstallment,
   ProductSearch,
   ProductVariant,
+  ProductVariantInventory,
   VariantProductSearch,
 } from "./openapi/vnda.openapi.gen.ts";
 import { getSegmentFromCookie, parse } from "./segment.ts";
@@ -246,6 +247,19 @@ const toPropertyValueCategoryTags = (
   });
 };
 
+const toPropertyValueInventory = (inventories?: ProductVariantInventory[]) => {
+  if (!inventories) return [];
+  return inventories.map((inventory) => {
+    return {
+      "@type": "PropertyValue",
+      name: inventory.name ?? inventory.place_name,
+      value: inventory.quantity.toString(),
+      description: inventory.slug,
+      valueReference: "INVENTORY",
+    } as PropertyValue;
+  });
+};
+
 // deno-lint-ignore no-explicit-any
 const isProductVariant = (p: any): p is VariantProductSearch =>
   typeof p.id === "number";
@@ -298,6 +312,7 @@ export const toProduct = (
 
   const productID = `${variant.sku}`;
   const productGroupID = `${product.id}`;
+  const inventories = variant.inventories as ProductVariantInventory[];
 
   const myTags = "tags" in product ? product.tags : [];
   const myCategoryTags = "category_tags" in product
@@ -315,6 +330,7 @@ export const toProduct = (
       ...toPropertyValue(variant),
       ...toPropertyValueTags(myTags),
       ...toPropertyValueCategoryTags(myCategoryTags),
+      ...toPropertyValueInventory(inventories),
     ],
     inProductGroupWithID: productGroupID,
     gtin: product.reference,
