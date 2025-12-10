@@ -125,7 +125,7 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     if (originalSrc.includes("fbitsstatic.net/img/")) {
       return optimizeWake(opts);
     }
-    
+
     if (originalSrc.startsWith("https://cdn.vnda.")) {
       return optmizeVNDA(opts);
     }
