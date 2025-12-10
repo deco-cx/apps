@@ -31,30 +31,30 @@ const logMismatchedCart = (cart: OrderForm, req: Request, ctx: AppContext) => {
 
   const userFromCookie = cookies[`VtexIdclientAutCookie_${ctx.account}`];
 
-  if (!userFromCookie) {
-    return;
-  }
-
-  const [jwtPayload, error] = safeParseJwt(userFromCookie);
-
-  if (error) {
-    console.error("Error parsing JWT", error);
-    return;
-  }
+  const [jwtPayload, _error] = userFromCookie
+    ? safeParseJwt(userFromCookie)
+    : [null, null];
 
   const emailFromCookie = jwtPayload?.sub;
   const userIdFromCookie = jwtPayload?.userId;
 
+  const orderFormIdFromRequest = cookies["checkout.vtex.com"]?.split("=").at(1);
+
   if (
+    userFromCookie &&
     typeof emailFromCookie === "string" &&
     typeof email === "string" &&
     emailFromCookie !== email
   ) {
     const headersDenyList = new Set(["cookie", "cache-control"]);
 
+    const hasTwoCookies =
+      req.headers.get("cookie")?.split("checkout.vtex.com")?.length === 3;
+
     logger.warn(`Cookie cart mismatch`, {
+      hasTwoCookies,
       OrderFormId: cart?.orderFormId,
-      OrderFormIdFromRequest: cookies["checkout.vtex.com"]?.split("=").at(1),
+      OrderFormIdFromRequest: orderFormIdFromRequest,
       EmailFromCookie: emailFromCookie,
       EmailFromOrderForm: email,
       UserIdFromCookie: userIdFromCookie,
