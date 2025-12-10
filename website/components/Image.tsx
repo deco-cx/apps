@@ -104,6 +104,16 @@ const optimizeVTEX = (opts: OptimizationOptions) => {
   return src.href;
 };
 
+const optimizeWake = (opts: OptimizationOptions) => {
+  const { originalSrc, width, height } = opts;
+
+  const url = new URL(originalSrc);
+  url.searchParams.set("w", `${width}`);
+  url.searchParams.set("h", `${height}`);
+
+  return url.href;
+};
+
 export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   const { originalSrc, width, height, fit } = opts;
 
@@ -112,6 +122,10 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   }
 
   if (!isImageOptmizationEnabled()) {
+    if (originalSrc.includes("fbitsstatic.net/img/")) {
+      return optimizeWake(opts);
+    }
+
     if (originalSrc.startsWith("https://cdn.vnda.")) {
       return optmizeVNDA(opts);
     }
