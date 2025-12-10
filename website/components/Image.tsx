@@ -222,12 +222,6 @@ export const getEarlyHintFromSrcProps = (srcProps: {
 const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
   const { preload, loading = "lazy" } = props;
 
-  if (!props.height) {
-    console.warn(
-      `Missing height. This image will NOT be optimized: ${props.src}`,
-    );
-  }
-
   const shouldSetEarlyHint = !!props.setEarlyHint && preload;
   const srcSet = props.srcSet ??
     getSrcSet(
