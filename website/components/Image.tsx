@@ -46,10 +46,7 @@ const isAzionAssetsEnabled = () =>
   IS_BROWSER
     // deno-lint-ignore no-explicit-any
     ? (globalThis as any).DECO?.featureFlags?.azionAssets
-    : Deno.env.get("ENABLE_AZION_ASSETS") !== "false";
-
-const canShowWarning = () =>
-  IS_BROWSER ? false : !Deno.env.get("DENO_DEPLOYMENT_ID");
+    : Deno.env.get("ENABLE_AZION_ASSETS") !== "false"; 
 
 interface OptimizationOptions {
   originalSrc: string;
@@ -104,6 +101,16 @@ const optimizeVTEX = (opts: OptimizationOptions) => {
   return src.href;
 };
 
+const optimizeWake = (opts: OptimizationOptions) => {
+  const { originalSrc, width, height } = opts;
+
+  const url = new URL(originalSrc);
+  url.searchParams.set("w", `${width}`);
+  url.searchParams.set("h", `${height}`);
+
+  return url.href;
+}
+
 export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   const { originalSrc, width, height, fit } = opts;
 
@@ -111,33 +118,28 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     return originalSrc;
   }
 
+  if(originalSrc.includes("fbitsstatic.net/img/")) {
+    return optimizeWake(opts);
+  }
+
+  if (originalSrc.startsWith("https://cdn.vnda.")) {
+    return optmizeVNDA(opts);
+  }
+
+  if (originalSrc.startsWith("https://cdn.shopify.com")) {
+    return optmizeShopify(opts);
+  }
+
+  if (
+    /(vteximg.com.br|vtexassets.com|myvtex.com)\/arquivos\/ids\/\d+/.test(
+      originalSrc,
+    )
+  ) {
+    return optimizeVTEX(opts);
+  }
+
   if (!isImageOptmizationEnabled()) {
-    if (originalSrc.startsWith("https://cdn.vnda.")) {
-      return optmizeVNDA(opts);
-    }
-
-    if (originalSrc.startsWith("https://cdn.shopify.com")) {
-      return optmizeShopify(opts);
-    }
-
-    if (
-      /(vteximg.com.br|vtexassets.com|myvtex.com)\/arquivos\/ids\/\d+/.test(
-        originalSrc,
-      )
-    ) {
-      return optimizeVTEX(opts);
-    }
-
-    if (
-      canShowWarning() &&
-      !originalSrc.startsWith(
-        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage",
-      )
-    ) {
-      console.warn(
-        `The following image ${originalSrc} requires automatic image optimization, but it's currently disabled. This may incur in additional costs. Please contact deco.cx for more information.`,
-      );
-    }
+    return originalSrc;
   }
 
   const params = new URLSearchParams();
