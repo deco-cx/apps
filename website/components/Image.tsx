@@ -46,7 +46,7 @@ const isAzionAssetsEnabled = () =>
   IS_BROWSER
     // deno-lint-ignore no-explicit-any
     ? (globalThis as any).DECO?.featureFlags?.azionAssets
-    : Deno.env.get("ENABLE_AZION_ASSETS") !== "false"; 
+    : Deno.env.get("ENABLE_AZION_ASSETS") !== "false";
 
 interface OptimizationOptions {
   originalSrc: string;
@@ -109,7 +109,7 @@ const optimizeWake = (opts: OptimizationOptions) => {
   url.searchParams.set("h", `${height}`);
 
   return url.href;
-}
+};
 
 export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   const { originalSrc, width, height, fit } = opts;
@@ -118,7 +118,7 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     return originalSrc;
   }
 
-  if(originalSrc.includes("fbitsstatic.net/img/")) {
+  if (originalSrc.includes("fbitsstatic.net/img/")) {
     return optimizeWake(opts);
   }
 
