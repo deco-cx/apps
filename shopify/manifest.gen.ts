@@ -2,45 +2,59 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/cart/addItems.ts";
-import * as $$$$$$$$$1 from "./actions/cart/updateCoupons.ts";
-import * as $$$$$$$$$2 from "./actions/cart/updateItems.ts";
-import * as $$$$$$$$$3 from "./actions/order/draftOrderCalculate.ts";
-import * as $$$$$$$$$4 from "./actions/user/signIn.ts";
-import * as $$$$$$$$$5 from "./actions/user/signUp.ts";
+import * as $$$$$$$$$0 from "./actions/address/createAddress.ts";
+import * as $$$$$$$$$1 from "./actions/address/deleteAddress.ts";
+import * as $$$$$$$$$2 from "./actions/address/setDefaultAddress.ts";
+import * as $$$$$$$$$3 from "./actions/address/updateAddress.ts";
+import * as $$$$$$$$$4 from "./actions/cart/addItems.ts";
+import * as $$$$$$$$$5 from "./actions/cart/updateCoupons.ts";
+import * as $$$$$$$$$6 from "./actions/cart/updateItems.ts";
+import * as $$$$$$$$$7 from "./actions/order/draftOrderCalculate.ts";
+import * as $$$$$$$$$8 from "./actions/user/sendPasswordResetEmail.ts";
+import * as $$$$$$$$$9 from "./actions/user/signIn.ts";
+import * as $$$$$$$$$10 from "./actions/user/signUp.ts";
+import * as $$$$$$$$$11 from "./actions/user/updateUser.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$4 from "./loaders/cart.ts";
 import * as $$$5 from "./loaders/config.ts";
+import * as $$$6 from "./loaders/orders/list.ts";
 import * as $$$0 from "./loaders/ProductDetailsPage.ts";
 import * as $$$1 from "./loaders/ProductList.ts";
 import * as $$$2 from "./loaders/ProductListingPage.ts";
-import * as $$$6 from "./loaders/proxy.ts";
+import * as $$$7 from "./loaders/proxy.ts";
 import * as $$$3 from "./loaders/RelatedProducts.ts";
-import * as $$$7 from "./loaders/shop.ts";
-import * as $$$8 from "./loaders/user.ts";
+import * as $$$8 from "./loaders/shop.ts";
+import * as $$$9 from "./loaders/user.ts";
 
 const manifest = {
   "loaders": {
     "shopify/loaders/cart.ts": $$$4,
     "shopify/loaders/config.ts": $$$5,
+    "shopify/loaders/orders/list.ts": $$$6,
     "shopify/loaders/ProductDetailsPage.ts": $$$0,
     "shopify/loaders/ProductList.ts": $$$1,
     "shopify/loaders/ProductListingPage.ts": $$$2,
-    "shopify/loaders/proxy.ts": $$$6,
+    "shopify/loaders/proxy.ts": $$$7,
     "shopify/loaders/RelatedProducts.ts": $$$3,
-    "shopify/loaders/shop.ts": $$$7,
-    "shopify/loaders/user.ts": $$$8,
+    "shopify/loaders/shop.ts": $$$8,
+    "shopify/loaders/user.ts": $$$9,
   },
   "handlers": {
     "shopify/handlers/sitemap.ts": $$$$0,
   },
   "actions": {
-    "shopify/actions/cart/addItems.ts": $$$$$$$$$0,
-    "shopify/actions/cart/updateCoupons.ts": $$$$$$$$$1,
-    "shopify/actions/cart/updateItems.ts": $$$$$$$$$2,
-    "shopify/actions/order/draftOrderCalculate.ts": $$$$$$$$$3,
-    "shopify/actions/user/signIn.ts": $$$$$$$$$4,
-    "shopify/actions/user/signUp.ts": $$$$$$$$$5,
+    "shopify/actions/address/createAddress.ts": $$$$$$$$$0,
+    "shopify/actions/address/deleteAddress.ts": $$$$$$$$$1,
+    "shopify/actions/address/setDefaultAddress.ts": $$$$$$$$$2,
+    "shopify/actions/address/updateAddress.ts": $$$$$$$$$3,
+    "shopify/actions/cart/addItems.ts": $$$$$$$$$4,
+    "shopify/actions/cart/updateCoupons.ts": $$$$$$$$$5,
+    "shopify/actions/cart/updateItems.ts": $$$$$$$$$6,
+    "shopify/actions/order/draftOrderCalculate.ts": $$$$$$$$$7,
+    "shopify/actions/user/sendPasswordResetEmail.ts": $$$$$$$$$8,
+    "shopify/actions/user/signIn.ts": $$$$$$$$$9,
+    "shopify/actions/user/signUp.ts": $$$$$$$$$10,
+    "shopify/actions/user/updateUser.ts": $$$$$$$$$11,
   },
   "name": "shopify",
   "baseUrl": import.meta.url,
