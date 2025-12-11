@@ -289,6 +289,9 @@ export interface VTEXCommerceStable {
       };
     };
   "POST /api/dataentities/:acronym/documents": {
+    searchParams: {
+      _schema?: string;
+    };
     response: CreateNewDocument;
     body: Record<string, unknown>;
   };

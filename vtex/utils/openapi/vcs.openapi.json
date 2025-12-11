@@ -972,6 +972,17 @@
             }
           },
           {
+            "name": "_schema",
+            "in": "query",
+            "description": "Name of the [schema](https://developers.vtex.com/docs/guides/master-data-schema-lifecycle) that the document complies with.  This field is required when using `_where` or `_fields` query parameters.",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "example": "schema"
+            }
+          },
+          {
             "name": "_where",
             "in": "query",
             "description": "Specification of filters.",
@@ -1557,6 +1568,17 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "_schema",
+            "in": "query",
+            "description": "Name of the [schema](https://developers.vtex.com/docs/guides/master-data-schema-lifecycle) that the document complies with.  This field is required when using `_where` or `_fields` query parameters.",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "example": "schema"
+            }
           }
         ],
         "requestBody": {
@@ -1614,6 +1636,9 @@
           },
           {
             "$ref": "#/components/parameters/acronym"
+          },
+          {
+            "$ref": "#/components/parameters/_schema"
           }
         ],
         "requestBody": {
@@ -1685,6 +1710,9 @@
           },
           {
             "$ref": "#/components/parameters/fields"
+          },
+          {
+            "$ref": "#/components/parameters/_schema"
           }
         ],
         "responses": {
@@ -1745,6 +1773,9 @@
           },
           {
             "$ref": "#/components/parameters/id"
+          },
+          {
+            "$ref": "#/components/parameters/_schema"
           }
         ],
         "requestBody": {
@@ -1810,6 +1841,9 @@
           },
           {
             "$ref": "#/components/parameters/id"
+          },
+          {
+            "$ref": "#/components/parameters/_schema"
           }
         ],
         "requestBody": {
@@ -1851,6 +1885,9 @@
           },
           {
             "$ref": "#/components/parameters/id"
+          },
+          {
+            "$ref": "#/components/parameters/_schema"
           }
         ],
         "responses": {
