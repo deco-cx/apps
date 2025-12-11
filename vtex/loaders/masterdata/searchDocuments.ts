@@ -17,6 +17,10 @@ interface Props {
    */
   where?: string;
   /**
+   * @description Schema of the data entity.
+   */
+  schema?: string;
+  /**
    * @description Inform a field name plus ASC to sort results by this field value in ascending order or DESC to sort by descending order.
    */
   sort?: string;
@@ -47,7 +51,7 @@ export default async function loader(
   ctx: AppContext,
 ): Promise<Document[]> {
   const { vcs } = ctx;
-  const { acronym, fields, where, sort, skip = 0, take = 10 } = props;
+  const { acronym, fields, where, sort, skip = 0, take = 10, schema } = props;
   const { cookie } = parseCookie(req.headers, ctx.account);
   const limits = resourceRange(skip, take);
 
@@ -56,6 +60,7 @@ export default async function loader(
     _fields: fields,
     _where: where,
     _sort: sort,
+    _schema: schema,
   }, {
     headers: {
       accept: "application/vnd.vtex.ds.v10+json",

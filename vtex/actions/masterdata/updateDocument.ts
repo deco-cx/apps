@@ -10,6 +10,7 @@ export interface Props {
   acronym: string;
   data: Record<string, unknown>;
   createIfNotExists?: boolean;
+  schema?: string;
 }
 
 /**
@@ -24,7 +25,7 @@ const action = async (
   ctx: AppContext,
 ): Promise<unknown | IdHrefDocumentID> => {
   const { vcs } = ctx;
-  const { id, data, acronym, createIfNotExists } = props;
+  const { id, data, acronym, createIfNotExists, schema } = props;
   const { cookie } = parseCookie(req.headers, ctx.account);
 
   const requestOptions = {
@@ -39,11 +40,11 @@ const action = async (
   const response =
     await (createIfNotExists
       ? vcs["PATCH /api/dataentities/:acronym/documents"](
-        { acronym },
+        schema ? { acronym, _schema: schema } : { acronym },
         requestOptions,
       )
       : vcs["PATCH /api/dataentities/:acronym/documents/:id"](
-        { acronym, id },
+        schema ? { acronym, id, _schema: schema } : { acronym, id },
         requestOptions,
       ));
 
