@@ -1,4 +1,4 @@
-import { Deferred, deferred } from "std/async/deferred.ts";
+import { type Deferred, deferred } from "../compat/runtime/async.ts";
 
 export const createPool = <T>(resources: T[]) => {
   const taken = new Set<number>();

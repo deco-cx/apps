@@ -1,6 +1,9 @@
 import { Head } from "$fresh/runtime.ts";
-import { DomInspectorActivators } from "https://deno.land/x/inspect_vscode@0.2.1/inspector.ts";
-import { DomInspector } from "https://deno.land/x/inspect_vscode@0.2.1/mod.ts";
+// DomInspector imports - use stub for non-Deno runtimes
+import {
+  DomInspector,
+  DomInspectorActivators,
+} from "@deco/deco";
 import { Page } from "../../commerce/types.ts";
 import { useScriptAsDataURI } from "@deco/deco/hooks";
 import { context, type Flag, type Site } from "@deco/deco";

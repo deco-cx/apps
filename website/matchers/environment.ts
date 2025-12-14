@@ -1,3 +1,5 @@
+import { env } from "../../compat/runtime/mod.ts";
+
 /**
  * @title {{{environment}}}
  */
@@ -11,7 +13,8 @@ export interface Props {
  * @icon code
  */
 const MatchEnvironment = ({ environment }: Props) => {
-  const deploymentId = Deno.env.get("DENO_DEPLOYMENT_ID") || "";
+  // Check both Deno and Bun deployment indicators
+  const deploymentId = env.get("DENO_DEPLOYMENT_ID") || env.get("DECO_DEPLOYMENT_ID") || "";
 
   return environment === "production"
     ? deploymentId !== ""

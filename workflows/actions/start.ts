@@ -1,4 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
+import { env } from "../../compat/runtime/mod.ts";
 import { start } from "../initializer.ts"; // side-effect initialize
 import { toExecution, WorkflowExecution, WorkflowMetadata } from "../types.ts";
 import { Workflow, WorkflowFn } from "@deco/deco/blocks";
@@ -92,7 +93,7 @@ export default async function startWorkflow<
   const { id, args, runtimeParameters } = props;
   const workflow = fromWorkflowProps(props);
   const context = Context.active();
-  const service = Deno.env.get("MY_DURABLE_URL") ??
+  const service = env.get("MY_DURABLE_URL") ??
     (context.isDeploy
       ? `wss://deco-sites-${context.site}-${context.deploymentId}.deno.dev`
       : "ws://localhost:8000");

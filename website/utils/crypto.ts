@@ -1,7 +1,24 @@
 /// <reference lib="deno.unstable" />
 
-import { crypto } from "std/crypto/mod.ts";
-import { decode as decodeHex, encode as encodeHex } from "std/encoding/hex.ts";
+// Cross-runtime crypto using Web Crypto API
+const crypto = globalThis.crypto;
+
+// Hex encode/decode utilities
+const encodeHex = (data: Uint8Array): Uint8Array => {
+  const hex = Array.from(data)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return new TextEncoder().encode(hex);
+};
+
+const decodeHex = (data: Uint8Array): Uint8Array => {
+  const hex = new TextDecoder().decode(data);
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+  }
+  return bytes;
+};
 
 const generateKey = async (): Promise<CryptoKey> => {
   return await crypto.subtle.generateKey(
@@ -44,15 +61,26 @@ export const fromSavedAESKey = async (
 };
 let key: null | Promise<AESKey> = null;
 
-let kv: Deno.Kv | null = null;
+// Runtime-agnostic KV and env access
+declare const Deno: {
+  Kv: unknown;
+  openKv: () => Promise<unknown>;
+  env: { has: (key: string) => boolean; get: (key: string) => string | undefined };
+  args: string[];
+};
+
+let kv: { get: <T>(key: string[]) => Promise<{ value: T | null }>; atomic: () => { set: (key: string[], value: unknown) => { check: (v: unknown) => { commit: () => Promise<{ ok: boolean }> } } } } | null = null;
 try {
-  kv = await Deno?.openKv().catch((_err) => null);
+  if (typeof Deno !== "undefined" && Deno.openKv) {
+    kv = await Deno?.openKv().catch((_err: unknown) => null) as typeof kv;
+  }
 } catch {
-  console.warn("please run with `--unstable` to enable deno kv support");
+  console.warn("Deno KV not available in this runtime");
 }
 const cryptoKey = ["deco", "secret_cryptokey"];
 
-export const getSavedAES = (kv: Deno.Kv) => {
+export const getSavedAES = (kv: typeof kv) => {
+  if (!kv) return Promise.resolve(null);
   return kv.get<SavedAESKey>(cryptoKey).then(({ value }) => {
     return value;
   });
@@ -61,7 +89,10 @@ export const getSavedAES = (kv: Deno.Kv) => {
 export const CRYPTO_KEY_ENV_VAR = "DECO_CRYPTO_KEY";
 
 export const hasLocalCryptoKey = () => {
-  return Deno.env.has(CRYPTO_KEY_ENV_VAR);
+  if (typeof Deno !== "undefined") {
+    return Deno.env.has(CRYPTO_KEY_ENV_VAR);
+  }
+  return typeof process !== "undefined" && !!process.env[CRYPTO_KEY_ENV_VAR];
 };
 
 export const generateAESKey = async (): Promise<SavedAESKey> => {
@@ -88,8 +119,11 @@ const getOrGenerateKey = (): Promise<AESKey> => {
     return key;
   }
   if (hasLocalCryptoKey()) {
+    const envValue = typeof Deno !== "undefined" 
+      ? Deno.env.get(CRYPTO_KEY_ENV_VAR)
+      : process.env[CRYPTO_KEY_ENV_VAR];
     const parsedAESKey: SavedAESKey = JSON.parse(
-      atob(Deno.env.get(CRYPTO_KEY_ENV_VAR)!),
+      atob(envValue!),
     );
     return fromSavedAESKey({
       key: new Uint8Array(Object.values(parsedAESKey.key)),
@@ -154,7 +188,7 @@ export const decryptFromHex = async (encrypted: string) => {
   return { decrypted: textDecode(decryptedBytes) };
 };
 
-if (import.meta.main) {
+if (typeof Deno !== "undefined" && (import.meta as { main?: boolean }).main) {
   const [arg] = Deno.args;
   if (!arg) {
     // Generate and print a new CRYPTO_KEY

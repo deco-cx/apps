@@ -1,4 +1,4 @@
-import * as colors from "std/fmt/colors.ts";
+import { colors, env } from "../../compat/runtime/mod.ts";
 import { once } from "../../typesense/utils/once.ts";
 import { decryptFromHex, hasLocalCryptoKey } from "../utils/crypto.ts";
 import { Context } from "@deco/deco";
@@ -36,8 +36,8 @@ const showWarningOnce = once(() => {
 });
 const getSecret = async (props: Props): Promise<string | null> => {
   const name = props?.name;
-  if (name && Deno.env.has(name)) {
-    return Promise.resolve(Deno.env.get(name)!);
+  if (name && env.has(name)) {
+    return Promise.resolve(env.get(name)!);
   }
   const encrypted = props?.encrypted;
   if (!encrypted) {

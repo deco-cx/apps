@@ -1,5 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
-import { Deferred, deferred } from "std/async/deferred.ts";
+import { deferred, type Deferred } from "../compat/runtime/async.ts";
+import { inspect } from "../compat/runtime/inspect.ts";
 
 /**
  * Deco labs: 🐁🐁🐁
@@ -143,7 +144,7 @@ if (IS_WORKER) {
         } catch (error) {
           self.postMessage({
             type: "invoke:reject",
-            payload: { id, reason: Deno.inspect(error) },
+            payload: { id, reason: inspect(error) },
           });
         }
 
@@ -160,7 +161,7 @@ if (IS_WORKER) {
         } catch (error) {
           self.postMessage({
             type: "setup:reject",
-            payload: Deno.inspect(error),
+            payload: inspect(error),
           });
         }
 

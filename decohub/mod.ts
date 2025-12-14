@@ -1,3 +1,4 @@
+import { env } from "../compat/runtime/mod.ts";
 import { Markdown } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { buildImportMap, ImportMap } from "@deco/deco/blocks";
@@ -15,7 +16,7 @@ export interface State {
   enableAdmin?: boolean;
   apps: DynamicApp[];
 }
-const DENY_DYNAMIC_IMPORT = Deno.env.get("DENY_DYNAMIC_IMPORT") === "true";
+const DENY_DYNAMIC_IMPORT = env.get("DENY_DYNAMIC_IMPORT") === "true";
 /**
  * @title Deco Hub
  * @description Unlock apps and integrations on deco.cx

@@ -1,1 +1,1 @@
-export * as weakcache from "npm:weak-lru-cache@1.0.0";
+export * as weakcache from "weak-lru-cache";

@@ -1,6 +1,23 @@
 import { join } from "std/path/mod.ts";
 import { Route } from "../flags/audience.ts";
 
+// Cross-runtime file reading
+const readTextFile = async (path: string): Promise<string> => {
+  if (typeof Deno !== "undefined") {
+    return (Deno as any).readTextFile(path);
+  }
+  const { readFile } = await import("node:fs/promises");
+  return readFile(path, "utf-8");
+};
+
+// Cross-runtime cwd
+const cwd = (): string => {
+  if (typeof Deno !== "undefined") {
+    return (Deno as any).cwd();
+  }
+  return process.cwd();
+};
+
 const REDIRECT_TYPE_ENUM = ["temporary", "permanent"];
 const CONCATENATE_PARAMS_VALUES = ["true", "false"];
 
@@ -42,8 +59,8 @@ const getRedirectFromFile = async (
     if (from.startsWith("http")) {
       redirectsRaw = await fetch(from).then((resp) => resp.text());
     } else {
-      redirectsRaw = await Deno.readTextFile(
-        join(Deno.cwd(), join(...from.split("/"))),
+      redirectsRaw = await readTextFile(
+        join(cwd(), join(...from.split("/"))),
       );
     }
   } catch (e) {

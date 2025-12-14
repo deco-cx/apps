@@ -2,6 +2,7 @@ import { Head } from "$fresh/runtime.ts";
 import { type AnalyticsEvent, type Deco } from "../../commerce/types.ts";
 import { useScriptAsDataURI } from "@deco/deco/hooks";
 import { DECO_SEGMENT, type Flag } from "@deco/deco";
+import { env } from "../../compat/runtime/mod.ts";
 type EventHandler = (event?: AnalyticsEvent) => void | Promise<void>;
 interface EventsAPI {
   dispatch: (event: unknown) => void;
@@ -31,8 +32,8 @@ declare global {
   }
 }
 const ENABLE_IMAGE_OPTIMIZATION =
-  Deno.env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
-const ENABLE_AZION_ASSETS = Deno.env.get("ENABLE_AZION_ASSETS") !== "false";
+  env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
+const ENABLE_AZION_ASSETS = env.get("ENABLE_AZION_ASSETS") !== "false";
 /**
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
