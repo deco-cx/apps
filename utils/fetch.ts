@@ -3,7 +3,7 @@ import {
   ExponentialBackoff,
   handleWhen,
   retry,
-} from "https://esm.sh/cockatiel@3.1.1?target=es2019";
+} from "cockatiel";
 import { HttpError } from "./http.ts";
 import { fetch } from "@deco/deco";
 // this error is thrown by deno deploy when the connection is closed by the server.

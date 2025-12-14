@@ -1,3 +1,5 @@
+import { env } from "../../compat/runtime/mod.ts";
+
 /**
  * @title Environment
  * @hideOption true
@@ -23,8 +25,8 @@ export interface Props {
 
 const getEnvironment = (props: Props): string | null => {
   const name = props?.name;
-  if (name && Deno.env.has(name)) {
-    return Deno.env.get(name)!;
+  if (name && env.has(name)) {
+    return env.get(name)!;
   }
   const value = props?.value;
   if (!value) {

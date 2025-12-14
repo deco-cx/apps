@@ -1,4 +1,4 @@
-import { parseMediaType } from "std/media_types/parse_media_type.ts";
+import { inspect, parseMediaType } from "../../../../../compat/runtime/mod.ts";
 import { HttpError } from "../../../../../utils/http.ts";
 import { createPool } from "../../../../../utils/pool.ts";
 import { createWorker } from "../../../../../utils/worker.ts";
@@ -59,7 +59,7 @@ const fetchImage = async (
   const response = await fetch(src, init);
 
   if (!response.ok) {
-    throw new HttpError(response.status, Deno.inspect(response));
+    throw new HttpError(response.status, inspect(response));
   }
 
   const data = await response.arrayBuffer();

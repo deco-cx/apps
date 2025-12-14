@@ -1,6 +1,7 @@
+import { env } from "../../../../../compat/runtime/mod.ts";
 import { createEngine } from "../remote/engine.ts";
 
-const ikid = Deno.env.get("DECO_IK_ID") ?? "decocx";
+const ikid = env.get("DECO_IK_ID") ?? "decocx";
 
 export const engine = createEngine({
   name: "deco",

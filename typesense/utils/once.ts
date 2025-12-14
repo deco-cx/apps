@@ -1,4 +1,4 @@
-import { deferred } from "std/async/deferred.ts";
+import { deferred } from "../../compat/runtime/async.ts";
 
 export const once = <T>(cb: () => Promise<T>) => {
   let promise = deferred<T>();

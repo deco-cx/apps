@@ -1,8 +1,9 @@
 import { type RequestInit } from "@deco/deco";
+import { env } from "../compat/runtime/mod.ts";
 import { fetchSafe } from "./fetch.ts";
 
 // Check if DEBUG_HTTP env var is set
-const DEBUG_HTTP = Deno.env.get("DEBUG_HTTP") === "true";
+const DEBUG_HTTP = env.get("DEBUG_HTTP") === "true";
 if (DEBUG_HTTP) {
   console.log("DEBUG_HTTP mode is:", DEBUG_HTTP ? "enabled" : "disabled");
 }

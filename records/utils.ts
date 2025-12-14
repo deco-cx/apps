@@ -1,7 +1,17 @@
+import { env } from "../compat/runtime/mod.ts";
 import { Secret } from "../website/loaders/secret.ts";
 import { brightGreen, brightRed } from "std/fmt/colors.ts";
 import { join } from "https://deno.land/std@0.204.0/path/join.ts";
 import { context } from "@deco/deco";
+
+// Cross-runtime cwd
+const cwd = (): string => {
+  if (typeof Deno !== "undefined") {
+    return (Deno as any).cwd();
+  }
+  return process.cwd();
+};
+
 export interface StorageConfig {
   /**
    * @title Url
@@ -13,13 +23,13 @@ export interface StorageConfig {
    */
   authToken: Secret;
 }
-export const getLocalDbFilename = () => join(Deno.cwd(), "sqlite.db");
+export const getLocalDbFilename = () => join(cwd(), "sqlite.db");
 export const getLocalSQLClientConfig = () => ({
   url: new URL(`file://${getLocalDbFilename()}`).href,
   authToken: "",
 });
 export const getSQLClientConfig = ({ authToken, url }: StorageConfig) => {
-  const useProdDb = Deno.env.get("USE_PRODUCTION_DB");
+  const useProdDb = env.get("USE_PRODUCTION_DB");
   const useLocalDB = useProdDb !== undefined && useProdDb !== "1" ||
     useProdDb === undefined && !context.isDeploy;
   if (useLocalDB) {

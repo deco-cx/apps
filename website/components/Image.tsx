@@ -2,6 +2,7 @@ import { Head, IS_BROWSER } from "$fresh/runtime.ts";
 import type { JSX } from "preact";
 import { forwardRef } from "preact/compat";
 import { Manifest } from "../manifest.gen.ts";
+import { env } from "../../compat/runtime/mod.ts";
 
 export const PATH: `/live/invoke/${keyof Manifest["loaders"]}` =
   "/live/invoke/website/loaders/image.ts";
@@ -40,16 +41,16 @@ const isImageOptmizationEnabled = () =>
   IS_BROWSER
     // deno-lint-ignore no-explicit-any
     ? (globalThis as any).DECO?.featureFlags?.enableImageOptimization
-    : Deno.env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
+    : env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
 
 const isAzionAssetsEnabled = () =>
   IS_BROWSER
     // deno-lint-ignore no-explicit-any
     ? (globalThis as any).DECO?.featureFlags?.azionAssets
-    : Deno.env.get("ENABLE_AZION_ASSETS") !== "false";
+    : env.get("ENABLE_AZION_ASSETS") !== "false";
 
 const canShowWarning = () =>
-  IS_BROWSER ? false : !Deno.env.get("DENO_DEPLOYMENT_ID");
+  IS_BROWSER ? false : !env.get("DENO_DEPLOYMENT_ID");
 
 interface OptimizationOptions {
   originalSrc: string;

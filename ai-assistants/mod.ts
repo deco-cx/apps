@@ -1,5 +1,6 @@
+import { env } from "../compat/runtime/mod.ts";
 import AWS from "npm:aws-sdk@2.1585.0";
-import { deferred } from "std/async/deferred.ts";
+import { deferred } from "../compat/runtime/async.ts";
 import openai, {
   Props as OpenAIProps,
   State as OpenAIState,
@@ -170,11 +171,11 @@ export default function App(state: Props): App<Manifest, State, [
         : Promise.resolve({} as Assistant),
       s3: new AWS.S3({
         region: state.assistantAwsProps?.assistantBucketRegion.get?.() ??
-          Deno.env.get("ASSISTANT_BUCKET_REGION"),
+          env.get("ASSISTANT_BUCKET_REGION"),
         accessKeyId: state.assistantAwsProps?.accessKeyId.get?.() ??
-          Deno.env.get("AWS_ACCESS_KEY_ID"),
+          env.get("AWS_ACCESS_KEY_ID"),
         secretAccessKey: state.assistantAwsProps?.secretAccessKey.get?.() ??
-          Deno.env.get("AWS_SECRET_ACCESS_KEY"),
+          env.get("AWS_SECRET_ACCESS_KEY"),
       }),
       assistantAwsProps: state.assistantAwsProps,
     },
