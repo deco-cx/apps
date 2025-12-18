@@ -40,6 +40,7 @@ async function loader(
       const result = await api["GET /api/v2/products/:id"]({
         id,
         include_images: "true",
+        include_inventory_place: "true",
       }, STALE);
       return result.json();
     } catch (error) {
