@@ -101,6 +101,20 @@ const optimizeVTEX = (opts: OptimizationOptions) => {
   return src.href;
 };
 
+const optimizeMagento = (opts: OptimizationOptions) => {
+  const { originalSrc, width, height } = opts;
+
+  const url = new URL(originalSrc);
+  url.searchParams.set("width", `${width}`);
+  url.searchParams.set("height", `${height}`);
+  url.searchParams.set("canvas", `${width}:${height}`);
+  url.searchParams.set("optimize", "low");
+  url.searchParams.set("fit", opts.fit === "cover" ? "" : "bounds");
+
+  return url.href;
+};
+
+
 export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   const { originalSrc, width, height, fit } = opts;
 
@@ -109,6 +123,10 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   }
 
   if (!isImageOptmizationEnabled()) {
+    if (originalSrc.includes("media/catalog/product")) {
+      return optimizeMagento(opts);
+    }
+    
     if (originalSrc.startsWith("https://cdn.vnda.")) {
       return optmizeVNDA(opts);
     }
