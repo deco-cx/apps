@@ -125,7 +125,7 @@ const optimizeMagento = (opts: OptimizationOptions) => {
   url.searchParams.set("fit", opts.fit === "cover" ? "" : "bounds");
 
   return url.href;
-}
+};
 
 export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   const { originalSrc, width, height, fit } = opts;
@@ -135,7 +135,6 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   }
 
   if (!isImageOptmizationEnabled()) {
-
     if (originalSrc.includes("media/catalog/product")) {
       return optimizeMagento(opts);
     }
