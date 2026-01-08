@@ -36,7 +36,7 @@ export default function productDetailsPage(
       ];
     }
 
-    const fullReview = await client.fullReview({
+    const fullReview = await ctx.invoke["verified-reviews"].loaders.fullReview({
       productId: productsToGetReviews,
       count: config?.count,
       offset: config?.offset,
@@ -52,3 +52,5 @@ export default function productDetailsPage(
     };
   };
 }
+
+export const cache = "no-cache";
