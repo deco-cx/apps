@@ -180,8 +180,8 @@ const filterPosts = (
   }
 
   return term
-      ? filterPostsByTerm(posts, term)
-      : posts;
+    ? filterPostsByTerm(posts, term)
+    : posts;
 };
 
 /**
