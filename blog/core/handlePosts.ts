@@ -179,9 +179,7 @@ const filterPosts = (
     return filterRelatedPosts(posts, slug);
   }
 
-  return term
-    ? filterPostsByTerm(posts, term)
-    : posts;
+  return term ? filterPostsByTerm(posts, term) : posts;
 };
 
 /**
