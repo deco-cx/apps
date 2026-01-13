@@ -16,7 +16,7 @@ import {
 } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { pageTypesFromUrl } from "../../utils/intelligentSearch.ts";
-import { withIsSimilarTo } from "../../utils/similars.ts";
+import { withIsSimilarToBatched } from "../../utils/similars.ts";
 import { slugify } from "../../utils/slugify.ts";
 import {
   filtersFromURL,
@@ -374,20 +374,20 @@ const loader = async (
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
   // it in here
-  const products = await Promise.all(
-    vtexProducts
-      .map((p) =>
-        toProduct(p, p.items.find(getFirstItemAvailable) || p.items[0], 0, {
-          baseUrl: baseUrl,
-          priceCurrency: segment?.payload?.currencyCode ?? "BRL",
-          includeOriginalAttributes: props.advancedConfigs
-            ?.includeOriginalAttributes,
-        })
-      )
-      .map((product) =>
-        props.similars ? withIsSimilarTo(req, ctx, product) : product
-      ),
+  const transformedProducts = vtexProducts.map((p) =>
+    toProduct(p, p.items.find(getFirstItemAvailable) || p.items[0], 0, {
+      baseUrl: baseUrl,
+      priceCurrency: segment?.payload?.currencyCode ?? "BRL",
+      includeOriginalAttributes: props.advancedConfigs
+        ?.includeOriginalAttributes,
+    })
   );
+
+  // Use batched version to reduce API calls when fetching similar products
+  // Instead of N calls with ~3 IDs each, this makes 1 batched call with all IDs
+  const products = props.similars
+    ? await withIsSimilarToBatched(req, ctx, transformedProducts)
+    : transformedProducts;
   const paramsToPersist = new URLSearchParams();
   searchArgs.query && paramsToPersist.set("q", searchArgs.query);
   searchArgs.sort && paramsToPersist.set("sort", searchArgs.sort);
