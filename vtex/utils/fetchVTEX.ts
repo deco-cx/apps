@@ -67,6 +67,7 @@ export const fetchSafe = (
   input: string | Request | URL,
   init?: DecoRequestInit,
 ) => {
+  console.log("fetchSafe", input);
   return _fetchSafe(getSanitizedInput(input), init);
 };
 
