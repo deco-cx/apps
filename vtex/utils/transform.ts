@@ -55,18 +55,18 @@ const isLegacySku = (sku: LegacySkuVTEX | SkuVTEX): sku is LegacySkuVTEX =>
   !!(sku as LegacySkuVTEX).Videos;
 
 const isLegacyProduct = (
-  product: ProductVTEX | LegacyProductVTEX,
+  product: ProductVTEX | LegacyProductVTEX
 ): product is LegacyProductVTEX => product.origin !== "intelligent-search";
 
 const getProductGroupURL = (
   origin: string,
-  { linkText }: { linkText: string },
+  { linkText }: { linkText: string }
 ) => new URL(`/${linkText}/p`, origin);
 
 const getProductURL = (
   origin: string,
   product: { linkText: string },
-  skuId?: string,
+  skuId?: string
 ) => {
   const canonicalUrl = getProductGroupURL(origin, product);
 
@@ -77,9 +77,8 @@ const getProductURL = (
   return canonicalUrl;
 };
 
-const nonEmptyArray = <T>(
-  array: T[] | null | undefined,
-) => (Array.isArray(array) && array.length > 0 ? array : null);
+const nonEmptyArray = <T>(array: T[] | null | undefined) =>
+  Array.isArray(array) && array.length > 0 ? array : null;
 
 interface ProductOptions {
   baseUrl: string;
@@ -94,15 +93,17 @@ interface ProductOptions {
 const findFirstAvailable = (items: Array<LegacySkuVTEX | SkuVTEX>) =>
   items?.find((item) =>
     Boolean(
-      item?.sellers?.find((s) => s.commertialOffer?.AvailableQuantity > 0),
+      item?.sellers?.find((s) => s.commertialOffer?.AvailableQuantity > 0)
     )
   );
 
 export const pickSku = <T extends ProductVTEX | LegacyProductVTEX>(
   product: T,
-  maybeSkuId?: string,
+  maybeSkuId?: string
 ): T["items"][number] => {
-  const skuId = maybeSkuId ?? findFirstAvailable(product.items)?.itemId ??
+  const skuId =
+    maybeSkuId ??
+    findFirstAvailable(product.items)?.itemId ??
     product.items[0]?.itemId;
   for (const item of product.items) {
     if (item.itemId === skuId) {
@@ -116,7 +117,7 @@ export const pickSku = <T extends ProductVTEX | LegacyProductVTEX>(
 const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
   sku: T["items"][number],
   kitItems: T[],
-  options: ProductOptions,
+  options: ProductOptions
 ) => {
   const productBySkuId = kitItems.reduce((map, product) => {
     product.items.forEach((item) => map.set(item.itemId, product));
@@ -153,14 +154,14 @@ export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
   product: T,
   sku: T["items"][number],
   kitItems: T[],
-  options: ProductOptions,
+  options: ProductOptions
 ): Omit<ProductDetailsPage, "seo"> => {
   const partialProduct = toProduct(product, sku, 0, options);
   // This is deprecated. Compose this loader at loaders > product > extension > detailsPage.ts
   const isAccessoryOrSparePartFor = toAccessoryOrSparePartFor(
     sku,
     kitItems,
-    options,
+    options
   );
 
   return {
@@ -196,9 +197,9 @@ const splitCategory = (firstCategory: string) =>
   firstCategory.split("/").filter(Boolean);
 
 const toAdditionalPropertyCategories = <
-  P extends LegacyProductVTEX | ProductVTEX,
+  P extends LegacyProductVTEX | ProductVTEX
 >(
-  product: P,
+  product: P
 ): Product["additionalProperty"] => {
   const categories = new Set<string>();
   const categoryIds = new Set<string>();
@@ -238,9 +239,9 @@ export const toAdditionalPropertyCategory = ({
 });
 
 const toAdditionalPropertyClusters = <
-  P extends LegacyProductVTEX | ProductVTEX,
+  P extends LegacyProductVTEX | ProductVTEX
 >(
-  product: P,
+  product: P
 ): Product["additionalProperty"] => {
   const mapEntriesToIdName = ([id, name]: [string, unknown]) => ({
     id,
@@ -256,16 +257,19 @@ const toAdditionalPropertyClusters = <
     : new Set(product.clusterHighlights.map(({ id }) => id));
 
   return allClusters.map((cluster) =>
-    toAdditionalPropertyCluster({
-      propertyID: cluster.id,
-      value: cluster.name || "",
-    }, highlightsSet)
+    toAdditionalPropertyCluster(
+      {
+        propertyID: cluster.id,
+        value: cluster.name || "",
+      },
+      highlightsSet
+    )
   );
 };
 
 export const toAdditionalPropertyCluster = (
   { propertyID, value }: { propertyID: string; value: string },
-  highlights?: Set<string>,
+  highlights?: Set<string>
 ): PropertyValue => ({
   "@type": "PropertyValue",
   name: "cluster",
@@ -275,7 +279,7 @@ export const toAdditionalPropertyCluster = (
 });
 
 const toAdditionalPropertyReferenceIds = (
-  referenceId: Array<{ Key: string; Value: string }>,
+  referenceId: Array<{ Key: string; Value: string }>
 ): Product["additionalProperty"] => {
   return referenceId.map(({ Key, Value }) =>
     toAdditionalPropertyReferenceId({ name: Key, value: Value })
@@ -312,7 +316,7 @@ const getImageKey = (src = "") => {
 
 export const aggregateOffers = (
   offers: Offer[],
-  priceCurrency?: string,
+  priceCurrency?: string
 ): AggregateOffer | undefined => {
   const sorted = offers.sort(bestOfferFirst);
 
@@ -335,7 +339,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
   product: P,
   sku: P["items"][number],
   level = 0, // prevent inifinte loop while self referencing the product
-  options: ProductOptions,
+  options: ProductOptions
 ): Product => {
   const { baseUrl, priceCurrency } = options;
   const {
@@ -359,7 +363,8 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
 
   const videos = isLegacySku(sku) ? sku.Videos : sku.videos;
   const nonEmptyVideos = nonEmptyArray(videos);
-  const imagesByKey = options.imagesByKey ??
+  const imagesByKey =
+    options.imagesByKey ??
     items
       .flatMap((i) => i.images)
       .reduce((map, img) => {
@@ -373,35 +378,35 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
   const originalAttributesAdditionalProperties =
     toOriginalAttributesAdditionalProperties(
       options.includeOriginalAttributes,
-      product,
+      product
     );
   const specificationsAdditionalProperty = isLegacySku(sku)
     ? toAdditionalPropertiesLegacy(sku)
     : toAdditionalProperties(sku);
-  const referenceIdAdditionalProperty = toAdditionalPropertyReferenceIds(
-    referenceId,
-  );
+  const referenceIdAdditionalProperty =
+    toAdditionalPropertyReferenceIds(referenceId);
   const images = nonEmptyArray(sku.images);
   const offers = (sku.sellers ?? []).map(
-    isLegacyProduct(product) ? toOfferLegacy : toOffer,
+    isLegacyProduct(product) ? toOfferLegacy : toOffer
   );
 
-  const isVariantOf = level < 1
-    ? ({
-      "@type": "ProductGroup",
-      productGroupID: productId,
-      hasVariant: items.map((sku) =>
-        toProduct(product, sku, 1, { ...options, imagesByKey })
-      ),
-      url: getProductGroupURL(baseUrl, product).href,
-      name: product.productName,
-      additionalProperty: [
-        ...groupAdditionalProperty,
-        ...originalAttributesAdditionalProperties,
-      ],
-      model: productReference,
-    } satisfies ProductGroup)
-    : undefined;
+  const isVariantOf =
+    level < 1
+      ? ({
+          "@type": "ProductGroup",
+          productGroupID: productId,
+          hasVariant: items.map((sku) =>
+            toProduct(product, sku, 1, { ...options, imagesByKey })
+          ),
+          url: getProductGroupURL(baseUrl, product).href,
+          name: product.productName,
+          additionalProperty: [
+            ...groupAdditionalProperty,
+            ...originalAttributesAdditionalProperties,
+          ],
+          model: productReference,
+        } satisfies ProductGroup)
+      : undefined;
 
   const finalImages = images?.map(({ imageUrl, imageText, imageLabel }) => {
     const url = imagesByKey.get(getImageKey(imageUrl)) ?? imageUrl;
@@ -434,7 +439,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
 
   // From schema.org: A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy
   const categoriesString = splitCategory(product.categories[0]).join(
-    DEFAULT_CATEGORY_SEPARATOR,
+    DEFAULT_CATEGORY_SEPARATOR
   );
 
   const categoryAdditionalProperties = toAdditionalPropertyCategories(product);
@@ -445,11 +450,12 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     .concat(clusterAdditionalProperties ?? [])
     .concat(referenceIdAdditionalProperty ?? []);
 
-  estimatedDateArrival && additionalProperty.push({
-    "@type": "PropertyValue",
-    name: "Estimated Date Arrival",
-    value: estimatedDateArrival,
-  });
+  estimatedDateArrival &&
+    additionalProperty.push({
+      "@type": "PropertyValue",
+      name: "Estimated Date Arrival",
+      value: estimatedDateArrival,
+    });
 
   if (sku.modalType) {
     additionalProperty.push({
@@ -492,7 +498,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
 
 const toBreadcrumbList = (
   product: ProductVTEX | LegacyProductVTEX,
-  { baseUrl }: ProductOptions,
+  { baseUrl }: ProductOptions
 ): BreadcrumbList => {
   const { categories, productName } = product;
   const names = categories[0]?.split("/").filter(Boolean);
@@ -508,8 +514,8 @@ const toBreadcrumbList = (
         return {
           "@type": "ListItem" as const,
           name,
-          item:
-            new URL(`/${segments.slice(0, position).join("/")}`, baseUrl).href,
+          item: new URL(`/${segments.slice(0, position).join("/")}`, baseUrl)
+            .href,
           position,
         };
       }),
@@ -525,7 +531,7 @@ const toBreadcrumbList = (
 };
 
 const legacyToProductGroupAdditionalProperties = (
-  product: LegacyProductVTEX,
+  product: LegacyProductVTEX
 ) => {
   const groups = product.allSpecificationsGroups ?? [];
   const allSpecifications = product.allSpecifications ?? [];
@@ -551,9 +557,9 @@ const legacyToProductGroupAdditionalProperties = (
   });
 };
 
-const toProductGroupAdditionalProperties = (
-  { specificationGroups = [] }: ProductVTEX,
-) =>
+const toProductGroupAdditionalProperties = ({
+  specificationGroups = [],
+}: ProductVTEX) =>
   specificationGroups.flatMap(({ name: groupName, specifications }) =>
     specifications.flatMap(({ name, values }) =>
       values.map(
@@ -564,14 +570,14 @@ const toProductGroupAdditionalProperties = (
             value,
             propertyID: groupName,
             valueReference: "PROPERTY" as string,
-          }) as const,
+          } as const)
       )
     )
   );
 
 const toOriginalAttributesAdditionalProperties = (
   originalAttributes: Maybe<string[]>,
-  product: ProductVTEX | LegacyProduct,
+  product: ProductVTEX | LegacyProduct
 ) => {
   if (!originalAttributes) {
     return [];
@@ -580,13 +586,14 @@ const toOriginalAttributesAdditionalProperties = (
   const attributes =
     pick(originalAttributes as Array<keyof typeof product>, product) ?? {};
 
-  return Object.entries(attributes).map(([name, value]) =>
-    ({
-      "@type": "PropertyValue",
-      name,
-      value,
-      valueReference: "ORIGINAL_PROPERTY" as string,
-    }) as const
+  return Object.entries(attributes).map(
+    ([name, value]) =>
+      ({
+        "@type": "PropertyValue",
+        name,
+        value,
+        valueReference: "ORIGINAL_PROPERTY" as string,
+      } as const)
   ) as unknown as PropertyValue[];
 };
 
@@ -629,7 +636,7 @@ const toAdditionalPropertiesLegacy = (sku: LegacySkuVTEX): PropertyValue[] => {
         value: attachment.domainValues,
         required: attachment.required,
         valueReference: "ATTACHMENT",
-      }) as const,
+      } as const)
   );
 
   return [...specificationProperties, ...attachmentProperties];
@@ -676,33 +683,35 @@ const toOffer = ({
         billingDuration: installment.NumberOfInstallments,
         billingIncrement: installment.Value,
         price: installment.TotalValuePlusInterestRate,
-      }),
+      })
     ),
   ],
-  availability: offer.AvailableQuantity > 0
-    ? "https://schema.org/InStock"
-    : "https://schema.org/OutOfStock",
+  availability:
+    offer.AvailableQuantity > 0
+      ? "https://schema.org/InStock"
+      : "https://schema.org/OutOfStock",
 });
 
 const toOfferLegacy = (seller: SellerVTEX): Offer => {
-  const otherTeasers = seller.commertialOffer.DiscountHighLight?.map((i) => {
-    const discount = i as Record<string, string>;
-    const [_k__BackingField, discountName] = Object.entries(discount)?.[0] ??
-      [];
+  const otherTeasers =
+    seller.commertialOffer.DiscountHighLight?.map((i) => {
+      const discount = i as Record<string, string>;
+      const [_k__BackingField, discountName] =
+        Object.entries(discount)?.[0] ?? [];
 
-    const teasers: Teasers = {
-      name: discountName,
-      conditions: {
-        minimumQuantity: 0,
-        parameters: [],
-      },
-      effects: {
-        parameters: [],
-      },
-    };
+      const teasers: Teasers = {
+        name: discountName,
+        conditions: {
+          minimumQuantity: 0,
+          parameters: [],
+        },
+        effects: {
+          parameters: [],
+        },
+      };
 
-    return teasers;
-  }) ?? [];
+      return teasers;
+    }) ?? [];
 
   return {
     ...toOffer(seller),
@@ -712,9 +721,10 @@ const toOfferLegacy = (seller: SellerVTEX): Offer => {
         name: teaser["<Name>k__BackingField"],
         generalValues: teaser["<GeneralValues>k__BackingField"],
         conditions: {
-          minimumQuantity: teaser["<Conditions>k__BackingField"][
-            "<MinimumQuantity>k__BackingField"
-          ],
+          minimumQuantity:
+            teaser["<Conditions>k__BackingField"][
+              "<MinimumQuantity>k__BackingField"
+            ],
           parameters: teaser["<Conditions>k__BackingField"][
             "<Parameters>k__BackingField"
           ].map((parameter) => ({
@@ -743,19 +753,19 @@ export const legacyFacetToFilter = (
   term: string,
   behavior: "dynamic" | "static",
   ignoreCaseSelected?: boolean,
-  fullPath = false,
+  fullPath = false
 ): Filter | null => {
   const mapSegments = map.split(",").filter((x) => x.length > 0);
-  const pathSegments = term.replace(/^\//, "").split("/").slice(
-    0,
-    mapSegments.length,
-  );
+  const pathSegments = term
+    .replace(/^\//, "")
+    .split("/")
+    .slice(0, mapSegments.length);
 
   const mapSet = new Set(
-    mapSegments.map((i) => ignoreCaseSelected ? i.toLowerCase() : i),
+    mapSegments.map((i) => (ignoreCaseSelected ? i.toLowerCase() : i))
   );
   const pathSet = new Set(
-    pathSegments.map((i) => ignoreCaseSelected ? i.toLowerCase() : i),
+    pathSegments.map((i) => (ignoreCaseSelected ? i.toLowerCase() : i))
   );
 
   // for productClusterIds, we have to use the full path
@@ -763,7 +773,8 @@ export const legacyFacetToFilter = (
   // category2/123?map=c,productClusterIds -> DO NOT WORK
   // category1/category2/123?map=c,c,productClusterIds -> WORK
   const hasProductClusterIds = mapSegments.includes("productClusterIds");
-  const hasToBeFullpath = fullPath ||
+  const hasToBeFullpath =
+    fullPath ||
     hasProductClusterIds ||
     mapSegments.includes("ft") ||
     mapSegments.includes("b");
@@ -776,7 +787,17 @@ export const legacyFacetToFilter = (
 
       return s === facet.Value;
     });
+    if (!selected && facet.Link && facet.Link.includes("map=")) {
+      const vtexLink = new URL(facet.Link, url);
 
+      // Preserva query params existentes (como q=)
+      const currentQuery = url.searchParams.get("q");
+      if (currentQuery) {
+        vtexLink.searchParams.set("q", currentQuery);
+      }
+
+      return `${vtexLink.pathname}${vtexLink.search}`;
+    }
     const map = hasToBeFullpath
       ? facet.Link.split("map=")[1].split(",")
       : [facet.Map];
@@ -806,8 +827,10 @@ export const legacyFacetToFilter = (
     for (let it = 0; it < newMap.length; it++) {
       let i = 0;
       while (
-        i < zipped.length && (zipped[i][0] === "c" || zipped[i][0] === "C")
-      ) i++;
+        i < zipped.length &&
+        (zipped[i][0] === "c" || zipped[i][0] === "C")
+      )
+        i++;
 
       zipped.splice(i, 0, [newMap[it], newPath[it]]);
     }
@@ -817,7 +840,7 @@ export const legacyFacetToFilter = (
     if (behavior === "static") {
       link.searchParams.set(
         "fmap",
-        url.searchParams.get("fmap") || mapSegments.join(","),
+        url.searchParams.get("fmap") || mapSegments.join(",")
       );
     }
     const currentQuery = url.searchParams.get("q");
@@ -834,19 +857,19 @@ export const legacyFacetToFilter = (
     label: name,
     key: name,
     values: facets.map((facet) => {
-      const normalizedFacet = name !== "PriceRanges"
-        ? facet
-        : normalizeFacet(facet);
+      const normalizedFacet =
+        name !== "PriceRanges" ? facet : normalizeFacet(facet);
 
-      const selected = mapSet.has(
-        ignoreCaseSelected
-          ? normalizedFacet.Map.toLowerCase()
-          : normalizedFacet.Map,
-      ) &&
+      const selected =
+        mapSet.has(
+          ignoreCaseSelected
+            ? normalizedFacet.Map.toLowerCase()
+            : normalizedFacet.Map
+        ) &&
         pathSet.has(
           ignoreCaseSelected
             ? normalizedFacet.Value.toLowerCase()
-            : normalizedFacet.Value,
+            : normalizedFacet.Value
         );
 
       return {
@@ -855,18 +878,19 @@ export const legacyFacetToFilter = (
         url: getLink(normalizedFacet, selected),
         label: normalizedFacet.Name,
         selected,
-        children: facet.Children?.length > 0
-          ? legacyFacetToFilter(
-            normalizedFacet.Name,
-            facet.Children,
-            url,
-            map,
-            term,
-            behavior,
-            ignoreCaseSelected,
-            fullPath,
-          )
-          : undefined,
+        children:
+          facet.Children?.length > 0
+            ? legacyFacetToFilter(
+                normalizedFacet.Name,
+                facet.Children,
+                url,
+                map,
+                term,
+                behavior,
+                ignoreCaseSelected,
+                fullPath
+              )
+            : undefined,
       };
     }),
   };
@@ -874,7 +898,7 @@ export const legacyFacetToFilter = (
 
 export const filtersToSearchParams = (
   selectedFacets: SelectedFacet[],
-  paramsToPersist?: URLSearchParams,
+  paramsToPersist?: URLSearchParams
 ) => {
   const searchParams = new URLSearchParams(paramsToPersist);
 
@@ -898,7 +922,7 @@ export const legacyFacetsNormalize = (map: string, path: string) => {
     /de-(?<from>\d+[,]?[\d]+)-a-(?<to>\d+[,]?[\d]+)/,
     (_match, from, to) => {
       return `${from.replace(",", ".")}:${to.replace(",", ".")}`;
-    },
+    }
   );
 
   const key = fromLegacyMap[map] || map;
@@ -941,7 +965,7 @@ export const filtersFromURL = (url: URL) => {
 
 export const mergeFacets = (
   f1: SelectedFacet[],
-  f2: SelectedFacet[],
+  f2: SelectedFacet[]
 ): SelectedFacet[] => {
   const facetKey = (facet: SelectedFacet) =>
     `key:${facet.key}-value:${facet.value}`;
@@ -958,38 +982,39 @@ export const mergeFacets = (
 };
 
 const isValueRange = (
-  facet: FacetValueRange | FacetValueBoolean,
+  facet: FacetValueRange | FacetValueBoolean
 ): facet is FacetValueRange =>
   // deno-lint-ignore no-explicit-any
   Boolean((facet as any).range);
 
-const facetToToggle = (
-  selectedFacets: SelectedFacet[],
-  key: string,
-  paramsToPersist?: URLSearchParams,
-) =>
-(item: FacetValueRange | FacetValueBoolean): FilterToggleValue => {
-  const { quantity, selected } = item;
-  const isRange = isValueRange(item);
+const facetToToggle =
+  (
+    selectedFacets: SelectedFacet[],
+    key: string,
+    paramsToPersist?: URLSearchParams
+  ) =>
+  (item: FacetValueRange | FacetValueBoolean): FilterToggleValue => {
+    const { quantity, selected } = item;
+    const isRange = isValueRange(item);
 
-  const value = isRange
-    ? formatRange(item.range.from, item.range.to)
-    : item.value;
-  const label = isRange ? value : item.name;
-  const facet = { key, value };
+    const value = isRange
+      ? formatRange(item.range.from, item.range.to)
+      : item.value;
+    const label = isRange ? value : item.name;
+    const facet = { key, value };
 
-  const filters = selected
-    ? selectedFacets.filter((f) => f.key !== key || f.value !== value)
-    : [...selectedFacets, facet];
+    const filters = selected
+      ? selectedFacets.filter((f) => f.key !== key || f.value !== value)
+      : [...selectedFacets, facet];
 
-  return {
-    value,
-    quantity,
-    selected,
-    url: `?${filtersToSearchParams(filters, paramsToPersist)}`,
-    label,
+    return {
+      value,
+      quantity,
+      selected,
+      url: `?${filtersToSearchParams(filters, paramsToPersist)}`,
+      label,
+    };
   };
-};
 
 export const toFilter =
   (selectedFacets: SelectedFacet[], paramsToPersist?: URLSearchParams) =>
@@ -1013,12 +1038,12 @@ function nodeToNavbar(node: Category): SiteNavigationElement {
 }
 
 export const categoryTreeToNavbar = (
-  tree: Category[],
+  tree: Category[]
 ): SiteNavigationElement[] => tree.map(nodeToNavbar);
 
 export const toBrand = (
   { id, name, imageUrl, metaTagDescription }: BrandVTEX,
-  baseUrl: string,
+  baseUrl: string
 ): Brand => ({
   "@type": "Brand",
   "@id": `${id}`,
@@ -1038,7 +1063,7 @@ export const normalizeFacet = (facet: LegacyFacet) => {
 export const toReview = (
   products: Product[],
   ratings: ProductRating[],
-  reviews: ProductReviewData[],
+  reviews: ProductReviewData[]
 ): Product[] => {
   return products.map((p, index) => {
     const ratingsCount = ratings[index].totalCount || 0;
@@ -1055,11 +1080,13 @@ export const toReview = (
       review: productReviews.map((_, reviewIndex) => ({
         "@type": "Review",
         id: productReviews[reviewIndex]?.id?.toString(),
-        author: [{
-          "@type": "Author",
-          name: productReviews[reviewIndex]?.reviewerName,
-          verifiedBuyer: productReviews[reviewIndex]?.verifiedPurchaser,
-        }],
+        author: [
+          {
+            "@type": "Author",
+            name: productReviews[reviewIndex]?.reviewerName,
+            verifiedBuyer: productReviews[reviewIndex]?.verifiedPurchaser,
+          },
+        ],
         itemReviewed: productReviews[reviewIndex]?.productId,
         datePublished: productReviews[reviewIndex]?.reviewDateTime,
         reviewHeadline: productReviews[reviewIndex]?.title,
@@ -1075,7 +1102,7 @@ export const toReview = (
 
 export const toInventories = (
   products: Product[],
-  inventoriesData: ProductInventoryData[],
+  inventoriesData: ProductInventoryData[]
 ): Product[] => {
   return products.map((p, index) => {
     const balance = inventoriesData[index].balance || [];
@@ -1102,7 +1129,7 @@ type ProductMap = Record<string, Product>;
 export const sortProducts = (
   products: Product[],
   orderOfIdsOrSkus: string[],
-  prop: "sku" | "inProductGroupWithID",
+  prop: "sku" | "inProductGroupWithID"
 ) => {
   const productMap: ProductMap = {};
 
@@ -1166,11 +1193,12 @@ function toHoursSpecification(hours: Hours): OpeningHoursSpecification {
 }
 
 function toSpecialHoursSpecification(
-  holiday: PickupHolidays,
+  holiday: PickupHolidays
 ): OpeningHoursSpecification {
   const dateHoliday = new Date(holiday.date ?? "");
   // VTEX provide date in ISO format, at 00h on the day
-  const validThrough = dateHoliday.setDate(dateHoliday.getDate() + 1)
+  const validThrough = dateHoliday
+    .setDate(dateHoliday.getDate() + 1)
     .toString();
 
   return {
@@ -1183,7 +1211,7 @@ function toSpecialHoursSpecification(
 }
 
 function isPickupPointVCS(
-  pickupPoint: PickupPoint | PickupPointVCS,
+  pickupPoint: PickupPoint | PickupPointVCS
 ): pickupPoint is PickupPointVCS {
   return "name" in pickupPoint;
 }
@@ -1193,8 +1221,8 @@ interface ToPlaceOptions {
 }
 
 export function toPlace(
-  pickupPoint: PickupPoint & { distance?: number } | PickupPointVCS,
-  options?: ToPlaceOptions,
+  pickupPoint: (PickupPoint & { distance?: number }) | PickupPointVCS,
+  options?: ToPlaceOptions
 ): Place {
   const {
     name,
@@ -1206,37 +1234,35 @@ export function toPlace(
     isActive,
   } = isPickupPointVCS(pickupPoint)
     ? {
-      name: pickupPoint.name,
-      country: pickupPoint.address?.country?.acronym,
-      latitude: pickupPoint.address?.location?.latitude,
-      longitude: pickupPoint.address?.location?.longitude,
-      specialOpeningHoursSpecification: pickupPoint.pickupHolidays?.map(
-        toSpecialHoursSpecification,
-      ),
-      openingHoursSpecification: pickupPoint.businessHours?.map(
-        toHoursSpecification,
-      ),
-      isActive: pickupPoint.isActive,
-    }
+        name: pickupPoint.name,
+        country: pickupPoint.address?.country?.acronym,
+        latitude: pickupPoint.address?.location?.latitude,
+        longitude: pickupPoint.address?.location?.longitude,
+        specialOpeningHoursSpecification: pickupPoint.pickupHolidays?.map(
+          toSpecialHoursSpecification
+        ),
+        openingHoursSpecification:
+          pickupPoint.businessHours?.map(toHoursSpecification),
+        isActive: pickupPoint.isActive,
+      }
     : {
-      name: pickupPoint.friendlyName,
-      country: pickupPoint.address?.country,
-      latitude: pickupPoint.address?.geoCoordinates?.[0],
-      longitude: pickupPoint.address?.geoCoordinates?.[1],
-      specialOpeningHoursSpecification: pickupPoint.pickupHolidays?.map(
-        toSpecialHoursSpecification,
-      ),
-      openingHoursSpecification: pickupPoint.businessHours?.map((
-        { ClosingTime, DayOfWeek, OpeningTime },
-      ) =>
-        toHoursSpecification({
-          closingTime: ClosingTime,
-          dayOfWeek: DayOfWeek,
-          openingTime: OpeningTime,
-        })
-      ),
-      isActive: options?.isActive,
-    };
+        name: pickupPoint.friendlyName,
+        country: pickupPoint.address?.country,
+        latitude: pickupPoint.address?.geoCoordinates?.[0],
+        longitude: pickupPoint.address?.geoCoordinates?.[1],
+        specialOpeningHoursSpecification: pickupPoint.pickupHolidays?.map(
+          toSpecialHoursSpecification
+        ),
+        openingHoursSpecification: pickupPoint.businessHours?.map(
+          ({ ClosingTime, DayOfWeek, OpeningTime }) =>
+            toHoursSpecification({
+              closingTime: ClosingTime,
+              dayOfWeek: DayOfWeek,
+              openingTime: OpeningTime,
+            })
+        ),
+        isActive: options?.isActive,
+      };
 
   return {
     "@id": pickupPoint.id,
