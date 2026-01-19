@@ -25,11 +25,10 @@ const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-  sc?: number,
 ): Promise<SimulationOrderForm> => {
   const cookie = req.headers.get("cookie") ?? "";
   const { vcsDeprecated } = ctx;
-  const { items, postalCode, country, RnbBehavior = 1 } = props;
+  const { items, postalCode, country, RnbBehavior = 1, sc } = props;
   const segment = getSegmentFromBag(ctx);
 
   const response = await vcsDeprecated[
