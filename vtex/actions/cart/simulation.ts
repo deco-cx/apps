@@ -13,6 +13,7 @@ export interface Props {
   postalCode: string;
   country: string;
   RnbBehavior?: 0 | 1;
+  sc?: number;
 }
 
 /**
@@ -24,6 +25,7 @@ const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
+  sc?: number,
 ): Promise<SimulationOrderForm> => {
   const cookie = req.headers.get("cookie") ?? "";
   const { vcsDeprecated } = ctx;
@@ -35,7 +37,7 @@ const action = async (
   ](
     {
       RnbBehavior,
-      sc: segment?.payload.channel,
+      sc: sc ?? segment?.payload.channel,
     },
     {
       body: { items, country, postalCode },
