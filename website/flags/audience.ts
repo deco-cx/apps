@@ -22,6 +22,7 @@ export interface Route {
    * @description higher priority means that this route will be used in favor of other routes with less or none priority
    */
   highPriority?: boolean;
+  supportedExtensions?: string[];
 }
 /**
  * @title Routes
