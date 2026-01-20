@@ -70,7 +70,6 @@ const oneDollarSnippet = () => {
     }
     const values = { ...props };
     for (const key in params) {
-      // @ts-expect-error somehow typescript bugs
       const value = params[key];
       if (value !== null && value !== undefined) {
         values[key] = truncate(
@@ -84,6 +83,13 @@ const oneDollarSnippet = () => {
 
 export const DEFAULT_COLLECTOR_ADDRESS = "https://d.lilstts.com/events";
 
+/**
+ * Renders Head elements that configure and load the analytics collector and inline tracking snippet.
+ *
+ * @param collectorAddress - Optional URL of the analytics collector; falls back to the default collector when omitted.
+ * @param staticScriptUrl - Optional URL of the static analytics script to load; falls back to the bundled default when omitted.
+ * @returns A Head element that dns-prefetches and preconnects to the collector, loads the analytics module script, and injects the inline tracking snippet.
+ */
 function Component({ collectorAddress, staticScriptUrl }: Props) {
   const collector = collectorAddress ?? DEFAULT_COLLECTOR_ADDRESS;
   const staticScript = staticScriptUrl ?? DEFAULT_ANALYTICS_SCRIPT_URL;
@@ -101,6 +107,7 @@ function Component({ collectorAddress, staticScriptUrl }: Props) {
         data-autocollect="false"
         data-hash-routing="true"
         data-url={collector}
+        type="module"
         src={`/live/invoke/website/loaders/analyticsScript.ts?url=${staticScript}`}
       />
       <script defer src={useScriptAsDataURI(oneDollarSnippet)} />
