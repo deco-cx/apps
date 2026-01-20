@@ -1,5 +1,5 @@
 import type { AppContext } from "../../mod.ts";
-import type { GetSessionResponse } from "../../utils/openapi/vcs.openapi.gen.ts";
+import { Session } from "../../utils/types.ts";
 
 interface Props {
   /**
@@ -20,7 +20,7 @@ async function loader(
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<GetSessionResponse> {
+): Promise<Session> {
   const { vcs } = ctx;
 
   const response = await vcs["GET /api/sessions"]({
@@ -33,7 +33,7 @@ async function loader(
     throw new Error(`Failed to get session: ${response.status}`);
   }
 
-  return await response.json();
+  return await response.json() as Session;
 }
 
 export default loader;

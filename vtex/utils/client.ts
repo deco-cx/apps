@@ -12,6 +12,7 @@ import {
   LegacyFacets,
   LegacyProduct,
   LegacySort,
+  LogoutResponse,
   OrderForm,
   OrderFormOrder,
   PageType,
@@ -170,7 +171,7 @@ export interface VTEXCommerceStable {
     };
   };
 
-  "GET /api/checkout/changeToAnonymousUser/:orderFormId": {
+  "GET /checkout/changeToAnonymousUser/:orderFormId": {
     response: OrderForm;
     searchParams: { sc?: string };
   };
@@ -309,6 +310,13 @@ export interface VTEXCommerceStable {
   };
   "GET /api/checkout/pub/orders/order-group/:orderGroupId": {
     response: OrderFormOrder[];
+  };
+  "GET /api/vtexid/pub/logout": {
+    searchParams: {
+      scope?: string;
+      returnUrl?: string;
+    };
+    response: LogoutResponse;
   };
 }
 
