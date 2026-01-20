@@ -145,6 +145,15 @@ export interface Props {
    */
   priceFacets?: boolean;
   /**
+   * @title Additional Search Parameters
+   * @description Extra query params to pass to VTEX Intelligent Search API (e.g., for VTEX Ads).
+   * Use key: "showSponsored", value: "true" and key: "placement", value: "top-search" for VTEX Ads.
+   */
+  additionalSearchParams?: {
+    key: string;
+    value: string;
+  }[];
+  /**
    * @title Advanced Configuration
    * @description Further change loader behaviour
    */
@@ -307,10 +316,18 @@ const loader = async (
     ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   const params = withDefaultParams({ ...searchArgs, page, locale });
+
+  // Build additional search params object from array
+  const additionalParams: Record<string, string> = {};
+  props.additionalSearchParams?.forEach((param) => {
+    additionalParams[param.key] = param.value;
+  });
+
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
     vcsDeprecated
       ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+        ...additionalParams,
         ...params,
         facets: toPath(selected),
       }, {
@@ -318,6 +335,7 @@ const loader = async (
         headers: segment ? withSegmentCookie(segment) : undefined,
       }).then((res) => res.json()),
     vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
+      ...additionalParams,
       ...params,
       facets: toPath(fselected),
     }, { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined })
@@ -461,6 +479,12 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
       "simulationBehavior",
       url.searchParams.get("simulationBehavior") || props.simulationBehavior ||
       "default",
+    ],
+    [
+      "additionalSearchParams",
+      (props.additionalSearchParams ?? [])
+        .map((p) => `${p.key}:${p.value}`)
+        .join("\\"),
     ],
   ]);
   url.searchParams.forEach((value, key) => {
