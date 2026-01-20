@@ -245,3 +245,51 @@ export const nullOnNotFound = (error: any) => {
   }
   throw error;
 };
+
+/**
+ * Clean function to process HTTP responses based on Content-Type
+ * @param {Response} response - The fetch response object
+ * @returns {Promise<object|string|Blob>} - Returns the response body converted to the appropriate format
+ */
+export async function cleanResponse<T>(response: Response): Promise<T> {
+  if (!response.ok) {
+    throw new Error(`HTTP Error! Status: ${response.status}`);
+  }
+
+  const contentType = response.headers.get("Content-Type") || "";
+
+  // deno-lint-ignore no-explicit-any
+  const contentHandlers: Record<string, () => Promise<any>> = {
+    "application/json": () => response.json(),
+    "text/": () => response.text(),
+    "image/": () => response.blob(),
+    "audio/": () => response.blob(),
+    "video/": () => response.blob(),
+    "application/octet-stream": () => response.blob(),
+  };
+
+  try {
+    // Find the appropriate handler based on content-type
+    const handlerKey = Object.keys(contentHandlers).find((type) =>
+      contentType.includes(type)
+    );
+
+    if (handlerKey) {
+      return await contentHandlers[handlerKey]();
+    }
+
+    // Fallback - try JSON first, then text
+    try {
+      return await response.json();
+    } catch {
+      return await response.text() as unknown as T;
+    }
+  } catch (error) {
+    console.error("Error processing response:", error);
+    throw new Error(
+      `Failed to process response: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+  }
+}
