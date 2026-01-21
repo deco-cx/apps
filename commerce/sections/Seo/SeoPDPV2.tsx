@@ -10,6 +10,7 @@ import {
   shouldIncludeStructuredData,
   StructuredDataControl,
 } from "../../utils/structuredData.ts";
+import { optimizeVTEX } from "../../../website/components/Image.tsx";
 
 export interface Props {
   /** @title Data Source */
@@ -30,6 +31,10 @@ export interface Props {
    * @deprecated Use `structuredDataControl` instead.
    */
   ignoreStructuredData?: boolean;
+  /**
+   * @title Optimize Image for VTEX?
+   */
+  optimizeImageForVTEX?: boolean;
   /**
    * @title Structured Data Control
    * @description Choose when to include JSON-LD structured data. Default sends to everyone. "disable for users" shows only to bots/crawlers. "disable for all" removes completely. Note: some third-party integrations may require structured data to function properly.
@@ -53,6 +58,7 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     omitVariants,
     ignoreStructuredData,
     structuredDataControl,
+    optimizeImageForVTEX = false,
   } = props;
 
   const title = renderTemplateString(
@@ -63,7 +69,20 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     descriptionTemplate,
     descriptionProp || jsonLD?.seo?.description || ctx.seo?.description || "",
   );
-  const image = jsonLD?.product.image?.[0]?.url;
+
+  const originalImage = jsonLD?.product.image?.[0]?.url;
+  let image = originalImage;
+
+  if (optimizeImageForVTEX && originalImage) {
+    image = optimizeVTEX({
+      originalSrc: originalImage,
+      width: 1200,
+      height: 1200,
+      factor: 1,
+      fit: "cover",
+    });
+  }
+
   const canonical = jsonLD?.seo?.canonical
     ? jsonLD?.seo?.canonical
     : jsonLD?.breadcrumbList

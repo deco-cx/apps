@@ -85,7 +85,7 @@ const optmizeShopify = (opts: OptimizationOptions) => {
   return url.href;
 };
 
-const optimizeVTEX = (opts: OptimizationOptions) => {
+export const optimizeVTEX = (opts: OptimizationOptions) => {
   const { originalSrc, width, height } = opts;
 
   const src = new URL(originalSrc);
