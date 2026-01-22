@@ -305,7 +305,7 @@ export const cacheKey = (
     : getSegmentFromBag(ctx)?.token;
   const params = new URLSearchParams([
     ...getSearchParams(props, url.searchParams),
-    ["segment", segment],
+    ["segment", segment ?? ""],
   ]);
 
   if (isSKUIDProps(props)) {

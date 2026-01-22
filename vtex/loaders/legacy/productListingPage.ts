@@ -484,7 +484,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     ["map", props.map ?? url.searchParams.get("map") ?? ""],
     ["pageOffset", (props.pageOffset ?? 1).toString()],
     ["ignoreCaseSelected", (props.ignoreCaseSelected ?? false).toString()],
-    ["segment", segment],
+    ["segment", segment ?? ""],
   ]);
 
   url.searchParams.forEach((value, key) => {

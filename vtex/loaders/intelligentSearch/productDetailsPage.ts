@@ -186,7 +186,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
 
   const params = new URLSearchParams([
     ["slug", props.slug],
-    ["segment", segment],
+    ["segment", segment ?? ""],
     ["skuId", skuId],
   ]);
 

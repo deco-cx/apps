@@ -463,7 +463,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
         [] as string[],
       ).join("\\"),
     ],
-    ["segment", segment],
+    ["segment", segment ?? ""],
     [
       "simulationBehavior",
       url.searchParams.get("simulationBehavior") || props.simulationBehavior ||

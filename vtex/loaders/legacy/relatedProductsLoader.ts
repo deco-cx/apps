@@ -178,7 +178,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     ["crossSelling", props.crossSelling],
     ["count", (props.count ?? 0).toString()],
     ["hideUnavailableItems", (props.hideUnavailableItems ?? false).toString()],
-    ["segment", segment],
+    ["segment", segment ?? ""],
   ]);
 
   url.searchParams.forEach((value, key) => {
