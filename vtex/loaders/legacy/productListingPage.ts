@@ -11,7 +11,11 @@ import {
   pageTypesToSeo,
   toSegmentParams,
 } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentCacheKeyWithoutUTM,
+  getSegmentFromBag,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { parsePageType } from "../../utils/transform.ts";
 import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
@@ -455,7 +459,9 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
       ...url.searchParams.getAll("fq"),
     ]),
   ].sort();
-  const segment = getSegmentFromBag(ctx)?.token ?? "";
+  const segment = ctx.advancedConfigs?.removeUTMFromCacheKey
+    ? getSegmentCacheKeyWithoutUTM(ctx)
+    : getSegmentFromBag(ctx)?.token;
   const sort = (url.searchParams.get("O") as LegacySort) ??
     IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
     url.searchParams.get("sort") ??
@@ -478,7 +484,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     ["map", props.map ?? url.searchParams.get("map") ?? ""],
     ["pageOffset", (props.pageOffset ?? 1).toString()],
     ["ignoreCaseSelected", (props.ignoreCaseSelected ?? false).toString()],
-    ["segment", segment],
+    ["segment", segment ?? ""],
   ]);
 
   url.searchParams.forEach((value, key) => {
