@@ -3,7 +3,11 @@ import { STALE } from "../../../utils/fetch.ts";
 import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentCacheKeyWithoutUTM,
+  getSegmentFromBag,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { AdvancedLoaderConfig, LegacyProduct } from "../../utils/types.ts";
@@ -118,7 +122,10 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   if (url.searchParams.has("ft")) {
     return null;
   }
-  const segment = getSegmentFromBag(ctx)?.token ?? "";
+  // Use cache-stable segment key that excludes marketing/tracking params
+  const segment = ctx.advancedConfigs?.removeUTMFromCacheKey
+    ? getSegmentCacheKeyWithoutUTM(ctx)
+    : getSegmentFromBag(ctx)?.token;
   const skuId = url.searchParams.get("skuId") ?? "";
 
   const params = new URLSearchParams([

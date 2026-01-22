@@ -4,7 +4,11 @@ import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { isFilterParam, toSegmentParams } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentCacheKeyWithoutUTM,
+  getSegmentFromBag,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { pickSku, toProduct } from "../../utils/transform.ts";
 import type { CrossSellingType } from "../../utils/types.ts";
 import productList from "./productList.ts";
@@ -165,7 +169,10 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     return null;
   }
 
-  const segment = getSegmentFromBag(ctx)?.token || "";
+  // Use cache-stable segment key that excludes marketing/tracking params
+  const segment = ctx.advancedConfigs?.removeUTMFromCacheKey
+    ? getSegmentCacheKeyWithoutUTM(ctx)
+    : getSegmentFromBag(ctx)?.token;
   const params = new URLSearchParams([
     ["slug", props.slug ?? ""],
     ["id", props.id ?? ""],

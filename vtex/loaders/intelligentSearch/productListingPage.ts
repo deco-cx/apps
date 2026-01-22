@@ -14,7 +14,11 @@ import {
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
 } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentCacheKeyWithoutUTM,
+  getSegmentFromBag,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { pageTypesFromUrl } from "../../utils/intelligentSearch.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { slugify } from "../../utils/slugify.ts";
@@ -439,7 +443,10 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   if (searchTerm && !cachedSearchTerms.includes(searchTerm.toLowerCase())) {
     return null;
   }
-  const segment = getSegmentFromBag(ctx)?.token ?? "";
+  // Use cache-stable segment key that excludes marketing/tracking params
+  const segment = ctx.advancedConfigs?.removeUTMFromCacheKey
+    ? getSegmentCacheKeyWithoutUTM(ctx)
+    : getSegmentFromBag(ctx)?.token;
 
   const params = new URLSearchParams([
     ["query", props.query ?? ""],
