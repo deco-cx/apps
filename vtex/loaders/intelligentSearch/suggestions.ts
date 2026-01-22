@@ -107,7 +107,6 @@ const loaders = async (
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, _req: Request, ctx: AppContext) => {
-  // Use cache-stable segment key that excludes marketing/tracking params
   const segment = ctx.advancedConfigs?.removeUTMFromCacheKey
     ? getSegmentCacheKeyWithoutUTM(ctx)
     : getSegmentFromBag(ctx)?.token;

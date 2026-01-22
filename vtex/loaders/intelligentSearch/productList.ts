@@ -326,9 +326,6 @@ export const cacheKey = (
   ) {
     return null;
   }
-
-  // Use cache-stable segment key that excludes marketing/tracking params (UTM, UTMI)
-  // This prevents cache fragmentation while keeping price/inventory-affecting fields
   const segmentCacheKey = ctx.advancedConfigs?.removeUTMFromCacheKey
     ? getSegmentCacheKeyWithoutUTM(ctx)
     : getSegmentFromBag(ctx)?.token;

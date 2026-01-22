@@ -300,7 +300,6 @@ export const cacheKey = (
     return null;
   }
 
-  // Use cache-stable segment key that excludes marketing/tracking params
   const segment = ctx.advancedConfigs?.removeUTMFromCacheKey
     ? getSegmentCacheKeyWithoutUTM(ctx)
     : getSegmentFromBag(ctx)?.token;

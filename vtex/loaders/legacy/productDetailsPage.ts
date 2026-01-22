@@ -122,7 +122,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   if (url.searchParams.has("ft")) {
     return null;
   }
-  // Use cache-stable segment key that excludes marketing/tracking params
+
   const segment = ctx.advancedConfigs?.removeUTMFromCacheKey
     ? getSegmentCacheKeyWithoutUTM(ctx)
     : getSegmentFromBag(ctx)?.token;
