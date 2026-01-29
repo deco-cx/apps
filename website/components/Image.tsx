@@ -1,4 +1,4 @@
-import { Head, IS_BROWSER } from "$fresh/runtime.ts";
+import { Head, IS_BROWSER } from "fresh/runtime";
 import type { JSX } from "preact";
 import { forwardRef } from "preact/compat";
 import { Manifest } from "../manifest.gen.ts";

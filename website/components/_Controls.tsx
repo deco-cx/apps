@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head } from "fresh/runtime";
 import { Page } from "../../commerce/types.ts";
 import { useScriptAsDataURI } from "@deco/deco/hooks";
 import { type Flag, type Site } from "@deco/deco";

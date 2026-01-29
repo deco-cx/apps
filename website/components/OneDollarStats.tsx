@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head } from "fresh/runtime";
 import { useScriptAsDataURI } from "@deco/deco/hooks";
 import { DEFAULT_ANALYTICS_SCRIPT_URL } from "../loaders/analyticsScript.ts";
 

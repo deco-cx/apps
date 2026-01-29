@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head } from "fresh/runtime";
 import type { ComponentChildren, ComponentProps } from "preact";
 import { useMemo } from "preact/hooks";
 import { ImageWidget } from "../../../admin/widgets.ts";

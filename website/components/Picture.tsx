@@ -1,7 +1,7 @@
 import { useContext, useMemo } from "preact/hooks";
 import { forwardRef } from "preact/compat";
 import { ComponentChildren, createContext, JSX } from "preact";
-import { Head, IS_BROWSER } from "$fresh/runtime.ts";
+import { Head, IS_BROWSER } from "fresh/runtime";
 
 import {
   FACTORS,

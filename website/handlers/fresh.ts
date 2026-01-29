@@ -1,4 +1,3 @@
-import { HandlerContext } from "$fresh/server.ts";
 import { getSetCookies } from "std/http/cookie.ts";
 import { __DECO_FBT } from "../../utils/deferred.ts";
 import { errorIfFrameworkMismatch } from "../../utils/framework.tsx";
@@ -15,6 +14,13 @@ import {
 import type { Exception } from "npm:@opentelemetry/api@1.9.0";
 
 type ConnInfo = Deno.ServeHandlerInfo;
+
+/** Fresh context with render function */
+interface FreshContext<Data = unknown, State = unknown> {
+  render: (data?: Data) => Response | Promise<Response>;
+  state: State;
+}
+
 /**
  * @title Fresh Config
  */
@@ -22,9 +28,9 @@ export interface FreshConfig {
   page: Page;
 }
 export const isFreshCtx = <TState>(
-  ctx: ConnInfo | HandlerContext<unknown, TState>,
-): ctx is HandlerContext<unknown, TState> => {
-  return typeof (ctx as HandlerContext).render === "function";
+  ctx: ConnInfo | FreshContext<unknown, TState>,
+): ctx is FreshContext<unknown, TState> => {
+  return typeof (ctx as FreshContext).render === "function";
 };
 function abortHandler(
   ctrl: AbortController,
