@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head } from "fresh/runtime";
 import { AppContext, Extension } from "../mod.ts";
 import { type SectionProps } from "@deco/deco";
 import { useScript } from "@deco/deco/hooks";

@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head } from "fresh/runtime";
 import { AppContext } from "../../mod.ts";
 import { type SectionProps } from "@deco/deco";
 export const loader = (_props: unknown, _req: Request, ctx: AppContext) => ({

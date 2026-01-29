@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head } from "fresh/runtime";
 import { useScriptAsDataURI } from "@deco/deco/hooks";
 import { context } from "@deco/deco";
 declare global {

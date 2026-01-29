@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head } from "fresh/runtime";
 import { AppContext } from "../mod.ts";
 import { useScriptAsDataURI } from "@deco/deco/hooks";
 export interface Props {
