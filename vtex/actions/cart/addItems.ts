@@ -16,6 +16,7 @@ export interface Item {
 export interface Props {
   orderItems: Item[];
   allowedOutdatedData?: Array<"paymentData">;
+  sc?: string;
 }
 
 /**
@@ -29,28 +30,29 @@ const action = async (
   ctx: AppContext,
 ): Promise<OrderForm> => {
   const { vcsDeprecated } = ctx;
-  const {
-    orderItems,
-    allowedOutdatedData = ["paymentData"],
-  } = props;
+  const { orderItems, allowedOutdatedData = ["paymentData"], sc } = props;
   const { orderFormId } = parseCookie(req.headers);
   const cookie = req.headers.get("cookie") ?? "";
   const segment = getSegmentFromBag(ctx);
 
   try {
-    const response = await vcsDeprecated
-      ["POST /api/checkout/pub/orderForm/:orderFormId/items"]({
+    const response = await vcsDeprecated[
+      "POST /api/checkout/pub/orderForm/:orderFormId/items"
+    ](
+      {
         orderFormId,
         allowedOutdatedData,
-        sc: segment?.payload.channel,
-      }, {
+        sc: sc ?? segment?.payload.channel,
+      },
+      {
         body: { orderItems },
         headers: {
           "content-type": "application/json",
           accept: "application/json",
           cookie,
         },
-      });
+      },
+    );
 
     proxySetCookie(response.headers, ctx.response.headers, req.url);
 
