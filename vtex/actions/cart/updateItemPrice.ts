@@ -33,9 +33,9 @@ const action = async (
       orderFormId,
       index: itemIndex,
       sc:
-        (sc ?? ctx.allowMixedSegments)
+        sc ?? (ctx.allowMixedSegments
           ? segment?.payload.channel
-          : ctx.salesChannel,
+          : ctx.salesChannel),
     },
     {
       body: { price },
