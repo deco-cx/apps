@@ -6,6 +6,7 @@ import { getSegmentFromBag } from "../../utils/segment.ts";
 
 export interface Props {
   ignoreProfileData: boolean;
+  sc?: string;
 }
 
 /**
@@ -19,23 +20,30 @@ const action = async (
   ctx: AppContext,
 ): Promise<OrderForm> => {
   const { vcsDeprecated } = ctx;
-  const { ignoreProfileData } = props;
+  const { ignoreProfileData, sc } = props;
   const { orderFormId } = parseCookie(req.headers);
   const cookie = req.headers.get("cookie") ?? "";
   const segment = getSegmentFromBag(ctx);
 
-  const response = await vcsDeprecated
-    ["PATCH /api/checkout/pub/orderForm/:orderFormId/profile"]({
+  const response = await vcsDeprecated[
+    "PATCH /api/checkout/pub/orderForm/:orderFormId/profile"
+  ](
+    {
       orderFormId,
-      sc: segment?.payload.channel,
-    }, {
+      sc:
+        (sc ?? ctx.allowMixedSegments)
+          ? segment?.payload.channel
+          : ctx.salesChannel,
+    },
+    {
       body: { ignoreProfileData },
       headers: {
         "content-type": "application/json",
         accept: "application/json",
         cookie,
       },
-    });
+    },
+  );
 
   proxySetCookie(response.headers, ctx.response.headers, req.url);
 

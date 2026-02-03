@@ -6,6 +6,7 @@ import { getSegmentFromBag } from "../../utils/segment.ts";
 
 export interface Props {
   paymentSystem: number;
+  sc?: string;
 }
 
 /**
@@ -19,16 +20,24 @@ const action = async (
   ctx: AppContext,
 ): Promise<InstallmentOption> => {
   const { vcsDeprecated } = ctx;
-  const { paymentSystem } = props;
+  const { paymentSystem, sc } = props;
   const { orderFormId } = parseCookie(req.headers);
   const cookie = req.headers.get("cookie") ?? "";
   const segment = getSegmentFromBag(ctx);
 
-  const response = await vcsDeprecated
-    ["GET /api/checkout/pub/orderForm/:orderFormId/installments"](
-      { orderFormId, paymentSystem, sc: segment?.payload.channel },
-      { headers: { accept: "application/json", cookie } },
-    );
+  const response = await vcsDeprecated[
+    "GET /api/checkout/pub/orderForm/:orderFormId/installments"
+  ](
+    {
+      orderFormId,
+      paymentSystem,
+      sc:
+        (sc ?? ctx.allowMixedSegments)
+          ? segment?.payload.channel
+          : ctx.salesChannel,
+    },
+    { headers: { accept: "application/json", cookie } },
+  );
 
   proxySetCookie(response.headers, ctx.response.headers, req.url);
 
