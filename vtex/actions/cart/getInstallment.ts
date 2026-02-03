@@ -32,9 +32,9 @@ const action = async (
       orderFormId,
       paymentSystem,
       sc:
-        (sc ?? ctx.allowMixedSegments)
+        sc ?? (ctx.allowMixedSegments
           ? segment?.payload.channel
-          : ctx.salesChannel,
+          : ctx.salesChannel),
     },
     { headers: { accept: "application/json", cookie } },
   );
