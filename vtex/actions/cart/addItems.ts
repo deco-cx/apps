@@ -16,7 +16,7 @@ export interface Item {
 export interface Props {
   orderItems: Item[];
   allowedOutdatedData?: Array<"paymentData">;
-  sc?: string;
+  sc?: number;
 }
 
 /**

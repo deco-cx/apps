@@ -5,7 +5,7 @@ import type { OrderForm } from "../../utils/types.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
 
 export interface Props {
-  sc?: string;
+  sc?: number;
 }
 
 /**

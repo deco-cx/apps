@@ -13,7 +13,7 @@ export interface Props {
   orderItems: Item[];
   allowedOutdatedData?: Array<"paymentData">;
   noSplitItem?: boolean;
-  sc?: string;
+  sc?: number;
 }
 
 /**

@@ -10,7 +10,7 @@ export interface Props {
   expectedOrderFormSections?: string[];
   // deno-lint-ignore no-explicit-any
   body: any;
-  sc?: string;
+  sc?: number;
 }
 
 /**

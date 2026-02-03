@@ -12,7 +12,7 @@ export interface Props {
   content: Record<string, string>;
   expectedOrderFormSections?: string[];
   noSplitItem?: boolean;
-  sc?: string;
+  sc?: number;
 }
 
 export const DEFAULT_EXPECTED_SECTIONS = [

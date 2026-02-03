@@ -7,7 +7,7 @@ import { getSegmentFromBag } from "../../utils/segment.ts";
 export interface Props {
   itemIndex: number;
   price: number;
-  sc?: string;
+  sc?: number;
 }
 
 /**

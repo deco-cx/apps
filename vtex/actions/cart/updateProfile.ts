@@ -6,7 +6,7 @@ import { getSegmentFromBag } from "../../utils/segment.ts";
 
 export interface Props {
   ignoreProfileData: boolean;
-  sc?: string;
+  sc?: number;
 }
 
 /**
