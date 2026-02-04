@@ -6,7 +6,7 @@ import { getSegmentFromBag } from "../../utils/segment.ts";
 
 export interface Props {
   paymentSystem: number;
-  sc?: number;
+  sc?: string;
 }
 
 /**
@@ -32,9 +32,8 @@ const action = async (
       orderFormId,
       paymentSystem,
       sc:
-        sc ?? (ctx.allowMixedSegments
-          ? segment?.payload.channel
-          : ctx.salesChannel),
+        sc ??
+        (ctx.allowMixedSegments ? segment?.payload.channel : ctx.salesChannel),
     },
     { headers: { accept: "application/json", cookie } },
   );

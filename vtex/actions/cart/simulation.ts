@@ -13,7 +13,7 @@ export interface Props {
   postalCode: string;
   country: string;
   RnbBehavior?: 0 | 1;
-  sc?: number;
+  sc?: string;
 }
 
 /**

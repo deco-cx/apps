@@ -5,7 +5,7 @@ import type { OrderForm } from "../../utils/types.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
 
 export interface Props {
-  sc?: number;
+  sc?: string;
 }
 
 /**
@@ -29,9 +29,9 @@ const action = async (
   ](
     {
       orderFormId,
-      sc: sc ?? (ctx.allowMixedSegments
-        ? segment?.payload.channel
-        : ctx.salesChannel),
+      sc:
+        sc ??
+        (ctx.allowMixedSegments ? segment?.payload.channel : ctx.salesChannel),
     },
     {
       headers: {

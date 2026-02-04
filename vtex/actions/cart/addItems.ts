@@ -16,7 +16,7 @@ export interface Item {
 export interface Props {
   orderItems: Item[];
   allowedOutdatedData?: Array<"paymentData">;
-  sc?: number;
+  sc?: string;
 }
 
 /**
@@ -43,7 +43,8 @@ const action = async (
         orderFormId,
         allowedOutdatedData,
         sc:
-          sc ?? (ctx.allowMixedSegments
+          sc ??
+          (ctx.allowMixedSegments
             ? segment?.payload.channel
             : ctx.salesChannel),
       },

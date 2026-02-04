@@ -105,6 +105,12 @@ export interface Props {
      */
     extraTerms?: string[];
   };
+
+  /**
+   * @title Allow Mixed Segments
+   * @description Allow mixed segments in cart operations
+   */
+  allowMixedSegments?: boolean;
 }
 export const color = 0xf71963;
 /**
@@ -114,10 +120,14 @@ export const color = 0xf71963;
  * @category Ecommmerce
  * @logo https://assets.decocache.com/mcp/0d6e795b-cefd-4853-9a51-93b346c52c3f/VTEX.svg
  */
-export default function VTEX(
-  { appKey, appToken, account, publicUrl: _publicUrl, salesChannel, ...props }:
-    Props,
-) {
+export default function VTEX({
+  appKey,
+  appToken,
+  account,
+  publicUrl: _publicUrl,
+  salesChannel,
+  ...props
+}: Props) {
   const publicUrl = _publicUrl?.startsWith("https://")
     ? _publicUrl
     : `https://${_publicUrl}`;
@@ -125,12 +135,12 @@ export default function VTEX(
   appKey &&
     headers.set(
       "X-VTEX-API-AppKey",
-      typeof appKey === "string" ? appKey : appKey?.get?.() ?? "",
+      typeof appKey === "string" ? appKey : (appKey?.get?.() ?? ""),
     );
   appToken &&
     headers.set(
       "X-VTEX-API-AppToken",
-      typeof appToken === "string" ? appToken : appToken?.get?.() ?? "",
+      typeof appToken === "string" ? appToken : (appToken?.get?.() ?? ""),
     );
   const sp = createHttpClient<SP>({
     base: `https://sp.vtex.com`,
@@ -181,8 +191,8 @@ export default function VTEX(
   });
 
   const cachedSearchTerms = [
-    ...(props.cachedSearchTerms?.terms?.searches ?? []).map((search) =>
-      search.term
+    ...(props.cachedSearchTerms?.terms?.searches ?? []).map(
+      (search) => search.term,
     ),
     ...(props.cachedSearchTerms?.extraTerms ?? []),
   ];
@@ -202,9 +212,7 @@ export default function VTEX(
     sub,
     cachedSearchTerms,
   };
-  const app: A<Manifest, typeof state, [
-    ReturnType<typeof workflow>,
-  ]> = {
+  const app: A<Manifest, typeof state, [ReturnType<typeof workflow>]> = {
     state,
     manifest,
     middleware,

@@ -12,7 +12,7 @@ export interface Props {
   content: Record<string, string>;
   expectedOrderFormSections?: string[];
   noSplitItem?: boolean;
-  sc?: number;
+  sc?: string;
 }
 
 export const DEFAULT_EXPECTED_SECTIONS = [
@@ -62,10 +62,9 @@ const action = async (
       orderFormId,
       attachment,
       index,
-      sc: sc ??
-        (ctx.allowMixedSegments
-          ? segment?.payload.channel
-          : ctx.salesChannel),
+      sc:
+        sc ??
+        (ctx.allowMixedSegments ? segment?.payload.channel : ctx.salesChannel),
     },
     {
       body: { content, noSplitItem, expectedOrderFormSections },

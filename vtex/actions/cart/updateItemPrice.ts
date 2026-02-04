@@ -7,7 +7,7 @@ import { getSegmentFromBag } from "../../utils/segment.ts";
 export interface Props {
   itemIndex: number;
   price: number;
-  sc?: number;
+  sc?: string;
 }
 
 /**
@@ -33,9 +33,8 @@ const action = async (
       orderFormId,
       index: itemIndex,
       sc:
-        sc ?? (ctx.allowMixedSegments
-          ? segment?.payload.channel
-          : ctx.salesChannel),
+        sc ??
+        (ctx.allowMixedSegments ? segment?.payload.channel : ctx.salesChannel),
     },
     {
       body: { price },
