@@ -34,7 +34,8 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
     descriptionProp || jsonLD?.seo?.description || "",
   );
 
-  const image = jsonLD?.post?.seo?.image || jsonLD?.seo?.image || jsonLD?.post?.image;
+  const image = jsonLD?.post?.seo?.image || jsonLD?.seo?.image ||
+    jsonLD?.post?.image;
   const canonical = jsonLD?.seo?.canonical ? jsonLD?.seo?.canonical : undefined;
   const noIndexing = !jsonLD || jsonLD.seo?.noIndexing;
 
