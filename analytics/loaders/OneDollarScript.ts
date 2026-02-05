@@ -1,6 +1,7 @@
 import { useScriptAsDataURI } from "@deco/deco/hooks";
 import {
   DEFAULT_COLLECTOR_ADDRESS,
+  USE_SITE_DOMAIN_FOR_ANALYTICS_SCRIPT,
 } from "../../website/components/OneDollarStats.tsx";
 import { Script } from "../../website/types.ts";
 import { type Flag } from "@deco/deco";
@@ -80,7 +81,7 @@ const loader = (props: Props): Script => {
         data-autocollect="false"
         data-hash-routing="true"
         data-url="${collector}"
-        src="/live/invoke/website/loaders/analyticsScript.ts?url=${staticScriptUrl}"
+        src="${USE_SITE_DOMAIN_FOR_ANALYTICS_SCRIPT ? `/live/invoke/website/loaders/analyticsScript.ts?url=${staticScriptUrl}` : staticScriptUrl}"
       ></script>`;
 
     const script = `<script defer src="${

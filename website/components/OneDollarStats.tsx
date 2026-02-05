@@ -84,6 +84,8 @@ const oneDollarSnippet = () => {
 
 export const DEFAULT_COLLECTOR_ADDRESS = "https://d.lilstts.com/events";
 
+export const USE_SITE_DOMAIN_FOR_ANALYTICS_SCRIPT = Deno.env.get("USE_SITE_DOMAIN_FOR_ANALYTICS_SCRIPT") === "true";
+
 function Component({ collectorAddress, staticScriptUrl }: Props) {
   const collector = collectorAddress ?? DEFAULT_COLLECTOR_ADDRESS;
   const staticScript = staticScriptUrl ?? DEFAULT_ANALYTICS_SCRIPT_URL;
@@ -101,7 +103,7 @@ function Component({ collectorAddress, staticScriptUrl }: Props) {
         data-autocollect="false"
         data-hash-routing="true"
         data-url={collector}
-        src={`/live/invoke/website/loaders/analyticsScript.ts?url=${staticScript}`}
+        src={USE_SITE_DOMAIN_FOR_ANALYTICS_SCRIPT ? `/live/invoke/website/loaders/analyticsScript.ts?url=${staticScript}` : staticScript}
       />
       <script defer src={useScriptAsDataURI(oneDollarSnippet)} />
     </Head>
