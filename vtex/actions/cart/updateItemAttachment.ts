@@ -63,8 +63,10 @@ const action = async (
       attachment,
       index,
       sc:
-        sc ??
-        (ctx.allowMixedSegments ? segment?.payload.channel : ctx.salesChannel),
+        sc ? sc :
+        (ctx.allowMixedSegments
+          ? segment?.payload.channel
+          : ctx.salesChannel),
     },
     {
       body: { content, noSplitItem, expectedOrderFormSections },

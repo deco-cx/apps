@@ -31,8 +31,10 @@ const action = async (
     {
       orderFormId,
       sc:
-        sc ??
-        (ctx.allowMixedSegments ? segment?.payload.channel : ctx.salesChannel),
+        sc ? sc :
+        (ctx.allowMixedSegments
+          ? segment?.payload.channel
+          : ctx.salesChannel),
     },
     {
       body: { ignoreProfileData },

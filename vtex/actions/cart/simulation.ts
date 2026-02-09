@@ -37,9 +37,10 @@ const action = async (
     {
       RnbBehavior,
       sc:
-        (sc ?? ctx.allowMixedSegments)
+        sc ? sc :
+        (ctx.allowMixedSegments
           ? segment?.payload.channel
-          : ctx.salesChannel,
+          : ctx.salesChannel),
     },
     {
       body: { items, country, postalCode },

@@ -43,7 +43,7 @@ const action = async (
         orderFormId,
         allowedOutdatedData,
         sc:
-          sc ??
+          sc ? sc :
           (ctx.allowMixedSegments
             ? segment?.payload.channel
             : ctx.salesChannel),

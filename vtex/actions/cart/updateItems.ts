@@ -44,9 +44,10 @@ const action = async (
       orderFormId,
       allowedOutdatedData,
       sc:
-        (sc ?? ctx.allowMixedSegments)
+        sc ? sc :
+        (ctx.allowMixedSegments
           ? segment?.payload.channel
-          : ctx.salesChannel,
+          : ctx.salesChannel),
     },
     {
       body: { orderItems, noSplitItem: Boolean(noSplitItem) },
