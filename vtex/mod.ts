@@ -1,5 +1,6 @@
 import { createGraphqlClient } from "../utils/graphql.ts";
-import { createHttpClient } from "../utils/http.ts";
+import { createHttpClient, type HttpClientOptions } from "../utils/http.ts";
+import { createSecureHttpClient } from "./utils/secureHttpClient.ts";
 import workflow from "../workflows/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { middleware } from "./middleware.ts";
@@ -23,6 +24,7 @@ import {
   type ManifestOf,
 } from "@deco/deco";
 import { Suggestion } from "../commerce/types.ts";
+
 export type App = ReturnType<typeof VTEX>;
 export type AppContext = AC<App>;
 export type AppManifest = ManifestOf<App>;
@@ -112,6 +114,7 @@ export interface Props {
   };
 }
 export const color = 0xf71963;
+
 /**
  * @appName vtex
  * @title VTEX
@@ -137,48 +140,58 @@ export default function VTEX(
       "X-VTEX-API-AppToken",
       typeof appToken === "string" ? appToken : appToken?.get?.() ?? "",
     );
+  
   const sp = createHttpClient<SP>({
     base: `https://sp.vtex.com`,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
+  
   const my = createHttpClient<MY>({
     base: `https://${account}.myvtex.com/`,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
-  const vcsDeprecated = createHttpClient<VTEXCommerceStable>({
+  
+  const vcsDeprecated = createSecureHttpClient<VTEXCommerceStable>({
     base: publicUrl,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
+  
   const ioUrl = publicUrl.endsWith("/")
     ? `${publicUrl}api/io/_v/private/graphql/v1`
     : `${publicUrl}/api/io/_v/private/graphql/v1`;
+  
   const io = createGraphqlClient({
     endpoint: ioUrl,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
-  const vcs = createHttpClient<VCS>({
+  
+  // Use secure clients for all authenticated endpoints
+  const vcs = createSecureHttpClient<VCS>({
     base: publicUrl,
     fetcher: fetchSafe,
     processHeaders: removeDirtyCookies,
     headers: headers,
   });
-  const api = createHttpClient<API>({
+  
+  const api = createSecureHttpClient<API>({
     base: `https://api.vtex.com/${account}`,
     fetcher: fetchSafe,
     processHeaders: removeDirtyCookies,
     headers: headers,
   });
-  const vpay = createHttpClient<VPAY>({
+  
+  const vpay = createSecureHttpClient<VPAY>({
     base: `https://${account}.vtexpayments.com.br`,
     fetcher: fetchSafe,
     processHeaders: removeDirtyCookies,
     headers: headers,
   });
-  const sub = createHttpClient<SUB>({
+  
+  const sub = createSecureHttpClient<SUB>({
     base: `https://${account}.vtexcommercestable.com.br`,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
@@ -207,6 +220,7 @@ export default function VTEX(
     sub,
     cachedSearchTerms,
   };
+  
   const app: A<Manifest, typeof state, [
     ReturnType<typeof workflow>,
   ]> = {
@@ -215,8 +229,10 @@ export default function VTEX(
     middleware,
     dependencies: [workflow({})],
   };
+  
   return app;
 }
+
 export const preview = async (props: AppRuntime) => {
   const markdownContent = await Markdown(
     new URL("./README.md", import.meta.url).href,
