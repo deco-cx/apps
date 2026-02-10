@@ -1,6 +1,6 @@
 import { type RequestInit } from "@deco/deco";
 import { fetchSafe } from "./fetch.ts";
-import { normalize } from "node:path";
+import { normalize } from "node:path/posix";
 
 // Check if DEBUG_HTTP env var is set
 const DEBUG_HTTP = Deno.env.get("DEBUG_HTTP") === "true";
@@ -196,8 +196,10 @@ export const createHttpClient = <T>(
           )
           .join("/");
 
-        if(normalize(compiled) !== compiled){
-          throw new Error(`Path traversal detected in parameter '${path}': ${compiled}`);
+        if (normalize(compiled) !== compiled) {
+          throw new Error(
+            `Path traversal detected in parameter '${path}': ${compiled}`,
+          );
         }
 
         const url = new URL(compiled, base);
