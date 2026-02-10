@@ -1,6 +1,7 @@
 import { type RequestInit } from "@deco/deco";
 import { fetchSafe } from "./fetch.ts";
 import { normalize } from "node:path/posix";
+import { normalize as normalizeWin32 } from "node:path/win32";
 
 // Check if DEBUG_HTTP env var is set
 const DEBUG_HTTP = Deno.env.get("DEBUG_HTTP") === "true";
@@ -196,7 +197,10 @@ export const createHttpClient = <T>(
           )
           .join("/");
 
-        if (normalize(compiled) !== compiled) {
+        if (
+          normalize(compiled) !== compiled ||
+          normalizeWin32(compiled) !== compiled
+        ) {
           throw new Error(
             `Path traversal detected in parameter '${path}': ${compiled}`,
           );
