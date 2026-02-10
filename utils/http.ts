@@ -123,14 +123,14 @@ function normalizePathParam(
   // Step 2: Check for path traversal in decoded value
   if (decoded.includes("..")) {
     throw new Error(
-      `Path traversal detected in parameter '${paramName}': ${str}`,
+      `Path traversal detected in parameter '${paramName}'`,
     );
   }
 
   // Step 3: Block absolute paths
   if (decoded.startsWith("/") || decoded.startsWith("\\")) {
     throw new Error(
-      `Absolute paths not allowed in parameter '${paramName}': ${str}`,
+      `Absolute paths not allowed in parameter '${paramName}'`,
     );
   }
 
@@ -145,7 +145,7 @@ function normalizePathParam(
   for (const segment of segments) {
     if (segment === ".." || segment === ".") {
       throw new Error(
-        `Invalid path segment in parameter '${paramName}': ${str}`,
+        `Invalid path segment in parameter '${paramName}'`,
       );
     }
   }
@@ -153,7 +153,7 @@ function normalizePathParam(
   // Step 6: Block null bytes
   if (normalized.includes("\0")) {
     throw new Error(
-      `Null byte detected in parameter '${paramName}': ${str}`,
+      `Null byte detected in parameter '${paramName}'`,
     );
   }
 
@@ -258,22 +258,31 @@ export const createHttpClient = <T>(
 
             // Normalize and validate path parameters to prevent path traversal
             if (param !== undefined) {
-              // Handle array params (for wildcard routes like /*)
-              if (Array.isArray(param)) {
-                return param.map((item) => {
-                  const itemStr = String(item);
-                  const normalized = normalizePathParam(itemStr, name);
-                  // URL encode to prevent injection attacks
-                  return encodeURIComponent(normalized);
-                });
+              try {
+                // Handle array params (for wildcard routes like /*)
+                if (Array.isArray(param)) {
+                  return param.map((item) => {
+                    const itemStr = String(item);
+                    const normalized = normalizePathParam(itemStr, name);
+                    // URL encode to prevent injection attacks
+                    return encodeURIComponent(normalized);
+                  });
+                }
+
+                // Handle single value params
+                const paramStr = String(param);
+                const normalized = normalizePathParam(paramStr, name);
+
+                // URL encode to prevent injection attacks
+                return encodeURIComponent(normalized);
+              } catch (_error) {
+                // Translate validation errors into generic HTTP 400 errors
+                // without exposing the original input value or error details
+                throw new HttpError(
+                  400,
+                  `Invalid parameter '${name}'`,
+                );
               }
-
-              // Handle single value params
-              const paramStr = String(param);
-              const normalized = normalizePathParam(paramStr, name);
-
-              // URL encode to prevent injection attacks
-              return encodeURIComponent(normalized);
             }
 
             return param;
