@@ -98,6 +98,18 @@ export interface HttpClientOptions {
 }
 
 /**
+ * Encode path segment for URLs while preserving forward slashes
+ * Encodes special characters but leaves / intact for API compatibility
+ */
+function encodePathSegment(value: string): string {
+  // Split by /, encode each segment, then rejoin
+  return value
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+}
+
+/**
  * Normalize and validate path parameters to prevent path traversal attacks
  */
 function normalizePathParam(
@@ -264,17 +276,16 @@ export const createHttpClient = <T>(
                   return param.map((item) => {
                     const itemStr = String(item);
                     const normalized = normalizePathParam(itemStr, name);
-                    // URL encode to prevent injection attacks
-                    return encodeURIComponent(normalized);
+                    // Encode special chars but preserve forward slashes for API compatibility
+                    return encodePathSegment(normalized);
                   });
                 }
 
                 // Handle single value params
                 const paramStr = String(param);
                 const normalized = normalizePathParam(paramStr, name);
-
-                // URL encode to prevent injection attacks
-                return encodeURIComponent(normalized);
+                // Encode special chars but preserve forward slashes for API compatibility
+                return encodePathSegment(normalized);
               } catch (_error) {
                 // Translate validation errors into generic HTTP 400 errors
                 // without exposing the original input value or error details
