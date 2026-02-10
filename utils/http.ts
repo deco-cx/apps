@@ -268,11 +268,11 @@ export const createHttpClient = <T>(
                   return encodeURIComponent(normalized);
                 });
               }
-              
+
               // Handle single value params
               const paramStr = String(param);
               const normalized = normalizePathParam(paramStr, name);
-              
+
               // URL encode to prevent injection attacks
               return encodeURIComponent(normalized);
             }
