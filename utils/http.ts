@@ -117,8 +117,8 @@ function normalizePathParam(
       decoded = decodeURIComponent(decoded);
     }
   } catch {
-    // If decode fails, use original string
-    decoded = str;
+    // If decode fails, keep the last successful decoded value
+    // Do not reset to original string as that would bypass security checks
   }
 
   // Step 2: Check for path traversal in decoded value
@@ -259,6 +259,17 @@ export const createHttpClient = <T>(
 
             // Normalize and validate path parameters to prevent path traversal
             if (param !== undefined) {
+              // Handle array params (for wildcard routes like /*)
+              if (Array.isArray(param)) {
+                return param.map((item) => {
+                  const itemStr = String(item);
+                  const normalized = normalizePathParam(itemStr, name);
+                  // URL encode to prevent injection attacks
+                  return encodeURIComponent(normalized);
+                });
+              }
+              
+              // Handle single value params
               const paramStr = String(param);
               const normalized = normalizePathParam(paramStr, name);
               
