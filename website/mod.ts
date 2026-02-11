@@ -12,7 +12,6 @@ import {
   type FnContext,
   type Site,
 } from "@deco/deco";
-import { VTEX_PATHS_THAT_REQUIRES_SAME_REFERER } from "../vtex/loaders/proxy.ts";
 
 declare global {
   interface Window {
@@ -77,6 +76,7 @@ export interface AbTesting {
   includeScriptsToBody?: {
     includes?: Script[];
   };
+  pathsThatRequireSameReferer?: string[];
 }
 /** @titleBy framework */
 interface Fresh {
@@ -209,7 +209,9 @@ const getAbTestAudience = (abTesting: AbTesting) => {
       includeScriptsToHead: abTesting.includeScriptsToHead,
       includeScriptsToBody: abTesting.includeScriptsToBody,
       replaces: abTesting.replaces,
-      pathsThatRequireSameReferer: [...VTEX_PATHS_THAT_REQUIRES_SAME_REFERER],
+      pathsThatRequireSameReferer: [
+        ...(abTesting.pathsThatRequireSameReferer ?? []),
+      ],
     },
   };
   if (abTesting.enabled) {
