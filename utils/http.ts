@@ -17,22 +17,28 @@ const HTTP_VERBS = new Set(
     "HEAD",
   ] as const,
 );
+
 export class HttpError extends Error {
   constructor(public status: number, message?: string, options?: ErrorOptions) {
     super(message, options);
     this.name = `HttpError ${status}`;
   }
 }
+
 export interface TypedRequestInit<T> extends Omit<RequestInit, "body"> {
   body: T;
   excludeFromSearchParams?: string[];
   templateMarker?: string;
 }
+
 export interface TypedResponse<T> extends Response {
   json: () => Promise<T>;
 }
+
 type HttpVerb = typeof HTTP_VERBS extends Set<infer Verb> ? Verb : never;
+
 type URLPatternParam = string | number;
+
 type URLPatternParams<URL extends string> = URL extends
   `/:${infer param}/${infer rest}` ?
     & {
@@ -60,6 +66,7 @@ type URLPatternParams<URL extends string> = URL extends
   : URL extends `/${string}/${infer rest}` ? URLPatternParams<`/${rest}`>
   // deno-lint-ignore ban-types
   : {};
+
 export type ClientOf<T> = {
   [key in (keyof T) & `${HttpVerb} /${string}`]: key extends
     `${HttpVerb} /${infer path}` ? T[key] extends {
@@ -80,6 +87,7 @@ export type ClientOf<T> = {
     : never
     : never;
 };
+
 export interface HttpClientOptions {
   base: string;
   headers?: Headers;
@@ -87,6 +95,81 @@ export interface HttpClientOptions {
   fetcher?: typeof fetch;
   // Keep empty segments in the URL
   keepEmptySegments?: boolean;
+}
+
+/**
+ * Encode path segment for URLs while preserving forward slashes
+ * Encodes special characters but leaves / intact for API compatibility
+ */
+function encodePathSegment(value: string): string {
+  // Split by /, encode each segment, then rejoin
+  return value
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+}
+
+/**
+ * Normalize and validate path parameters to prevent path traversal attacks
+ */
+function normalizePathParam(
+  value: string | number,
+  paramName: string,
+): string {
+  const str = String(value);
+
+  // Step 1: Decode any URL encoding to catch encoded attacks
+  let decoded = str;
+  try {
+    // Decode multiple times to catch double-encoding
+    let prev = "";
+    while (prev !== decoded) {
+      prev = decoded;
+      decoded = decodeURIComponent(decoded);
+    }
+  } catch {
+    // If decode fails, keep the last successful decoded value
+    // Do not reset to original string as that would bypass security checks
+  }
+
+  // Step 2: Check for path traversal in decoded value
+  if (decoded.includes("..")) {
+    throw new Error(
+      `Path traversal detected in parameter '${paramName}'`,
+    );
+  }
+
+  // Step 3: Block absolute paths
+  if (decoded.startsWith("/") || decoded.startsWith("\\")) {
+    throw new Error(
+      `Absolute paths not allowed in parameter '${paramName}'`,
+    );
+  }
+
+  // Step 4: Normalize path separators and clean up
+  const normalized = decoded
+    .replace(/\\/g, "/") // Convert backslashes to forward slashes
+    .replace(/\/+/g, "/") // Collapse multiple slashes
+    .replace(/^\/|\/$/g, ""); // Remove leading/trailing slashes
+
+  // Step 5: Final validation - ensure no ".." or "." segments remain
+  const segments = normalized.split("/");
+  for (const segment of segments) {
+    if (segment === ".." || segment === ".") {
+      throw new Error(
+        `Invalid path segment in parameter '${paramName}'`,
+      );
+    }
+  }
+
+  // Step 6: Block null bytes
+  if (normalized.includes("\0")) {
+    throw new Error(
+      `Null byte detected in parameter '${paramName}'`,
+    );
+  }
+
+  return normalized;
 }
 
 /**
@@ -98,7 +181,6 @@ function debugRequest(
   headers: Headers,
   body?: BodyInit | null,
 ): void {
-  // if (!DEBUG_HTTP) return;
   console.log("Calling debugRequest for URL:", url);
 
   console.log("\n----- HTTP Request -----");
@@ -107,7 +189,7 @@ function debugRequest(
   // Add headers
   headers.forEach((value, key) => {
     const redacted = key.toLowerCase() === "authorization"
-      ? "<redacted>"
+      ? "<REDACTED>"
       : value;
     console.log(`  -H "${key}: ${redacted}" \\`);
   });
@@ -149,7 +231,7 @@ export const createHttpClient = <T>(
         return `HttpClient: ${base}`;
       }
       if (typeof prop !== "string") {
-        throw new TypeError(`HttpClient: Uknown path ${typeof prop}`);
+        throw new TypeError(`HttpClient: Unknown path ${typeof prop}`);
       }
       const [method, path] = prop.split(" ");
 
@@ -184,6 +266,34 @@ export const createHttpClient = <T>(
             const param = mapped.get(name);
             if (param === undefined && isRequired) {
               throw new TypeError(`HttpClient: Missing ${name} at ${path}`);
+            }
+
+            // Normalize and validate path parameters to prevent path traversal
+            if (param !== undefined) {
+              try {
+                // Handle array params (for wildcard routes like /*)
+                if (Array.isArray(param)) {
+                  return param.map((item) => {
+                    const itemStr = String(item);
+                    const normalized = normalizePathParam(itemStr, name);
+                    // Encode special chars but preserve forward slashes for API compatibility
+                    return encodePathSegment(normalized);
+                  });
+                }
+
+                // Handle single value params
+                const paramStr = String(param);
+                const normalized = normalizePathParam(paramStr, name);
+                // Encode special chars but preserve forward slashes for API compatibility
+                return encodePathSegment(normalized);
+              } catch (_error) {
+                // Translate validation errors into generic HTTP 400 errors
+                // without exposing the original input value or error details
+                throw new HttpError(
+                  400,
+                  `Invalid parameter '${name}'`,
+                );
+              }
             }
 
             return param;
@@ -238,6 +348,7 @@ export const createHttpClient = <T>(
     },
   });
 };
+
 // deno-lint-ignore no-explicit-any
 export const nullOnNotFound = (error: any) => {
   if (error.status === 404) {

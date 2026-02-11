@@ -10,6 +10,11 @@ export interface Props {
    * @description Used to sync user data with linx impulse
    */
   user?: Person | null;
+  /**
+   * @title Force Source
+   * @description Force the source of the request
+   */
+  forceSource?: "desktop" | "mobile";
 
   /**
    * @ignore
@@ -27,7 +32,7 @@ const loaders = async (
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
   const { api, apiKey, origin } = ctx;
-  const { user, userId: _userId } = props;
+  const { user, userId: _userId, forceSource } = props;
   const userId = _userId ?? user?.["@id"];
 
   const search = await api["GET /engage/search/v3/autocompletes/popular"]({
@@ -35,7 +40,7 @@ const loaders = async (
     origin,
     deviceId: getDeviceIdFromBag(ctx),
     salesChannel: ctx.salesChannel,
-    source: getSource(ctx),
+    source: forceSource ?? getSource(ctx),
     userId,
     // For some reason the API is returning onlyIds products, even when the productFormat is set to complete
     // If you are here to fix this, see the output of the API and check if the products are being returned

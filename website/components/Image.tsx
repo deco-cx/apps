@@ -5,8 +5,11 @@ import { Manifest } from "../manifest.gen.ts";
 
 export const PATH: `/live/invoke/${keyof Manifest["loaders"]}` =
   "/live/invoke/website/loaders/image.ts";
-const DECO_CACHE_URL = "https://assets.decocache.com/";
-const S3_URL = "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/";
+const ASSET_URLS_TO_REPLACE = [
+  "https://assets.decocache.com/",
+  "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/",
+  "https://data.decoassets.com/",
+];
 
 export type SetEarlyHint = (hint: string) => void;
 export type Props =
@@ -101,6 +104,16 @@ const optimizeVTEX = (opts: OptimizationOptions) => {
   return src.href;
 };
 
+const optimizeWake = (opts: OptimizationOptions) => {
+  const { originalSrc, width, height } = opts;
+
+  const url = new URL(originalSrc);
+  url.searchParams.set("w", `${width}`);
+  url.searchParams.set("h", `${height}`);
+
+  return url.href;
+};
+
 const optimizeMagento = (opts: OptimizationOptions) => {
   const { originalSrc, width, height } = opts;
 
@@ -114,7 +127,6 @@ const optimizeMagento = (opts: OptimizationOptions) => {
   return url.href;
 };
 
-
 export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   const { originalSrc, width, height, fit } = opts;
 
@@ -126,7 +138,11 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     if (originalSrc.includes("media/catalog/product")) {
       return optimizeMagento(opts);
     }
-    
+
+    if (originalSrc.includes("fbitsstatic.net/img/")) {
+      return optimizeWake(opts);
+    }
+
     if (originalSrc.startsWith("https://cdn.vnda.")) {
       return optmizeVNDA(opts);
     }
@@ -162,13 +178,11 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   height && params.set("height", `${height}`);
 
   if (isAzionAssetsEnabled()) {
-    const imageSource = originalSrc
-      .replace(DECO_CACHE_URL, "")
-      .replace(
-        S3_URL,
-        "",
-      )
-      .split("?")[0];
+    const originalSrc = ASSET_URLS_TO_REPLACE.reduce(
+      (acc, url) => acc.replace(url, ""),
+      opts.originalSrc,
+    );
+    const imageSource = originalSrc.split("?")[0];
     // src is being passed separately to avoid URL encoding issues
     return `https://deco-assets.decoazn.com/image?${params}&src=${imageSource}`;
   }
@@ -238,12 +252,6 @@ export const getEarlyHintFromSrcProps = (srcProps: {
 
 const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
   const { preload, loading = "lazy" } = props;
-
-  if (!props.height) {
-    console.warn(
-      `Missing height. This image will NOT be optimized: ${props.src}`,
-    );
-  }
 
   const shouldSetEarlyHint = !!props.setEarlyHint && preload;
   const srcSet = props.srcSet ??

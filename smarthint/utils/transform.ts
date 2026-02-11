@@ -270,7 +270,7 @@ export const toProduct = (product: SHProduct): Product => {
         sku: specification.sku!,
         additionalProperty: specification.variations?.map((variation) => ({
           "@type": "PropertyValue" as const,
-          name: "Tamanho",
+          name: variation.Name,
           value: variation.Value,
         })),
         offers: {

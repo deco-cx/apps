@@ -101,3 +101,11 @@ export default async function getReviewProduct(
     aggregateRating,
   };
 }
+
+export const cache = {
+  maxAge: 60 * 60, // 1 hour
+};
+
+export const cacheKey = (props: Props) => {
+  return JSON.stringify(props);
+};
