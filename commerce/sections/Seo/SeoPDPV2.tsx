@@ -6,6 +6,10 @@ import {
 import { ProductDetailsPage } from "../../types.ts";
 import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";
 import { AppContext } from "../../mod.ts";
+import {
+  shouldIncludeStructuredData,
+  StructuredDataControl,
+} from "../../utils/structuredData.ts";
 
 export interface Props {
   /** @title Data Source */
@@ -23,8 +27,15 @@ export interface Props {
   /**
    * @title Ignore Structured Data
    * @description By default, Structured Data is sent to everyone. Use this to prevent Structured Data from being sent to your customers, it will still be sent to crawlers and bots. Be aware that some integrations may not work if Structured Data is not sent.
+   * @deprecated Use `structuredDataControl` instead.
    */
   ignoreStructuredData?: boolean;
+  /**
+   * @title Structured Data Control
+   * @description Choose when to include JSON-LD structured data. Default sends to everyone. "disable for users" shows only to bots/crawlers. "disable for all" removes completely. Note: some third-party integrations may require structured data to function properly.
+   * @default "always include"
+   */
+  structuredDataControl?: StructuredDataControl;
 }
 
 /** @title Product details */
@@ -41,6 +52,7 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     jsonLD,
     omitVariants,
     ignoreStructuredData,
+    structuredDataControl,
   } = props;
 
   const title = renderTemplateString(
@@ -63,9 +75,13 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     jsonLD.product.isVariantOf.hasVariant = [];
   }
 
-  const jsonLDs = (ignoreStructuredData && !ctx.isBot) || !jsonLD
-    ? []
-    : [jsonLD];
+  // Handle deprecated prop
+  const mode = structuredDataControl ??
+    (ignoreStructuredData ? "disable for users" : "always include");
+
+  const jsonLDs = shouldIncludeStructuredData(jsonLD, mode, ctx.isBot)
+    ? [jsonLD]
+    : [];
 
   return {
     ...seoSiteProps,
