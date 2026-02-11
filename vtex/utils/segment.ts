@@ -76,6 +76,37 @@ export const setOrderFormIdInBag = (
   ctx: AppContext,
   orderFormId: Promise<string | undefined>,
 ) => ctx?.bag?.set(ORDER_FORM_ID, orderFormId);
+
+/**
+ * Creates a stable cache key from segment that only includes business-critical fields.
+ * Excludes marketing/tracking parameters (UTM, UTMI) to prevent cache fragmentation.
+ *
+ * Use this for cacheKey generation instead of the full segment token.
+ */
+export const getSegmentCacheKeyWithoutUTM = (ctx: AppContext): string => {
+  const segment = getSegmentFromBag(ctx)?.payload;
+
+  if (!segment) {
+    return "";
+  }
+
+  // Only include fields that affect pricing, inventory, or content
+  const cacheRelevantSegment = {
+    campaigns: segment.campaigns, // VTEX campaigns (can affect pricing)
+    channel: segment.channel, // Sales channel (affects inventory/pricing)
+    priceTables: segment.priceTables, // Price tables (affects pricing)
+    regionId: segment.regionId, // Region (can affect pricing/inventory)
+    currencyCode: segment.currencyCode, // Currency
+    cultureInfo: segment.cultureInfo, // Locale/language
+    countryCode: segment.countryCode, // Country
+    channelPrivacy: segment.channelPrivacy, // Privacy settings
+    // EXCLUDED: utm_campaign, utm_source, utm_medium (marketing only)
+    // EXCLUDED: utmi_campaign, utmi_page, utmi_part (VTEX tracking only)
+  };
+
+  // Stable serialization for consistent cache keys
+  return btoa(JSON.stringify(cacheRelevantSegment));
+};
 /**
  * Stable serialization.
  *
