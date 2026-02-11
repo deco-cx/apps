@@ -39,8 +39,14 @@ export const withDefaultFacets = (
   return [...allFacets];
 };
 
+function removeLeadingSlash(value: string) {
+  return value.replace(/^\//, "");
+}
+
 export const toPath = (facets: SelectedFacet[]) =>
-  facets.map(({ key, value }) => `${key}/${value}`).join("/");
+  removeLeadingSlash(
+    facets.map(({ key, value }) => `${key}/${value}`).join("/"),
+  );
 
 interface Params {
   query: string;
