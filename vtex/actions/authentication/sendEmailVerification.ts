@@ -1,5 +1,7 @@
 import { setCookie } from "std/http/mod.ts";
 import type { AppContext } from "../../mod.ts";
+import { getSetCookies } from "std/http/cookie.ts";
+import { buildCookieJar, proxySetCookie } from "../../utils/cookies.ts";
 
 export interface Props {
   email: string;
@@ -15,7 +17,7 @@ export type SendEmailVerificationResult = boolean;
  */
 export default async function action(
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<SendEmailVerificationResult> {
   const { vcsDeprecated } = ctx;
@@ -26,6 +28,9 @@ export default async function action(
 
   const startAuthentication = await ctx.invoke.vtex.actions.authentication
     .startAuthentication({});
+
+  const startSetCookies = getSetCookies(ctx.response.headers);
+  const { header: cookie } = buildCookieJar(req.headers, startSetCookies);
 
   if (!startAuthentication?.authenticationToken) {
     throw new Error(
@@ -48,14 +53,18 @@ export default async function action(
   try {
     const response = await vcsDeprecated[
       "POST /api/vtexid/pub/authentication/accesskey/send"
-    ]({
-      deliveryMethod: "email",
-    }, {
-      body: formData,
-      headers: {
-        "Accept": "application/json",
+    ](
+      {
+        deliveryMethod: "email",
       },
-    });
+      {
+        body: formData,
+        headers: {
+          Accept: "application/json",
+          cookie,
+        },
+      },
+    );
 
     if (!response.ok) {
       throw new Error(
@@ -67,6 +76,8 @@ export default async function action(
     if (data?.authStatus === "InvalidToken") {
       throw new Error('"Authentication Token" is invalid');
     }
+
+    proxySetCookie(response.headers, ctx.response.headers, req.url);
 
     // VtexSessionToken is valid for 10 minutes
     const SESSION_TOKEN_EXPIRES = 600;

@@ -5,6 +5,7 @@ import {
   setISCookiesBag,
 } from "./utils/intelligentSearch.ts";
 import { getSegmentFromBag, setSegmentBag } from "./utils/segment.ts";
+// import { parseCookie } from "./utils/vtexId.ts";
 
 export const middleware = (
   _props: unknown,

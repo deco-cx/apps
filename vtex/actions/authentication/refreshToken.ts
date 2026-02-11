@@ -1,12 +1,19 @@
-import { getCookies, setCookie } from "std/http/cookie.ts";
+import { deleteCookie, getSetCookies, setCookie } from "std/http/cookie.ts";
 import { AppContext } from "../../mod.ts";
-import getLoginCookies from "../../utils/login/getLoginCookies.ts";
-import { getSetCookies } from "std/http/mod.ts";
-import { VID_RT_COOKIE_NAME } from "../../utils/login/setLoginCookies.ts";
+import { buildCookieJar, REFRESH_TOKEN_COOKIE } from "../../utils/cookies.ts";
 
 interface Props {
   fingerprint?: string;
 }
+
+const STATUS = {
+  SUCCESS: "Success",
+  INVALID_SESSION: "InvalidSession",
+  INVALID_TOKEN: "InvalidToken",
+  INVALID_EMAIL: "InvalidEmail",
+  INVALID_SCOPE: "InvalidScope",
+  ERROR: "Error",
+};
 
 /**
  * @title Refresh Authentication Token
@@ -19,9 +26,13 @@ export default async function refreshToken(
 ) {
   const { fingerprint } = props;
   const { vcsDeprecated } = ctx;
-  const cookies = getLoginCookies({ cookies: getCookies(req.headers) });
+  const setCookiesSoFar = getSetCookies(ctx.response.headers);
+  const { cookies, header: cookie } = buildCookieJar(
+    req.headers,
+    setCookiesSoFar,
+  );
 
-  if (!cookies.vid_rt) {
+  if (!cookies[REFRESH_TOKEN_COOKIE]) {
     throw new Error("Refresh token cookie is missing");
   }
 
@@ -31,9 +42,7 @@ export default async function refreshToken(
         fingerprint,
       },
       headers: {
-        cookie: Object.entries(cookies)
-          .map(([name, value]) => `${name}=${value}`)
-          .join("; "),
+        cookie,
       },
     });
 
@@ -44,41 +53,20 @@ export default async function refreshToken(
   }
 
   const data = await response.json();
-  const setCookies = getSetCookies(response.headers);
-  const vidRtCookie = setCookies?.find((cookie) =>
-    cookie.name === VID_RT_COOKIE_NAME
-  );
-  const authCookies = setCookies?.filter((cookie) =>
-    cookie.name.startsWith("VtexIdclientAutCookie")
-  ).filter((cookie) => cookie !== undefined);
 
-  if (!vidRtCookie) {
-    return;
+  if (data?.status !== STATUS.SUCCESS) {
+    deleteCookie(ctx.response.headers, REFRESH_TOKEN_COOKIE, {
+      path: "/",
+      domain: new URL(req.url).hostname,
+    });
   }
 
-  const expiresDate = new Date(vidRtCookie.expires ?? 0);
-  const maxAge = Math.max(
-    0,
-    Math.floor((expiresDate.getTime() - Date.now()) / 1000),
-  );
-
-  setCookie(ctx.response.headers, {
-    name: VID_RT_COOKIE_NAME,
-    value: vidRtCookie.value,
-    httpOnly: true,
-    maxAge: maxAge,
-    path: "/",
-    secure: true,
-  });
-
-  for (const cookie of authCookies) {
+  const setCookies = getSetCookies(response.headers);
+  for (const cookie of setCookies) {
     setCookie(ctx.response.headers, {
-      name: cookie.name,
-      value: cookie.value,
-      httpOnly: true,
-      maxAge: maxAge,
-      path: "/",
-      secure: true,
+      ...cookie,
+      path: cookie.name === REFRESH_TOKEN_COOKIE ? "/" : cookie.path,
+      domain: new URL(req.url).hostname,
     });
   }
 

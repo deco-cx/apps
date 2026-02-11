@@ -1,34 +1,57 @@
-import { getCookies, setCookie } from "std/http/mod.ts";
-import { AppContext } from "../../mod.ts";
-import { parseCookie } from "../../utils/vtexId.ts";
+// import { getCookies, getSetCookies } from "std/http/cookie.ts";
+import type { AppContext } from "../../mod.ts";
+import { proxySetCookie, REFRESH_TOKEN_COOKIE } from "../../utils/cookies.ts";
+// import { setSegmentBag } from "../../utils/segment.ts";
+import { redirect } from "@deco/deco";
+import { LogoutResponse } from "../../utils/types.ts";
+import { deleteCookie } from "std/http/cookie.ts";
+
+export interface Props {
+  /**
+   * URL to redirect after logout
+   * @default "/"
+   */
+  returnUrl?: string;
+}
 
 /**
- * @title Logout
- * @description Logout the user
+ * @title VTEX Integration - Logout
+ * @description Performs user logout and cleans session data
  */
 export default async function action(
-  _: unknown,
+  { returnUrl = "/" }: Props,
   req: Request,
   ctx: AppContext,
-) {
-  const cookies = getCookies(req.headers);
-  const { payload } = parseCookie(req.headers, ctx.account);
+): Promise<LogoutResponse> {
+  const { account, vcsDeprecated } = ctx;
 
-  for (const cookieName in cookies) {
-    if (cookieName.startsWith("VtexIdclientAutCookie")) {
-      setCookie(ctx.response.headers, {
-        name: cookieName,
-        value: "",
-        expires: new Date(0),
-        path: "/",
-      });
-    }
+  const response = await vcsDeprecated["GET /api/vtexid/pub/logout"]({
+    scope: account,
+  }, {
+    headers: {
+      "cookie": req.headers.get("cookie") || "",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Logout request failed: ${response.status} ${response.statusText}`,
+    );
   }
 
-  const sessionId = payload?.sess;
-  if (!sessionId) {
-    return;
-  }
+  const data = await response.json();
 
-  await ctx.invoke.vtex.actions.session.deleteSession({ sessionId });
+  deleteCookie(ctx.response.headers, REFRESH_TOKEN_COOKIE, {
+    path: "/",
+    domain: new URL(req.url).hostname,
+  });
+
+  proxySetCookie(response.headers, ctx.response.headers, req.url);
+
+  await ctx.invoke.vtex.actions.cart.updateUser();
+  await ctx.invoke.vtex.actions.session
+    .validateSession();
+
+  redirect(returnUrl);
+  return data;
 }

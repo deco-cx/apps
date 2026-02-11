@@ -1,7 +1,12 @@
 import { AppContext } from "../../mod.ts";
 import { AuthResponse } from "../../utils/types.ts";
-import setLoginCookies from "../../utils/login/setLoginCookies.ts";
-import { getSetCookies } from "std/http/cookie.ts";
+// import setLoginCookies from "../../utils/login/setLoginCookies.ts";
+import { getSetCookies, setCookie } from "std/http/cookie.ts";
+import {
+  buildCookieJar,
+  proxySetCookie,
+  REFRESH_TOKEN_COOKIE,
+} from "../../utils/cookies.ts";
 
 export interface Props {
   email: string;
@@ -14,7 +19,7 @@ export interface Props {
  */
 export default async function action(
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<AuthResponse> {
   const { vcsDeprecated } = ctx;
@@ -26,6 +31,8 @@ export default async function action(
   const startAuthentication = await ctx.invoke.vtex.actions.authentication
     .startAuthentication({});
 
+  const startSetCookies = getSetCookies(ctx.response.headers);
+  const { header: cookieHeader } = buildCookieJar(req.headers, startSetCookies);
   const authenticationToken = startAuthentication?.authenticationToken;
 
   if (!authenticationToken) {
@@ -39,17 +46,19 @@ export default async function action(
   urlencoded.append("password", props.password);
   urlencoded.append("authenticationToken", authenticationToken);
 
-  const response = await vcsDeprecated
-    ["POST /api/vtexid/pub/authentication/classic/validate"](
-      {},
-      {
-        body: urlencoded,
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Accept": "application/json",
-        },
+  const response = await vcsDeprecated[
+    "POST /api/vtexid/pub/authentication/classic/validate"
+  ](
+    {},
+    {
+      body: urlencoded,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Accept: "application/json",
+        cookie: cookieHeader,
       },
-    );
+    },
+  );
 
   if (!response.ok) {
     throw new Error(
@@ -58,8 +67,27 @@ export default async function action(
   }
 
   const data: AuthResponse = await response.json();
-  const setCookies = getSetCookies(response.headers);
-  await setLoginCookies(data, ctx, setCookies);
+  proxySetCookie(response.headers, ctx.response.headers, req.url);
+  if (data.authStatus === "Success") {
+    // First login was made, but we need to call the refresh token at least once to get the refreshAfter for the first time
+    const dataRefreshToken = await ctx.invoke.vtex.actions.authentication
+      .refreshToken();
+    await ctx.invoke.vtex.actions.session.validateSession({
+      publicProperties: {
+        refreshAfter: { value: dataRefreshToken.refreshAfter },
+      },
+    });
+    // TODO: REMOVE THIS AFTER TESTING AND VALIDATE IF NEEDED REWRITE REFRESH_TOKEN_COOKIE
+    const setCookies = getSetCookies(ctx.response.headers);
+    for (const cookie of setCookies) {
+      if (cookie.name === REFRESH_TOKEN_COOKIE) {
+        setCookie(ctx.response.headers, {
+          ...cookie,
+          path: "/", // default path is /api/vtexid/refreshtoken/webstore, but browser dont send to backend headers
+        });
+      }
+    }
+  }
 
   return data;
 }
