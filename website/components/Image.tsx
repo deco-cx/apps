@@ -250,8 +250,24 @@ export const getEarlyHintFromSrcProps = (srcProps: {
   return earlyHintParts.join("; ");
 };
 
+const isSvg = (src: string) => src?.toLowerCase().endsWith(".svg");
+
 const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
   const { preload, loading = "lazy" } = props;
+
+  // SVGs are vector graphics and don't need raster optimization
+  if (isSvg(props.src)) {
+    return (
+      <img
+        {...props}
+        data-fresh-disable-lock
+        preload={undefined}
+        src={props.src}
+        loading={loading}
+        ref={ref}
+      />
+    );
+  }
 
   const shouldSetEarlyHint = !!props.setEarlyHint && preload;
   const srcSet = props.srcSet ??
