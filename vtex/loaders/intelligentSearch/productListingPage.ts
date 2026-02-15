@@ -90,6 +90,7 @@ const ALLOWED_PARAMS = new Set([
   "q",
   "fuzzy",
   "map",
+  "zip-code",
 ]);
 export interface Props {
   /**
@@ -187,6 +188,7 @@ const searchArgsOf = (props: Props, url: URL) => {
   );
   const fuzzy = mapLabelledFuzzyToFuzzy(props.fuzzy) ??
     (url.searchParams.get("fuzzy") as Fuzzy);
+  const zipCode = url.searchParams.get("zip-code") ?? undefined;
   return {
     query,
     fuzzy,
@@ -196,6 +198,7 @@ const searchArgsOf = (props: Props, url: URL) => {
     hideUnavailableItems,
     selectedFacets,
     simulationBehavior,
+    zipCode,
   };
 };
 const PAGE_TYPE_TO_MAP_PARAM = {
@@ -395,6 +398,7 @@ const loader = async (
   const paramsToPersist = new URLSearchParams();
   searchArgs.query && paramsToPersist.set("q", searchArgs.query);
   searchArgs.sort && paramsToPersist.set("sort", searchArgs.sort);
+  searchArgs.zipCode && paramsToPersist.set("zip-code", searchArgs.zipCode);
   const filters = facets
     .filter((f) => !f.hidden)
     .map(toFilter(selectedFacets, paramsToPersist));
