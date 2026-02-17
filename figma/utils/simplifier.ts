@@ -3,7 +3,7 @@ import type {
   FigmaComponentSet,
   FigmaNode,
   FigmaStyle,
-} from "../client.ts";
+} from "./client.ts";
 
 type SimplifiedNode = Omit<Partial<FigmaNode>, "children"> & {
   children?: SimplifiedNode[];
