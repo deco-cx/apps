@@ -36,17 +36,28 @@ export const FACTORS = [1, 2];
 
 type FitOptions = "contain" | "cover";
 
-const isImageOptmizationEnabled = () =>
+// By default we use the platform image optimization, with functions like:
+// optimizeVTEX, optimizeWake, optmizeShopify
+// if you want to use deco optimization
+// you can set the OVERRIDE_PLATFORM_IMAGE_OPTIMIZATION environment variable to true
+const bypassPlatformImageOptimization = () =>
   IS_BROWSER
     // deno-lint-ignore no-explicit-any
-    ? (globalThis as any).DECO?.featureFlags?.enableImageOptimization
-    : Deno.env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
+    ? (globalThis as any).DECO?.featureFlags?.bypassPlatformImageOptimization
+    : Deno.env.get("BYPASS_PLATFORM_IMAGE_OPTIMIZATION") === "true";
 
+// Default is true
 const isAzionAssetsEnabled = () =>
   IS_BROWSER
     // deno-lint-ignore no-explicit-any
     ? (globalThis as any).DECO?.featureFlags?.azionAssets
     : Deno.env.get("ENABLE_AZION_ASSETS") !== "false";
+
+const bypassDecoImageOptimization = () =>
+  IS_BROWSER
+    // deno-lint-ignore no-explicit-any
+    ? (globalThis as any).DECO?.featureFlags?.bypassDecoImageOptimization
+    : Deno.env.get("BYPASS_DECO_IMAGE_OPTIMIZATION") === "true";
 
 const canShowWarning = () =>
   IS_BROWSER ? false : !Deno.env.get("DENO_DEPLOYMENT_ID");
@@ -57,6 +68,7 @@ interface OptimizationOptions {
   height?: number;
   factor: number;
   fit: FitOptions;
+  quality?: "low" | "medium" | "high" | "original"; // 60% - 70% - 80% - 100%
 }
 
 const optmizeVNDA = (opts: OptimizationOptions) => {
@@ -114,6 +126,32 @@ const optimizeWake = (opts: OptimizationOptions) => {
   return url.href;
 };
 
+const qualityToNumber = (quality: "low" | "medium" | "high" | "original") => {
+  switch (quality) {
+    case "low":
+      return 60;
+    case "medium":
+      return 70;
+    case "high":
+      return 80;
+    case "original":
+      return 100;
+  }
+};
+
+const optimizeSourei = (opts: OptimizationOptions) => {
+  const { originalSrc, width, height, fit, quality } = opts;
+
+  const url = new URL(originalSrc);
+  url.searchParams.set("w", `${width}`);
+  height && url.searchParams.set("h", `${height}`);
+  fit && url.searchParams.set("fit", fit);
+  quality &&
+    url.searchParams.set("quality", qualityToNumber(quality).toString());
+
+  return url.href;
+};
+
 const optimizeMagento = (opts: OptimizationOptions) => {
   const { originalSrc, width, height } = opts;
 
@@ -128,13 +166,17 @@ const optimizeMagento = (opts: OptimizationOptions) => {
 };
 
 export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
-  const { originalSrc, width, height, fit } = opts;
+  const { originalSrc, width, height, fit, quality } = opts;
 
   if (originalSrc.startsWith("data:")) {
     return originalSrc;
   }
 
-  if (!isImageOptmizationEnabled()) {
+  if (!bypassPlatformImageOptimization()) {
+    if (originalSrc.startsWith("https://media-storage-staging.soureicdn.com")) {
+      return optimizeSourei(opts);
+    }
+
     if (originalSrc.includes("media/catalog/product")) {
       return optimizeMagento(opts);
     }
@@ -171,11 +213,16 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     }
   }
 
+  if (bypassDecoImageOptimization()) {
+    return originalSrc;
+  }
+
   const params = new URLSearchParams();
 
   params.set("fit", fit);
   params.set("width", `${width}`);
   height && params.set("height", `${height}`);
+  quality && params.set("quality", quality);
 
   if (isAzionAssetsEnabled()) {
     const originalSrc = ASSET_URLS_TO_REPLACE.reduce(
@@ -184,7 +231,7 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     );
     const imageSource = originalSrc.split("?")[0];
     // src is being passed separately to avoid URL encoding issues
-    return `https://deco-assets.decoazn.com/image?${params}&src=${imageSource}`;
+    return `https://deco-assets.edgedeco.com/image?${params}&src=${imageSource}`;
   }
 
   params.set("src", originalSrc);

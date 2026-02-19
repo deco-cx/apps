@@ -18,9 +18,9 @@ export const review = sqliteTable("review", {
   author: text("author", { mode: "json" }),
   datePublished: (text("datePublished")).notNull(),
   dateModified: (text("dateModified")).notNull(),
-  reviewHeadline: (text("reviewHeadline")),
+  reviewHeadline: text("reviewHeadline"),
   reviewBody: (text("reviewBody")).notNull(),
-  additionalType: (text("additionalType")),
+  additionalType: text("additionalType"),
   isAnonymous: integer("isAnonymous", { mode: "boolean" }),
 });
 
