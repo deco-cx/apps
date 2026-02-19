@@ -39,7 +39,7 @@ type FitOptions = "contain" | "cover";
 // By default we use the platform image optimization, with functions like:
 // optimizeVTEX, optimizeWake, optmizeShopify
 // if you want to use deco optimization
-// you can set the OVERRIDE_PLATFORM_IMAGE_OPTIMIZATION environment variable to true
+// you can set the BYPASS_PLATFORM_IMAGE_OPTIMIZATION environment variable to true
 const bypassPlatformImageOptimization = () =>
   IS_BROWSER
     // deno-lint-ignore no-explicit-any
@@ -222,9 +222,11 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   params.set("fit", fit);
   params.set("width", `${width}`);
   height && params.set("height", `${height}`);
-  quality && params.set("quality", quality);
 
   if (isAzionAssetsEnabled()) {
+    // only accepted for Azion for now
+    quality && params.set("quality", quality);
+
     const originalSrc = ASSET_URLS_TO_REPLACE.reduce(
       (acc, url) => acc.replace(url, ""),
       opts.originalSrc,
