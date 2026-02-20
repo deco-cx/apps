@@ -29,6 +29,8 @@ export type Props =
     fetchPriority?: "high" | "low" | "auto";
     /** @description Object-fit */
     fit?: FitOptions;
+    /** @description Quality */
+    quality?: QualityOptions;
     setEarlyHint?: SetEarlyHint;
   };
 
@@ -40,6 +42,7 @@ type FitOptions = "contain" | "cover";
 // optimizeVTEX, optimizeWake, optmizeShopify
 // if you want to use deco optimization
 // you can set the BYPASS_PLATFORM_IMAGE_OPTIMIZATION environment variable to true
+// Default is false
 const bypassPlatformImageOptimization = () =>
   IS_BROWSER
     // deno-lint-ignore no-explicit-any
@@ -53,6 +56,7 @@ const isAzionAssetsEnabled = () =>
     ? (globalThis as any).DECO?.featureFlags?.azionAssets
     : Deno.env.get("ENABLE_AZION_ASSETS") !== "false";
 
+// Default is false
 const bypassDecoImageOptimization = () =>
   IS_BROWSER
     // deno-lint-ignore no-explicit-any
@@ -62,13 +66,15 @@ const bypassDecoImageOptimization = () =>
 const canShowWarning = () =>
   IS_BROWSER ? false : !Deno.env.get("DENO_DEPLOYMENT_ID");
 
+export type QualityOptions = "low" | "medium" | "high" | "original"; // 60% - 70% - 80% - 100%
+
 interface OptimizationOptions {
   originalSrc: string;
   width: number;
   height?: number;
   factor: number;
   fit: FitOptions;
-  quality?: "low" | "medium" | "high" | "original"; // 60% - 70% - 80% - 100%
+  quality?: QualityOptions;
 }
 
 const optmizeVNDA = (opts: OptimizationOptions) => {
@@ -147,7 +153,7 @@ const optimizeSourei = (opts: OptimizationOptions) => {
   height && url.searchParams.set("h", `${height}`);
   fit && url.searchParams.set("fit", fit);
   quality &&
-    url.searchParams.set("quality", qualityToNumber(quality).toString());
+    url.searchParams.set("q", qualityToNumber(quality).toString());
 
   return url.href;
 };
@@ -171,9 +177,11 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   if (originalSrc.startsWith("data:")) {
     return originalSrc;
   }
-
+  console.log("bypassPlatformImageOptimization", bypassPlatformImageOptimization());
   if (!bypassPlatformImageOptimization()) {
+    console.log("originalSrc", originalSrc);
     if (originalSrc.startsWith("https://media-storage.soureicdn.com")) {
+      console.log("optimizeSourei");
       return optimizeSourei(opts);
     }
 
@@ -247,6 +255,7 @@ export const getSrcSet = (
   height?: number,
   fit?: FitOptions,
   factors: number[] = FACTORS,
+  quality?: QualityOptions,
 ) => {
   const srcSet = [];
 
@@ -261,6 +270,7 @@ export const getSrcSet = (
       height: h,
       factor,
       fit: fit || "cover",
+      quality: quality,
     });
 
     if (src) {
@@ -277,6 +287,7 @@ export const getEarlyHintFromSrcProps = (srcProps: {
   fit?: FitOptions;
   width: number;
   height?: number;
+  quality?: QualityOptions;
 }) => {
   const factor = FACTORS.at(-1)!;
   const src = getOptimizedMediaUrl({
@@ -285,6 +296,7 @@ export const getEarlyHintFromSrcProps = (srcProps: {
     height: srcProps.height && Math.trunc(srcProps.height * factor),
     fit: srcProps.fit || "cover",
     factor,
+    quality: srcProps.quality,
   });
   const earlyHintParts = [
     `<${src}>`,
@@ -310,6 +322,7 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
       props.height,
       props.fit,
       shouldSetEarlyHint ? FACTORS.slice(-1) : FACTORS,
+      props.quality,
     );
 
   const linkProps = srcSet &&
@@ -335,6 +348,7 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
         height: props.height,
         fetchpriority: props.fetchPriority,
         src: props.src,
+        quality: props.quality,
       }),
     );
   }
