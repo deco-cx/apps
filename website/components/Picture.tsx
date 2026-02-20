@@ -7,9 +7,9 @@ import {
   FACTORS,
   getEarlyHintFromSrcProps,
   getSrcSet,
-  type SetEarlyHint,
   type QualityOptions,
-  } from "./Image.tsx";
+  type SetEarlyHint,
+} from "./Image.tsx";
 
 interface Context {
   preload?: boolean;
