@@ -25,40 +25,41 @@ import * as $$$$$$$$$19 from "./actions/notas/excluir-marcadores.ts";
 import * as $$$$$$$$$20 from "./actions/notas/incluir-xml.ts";
 import * as $$$$$$$$$21 from "./actions/notas/lancar-contas.ts";
 import * as $$$$$$$$$22 from "./actions/notas/lancar-estoque.ts";
-import * as $$$$$$$$$23 from "./actions/ordem-compra/atualizar-situacao.ts";
-import * as $$$$$$$$$24 from "./actions/ordem-compra/atualizar.ts";
-import * as $$$$$$$$$25 from "./actions/ordem-compra/criar.ts";
-import * as $$$$$$$$$26 from "./actions/ordem-compra/lancar-contas.ts";
-import * as $$$$$$$$$27 from "./actions/ordem-compra/lancar-estoque.ts";
-import * as $$$$$$$$$28 from "./actions/ordem-servico/atualizar-situacao.ts";
-import * as $$$$$$$$$29 from "./actions/ordem-servico/atualizar.ts";
-import * as $$$$$$$$$30 from "./actions/ordem-servico/criar.ts";
-import * as $$$$$$$$$31 from "./actions/ordem-servico/gerar-nota-fiscal.ts";
-import * as $$$$$$$$$32 from "./actions/ordem-servico/lancar-contas.ts";
-import * as $$$$$$$$$33 from "./actions/ordem-servico/lancar-estoque.ts";
-import * as $$$$$$$$$34 from "./actions/pedidos/atualizar-despacho.ts";
-import * as $$$$$$$$$35 from "./actions/pedidos/atualizar-situacao.ts";
-import * as $$$$$$$$$36 from "./actions/pedidos/atualizar.ts";
-import * as $$$$$$$$$37 from "./actions/pedidos/criar.ts";
-import * as $$$$$$$$$38 from "./actions/pedidos/estornar-contas.ts";
-import * as $$$$$$$$$39 from "./actions/pedidos/estornar-estoque.ts";
-import * as $$$$$$$$$40 from "./actions/pedidos/gerar-nota-fiscal.ts";
-import * as $$$$$$$$$41 from "./actions/pedidos/lancar-contas.ts";
-import * as $$$$$$$$$42 from "./actions/pedidos/lancar-estoque.ts";
-import * as $$$$$$$$$43 from "./actions/pedidos/marcadores/atualizar.ts";
-import * as $$$$$$$$$44 from "./actions/pedidos/marcadores/criar.ts";
-import * as $$$$$$$$$45 from "./actions/pedidos/marcadores/excluir.ts";
-import * as $$$$$$$$$46 from "./actions/produtos/atualizar-kit.ts";
-import * as $$$$$$$$$47 from "./actions/produtos/atualizar.ts";
-import * as $$$$$$$$$48 from "./actions/produtos/criar.ts";
-import * as $$$$$$$$$49 from "./actions/produtos/preco/atualizar.ts";
-import * as $$$$$$$$$50 from "./actions/produtos/variacoes/atualizar.ts";
-import * as $$$$$$$$$51 from "./actions/produtos/variacoes/criar.ts";
-import * as $$$$$$$$$52 from "./actions/produtos/variacoes/excluir.ts";
-import * as $$$$$$$$$53 from "./actions/separacao/atualizar-situacao.ts";
-import * as $$$$$$$$$54 from "./actions/servicos/atualizar.ts";
-import * as $$$$$$$$$55 from "./actions/servicos/criar.ts";
-import * as $$$$$$$$$56 from "./actions/servicos/transformar-produto.ts";
+import * as $$$$$$$$$23 from "./actions/oauth/callback.ts";
+import * as $$$$$$$$$24 from "./actions/ordem-compra/atualizar-situacao.ts";
+import * as $$$$$$$$$25 from "./actions/ordem-compra/atualizar.ts";
+import * as $$$$$$$$$26 from "./actions/ordem-compra/criar.ts";
+import * as $$$$$$$$$27 from "./actions/ordem-compra/lancar-contas.ts";
+import * as $$$$$$$$$28 from "./actions/ordem-compra/lancar-estoque.ts";
+import * as $$$$$$$$$29 from "./actions/ordem-servico/atualizar-situacao.ts";
+import * as $$$$$$$$$30 from "./actions/ordem-servico/atualizar.ts";
+import * as $$$$$$$$$31 from "./actions/ordem-servico/criar.ts";
+import * as $$$$$$$$$32 from "./actions/ordem-servico/gerar-nota-fiscal.ts";
+import * as $$$$$$$$$33 from "./actions/ordem-servico/lancar-contas.ts";
+import * as $$$$$$$$$34 from "./actions/ordem-servico/lancar-estoque.ts";
+import * as $$$$$$$$$35 from "./actions/pedidos/atualizar-despacho.ts";
+import * as $$$$$$$$$36 from "./actions/pedidos/atualizar-situacao.ts";
+import * as $$$$$$$$$37 from "./actions/pedidos/atualizar.ts";
+import * as $$$$$$$$$38 from "./actions/pedidos/criar.ts";
+import * as $$$$$$$$$39 from "./actions/pedidos/estornar-contas.ts";
+import * as $$$$$$$$$40 from "./actions/pedidos/estornar-estoque.ts";
+import * as $$$$$$$$$41 from "./actions/pedidos/gerar-nota-fiscal.ts";
+import * as $$$$$$$$$42 from "./actions/pedidos/lancar-contas.ts";
+import * as $$$$$$$$$43 from "./actions/pedidos/lancar-estoque.ts";
+import * as $$$$$$$$$44 from "./actions/pedidos/marcadores/atualizar.ts";
+import * as $$$$$$$$$45 from "./actions/pedidos/marcadores/criar.ts";
+import * as $$$$$$$$$46 from "./actions/pedidos/marcadores/excluir.ts";
+import * as $$$$$$$$$47 from "./actions/produtos/atualizar-kit.ts";
+import * as $$$$$$$$$48 from "./actions/produtos/atualizar.ts";
+import * as $$$$$$$$$49 from "./actions/produtos/criar.ts";
+import * as $$$$$$$$$50 from "./actions/produtos/preco/atualizar.ts";
+import * as $$$$$$$$$51 from "./actions/produtos/variacoes/atualizar.ts";
+import * as $$$$$$$$$52 from "./actions/produtos/variacoes/criar.ts";
+import * as $$$$$$$$$53 from "./actions/produtos/variacoes/excluir.ts";
+import * as $$$$$$$$$54 from "./actions/separacao/atualizar-situacao.ts";
+import * as $$$$$$$$$55 from "./actions/servicos/atualizar.ts";
+import * as $$$$$$$$$56 from "./actions/servicos/criar.ts";
+import * as $$$$$$$$$57 from "./actions/servicos/transformar-produto.ts";
 import * as $$$0 from "./loaders/categorias-receita-despesa.ts";
 import * as $$$1 from "./loaders/categorias/todas.ts";
 import * as $$$2 from "./loaders/contas-pagar/listar.ts";
@@ -92,23 +93,24 @@ import * as $$$29 from "./loaders/notas/listar.ts";
 import * as $$$30 from "./loaders/notas/marcadores.ts";
 import * as $$$31 from "./loaders/notas/obter.ts";
 import * as $$$32 from "./loaders/notas/xml.ts";
-import * as $$$33 from "./loaders/ordem-compra/listar.ts";
-import * as $$$34 from "./loaders/ordem-compra/obter.ts";
-import * as $$$35 from "./loaders/ordem-servico/listar.ts";
-import * as $$$36 from "./loaders/ordem-servico/obter.ts";
-import * as $$$37 from "./loaders/pedidos/listar.ts";
-import * as $$$38 from "./loaders/pedidos/marcadores/listar.ts";
-import * as $$$39 from "./loaders/pedidos/obter.ts";
-import * as $$$40 from "./loaders/produtos/custos.ts";
-import * as $$$41 from "./loaders/produtos/kit.ts";
-import * as $$$42 from "./loaders/produtos/listar.ts";
-import * as $$$43 from "./loaders/produtos/obter.ts";
-import * as $$$44 from "./loaders/produtos/tags.ts";
-import * as $$$45 from "./loaders/separacao/listar.ts";
-import * as $$$46 from "./loaders/separacao/obter.ts";
-import * as $$$47 from "./loaders/servicos/listar.ts";
-import * as $$$48 from "./loaders/servicos/obter.ts";
-import * as $$$49 from "./loaders/vendedores/listar.ts";
+import * as $$$33 from "./loaders/oauth/start.ts";
+import * as $$$34 from "./loaders/ordem-compra/listar.ts";
+import * as $$$35 from "./loaders/ordem-compra/obter.ts";
+import * as $$$36 from "./loaders/ordem-servico/listar.ts";
+import * as $$$37 from "./loaders/ordem-servico/obter.ts";
+import * as $$$38 from "./loaders/pedidos/listar.ts";
+import * as $$$39 from "./loaders/pedidos/marcadores/listar.ts";
+import * as $$$40 from "./loaders/pedidos/obter.ts";
+import * as $$$41 from "./loaders/produtos/custos.ts";
+import * as $$$42 from "./loaders/produtos/kit.ts";
+import * as $$$43 from "./loaders/produtos/listar.ts";
+import * as $$$44 from "./loaders/produtos/obter.ts";
+import * as $$$45 from "./loaders/produtos/tags.ts";
+import * as $$$46 from "./loaders/separacao/listar.ts";
+import * as $$$47 from "./loaders/separacao/obter.ts";
+import * as $$$48 from "./loaders/servicos/listar.ts";
+import * as $$$49 from "./loaders/servicos/obter.ts";
+import * as $$$50 from "./loaders/vendedores/listar.ts";
 
 const manifest = {
   "loaders": {
@@ -145,23 +147,24 @@ const manifest = {
     "tiny/loaders/notas/marcadores.ts": $$$30,
     "tiny/loaders/notas/obter.ts": $$$31,
     "tiny/loaders/notas/xml.ts": $$$32,
-    "tiny/loaders/ordem-compra/listar.ts": $$$33,
-    "tiny/loaders/ordem-compra/obter.ts": $$$34,
-    "tiny/loaders/ordem-servico/listar.ts": $$$35,
-    "tiny/loaders/ordem-servico/obter.ts": $$$36,
-    "tiny/loaders/pedidos/listar.ts": $$$37,
-    "tiny/loaders/pedidos/marcadores/listar.ts": $$$38,
-    "tiny/loaders/pedidos/obter.ts": $$$39,
-    "tiny/loaders/produtos/custos.ts": $$$40,
-    "tiny/loaders/produtos/kit.ts": $$$41,
-    "tiny/loaders/produtos/listar.ts": $$$42,
-    "tiny/loaders/produtos/obter.ts": $$$43,
-    "tiny/loaders/produtos/tags.ts": $$$44,
-    "tiny/loaders/separacao/listar.ts": $$$45,
-    "tiny/loaders/separacao/obter.ts": $$$46,
-    "tiny/loaders/servicos/listar.ts": $$$47,
-    "tiny/loaders/servicos/obter.ts": $$$48,
-    "tiny/loaders/vendedores/listar.ts": $$$49,
+    "tiny/loaders/oauth/start.ts": $$$33,
+    "tiny/loaders/ordem-compra/listar.ts": $$$34,
+    "tiny/loaders/ordem-compra/obter.ts": $$$35,
+    "tiny/loaders/ordem-servico/listar.ts": $$$36,
+    "tiny/loaders/ordem-servico/obter.ts": $$$37,
+    "tiny/loaders/pedidos/listar.ts": $$$38,
+    "tiny/loaders/pedidos/marcadores/listar.ts": $$$39,
+    "tiny/loaders/pedidos/obter.ts": $$$40,
+    "tiny/loaders/produtos/custos.ts": $$$41,
+    "tiny/loaders/produtos/kit.ts": $$$42,
+    "tiny/loaders/produtos/listar.ts": $$$43,
+    "tiny/loaders/produtos/obter.ts": $$$44,
+    "tiny/loaders/produtos/tags.ts": $$$45,
+    "tiny/loaders/separacao/listar.ts": $$$46,
+    "tiny/loaders/separacao/obter.ts": $$$47,
+    "tiny/loaders/servicos/listar.ts": $$$48,
+    "tiny/loaders/servicos/obter.ts": $$$49,
+    "tiny/loaders/vendedores/listar.ts": $$$50,
   },
   "actions": {
     "tiny/actions/contas-pagar/criar.ts": $$$$$$$$$0,
@@ -187,40 +190,41 @@ const manifest = {
     "tiny/actions/notas/incluir-xml.ts": $$$$$$$$$20,
     "tiny/actions/notas/lancar-contas.ts": $$$$$$$$$21,
     "tiny/actions/notas/lancar-estoque.ts": $$$$$$$$$22,
-    "tiny/actions/ordem-compra/atualizar-situacao.ts": $$$$$$$$$23,
-    "tiny/actions/ordem-compra/atualizar.ts": $$$$$$$$$24,
-    "tiny/actions/ordem-compra/criar.ts": $$$$$$$$$25,
-    "tiny/actions/ordem-compra/lancar-contas.ts": $$$$$$$$$26,
-    "tiny/actions/ordem-compra/lancar-estoque.ts": $$$$$$$$$27,
-    "tiny/actions/ordem-servico/atualizar-situacao.ts": $$$$$$$$$28,
-    "tiny/actions/ordem-servico/atualizar.ts": $$$$$$$$$29,
-    "tiny/actions/ordem-servico/criar.ts": $$$$$$$$$30,
-    "tiny/actions/ordem-servico/gerar-nota-fiscal.ts": $$$$$$$$$31,
-    "tiny/actions/ordem-servico/lancar-contas.ts": $$$$$$$$$32,
-    "tiny/actions/ordem-servico/lancar-estoque.ts": $$$$$$$$$33,
-    "tiny/actions/pedidos/atualizar-despacho.ts": $$$$$$$$$34,
-    "tiny/actions/pedidos/atualizar-situacao.ts": $$$$$$$$$35,
-    "tiny/actions/pedidos/atualizar.ts": $$$$$$$$$36,
-    "tiny/actions/pedidos/criar.ts": $$$$$$$$$37,
-    "tiny/actions/pedidos/estornar-contas.ts": $$$$$$$$$38,
-    "tiny/actions/pedidos/estornar-estoque.ts": $$$$$$$$$39,
-    "tiny/actions/pedidos/gerar-nota-fiscal.ts": $$$$$$$$$40,
-    "tiny/actions/pedidos/lancar-contas.ts": $$$$$$$$$41,
-    "tiny/actions/pedidos/lancar-estoque.ts": $$$$$$$$$42,
-    "tiny/actions/pedidos/marcadores/atualizar.ts": $$$$$$$$$43,
-    "tiny/actions/pedidos/marcadores/criar.ts": $$$$$$$$$44,
-    "tiny/actions/pedidos/marcadores/excluir.ts": $$$$$$$$$45,
-    "tiny/actions/produtos/atualizar-kit.ts": $$$$$$$$$46,
-    "tiny/actions/produtos/atualizar.ts": $$$$$$$$$47,
-    "tiny/actions/produtos/criar.ts": $$$$$$$$$48,
-    "tiny/actions/produtos/preco/atualizar.ts": $$$$$$$$$49,
-    "tiny/actions/produtos/variacoes/atualizar.ts": $$$$$$$$$50,
-    "tiny/actions/produtos/variacoes/criar.ts": $$$$$$$$$51,
-    "tiny/actions/produtos/variacoes/excluir.ts": $$$$$$$$$52,
-    "tiny/actions/separacao/atualizar-situacao.ts": $$$$$$$$$53,
-    "tiny/actions/servicos/atualizar.ts": $$$$$$$$$54,
-    "tiny/actions/servicos/criar.ts": $$$$$$$$$55,
-    "tiny/actions/servicos/transformar-produto.ts": $$$$$$$$$56,
+    "tiny/actions/oauth/callback.ts": $$$$$$$$$23,
+    "tiny/actions/ordem-compra/atualizar-situacao.ts": $$$$$$$$$24,
+    "tiny/actions/ordem-compra/atualizar.ts": $$$$$$$$$25,
+    "tiny/actions/ordem-compra/criar.ts": $$$$$$$$$26,
+    "tiny/actions/ordem-compra/lancar-contas.ts": $$$$$$$$$27,
+    "tiny/actions/ordem-compra/lancar-estoque.ts": $$$$$$$$$28,
+    "tiny/actions/ordem-servico/atualizar-situacao.ts": $$$$$$$$$29,
+    "tiny/actions/ordem-servico/atualizar.ts": $$$$$$$$$30,
+    "tiny/actions/ordem-servico/criar.ts": $$$$$$$$$31,
+    "tiny/actions/ordem-servico/gerar-nota-fiscal.ts": $$$$$$$$$32,
+    "tiny/actions/ordem-servico/lancar-contas.ts": $$$$$$$$$33,
+    "tiny/actions/ordem-servico/lancar-estoque.ts": $$$$$$$$$34,
+    "tiny/actions/pedidos/atualizar-despacho.ts": $$$$$$$$$35,
+    "tiny/actions/pedidos/atualizar-situacao.ts": $$$$$$$$$36,
+    "tiny/actions/pedidos/atualizar.ts": $$$$$$$$$37,
+    "tiny/actions/pedidos/criar.ts": $$$$$$$$$38,
+    "tiny/actions/pedidos/estornar-contas.ts": $$$$$$$$$39,
+    "tiny/actions/pedidos/estornar-estoque.ts": $$$$$$$$$40,
+    "tiny/actions/pedidos/gerar-nota-fiscal.ts": $$$$$$$$$41,
+    "tiny/actions/pedidos/lancar-contas.ts": $$$$$$$$$42,
+    "tiny/actions/pedidos/lancar-estoque.ts": $$$$$$$$$43,
+    "tiny/actions/pedidos/marcadores/atualizar.ts": $$$$$$$$$44,
+    "tiny/actions/pedidos/marcadores/criar.ts": $$$$$$$$$45,
+    "tiny/actions/pedidos/marcadores/excluir.ts": $$$$$$$$$46,
+    "tiny/actions/produtos/atualizar-kit.ts": $$$$$$$$$47,
+    "tiny/actions/produtos/atualizar.ts": $$$$$$$$$48,
+    "tiny/actions/produtos/criar.ts": $$$$$$$$$49,
+    "tiny/actions/produtos/preco/atualizar.ts": $$$$$$$$$50,
+    "tiny/actions/produtos/variacoes/atualizar.ts": $$$$$$$$$51,
+    "tiny/actions/produtos/variacoes/criar.ts": $$$$$$$$$52,
+    "tiny/actions/produtos/variacoes/excluir.ts": $$$$$$$$$53,
+    "tiny/actions/separacao/atualizar-situacao.ts": $$$$$$$$$54,
+    "tiny/actions/servicos/atualizar.ts": $$$$$$$$$55,
+    "tiny/actions/servicos/criar.ts": $$$$$$$$$56,
+    "tiny/actions/servicos/transformar-produto.ts": $$$$$$$$$57,
   },
   "name": "tiny",
   "baseUrl": import.meta.url,
