@@ -177,14 +177,8 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   if (originalSrc.startsWith("data:")) {
     return originalSrc;
   }
-  console.log(
-    "bypassPlatformImageOptimization",
-    bypassPlatformImageOptimization(),
-  );
   if (!bypassPlatformImageOptimization()) {
-    console.log("originalSrc", originalSrc);
     if (originalSrc.startsWith("https://media-storage.soureicdn.com")) {
-      console.log("optimizeSourei");
       return optimizeSourei(opts);
     }
 
