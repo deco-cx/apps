@@ -1882,3 +1882,24 @@ export interface OrderFormOrder {
   orderFormCreationDate?: string;
   marketplaceRequestedCancellationWindow?: unknown;
 }
+
+export type CampaignType =
+  | "rec-top-items-v2"
+  | "rec-persona-v2"
+  | "rec-similar-v2"
+  | "rec-cross-v2"
+  | "rec-cart-v2"
+  | "rec-last-v2"
+  | "rec-interactions-v2"
+  | "rec-visual-v2"
+  | "rec-search-v2"
+  | "rec-next-v2";
+
+export type ProductListToId = string[];
+
+export type ProductViewSource =
+  | "WEB_DESKTOP"
+  | "WEB_MOBILE"
+  | "MOBILE_APP"
+  | "MOBILE"
+  | "DESKTOP";
