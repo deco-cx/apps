@@ -3,7 +3,11 @@ import { AppContext } from "../../mod.ts";
 import { batch } from "../batch.ts";
 import { OpenAPI } from "../openapi/vcs.openapi.gen.ts";
 import { getSegmentFromBag, isAnonymous } from "../segment.ts";
-import { aggregateOffers } from "../transform.ts";
+import {
+  aggregateOffers,
+  SCHEMA_LIST_PRICE,
+  SCHEMA_SALE_PRICE,
+} from "../transform.ts";
 
 type Item = NonNullable<
   OpenAPI["POST /api/checkout/pub/orderForms/simulation"]["response"]["items"]
@@ -91,50 +95,47 @@ export const extension = async (products: Product[], ctx: AppContext) => {
     }
   }
 
-  const fixOffer = (product: ProductLeaf): ProductLeaf => {
-    if (!product.offers) {
-      return product;
+  const fixOffer = (product: ProductLeaf): void => {
+    if (!product.offers) return;
+
+    const skuOffers = mapped.get(product.productID);
+    if (!skuOffers) return;
+
+    let changed = false;
+    for (const o of product.offers.offers) {
+      const simulated = skuOffers.get(o.seller!);
+      if (!simulated) continue;
+
+      const salePrice = simulated.price ? simulated.price / 100 : o.price;
+      const listPrice = simulated.listPrice && simulated.listPrice / 100;
+      o.price = salePrice;
+      changed = true;
+
+      for (const spec of o.priceSpecification) {
+        if (spec.priceType === SCHEMA_SALE_PRICE) {
+          spec.price = salePrice;
+        } else if (spec.priceType === SCHEMA_LIST_PRICE) {
+          spec.price = listPrice ?? spec.price;
+        }
+      }
     }
 
-    const offers = product.offers.offers.map((o) => {
-      const offer = mapped.get(product.productID)?.get(o.seller!);
-
-      if (!offer) {
-        return o;
-      }
-
-      const salePrice = offer.price ? offer.price / 100 : o.price;
-      const listPrice = offer.listPrice && offer.listPrice / 100;
-
-      return {
-        ...o,
-        price: salePrice,
-        priceSpecification: o.priceSpecification.map((spec) =>
-          spec.priceType === "https://schema.org/SalePrice"
-            ? ({ ...spec, price: salePrice })
-            : spec.priceType === "https://schema.org/ListPrice"
-            ? ({ ...spec, price: listPrice ?? spec.price })
-            : spec
-        ),
-      };
-    });
-
-    const aggregated = aggregateOffers(
-      offers,
-      product.offers.priceCurrency,
-    );
-
-    return {
-      ...product,
-      offers: aggregated,
-    };
+    if (changed) {
+      product.offers = aggregateOffers(
+        product.offers.offers,
+        product.offers.priceCurrency,
+      );
+    }
   };
 
-  return products?.map((p) => ({
-    ...fixOffer(p),
-    isVariantOf: p.isVariantOf && {
-      ...p.isVariantOf,
-      hasVariant: p.isVariantOf.hasVariant.map(fixOffer),
-    },
-  })) ?? null;
+  for (const p of products) {
+    fixOffer(p);
+    if (p.isVariantOf) {
+      for (const variant of p.isVariantOf.hasVariant) {
+        fixOffer(variant);
+      }
+    }
+  }
+
+  return products;
 };

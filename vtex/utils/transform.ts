@@ -5,11 +5,14 @@ import type {
   DayOfWeek,
   Filter,
   FilterToggleValue,
+  ItemAvailability,
   Offer,
   OpeningHoursSpecification,
   PageType,
   Place,
   PostalAddress,
+  PriceComponentTypeEnumeration,
+  PriceTypeEnumeration,
   Product,
   ProductDetailsPage,
   ProductGroup,
@@ -49,6 +52,17 @@ import type {
 } from "./types.ts";
 
 const DEFAULT_CATEGORY_SEPARATOR = ">";
+
+export const SCHEMA_LIST_PRICE: PriceTypeEnumeration =
+  "https://schema.org/ListPrice";
+export const SCHEMA_SALE_PRICE: PriceTypeEnumeration =
+  "https://schema.org/SalePrice";
+export const SCHEMA_SRP: PriceTypeEnumeration = "https://schema.org/SRP";
+export const SCHEMA_INSTALLMENT: PriceComponentTypeEnumeration =
+  "https://schema.org/Installment";
+export const SCHEMA_IN_STOCK: ItemAvailability = "https://schema.org/InStock";
+export const SCHEMA_OUT_OF_STOCK: ItemAvailability =
+  "https://schema.org/OutOfStock";
 
 const isLegacySku = (sku: LegacySkuVTEX | SkuVTEX): sku is LegacySkuVTEX =>
   typeof (sku as LegacySkuVTEX).variations?.[0] === "string" ||
@@ -170,8 +184,7 @@ export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
   };
 };
 
-export const inStock = (offer: Offer) =>
-  offer.availability === "https://schema.org/InStock";
+export const inStock = (offer: Offer) => offer.availability === SCHEMA_IN_STOCK;
 
 // Smallest Available Spot Price First
 export const bestOfferFirst = (a: Offer, b: Offer) => {
@@ -359,13 +372,15 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
 
   const videos = isLegacySku(sku) ? sku.Videos : sku.videos;
   const nonEmptyVideos = nonEmptyArray(videos);
-  const imagesByKey = options.imagesByKey ??
-    items
+  if (!options.imagesByKey) {
+    options.imagesByKey = items
       .flatMap((i) => i.images)
       .reduce((map, img) => {
         img?.imageUrl && map.set(getImageKey(img.imageUrl), img.imageUrl);
         return map;
       }, new Map<string, string>());
+  }
+  const imagesByKey = options.imagesByKey;
 
   const groupAdditionalProperty = isLegacyProduct(product)
     ? legacyToProductGroupAdditionalProperties(product)
@@ -390,9 +405,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     ? ({
       "@type": "ProductGroup",
       productGroupID: productId,
-      hasVariant: items.map((sku) =>
-        toProduct(product, sku, 1, { ...options, imagesByKey })
-      ),
+      hasVariant: items.map((sku) => toProduct(product, sku, 1, options)),
       url: getProductGroupURL(baseUrl, product).href,
       name: product.productName,
       additionalProperty: [
@@ -440,10 +453,18 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
   const categoryAdditionalProperties = toAdditionalPropertyCategories(product);
   const clusterAdditionalProperties = toAdditionalPropertyClusters(product);
 
-  const additionalProperty = specificationsAdditionalProperty
-    .concat(categoryAdditionalProperties ?? [])
-    .concat(clusterAdditionalProperties ?? [])
-    .concat(referenceIdAdditionalProperty ?? []);
+  const additionalProperty: PropertyValue[] = [
+    ...specificationsAdditionalProperty,
+  ];
+  if (categoryAdditionalProperties) {
+    additionalProperty.push(...categoryAdditionalProperties);
+  }
+  if (clusterAdditionalProperties) {
+    additionalProperty.push(...clusterAdditionalProperties);
+  }
+  if (referenceIdAdditionalProperty) {
+    additionalProperty.push(...referenceIdAdditionalProperty);
+  }
 
   estimatedDateArrival && additionalProperty.push({
     "@type": "PropertyValue",
@@ -632,15 +653,15 @@ const toAdditionalPropertiesLegacy = (sku: LegacySkuVTEX): PropertyValue[] => {
       }) as const,
   );
 
-  return [...specificationProperties, ...attachmentProperties];
+  if (attachmentProperties.length === 0) return specificationProperties;
+  specificationProperties.push(...attachmentProperties);
+  return specificationProperties;
 };
 
-const toOffer = ({
-  commertialOffer: offer,
-  sellerId,
-  sellerName,
-  sellerDefault,
-}: SellerVTEX): Offer => ({
+const buildOffer = (
+  { commertialOffer: offer, sellerId, sellerName, sellerDefault }: SellerVTEX,
+  teasers: Teasers[],
+): Offer => ({
   "@type": "Offer",
   identifier: sellerDefault ? "default" : undefined,
   price: offer.spotPrice ?? offer.Price,
@@ -649,28 +670,28 @@ const toOffer = ({
   priceValidUntil: offer.PriceValidUntil,
   inventoryLevel: { value: offer.AvailableQuantity },
   giftSkuIds: offer.GiftSkuIds ?? [],
-  teasers: offer.teasers ?? [],
+  teasers,
   priceSpecification: [
     {
       "@type": "UnitPriceSpecification",
-      priceType: "https://schema.org/ListPrice",
+      priceType: SCHEMA_LIST_PRICE,
       price: offer.ListPrice,
     },
     {
       "@type": "UnitPriceSpecification",
-      priceType: "https://schema.org/SalePrice",
+      priceType: SCHEMA_SALE_PRICE,
       price: offer.Price,
     },
     {
       "@type": "UnitPriceSpecification",
-      priceType: "https://schema.org/SRP",
+      priceType: SCHEMA_SRP,
       price: offer.PriceWithoutDiscount,
     },
     ...offer.Installments.map(
       (installment): UnitPriceSpecification => ({
         "@type": "UnitPriceSpecification",
-        priceType: "https://schema.org/SalePrice",
-        priceComponentType: "https://schema.org/Installment",
+        priceType: SCHEMA_SALE_PRICE,
+        priceComponentType: SCHEMA_INSTALLMENT,
         name: installment.PaymentSystemName,
         description: installment.Name,
         billingDuration: installment.NumberOfInstallments,
@@ -680,9 +701,12 @@ const toOffer = ({
     ),
   ],
   availability: offer.AvailableQuantity > 0
-    ? "https://schema.org/InStock"
-    : "https://schema.org/OutOfStock",
+    ? SCHEMA_IN_STOCK
+    : SCHEMA_OUT_OF_STOCK,
 });
+
+const toOffer = (seller: SellerVTEX): Offer =>
+  buildOffer(seller, seller.commertialOffer.teasers ?? []);
 
 const toOfferLegacy = (seller: SellerVTEX): Offer => {
   const otherTeasers = seller.commertialOffer.DiscountHighLight?.map((i) => {
@@ -704,35 +728,33 @@ const toOfferLegacy = (seller: SellerVTEX): Offer => {
     return teasers;
   }) ?? [];
 
-  return {
-    ...toOffer(seller),
-    teasers: [
-      ...otherTeasers,
-      ...(seller.commertialOffer.Teasers ?? []).map((teaser) => ({
-        name: teaser["<Name>k__BackingField"],
-        generalValues: teaser["<GeneralValues>k__BackingField"],
-        conditions: {
-          minimumQuantity: teaser["<Conditions>k__BackingField"][
-            "<MinimumQuantity>k__BackingField"
-          ],
-          parameters: teaser["<Conditions>k__BackingField"][
-            "<Parameters>k__BackingField"
-          ].map((parameter) => ({
-            name: parameter["<Name>k__BackingField"],
-            value: parameter["<Value>k__BackingField"],
-          })),
-        },
-        effects: {
-          parameters: teaser["<Effects>k__BackingField"][
-            "<Parameters>k__BackingField"
-          ].map((parameter) => ({
-            name: parameter["<Name>k__BackingField"],
-            value: parameter["<Value>k__BackingField"],
-          })),
-        },
-      })),
-    ],
-  };
+  const legacyTeasers = (seller.commertialOffer.Teasers ?? []).map(
+    (teaser) => ({
+      name: teaser["<Name>k__BackingField"],
+      generalValues: teaser["<GeneralValues>k__BackingField"],
+      conditions: {
+        minimumQuantity: teaser["<Conditions>k__BackingField"][
+          "<MinimumQuantity>k__BackingField"
+        ],
+        parameters: teaser["<Conditions>k__BackingField"][
+          "<Parameters>k__BackingField"
+        ].map((parameter) => ({
+          name: parameter["<Name>k__BackingField"],
+          value: parameter["<Value>k__BackingField"],
+        })),
+      },
+      effects: {
+        parameters: teaser["<Effects>k__BackingField"][
+          "<Parameters>k__BackingField"
+        ].map((parameter) => ({
+          name: parameter["<Name>k__BackingField"],
+          value: parameter["<Value>k__BackingField"],
+        })),
+      },
+    }),
+  );
+
+  return buildOffer(seller, [...otherTeasers, ...legacyTeasers]);
 };
 
 export const legacyFacetToFilter = (
