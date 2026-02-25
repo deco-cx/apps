@@ -121,6 +121,7 @@ const IS_TO_LEGACY: Record<string, LegacySort> = {
   "price:asc": "OrderByPriceASC",
   "orders:desc": "OrderByTopSaleDESC",
   "name:desc": "OrderByNameDESC",
+  "name:asc": "OrderByNameASC",
   "release:desc": "OrderByReleaseDateDESC",
   "discount:desc": "OrderByBestDiscountDESC",
   "relevance:desc": "OrderByScoreDESC",
@@ -207,11 +208,10 @@ const loader = async (
     ? Number(url.searchParams.get("page")) - currentPageoffset
     : 0;
   const page = props.page || pageParam;
-  const O = (url.searchParams.get("O") as LegacySort) ??
+  const O: LegacySort = (url.searchParams.get("O") as LegacySort) ??
     IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
-    url.searchParams.get("sort") ??
     props.sort ??
-    sortOptions[0].value;
+    sortOptions[0].value as LegacySort;
   const fq = [
     ...new Set([
       ...(props.fq ? [props.fq] : []),
