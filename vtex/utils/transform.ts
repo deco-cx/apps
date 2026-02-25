@@ -372,15 +372,13 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
 
   const videos = isLegacySku(sku) ? sku.Videos : sku.videos;
   const nonEmptyVideos = nonEmptyArray(videos);
-  if (!options.imagesByKey) {
-    options.imagesByKey = items
+  const imagesByKey = options.imagesByKey ??
+    items
       .flatMap((i) => i.images)
       .reduce((map, img) => {
         img?.imageUrl && map.set(getImageKey(img.imageUrl), img.imageUrl);
         return map;
       }, new Map<string, string>());
-  }
-  const imagesByKey = options.imagesByKey;
 
   const groupAdditionalProperty = isLegacyProduct(product)
     ? legacyToProductGroupAdditionalProperties(product)
@@ -401,11 +399,16 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     isLegacyProduct(product) ? toOfferLegacy : toOffer,
   );
 
+  const variantOptions = imagesByKey !== options.imagesByKey
+    ? { ...options, imagesByKey }
+    : options;
   const isVariantOf = level < 1
     ? ({
       "@type": "ProductGroup",
       productGroupID: productId,
-      hasVariant: items.map((sku) => toProduct(product, sku, 1, options)),
+      hasVariant: items.map((sku) =>
+        toProduct(product, sku, 1, variantOptions)
+      ),
       url: getProductGroupURL(baseUrl, product).href,
       name: product.productName,
       additionalProperty: [

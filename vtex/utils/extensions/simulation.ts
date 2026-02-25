@@ -106,8 +106,12 @@ export const extension = async (products: Product[], ctx: AppContext) => {
       const simulated = skuOffers.get(o.seller!);
       if (!simulated) continue;
 
-      const salePrice = simulated.price ? simulated.price / 100 : o.price;
-      const listPrice = simulated.listPrice && simulated.listPrice / 100;
+      const salePrice = simulated.price != null
+        ? simulated.price / 100
+        : o.price;
+      const listPrice = simulated.listPrice != null
+        ? simulated.listPrice / 100
+        : undefined;
       o.price = salePrice;
       changed = true;
 
