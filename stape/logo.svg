@@ -1,0 +1,93 @@
+<svg
+  width="200"
+  height="200"
+  viewBox="0 0 200 200"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- Background Circle -->
+  <circle
+    cx="100"
+    cy="100"
+    r="90"
+    fill="#4F46E5"
+    stroke="#3730A3"
+    stroke-width="4"
+  />
+
+  <!-- Server Icon -->
+  <rect x="60" y="70" width="80" height="8" rx="4" fill="white" />
+  <rect x="60" y="85" width="80" height="8" rx="4" fill="white" />
+  <rect x="60" y="100" width="80" height="8" rx="4" fill="white" />
+  <rect x="60" y="115" width="80" height="8" rx="4" fill="white" />
+
+  <!-- Server Base -->
+  <rect
+    x="55"
+    y="60"
+    width="90"
+    height="75"
+    rx="8"
+    fill="none"
+    stroke="white"
+    stroke-width="3"
+  />
+
+  <!-- Analytics Arrows -->
+  <path
+    d="M145 85 L165 85 L160 78 M165 85 L160 92"
+    stroke="#FFD700"
+    stroke-width="3"
+    fill="none"
+    stroke-linecap="round"
+  />
+  <path
+    d="M145 100 L165 100 L160 93 M165 100 L160 107"
+    stroke="#FFD700"
+    stroke-width="3"
+    fill="none"
+    stroke-linecap="round"
+  />
+  <path
+    d="M145 115 L165 115 L160 108 M165 115 L160 122"
+    stroke="#FFD700"
+    stroke-width="3"
+    fill="none"
+    stroke-linecap="round"
+  />
+
+  <!-- Shield (GDPR Protection) -->
+  <path
+    d="M35 95 Q35 85 45 85 Q55 85 55 95 L55 105 Q55 115 45 115 Q35 115 35 105 Z"
+    fill="#10B981"
+    stroke="white"
+    stroke-width="2"
+  />
+  <path
+    d="M42 98 L47 103 L53 92"
+    stroke="white"
+    stroke-width="2"
+    fill="none"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Brand Text -->
+  <text
+    x="100"
+    y="45"
+    font-family="Arial, sans-serif"
+    font-size="20"
+    font-weight="bold"
+    text-anchor="middle"
+    fill="white"
+  >STAPE</text>
+  <text
+    x="100"
+    y="165"
+    font-family="Arial, sans-serif"
+    font-size="12"
+    text-anchor="middle"
+    fill="white"
+  >Server-Side</text>
+</svg>
