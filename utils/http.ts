@@ -133,7 +133,7 @@ function normalizePathParam(
   }
 
   // Step 2: Check for path traversal in decoded value
-  if (decoded.includes("..")) {
+  if (decoded.includes("../") || decoded.includes("..\\")) {
     throw new Error(
       `Path traversal detected in parameter '${paramName}'`,
     );
