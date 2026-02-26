@@ -48,7 +48,7 @@ const loader = async (
     GetCartQuery,
     GetCartQueryVariables & LanguageContextArgs
   >({
-    variables: { id: decodeURIComponent(cartId), languageCode, countryCode },
+    variables: { id: cartId, languageCode, countryCode },
     ...GetCart,
   }).then((data) => data.cart);
 
