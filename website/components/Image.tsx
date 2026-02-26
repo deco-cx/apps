@@ -206,16 +206,6 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
       return optimizeVTEX(opts);
     }
 
-    if (
-      canShowWarning() &&
-      !originalSrc.startsWith(
-        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage",
-      )
-    ) {
-      console.warn(
-        `The following image ${originalSrc} requires automatic image optimization, but it's currently disabled. This may incur in additional costs. Please contact deco.cx for more information.`,
-      );
-    }
   }
 
   if (bypassDecoImageOptimization()) {
