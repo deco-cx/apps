@@ -8,3 +8,5 @@ const MatchAlways = () => {
 };
 
 export default MatchAlways;
+
+export const cacheable = true;

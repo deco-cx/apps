@@ -47,7 +47,10 @@ export interface Props {
    * @description number of products per page to display
    */
   count: number;
-
+  /**
+   * @title Sorting
+   */
+  sort?: Sort;
   /**
    * Slug for category pages
    */
@@ -98,7 +101,8 @@ const searchLoader = async (
   const { api } = ctx;
 
   const count = props.count ?? 12;
-  const sort = url.searchParams.get("sort") as Sort;
+  const sort = (url.searchParams.get("sort") as Sort) ?? props.sort ??
+    VNDA_SORT_OPTIONS[0].value;
   const page = Number(url.searchParams.get("page")) || 1;
 
   const isSearchPage = ctx.searchPagePath
@@ -292,7 +296,7 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
 
   const params = new URLSearchParams([
     ["count", (props.count || url.searchParams.get("count") || 12).toString()],
-    ["sort", url.searchParams.get("sort") ?? ""],
+    ["sort", url.searchParams.get("sort") ?? props.sort ?? ""],
     ["type_tags", typeTags],
     ["tags", props?.tags?.join("\\") ?? ""],
     [

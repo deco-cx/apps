@@ -2,7 +2,11 @@ import type { Product } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import { isFilterParam, toSegmentParams } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentCacheKeyWithoutUTM,
+  getSegmentFromBag,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { LegacyItem, LegacySort } from "../../utils/types.ts";
@@ -296,10 +300,12 @@ export const cacheKey = (
     return null;
   }
 
-  const segment = getSegmentFromBag(ctx)?.token ?? "";
+  const segment = ctx.advancedConfigs?.removeUTMFromCacheKey
+    ? getSegmentCacheKeyWithoutUTM(ctx)
+    : getSegmentFromBag(ctx)?.token;
   const params = new URLSearchParams([
     ...getSearchParams(props, url.searchParams),
-    ["segment", segment],
+    ["segment", segment ?? ""],
   ]);
 
   if (isSKUIDProps(props)) {

@@ -40,7 +40,7 @@ export const withDefaultFacets = (
 };
 
 export const toPath = (facets: SelectedFacet[]) =>
-  facets.map(({ key, value }) => `${key}/${value}`).join("/");
+  facets.map(({ key, value }) => key ? `${key}/${value}` : value).join("/");
 
 interface Params {
   query: string;
@@ -58,7 +58,7 @@ export const withDefaultParams = ({
   page = 0,
   count = 12,
   sort = "",
-  fuzzy = "auto",
+  fuzzy = "",
   locale = "pt-BR",
   hideUnavailableItems,
   simulationBehavior = "default",
@@ -67,7 +67,7 @@ export const withDefaultParams = ({
   count,
   query,
   sort,
-  fuzzy,
+  ...(fuzzy ? { fuzzy } : {}),
   locale,
   // locale: locale ?? ctx.configVTEX!.defaultLocale,
   hideUnavailableItems: hideUnavailableItems ?? false,

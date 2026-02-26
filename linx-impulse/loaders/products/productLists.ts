@@ -115,6 +115,11 @@ interface Props {
     | ProductPageProps
     | CategoryPageProps
     | SearchPageProps;
+  /**
+   * @title Force Source
+   * @description Force the source of the request
+   */
+  forceSource?: "desktop" | "mobile";
 }
 
 const generateParams = (
@@ -231,7 +236,7 @@ function toLinxImpulseShelf(
  * @title Linx Impulse - Shelves Loader
  */
 const loader = async (
-  { props }: Props,
+  { props, forceSource }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<LinxImpulseShelf[] | null> => {
@@ -242,7 +247,7 @@ const loader = async (
   const { showOnlyAvailable, userId: _userId, user } = props;
   const { chaordicApi, apiKey, salesChannel, origin, cdn } = ctx;
   const deviceId = getDeviceIdFromBag(ctx);
-  const source = getSource(ctx);
+  const source = forceSource ?? getSource(ctx);
 
   const url = new URL(req.url);
   const dummy = url.searchParams.get("dummy") || undefined;

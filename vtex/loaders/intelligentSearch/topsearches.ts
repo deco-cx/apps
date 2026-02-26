@@ -1,5 +1,9 @@
 import { AppContext } from "../../mod.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentCacheKeyWithoutUTM,
+  getSegmentFromBag,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { Suggestion } from "../../../commerce/types.ts";
 
@@ -28,6 +32,8 @@ export const cache = {
 };
 
 export const cacheKey = (_props: unknown, _req: Request, ctx: AppContext) => {
-  const segment = getSegmentFromBag(ctx)?.token ?? "";
+  const segment = ctx.advancedConfigs?.removeUTMFromCacheKey
+    ? getSegmentCacheKeyWithoutUTM(ctx)
+    : getSegmentFromBag(ctx)?.token;
   return `topsearches-${segment}`;
 };

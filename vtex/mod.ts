@@ -87,6 +87,11 @@ export interface Props {
 
   advancedConfigs?: {
     doNotFetchVariantsForRelatedProducts?: boolean;
+    /**
+     * @title Remove UTM from cache key
+     * @description Remove UTM from cache key to prevent cache fragmentation.
+     */
+    removeUTMFromCacheKey?: boolean;
   };
 
   /**

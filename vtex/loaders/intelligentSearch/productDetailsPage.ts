@@ -8,13 +8,18 @@ import {
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
 import { pageTypesToSeo } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentCacheKeyWithoutUTM,
+  getSegmentFromBag,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type {
   AdvancedLoaderConfig,
   PageType,
   Product as VTEXProduct,
+  SimulationBehavior,
 } from "../../utils/types.ts";
 import PDPDefaultPath from "../paths/PDPDefaultPath.ts";
 
@@ -35,6 +40,11 @@ export interface Props {
    * @description Further change loader behaviour
    */
   advancedConfigs?: AdvancedLoaderConfig;
+  /**
+   * @title Simulation Behavior
+   * @description Defines the simulation behavior.
+   */
+  simulationBehavior?: SimulationBehavior;
 }
 
 /**
@@ -101,8 +111,12 @@ const loader = async (
   }
 
   const facets = withDefaultFacets([], ctx);
-  const params = withDefaultParams({ query, count: 1, locale });
-
+  const params = withDefaultParams({
+    query,
+    count: 1,
+    locale,
+    simulationBehavior: props.simulationBehavior ?? "default",
+  });
   const { products: [product] } = await vcsDeprecated
     ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
       ...params,
@@ -122,6 +136,7 @@ const loader = async (
     const params = withDefaultParams({
       query: `sku:${sku.kitItems.join(";")}`,
       count: sku.kitItems.length,
+      simulationBehavior: props.simulationBehavior ?? "default",
     });
 
     const result = await vcsDeprecated
@@ -163,7 +178,9 @@ const loader = async (
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
-  const segment = getSegmentFromBag(ctx)?.token;
+  const segment = ctx.advancedConfigs?.removeUTMFromCacheKey
+    ? getSegmentCacheKeyWithoutUTM(ctx)
+    : getSegmentFromBag(ctx)?.token;
   const url = new URL(req.url);
   const skuId = url.searchParams.get("skuId") ?? "";
 

@@ -5,8 +5,11 @@ import { Manifest } from "../manifest.gen.ts";
 
 export const PATH: `/live/invoke/${keyof Manifest["loaders"]}` =
   "/live/invoke/website/loaders/image.ts";
-const DECO_CACHE_URL = "https://assets.decocache.com/";
-const S3_URL = "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/";
+const ASSET_URLS_TO_REPLACE = [
+  "https://assets.decocache.com/",
+  "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/",
+  "https://data.decoassets.com/",
+];
 
 export type SetEarlyHint = (hint: string) => void;
 export type Props =
@@ -26,6 +29,8 @@ export type Props =
     fetchPriority?: "high" | "low" | "auto";
     /** @description Object-fit */
     fit?: FitOptions;
+    /** @description Quality */
+    quality?: QualityOptions;
     setEarlyHint?: SetEarlyHint;
   };
 
@@ -33,20 +38,35 @@ export const FACTORS = [1, 2];
 
 type FitOptions = "contain" | "cover";
 
-const isImageOptmizationEnabled = () =>
+// By default we use the platform image optimization, with functions like:
+// optimizeVTEX, optimizeWake, optmizeShopify
+// if you want to use deco optimization
+// you can set the BYPASS_PLATFORM_IMAGE_OPTIMIZATION environment variable to true
+// Default is false
+const bypassPlatformImageOptimization = () =>
   IS_BROWSER
     // deno-lint-ignore no-explicit-any
-    ? (globalThis as any).DECO?.featureFlags?.enableImageOptimization
-    : Deno.env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
+    ? (globalThis as any).DECO?.featureFlags?.bypassPlatformImageOptimization
+    : Deno.env.get("BYPASS_PLATFORM_IMAGE_OPTIMIZATION") === "true";
 
+// Default is true
 const isAzionAssetsEnabled = () =>
   IS_BROWSER
     // deno-lint-ignore no-explicit-any
     ? (globalThis as any).DECO?.featureFlags?.azionAssets
     : Deno.env.get("ENABLE_AZION_ASSETS") !== "false";
 
+// Default is false
+const bypassDecoImageOptimization = () =>
+  IS_BROWSER
+    // deno-lint-ignore no-explicit-any
+    ? (globalThis as any).DECO?.featureFlags?.bypassDecoImageOptimization
+    : Deno.env.get("BYPASS_DECO_IMAGE_OPTIMIZATION") === "true";
+
 const canShowWarning = () =>
   IS_BROWSER ? false : !Deno.env.get("DENO_DEPLOYMENT_ID");
+
+export type QualityOptions = "low" | "medium" | "high" | "original"; // 60% - 70% - 80% - 100%
 
 interface OptimizationOptions {
   originalSrc: string;
@@ -54,6 +74,7 @@ interface OptimizationOptions {
   height?: number;
   factor: number;
   fit: FitOptions;
+  quality?: QualityOptions;
 }
 
 const optmizeVNDA = (opts: OptimizationOptions) => {
@@ -101,14 +122,74 @@ const optimizeVTEX = (opts: OptimizationOptions) => {
   return src.href;
 };
 
+const optimizeWake = (opts: OptimizationOptions) => {
+  const { originalSrc, width, height } = opts;
+
+  const url = new URL(originalSrc);
+  url.searchParams.set("w", `${width}`);
+  url.searchParams.set("h", `${height}`);
+
+  return url.href;
+};
+
+const qualityToNumber = (quality: "low" | "medium" | "high" | "original") => {
+  switch (quality) {
+    case "low":
+      return 60;
+    case "medium":
+      return 70;
+    case "high":
+      return 80;
+    case "original":
+      return 100;
+  }
+};
+
+const optimizeSourei = (opts: OptimizationOptions) => {
+  const { originalSrc, width, height, fit, quality } = opts;
+
+  const url = new URL(originalSrc);
+  url.searchParams.set("w", `${width}`);
+  height && url.searchParams.set("h", `${height}`);
+  fit && url.searchParams.set("fit", fit);
+  quality &&
+    url.searchParams.set("q", qualityToNumber(quality).toString());
+
+  return url.href;
+};
+
+const optimizeMagento = (opts: OptimizationOptions) => {
+  const { originalSrc, width, height } = opts;
+
+  const url = new URL(originalSrc);
+  url.searchParams.set("width", `${width}`);
+  url.searchParams.set("height", `${height}`);
+  url.searchParams.set("canvas", `${width}:${height}`);
+  url.searchParams.set("optimize", "low");
+  url.searchParams.set("fit", opts.fit === "cover" ? "" : "bounds");
+
+  return url.href;
+};
+
 export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
-  const { originalSrc, width, height, fit } = opts;
+  const { originalSrc, width, height, fit, quality } = opts;
 
   if (originalSrc.startsWith("data:")) {
     return originalSrc;
   }
+  if (!bypassPlatformImageOptimization()) {
+    if (originalSrc.startsWith("https://media-storage.soureicdn.com")) {
+      return optimizeSourei(opts);
+    }
 
-  if (!isImageOptmizationEnabled()) {
+    if (originalSrc.includes("media/catalog/product")) {
+      return optimizeMagento(opts);
+    }
+
+    if (originalSrc.includes("fbitsstatic.net/img/")) {
+      return optimizeWake(opts);
+    }
+
     if (originalSrc.startsWith("https://cdn.vnda.")) {
       return optmizeVNDA(opts);
     }
@@ -137,6 +218,10 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     }
   }
 
+  if (bypassDecoImageOptimization()) {
+    return originalSrc;
+  }
+
   const params = new URLSearchParams();
 
   params.set("fit", fit);
@@ -144,15 +229,16 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   height && params.set("height", `${height}`);
 
   if (isAzionAssetsEnabled()) {
-    const imageSource = originalSrc
-      .replace(DECO_CACHE_URL, "")
-      .replace(
-        S3_URL,
-        "",
-      )
-      .split("?")[0];
+    // only accepted for Azion for now
+    quality && params.set("quality", quality);
+
+    const originalSrc = ASSET_URLS_TO_REPLACE.reduce(
+      (acc, url) => acc.replace(url, ""),
+      opts.originalSrc,
+    );
+    const imageSource = originalSrc.split("?")[0];
     // src is being passed separately to avoid URL encoding issues
-    return `https://deco-assets.decoazn.com/image?${params}&src=${imageSource}`;
+    return `https://deco-assets.edgedeco.com/image?${params}&src=${imageSource}`;
   }
 
   params.set("src", originalSrc);
@@ -166,6 +252,7 @@ export const getSrcSet = (
   height?: number,
   fit?: FitOptions,
   factors: number[] = FACTORS,
+  quality?: QualityOptions,
 ) => {
   const srcSet = [];
 
@@ -180,6 +267,7 @@ export const getSrcSet = (
       height: h,
       factor,
       fit: fit || "cover",
+      quality: quality,
     });
 
     if (src) {
@@ -196,6 +284,7 @@ export const getEarlyHintFromSrcProps = (srcProps: {
   fit?: FitOptions;
   width: number;
   height?: number;
+  quality?: QualityOptions;
 }) => {
   const factor = FACTORS.at(-1)!;
   const src = getOptimizedMediaUrl({
@@ -204,6 +293,7 @@ export const getEarlyHintFromSrcProps = (srcProps: {
     height: srcProps.height && Math.trunc(srcProps.height * factor),
     fit: srcProps.fit || "cover",
     factor,
+    quality: srcProps.quality,
   });
   const earlyHintParts = [
     `<${src}>`,
@@ -221,12 +311,6 @@ export const getEarlyHintFromSrcProps = (srcProps: {
 const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
   const { preload, loading = "lazy" } = props;
 
-  if (!props.height) {
-    console.warn(
-      `Missing height. This image will NOT be optimized: ${props.src}`,
-    );
-  }
-
   const shouldSetEarlyHint = !!props.setEarlyHint && preload;
   const srcSet = props.srcSet ??
     getSrcSet(
@@ -235,6 +319,7 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
       props.height,
       props.fit,
       shouldSetEarlyHint ? FACTORS.slice(-1) : FACTORS,
+      props.quality,
     );
 
   const linkProps = srcSet &&
@@ -260,6 +345,7 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
         height: props.height,
         fetchpriority: props.fetchPriority,
         src: props.src,
+        quality: props.quality,
       }),
     );
   }
