@@ -49,13 +49,11 @@ const loader = async (
   const splitted = slug?.split("-");
   const maybeSkuId = Number(splitted[splitted.length - 1]);
 
-  const handle = splitted.slice(0, maybeSkuId ? -1 : undefined).join("-");
-
   const data = await storefront.query<
     GetProductQuery,
     GetProductQueryVariables & HasMetafieldsMetafieldsArgs & LanguageContextArgs
   >({
-    variables: { handle, identifiers: metafields, languageCode, countryCode },
+    variables: { handle: slug, identifiers: metafields, languageCode, countryCode },
     ...GetProduct,
   });
 

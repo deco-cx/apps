@@ -137,7 +137,6 @@ const loader = async (
 
   console.log("[ProductList][START]", {
     requestId,
-    url: req.url,
     count,
     sort,
     languageCode,
@@ -173,9 +172,9 @@ const loader = async (
 
       shopifyProducts = data.search;
 
-      console.log("[ProductList][COST]", {
+      console.log("[ProductList][QUERY_OK]", {
         requestId,
-        cost: data ?? null,
+        hasSearch: Boolean(data.search),
       });
     } else {
       const data = await storefront.query<
@@ -198,7 +197,7 @@ const loader = async (
       });
 
       if (!data.collection) {
-        console.error("[ProductList][NULL_COLLECTION]", {
+        console.warn("[ProductList][NULL_COLLECTION]", {
           requestId,
           handle: props.collection,
           languageCode,
@@ -208,24 +207,15 @@ const loader = async (
 
       shopifyProducts = data.collection?.products;
 
-      console.log("[ProductList][COST]", {
+      console.log("[ProductList][COLLECTION_OK]", {
         requestId,
-        cost: data ?? null,
+        hasCollection: Boolean(data.collection),
       });
     }
-
-    console.log("[ProductList][SUCCESS]", {
-      requestId,
-      nodesReturned: shopifyProducts?.nodes?.length ?? 0,
-      durationMs: Date.now() - startTime,
-    });
   } catch (error) {
-    console.error("[ProductList][ERROR]", {
+    console.error("[ProductList][SHOPIFY_ERROR]", {
       requestId,
       message: error instanceof Error ? error.message : "Unknown error",
-      stack: error instanceof Error ? error.stack : undefined,
-      languageCode,
-      countryCode,
       durationMs: Date.now() - startTime,
     });
 
@@ -234,20 +224,20 @@ const loader = async (
 
   const products = shopifyProducts?.nodes
     ?.map((p) => {
-      try {
+    try {
         return toProduct(
           p as ProductFragment,
       (p as ProductFragment).variants.nodes[0],
-          new URL(req.url),
-        );
+        new URL(req.url),
+      );
       } catch (error) {
         console.error("[ProductList][TRANSFORM_ERROR]", {
           requestId,
           productId: p.id,
-          message: error instanceof Error ? error.message : "Unknown error",
-        });
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
         return null;
-      }
+  }
     })
     .filter((p): p is Product => Boolean(p));
 
@@ -260,7 +250,7 @@ const loader = async (
   return products ?? [];
 };
 
-export const cache = "stale-while-revalidate";
+export const cache = "no-store";
 
 export const cacheKey = (expandedProps: Props, req: Request): string => {
   const props = expandedProps.props;
