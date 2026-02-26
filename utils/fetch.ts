@@ -47,7 +47,12 @@ export const fetchSafe = async (
   if (isManual && isRedirect) {
     return response;
   }
-  throw new HttpError(response.status, `${await response.text()}`);
+  console.error("[fetchSafe][ERROR]", {
+    url: input.toString(),
+    method: init?.method ?? "GET",
+    response: response.json(),
+  });
+  throw new HttpError(response.status, `${await response.json()}`);
 };
 export const fetchAPI = async <T>(
   input: string | Request | URL,
