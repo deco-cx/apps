@@ -36,13 +36,9 @@ const loader = async (
   const maybeCartId = getCartCookie(req.headers);
 
   const cartId = maybeCartId ||
-    await storefront.query<
-      CreateCartMutation,
-      CreateCartMutationVariables & LanguageContextArgs
-    >({
-      variables: { languageCode, countryCode },
-      ...CreateCart,
-    }).then((data) => data.payload?.cart?.id);
+    await storefront.query<CreateCartMutation, CreateCartMutationVariables>(
+      CreateCart,
+    ).then((data) => data.payload?.cart?.id);
 
   if (!cartId) {
     throw new Error("Missing cart id");
