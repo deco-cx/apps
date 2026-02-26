@@ -29,20 +29,27 @@ const buildProxyRoutes = (
   {
     ctx,
     ctx: { storeName, publicUrl },
-    extraPaths,
+    extraPathsToProxy = [],
+    extraPaths = [],
     includeSiteMap,
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
+    excludePathsFromShopifySiteMap,
     replaces,
-  }: {
-    extraPaths: string[];
-    includeSiteMap?: string[];
-    generateDecoSiteMap?: boolean;
-    excludePathsFromDecoSiteMap: string[];
-    replaces: TextReplace[];
+  }: Props & {
     ctx: AppContext;
+    extraPaths?: string[];
   },
 ) => {
+  // Handle backward compatibility for extraPaths prop
+  const finalExtraPathsToProxy = extraPathsToProxy.length > 0
+    ? extraPathsToProxy
+    : extraPaths;
+  if (extraPaths.length > 0 && extraPathsToProxy.length === 0) {
+    console.warn(
+      'DEPRECATION WARNING: "extraPaths" prop is deprecated. Use "extraPathsToProxy" instead.',
+    );
+  }
   const urlToUse = publicUrl
     ? new URL(publicUrl.startsWith("http") ? publicUrl : `https://${publicUrl}`)
     : new URL(`https://${storeName}.myshopify.com`);
@@ -64,7 +71,9 @@ const buildProxyRoutes = (
       pathTemplate,
       handler: {
         value: {
-          __resolveType: "website/handlers/proxy.ts",
+          __resolveType: pathTemplate.includes("sitemap")
+            ? "shopify/handlers/sitemap.ts"
+            : "website/handlers/proxy.ts",
           url: urlToProxy,
           host: hostToUse,
           customHeaders: withDigestCookie(ctx),
@@ -72,7 +81,7 @@ const buildProxyRoutes = (
         },
       },
     });
-    const routesFromPaths = [...PATHS_TO_PROXY, ...extraPaths].map(
+    const routesFromPaths = [...PATHS_TO_PROXY, ...finalExtraPathsToProxy].map(
       routeFromPath,
     );
 
@@ -95,6 +104,7 @@ const buildProxyRoutes = (
         handler: {
           value: {
             include,
+            exclude: excludePathsFromShopifySiteMap,
             __resolveType: "shopify/handlers/sitemap.ts",
           },
         },
@@ -119,6 +129,10 @@ const buildProxyRoutes = (
 export interface Props {
   extraPathsToProxy?: string[];
   /**
+   * @deprecated Use extraPathsToProxy instead
+   */
+  extraPaths?: string[];
+  /**
    * @title Other site maps to include
    */
   includeSiteMap?: string[];
@@ -130,6 +144,10 @@ export interface Props {
    * @title Exclude paths from /deco-sitemap.xml
    */
   excludePathsFromDecoSiteMap?: string[];
+  /**
+   * @title Exclude paths from /shopify-sitemap.xml
+   */
+  excludePathsFromShopifySiteMap?: string[];
   replaces?: TextReplace[];
 }
 
@@ -139,9 +157,11 @@ export interface Props {
 function loader(
   {
     extraPathsToProxy = [],
+    extraPaths = [],
     includeSiteMap = [],
     generateDecoSiteMap = true,
     excludePathsFromDecoSiteMap = [],
+    excludePathsFromShopifySiteMap = [],
     replaces = [],
   }: Props,
   _req: Request,
@@ -150,8 +170,10 @@ function loader(
   return buildProxyRoutes({
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
+    excludePathsFromShopifySiteMap,
     includeSiteMap,
-    extraPaths: extraPathsToProxy,
+    extraPathsToProxy,
+    extraPaths,
     replaces,
     ctx,
   });

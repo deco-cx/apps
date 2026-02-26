@@ -6,7 +6,9 @@ import {
 } from "../utils/storefront/queries.ts";
 import {
   CollectionProductsArgs,
+  CountryCode,
   HasMetafieldsMetafieldsArgs,
+  LanguageCode,
   ProductConnection,
   ProductFragment,
   QueryRoot,
@@ -21,7 +23,7 @@ import {
   searchSortShopify,
   sortShopify,
 } from "../utils/utils.ts";
-import { Metafield } from "../utils/types.ts";
+import { LanguageContextArgs, Metafield } from "../utils/types.ts";
 
 export interface QueryProps {
   /** @description search term to use on search */
@@ -70,6 +72,18 @@ export type Props = {
    * @description search for metafields
    */
   metafields?: Metafield[];
+  /**
+   * @title Language Code
+   * @description Language code for the storefront API
+   * @example "EN" for English, "FR" for French, etc.
+   */
+  languageCode?: LanguageCode;
+  /**
+   * @title Country Code
+   * @description Country code for the storefront API
+   * @example "US" for United States, "FR" for France, etc.
+   */
+  countryCode?: CountryCode;
 };
 
 // deno-lint-ignore no-explicit-any
@@ -92,6 +106,8 @@ const loader = async (
 
   const count = props.count ?? 12;
   const metafields = expandedProps.metafields || [];
+  const languageCode = expandedProps?.languageCode ?? "PT";
+  const countryCode = expandedProps?.countryCode ?? "BR";
 
   let shopifyProducts:
     | SearchResultItemConnection
@@ -121,13 +137,15 @@ const loader = async (
   if (isQueryList(props)) {
     const data = await storefront.query<
       QueryRoot,
-      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs
+      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs & LanguageContextArgs
     >({
       variables: {
         first: count,
         query: props.query,
         productFilters: filters,
         identifiers: metafields,
+        languageCode,
+        countryCode,
         ...searchSortShopify[sort],
       },
       ...SearchProducts,
@@ -139,12 +157,15 @@ const loader = async (
       & QueryRootCollectionArgs
       & CollectionProductsArgs
       & HasMetafieldsMetafieldsArgs
+      & LanguageContextArgs
     >({
       variables: {
         first: count,
         handle: props.collection,
         filters,
         identifiers: metafields,
+        languageCode,
+        countryCode,
         ...sortShopify[sort],
       },
       ...ProductsByCollection,
@@ -167,37 +188,30 @@ const loader = async (
   return products ?? [];
 };
 
-export const cache = "no-cache";
+export const cache = "stale-while-revalidate";
 export const cacheKey = (expandedProps: Props, req: Request): string => {
   const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
 
   const count = (props.count ?? 12).toString();
   const sort = props.sort ?? "";
+  const languageCode = expandedProps?.languageCode ?? "PT";
+  const countryCode = expandedProps?.countryCode ?? "BR";
+
   const searchParams = new URLSearchParams({
     count,
     sort,
+    languageCode,
+    countryCode,
   });
 
-  expandedProps.filters?.tags?.forEach((tag) => {
-    searchParams.append("tag", tag);
-  });
-  expandedProps.filters?.productTypes?.forEach((productType) => {
-    searchParams.append("productType", productType);
-  });
-  expandedProps.filters?.productVendors?.forEach((productVendor) => {
-    searchParams.append("productVendor", productVendor);
-  });
-  expandedProps.filters?.priceMin &&
-    searchParams.append("price.min", expandedProps.filters.priceMin.toString());
-  expandedProps.filters?.priceMax &&
-    searchParams.append("price.max", expandedProps.filters.priceMax.toString());
-  expandedProps.filters?.variantOptions?.forEach((variantOption) => {
-    searchParams.append(
-      "variantOption",
-      `${variantOption.name}:${variantOption.value}`,
-    );
-  });
+  if ("collection" in props) {
+    searchParams.append("collection", props.collection);
+  }
+
+  if ("query" in props) {
+    searchParams.append("query", props.query);
+  }
 
   const url = new URL(req.url);
   url.search = searchParams.toString();
