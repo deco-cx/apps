@@ -1,5 +1,6 @@
 import { BlogPost } from "../types.ts";
 import { CSS } from "../static/css.ts";
+import { renderSection } from "../../website/pages/Page.tsx";
 
 export interface Props {
   post: BlogPost | null;
@@ -15,10 +16,12 @@ export default function Template({ post }: Props) {
     date,
     image,
     alt,
+    sections,
   } = post;
 
   return (
     <>
+      <link href="/styles.css" rel="stylesheet"/>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <div class="deco-post-preview">
         <h1>{title}</h1>
@@ -39,7 +42,10 @@ export default function Template({ post }: Props) {
             alt={alt ?? title}
           />
         )}
-        <div dangerouslySetInnerHTML={{ __html: content }} />
+        <div dangerouslySetInnerHTML={{ __html: content as string }} />
+        <div class="content-sections">
+              {sections?.map(renderSection)}
+            </div>
       </div>
     </>
   );
