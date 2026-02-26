@@ -154,9 +154,9 @@ const loader = async (
     if (isQueryList(props)) {
       const data = await storefront.query<
         QueryRoot,
-        QueryRootSearchArgs &
-          HasMetafieldsMetafieldsArgs &
-          LanguageContextArgs
+        & QueryRootSearchArgs
+        & HasMetafieldsMetafieldsArgs
+        & LanguageContextArgs
       >({
         variables: {
           first: count,
@@ -179,10 +179,10 @@ const loader = async (
     } else {
       const data = await storefront.query<
         QueryRoot,
-        QueryRootCollectionArgs &
-          CollectionProductsArgs &
-          HasMetafieldsMetafieldsArgs &
-          LanguageContextArgs
+        & QueryRootCollectionArgs
+        & CollectionProductsArgs
+        & HasMetafieldsMetafieldsArgs
+        & LanguageContextArgs
       >({
         variables: {
           first: count,
@@ -224,20 +224,20 @@ const loader = async (
 
   const products = shopifyProducts?.nodes
     ?.map((p) => {
-    try {
+      try {
         return toProduct(
           p as ProductFragment,
-      (p as ProductFragment).variants.nodes[0],
-        new URL(req.url),
-      );
+          (p as ProductFragment).variants.nodes[0],
+          new URL(req.url),
+        );
       } catch (error) {
         console.error("[ProductList][TRANSFORM_ERROR]", {
           requestId,
           productId: p.id,
-        message: error instanceof Error ? error.message : "Unknown error",
-      });
+          message: error instanceof Error ? error.message : "Unknown error",
+        });
         return null;
-  }
+      }
     })
     .filter((p): p is Product => Boolean(p));
 

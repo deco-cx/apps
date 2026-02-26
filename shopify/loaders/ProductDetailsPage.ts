@@ -53,7 +53,12 @@ const loader = async (
     GetProductQuery,
     GetProductQueryVariables & HasMetafieldsMetafieldsArgs & LanguageContextArgs
   >({
-    variables: { handle: slug, identifiers: metafields, languageCode, countryCode },
+    variables: {
+      handle: slug,
+      identifiers: metafields,
+      languageCode,
+      countryCode,
+    },
     ...GetProduct,
   });
 
