@@ -86,9 +86,8 @@ export type Props = {
   countryCode?: CountryCode;
 };
 
-// deno-lint-ignore no-explicit-any
-const isQueryList = (p: any): p is QueryProps =>
-  typeof p.query === "string" && typeof p.count === "number";
+const isQueryList = (p: QueryProps | CollectionProps): p is QueryProps =>
+  "query" in p;
 
 /**
  * @title Shopify Integration
@@ -99,104 +98,177 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
+  const requestId = crypto.randomUUID();
+  const startTime = Date.now();
   const { storefront } = ctx;
 
-  const props = expandedProps.props ??
-    (expandedProps as unknown as Props["props"]);
-
+  const props = expandedProps.props;
   const count = props.count ?? 12;
-  const metafields = expandedProps.metafields || [];
-  const languageCode = expandedProps?.languageCode ?? "PT";
-  const countryCode = expandedProps?.countryCode ?? "BR";
-
-  let shopifyProducts:
-    | SearchResultItemConnection
-    | ProductConnection
-    | undefined = undefined;
-
+  const metafields = expandedProps.metafields ?? [];
+  const languageCode: LanguageCode = expandedProps.languageCode ?? "PT";
+  const countryCode: CountryCode = expandedProps.countryCode ?? "BR";
   const sort = props.sort ?? "";
 
   const filters = [];
+
   expandedProps.filters?.tags?.forEach((tag) => {
     filters.push({ tag });
   });
+
   expandedProps.filters?.productTypes?.forEach((productType) => {
     filters.push({ productType });
   });
+
   expandedProps.filters?.productVendors?.forEach((productVendor) => {
     filters.push({ productVendor });
   });
-  expandedProps.filters?.priceMin &&
+
+  if (expandedProps.filters?.priceMin !== undefined) {
     filters.push({ price: { min: expandedProps.filters.priceMin } });
-  expandedProps.filters?.priceMax &&
+  }
+
+  if (expandedProps.filters?.priceMax !== undefined) {
     filters.push({ price: { max: expandedProps.filters.priceMax } });
+  }
+
   expandedProps.filters?.variantOptions?.forEach((variantOption) => {
     filters.push({ variantOption });
   });
 
-  if (isQueryList(props)) {
-    const data = await storefront.query<
-      QueryRoot,
-      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs & LanguageContextArgs
-    >({
-      variables: {
-        first: count,
-        query: props.query,
-        productFilters: filters,
-        identifiers: metafields,
-        languageCode,
-        countryCode,
-        ...searchSortShopify[sort],
-      },
-      ...SearchProducts,
+  console.log("[ProductList][START]", {
+    requestId,
+    url: req.url,
+    count,
+    sort,
+    languageCode,
+    countryCode,
+    filtersCount: filters.length,
+    metafieldsCount: metafields.length,
+  });
+
+  let shopifyProducts:
+    | SearchResultItemConnection
+    | ProductConnection
+    | undefined;
+
+  try {
+    if (isQueryList(props)) {
+      const data = await storefront.query<
+        QueryRoot,
+        QueryRootSearchArgs &
+          HasMetafieldsMetafieldsArgs &
+          LanguageContextArgs
+      >({
+        variables: {
+          first: count,
+          query: props.query,
+          productFilters: filters,
+          identifiers: metafields,
+          languageCode,
+          countryCode,
+          ...searchSortShopify[sort],
+        },
+        ...SearchProducts,
+      });
+
+      shopifyProducts = data.search;
+
+      console.log("[ProductList][COST]", {
+        requestId,
+        cost: data ?? null,
+      });
+    } else {
+      const data = await storefront.query<
+        QueryRoot,
+        QueryRootCollectionArgs &
+          CollectionProductsArgs &
+          HasMetafieldsMetafieldsArgs &
+          LanguageContextArgs
+      >({
+        variables: {
+          first: count,
+          handle: props.collection,
+          filters,
+          identifiers: metafields,
+          languageCode,
+          countryCode,
+          ...sortShopify[sort],
+        },
+        ...ProductsByCollection,
+      });
+
+      if (!data.collection) {
+        console.error("[ProductList][NULL_COLLECTION]", {
+          requestId,
+          handle: props.collection,
+          languageCode,
+          countryCode,
+        });
+      }
+
+      shopifyProducts = data.collection?.products;
+
+      console.log("[ProductList][COST]", {
+        requestId,
+        cost: data ?? null,
+      });
+    }
+
+    console.log("[ProductList][SUCCESS]", {
+      requestId,
+      nodesReturned: shopifyProducts?.nodes?.length ?? 0,
+      durationMs: Date.now() - startTime,
     });
-    shopifyProducts = data.search;
-  } else {
-    const data = await storefront.query<
-      QueryRoot,
-      & QueryRootCollectionArgs
-      & CollectionProductsArgs
-      & HasMetafieldsMetafieldsArgs
-      & LanguageContextArgs
-    >({
-      variables: {
-        first: count,
-        handle: props.collection,
-        filters,
-        identifiers: metafields,
-        languageCode,
-        countryCode,
-        ...sortShopify[sort],
-      },
-      ...ProductsByCollection,
+  } catch (error) {
+    console.error("[ProductList][ERROR]", {
+      requestId,
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+      languageCode,
+      countryCode,
+      durationMs: Date.now() - startTime,
     });
 
-    shopifyProducts = data.collection?.products;
+    throw error;
   }
 
-  // Transform Shopify product format into schema.org's compatible format
-  // If a property is missing from the final `products` array you can add
-  // it in here
-  const products = shopifyProducts?.nodes.map((p) =>
-    toProduct(
-      p as ProductFragment,
+  const products = shopifyProducts?.nodes
+    ?.map((p) => {
+      try {
+        return toProduct(
+          p as ProductFragment,
       (p as ProductFragment).variants.nodes[0],
-      new URL(req.url),
-    )
-  );
+          new URL(req.url),
+        );
+      } catch (error) {
+        console.error("[ProductList][TRANSFORM_ERROR]", {
+          requestId,
+          productId: p.id,
+          message: error instanceof Error ? error.message : "Unknown error",
+        });
+        return null;
+      }
+    })
+    .filter((p): p is Product => Boolean(p));
+
+  console.log("[ProductList][END]", {
+    requestId,
+    finalCount: products?.length ?? 0,
+    totalDurationMs: Date.now() - startTime,
+  });
 
   return products ?? [];
 };
 
 export const cache = "stale-while-revalidate";
+
 export const cacheKey = (expandedProps: Props, req: Request): string => {
-  const props = expandedProps.props ??
-    (expandedProps as unknown as Props["props"]);
+  const props = expandedProps.props;
 
   const count = (props.count ?? 12).toString();
   const sort = props.sort ?? "";
-  const languageCode = expandedProps?.languageCode ?? "PT";
-  const countryCode = expandedProps?.countryCode ?? "BR";
+  const languageCode = expandedProps.languageCode ?? "PT";
+  const countryCode = expandedProps.countryCode ?? "BR";
 
   const searchParams = new URLSearchParams({
     count,
