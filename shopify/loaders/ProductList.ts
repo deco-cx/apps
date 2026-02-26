@@ -188,37 +188,30 @@ const loader = async (
   return products ?? [];
 };
 
-export const cache = "no-cache";
+export const cache = "stale-while-revalidate";
 export const cacheKey = (expandedProps: Props, req: Request): string => {
   const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
 
   const count = (props.count ?? 12).toString();
   const sort = props.sort ?? "";
+  const languageCode = expandedProps?.languageCode ?? "PT";
+  const countryCode = expandedProps?.countryCode ?? "BR";
+
   const searchParams = new URLSearchParams({
     count,
     sort,
+    languageCode,
+    countryCode,
   });
 
-  expandedProps.filters?.tags?.forEach((tag) => {
-    searchParams.append("tag", tag);
-  });
-  expandedProps.filters?.productTypes?.forEach((productType) => {
-    searchParams.append("productType", productType);
-  });
-  expandedProps.filters?.productVendors?.forEach((productVendor) => {
-    searchParams.append("productVendor", productVendor);
-  });
-  expandedProps.filters?.priceMin &&
-    searchParams.append("price.min", expandedProps.filters.priceMin.toString());
-  expandedProps.filters?.priceMax &&
-    searchParams.append("price.max", expandedProps.filters.priceMax.toString());
-  expandedProps.filters?.variantOptions?.forEach((variantOption) => {
-    searchParams.append(
-      "variantOption",
-      `${variantOption.name}:${variantOption.value}`,
-    );
-  });
+  if ("collection" in props) {
+    searchParams.append("collection", props.collection);
+  }
+
+  if ("query" in props) {
+    searchParams.append("query", props.query);
+  }
 
   const url = new URL(req.url);
   url.search = searchParams.toString();

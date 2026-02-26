@@ -66,15 +66,20 @@ const loader = async (
   return toProductPage(data.product, new URL(_req.url), maybeSkuId);
 };
 
-export const cache = "no-cache";
+export const cache = "stale-while-revalidate";
+
 export const cacheKey = (props: Props, req: Request): string => {
-  const { slug } = props;
+  const { slug, languageCode = "PT", countryCode = "BR" } = props;
+
   const searchParams = new URLSearchParams({
     slug,
+    languageCode,
+    countryCode,
   });
 
   const url = new URL(req.url);
   url.search = searchParams.toString();
+
   return url.href;
 };
 

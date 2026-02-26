@@ -96,17 +96,26 @@ const loader = async (
   ).slice(0, count);
 };
 
-export const cache = "no-cache";
+export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request): string => {
-  const { slug, count } = props;
+  const {
+    slug,
+    count,
+    languageCode = "PT",
+    countryCode = "BR",
+  } = props;
+
   const searchParams = new URLSearchParams({
     slug,
     count: count.toString(),
+    languageCode,
+    countryCode,
   });
 
   const url = new URL(req.url);
   url.search = searchParams.toString();
+
   return url.href;
 };
 
