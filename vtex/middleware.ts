@@ -4,7 +4,11 @@ import {
   getISCookiesFromBag,
   setISCookiesBag,
 } from "./utils/intelligentSearch.ts";
-import { getSegmentFromBag, setSegmentBag } from "./utils/segment.ts";
+import {
+  getSegmentFromBag,
+  isAnonymous,
+  setSegmentBag,
+} from "./utils/segment.ts";
 
 export const middleware = (
   _props: unknown,
@@ -24,6 +28,12 @@ export const middleware = (
     if (!segment) {
       setSegmentBag(cookies, req, ctx);
     }
+  }
+
+  // For anonymous users the page content is deterministic — safe to cache.
+  if (isAnonymous(ctx)) {
+    ctx.dirty = false;
+    ctx.dirtyTraces = [];
   }
 
   return ctx.next!();

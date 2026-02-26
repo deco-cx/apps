@@ -223,24 +223,26 @@ export const setSegmentBag = (
   const token = serialize(segment);
   setSegmentInBag(ctx, { payload: segment, token });
 
-  // If the user came from a sales channel in the URL, we set the cookie
-  if (segmentFromRequest.channel) {
-    setCookie(ctx.response.headers, {
-      value: `sc=${segmentFromRequest.channel}`,
-      name: SALES_CHANNEL_COOKIE,
-      path: "/",
-      secure: true,
-    });
-  }
+  // Skip Set-Cookie for anonymous users to allow CDN caching.
+  // Anonymous segment is deterministic (same for all users).
+  if (!isAnonymous(ctx)) {
+    if (segmentFromRequest.channel) {
+      setCookie(ctx.response.headers, {
+        value: `sc=${segmentFromRequest.channel}`,
+        name: SALES_CHANNEL_COOKIE,
+        path: "/",
+        secure: true,
+      });
+    }
 
-  // Avoid setting cookie when segment from request matches the one generated
-  if (vtex_segment !== token) {
-    setCookie(ctx.response.headers, {
-      value: token,
-      name: SEGMENT_COOKIE_NAME,
-      path: "/",
-      secure: true,
-      httpOnly: true,
-    });
+    if (vtex_segment !== token) {
+      setCookie(ctx.response.headers, {
+        value: token,
+        name: SEGMENT_COOKIE_NAME,
+        path: "/",
+        secure: true,
+        httpOnly: true,
+      });
+    }
   }
 };

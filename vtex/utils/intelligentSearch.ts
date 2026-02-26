@@ -1,4 +1,3 @@
-import { setCookie } from "std/http/mod.ts";
 import { AppContext } from "../mod.ts";
 import { STALE } from "../../utils/fetch.ts";
 import type {
@@ -100,28 +99,10 @@ export const setISCookiesBag = (
 
   if (!anonymous) {
     anonymous = crypto.randomUUID();
-
-    setCookie(ctx.response.headers, {
-      value: anonymous,
-      name: ANONYMOUS_COOKIE,
-      path: "/",
-      secure: true,
-      httpOnly: true,
-      maxAge: 365 * 24 * 3600,
-    });
   }
 
   if (!session) {
     session = crypto.randomUUID();
-
-    setCookie(ctx.response.headers, {
-      value: session,
-      name: SESSION_COOKIE,
-      path: "/",
-      secure: true,
-      httpOnly: true,
-      maxAge: 30 * 60,
-    });
   }
 
   ctx?.bag.set(IS_ANONYMOUS, anonymous);
