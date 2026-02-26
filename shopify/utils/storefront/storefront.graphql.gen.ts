@@ -7752,6 +7752,7 @@ export type CustomerFragment = { id: string, email?: string | null, firstName?: 
 
 export type CreateCartMutationVariables = Exact<{
   countryCode?: InputMaybe<CountryCode>;
+  languageCode?: InputMaybe<LanguageCode>;
 }>;
 
 
