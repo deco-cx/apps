@@ -62,23 +62,21 @@ export const isAnonymous = (
 };
 
 /**
- * Checks if the segment only contains fields that don't affect page content.
- * UTMs are excluded because they're marketing tracking only — they don't
- * change prices, products, or layout. This is used for CDN cache decisions.
+ * Checks if the segment is cacheable for CDN purposes.
+ * By default, uses isAnonymous (UTMs affect cacheability because prices
+ * can vary by utm_source). With removeUTMFromCacheKey, UTMs are ignored
+ * (opt-in for stores that don't vary prices by UTM).
  */
-export const isCacheableSegment = (
-  ctx: AppContext,
-) => {
-  const payload = getSegmentFromBag(ctx)?.payload;
-  if (!payload) {
-    return true;
+export const isCacheableSegment = (ctx: AppContext) => {
+  if (ctx.advancedConfigs?.removeUTMFromCacheKey) {
+    const payload = getSegmentFromBag(ctx)?.payload;
+    if (!payload) return true;
+    const { campaigns, channel, priceTables, regionId } = payload;
+    return !campaigns &&
+      (!channel || isDefautSalesChannel(ctx, channel)) &&
+      !priceTables && !regionId;
   }
-  const { campaigns, channel, priceTables, regionId, channelPrivacy } = payload;
-  return !campaigns &&
-    (!channel || isDefautSalesChannel(ctx, channel)) &&
-    !priceTables &&
-    !regionId &&
-    channelPrivacy !== "private";
+  return isAnonymous(ctx);
 };
 
 const setSegmentInBag = (ctx: AppContext, data: WrappedSegment) =>
