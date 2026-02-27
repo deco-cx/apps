@@ -18,7 +18,6 @@ export const createEngine = (
     const response = await fetch(url, { headers: new Headers(req.headers) });
 
     if (!response.ok) {
-      await response.body?.cancel();
       throw new HttpError(502);
     }
 
