@@ -73,11 +73,12 @@ export const isCacheableSegment = (
   if (!payload) {
     return true;
   }
-  const { campaigns, channel, priceTables, regionId } = payload;
+  const { campaigns, channel, priceTables, regionId, channelPrivacy } = payload;
   return !campaigns &&
     (!channel || isDefautSalesChannel(ctx, channel)) &&
     !priceTables &&
-    !regionId;
+    !regionId &&
+    channelPrivacy !== "private";
 };
 
 const setSegmentInBag = (ctx: AppContext, data: WrappedSegment) =>
