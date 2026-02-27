@@ -59,6 +59,7 @@ const fetchImage = async (
   const response = await fetch(src, init);
 
   if (!response.ok) {
+    await response.body?.cancel();
     throw new HttpError(response.status, Deno.inspect(response));
   }
 
