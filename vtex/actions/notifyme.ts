@@ -24,10 +24,7 @@ const action = async (
   form.append("notifymeClientEmail", email);
   form.append("notifymeIdSku", skuId);
 
-  const response = await vcsDeprecated["POST /no-cache/AviseMe.aspx"]({}, {
-    body: form,
-  });
-  await response.body?.cancel();
+  await vcsDeprecated["POST /no-cache/AviseMe.aspx"]({}, { body: form });
 };
 
 export default action;

@@ -63,21 +63,16 @@ const action = async (
     throw new Error("Missing IS Cookies");
   }
 
-  const response = await sp["POST /event-api/v1/:account/event"](
-    { account: ctx.account },
-    {
-      body: {
-        ...props,
-        ...cookies,
-        agent: req.headers.get("user-agent") || "deco-sites/apps",
-      },
-      headers: {
-        "content-type": "application/json",
-      },
+  await sp["POST /event-api/v1/:account/event"]({ account: ctx.account }, {
+    body: {
+      ...props,
+      ...cookies,
+      agent: req.headers.get("user-agent") || "deco-sites/apps",
     },
-  );
-
-  await response.body?.cancel();
+    headers: {
+      "content-type": "application/json",
+    },
+  });
 
   return null;
 };
