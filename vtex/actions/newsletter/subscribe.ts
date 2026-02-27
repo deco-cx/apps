@@ -33,9 +33,10 @@ const action = async (
   form.append("newsInternalPart", part);
   form.append("newsInternalCampaign", campaing);
 
-  await vcsDeprecated["POST /no-cache/Newsletter.aspx"]({}, {
+  const response = await vcsDeprecated["POST /no-cache/Newsletter.aspx"]({}, {
     body: form,
   });
+  await response.body?.cancel();
 };
 
 export default action;
