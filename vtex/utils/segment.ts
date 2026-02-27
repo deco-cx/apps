@@ -61,6 +61,25 @@ export const isAnonymous = (
     !regionId;
 };
 
+/**
+ * Checks if the segment only contains fields that don't affect page content.
+ * UTMs are excluded because they're marketing tracking only — they don't
+ * change prices, products, or layout. This is used for CDN cache decisions.
+ */
+export const isCacheableSegment = (
+  ctx: AppContext,
+) => {
+  const payload = getSegmentFromBag(ctx)?.payload;
+  if (!payload) {
+    return true;
+  }
+  const { campaigns, channel, priceTables, regionId } = payload;
+  return !campaigns &&
+    (!channel || isDefautSalesChannel(ctx, channel)) &&
+    !priceTables &&
+    !regionId;
+};
+
 const setSegmentInBag = (ctx: AppContext, data: WrappedSegment) =>
   ctx?.bag?.set(SEGMENT, data);
 
@@ -223,9 +242,11 @@ export const setSegmentBag = (
   const token = serialize(segment);
   setSegmentInBag(ctx, { payload: segment, token });
 
-  // Skip Set-Cookie for anonymous users to allow CDN caching.
-  // Anonymous segment is deterministic (same for all users).
-  if (!isAnonymous(ctx)) {
+  // Skip Set-Cookie when the segment only differs by UTMs.
+  // UTMs don't affect page content, so the response can still be cached.
+  // Only set cookies when content-affecting fields differ (campaigns,
+  // non-default sales channel, price tables, region).
+  if (!isCacheableSegment(ctx)) {
     if (segmentFromRequest.channel) {
       setCookie(ctx.response.headers, {
         value: `sc=${segmentFromRequest.channel}`,

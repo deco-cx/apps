@@ -1,4 +1,5 @@
 import { getCookies } from "std/http/cookie.ts";
+import { PAGE_DIRTY_KEY } from "@deco/deco/blocks";
 import { AppMiddlewareContext } from "./mod.ts";
 import {
   getISCookiesFromBag,
@@ -6,7 +7,7 @@ import {
 } from "./utils/intelligentSearch.ts";
 import {
   getSegmentFromBag,
-  isAnonymous,
+  isCacheableSegment,
   setSegmentBag,
 } from "./utils/segment.ts";
 
@@ -30,10 +31,11 @@ export const middleware = (
     }
   }
 
-  // For anonymous users the page content is deterministic — safe to cache.
-  if (isAnonymous(ctx)) {
-    ctx.dirty = false;
-    ctx.dirtyTraces = [];
+  // Mark as dirty when the segment has fields that affect page content
+  // (campaigns, non-default sales channel, price tables, region).
+  // UTMs are excluded — they're marketing tracking and don't change content.
+  if (!isCacheableSegment(ctx)) {
+    ctx.bag.set(PAGE_DIRTY_KEY, true);
   }
 
   return ctx.next!();
