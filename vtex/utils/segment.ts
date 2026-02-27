@@ -68,8 +68,10 @@ export const isAnonymous = (
  * (opt-in for stores that don't vary prices by UTM).
  */
 export const isCacheableSegment = (ctx: AppContext) => {
+  const payload = getSegmentFromBag(ctx)?.payload;
+  if (payload?.channelPrivacy === "private") return false;
+
   if (ctx.advancedConfigs?.removeUTMFromCacheKey) {
-    const payload = getSegmentFromBag(ctx)?.payload;
     if (!payload) return true;
     const { campaigns, channel, priceTables, regionId } = payload;
     return !campaigns &&
