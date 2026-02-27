@@ -14,7 +14,30 @@ interface ISCookies {
   // deno-lint-ignore no-explicit-any
   session: any;
 }
+const ANONYMOUS_COOKIE = "vtex_is_anonymous";
+const SESSION_COOKIE = "vtex_is_session";
+const ONE_YEAR_SECS = 365 * 24 * 3600;
+const THIRTY_MIN_SECS = 30 * 60;
+
+const persistISCookies = (cookies: ISCookies | null) => {
+  if (!cookies) return;
+
+  const setCookieIfMissing = (name: string, value: string, maxAge: number) => {
+    document.cookie =
+      `${name}=${value};path=/;max-age=${maxAge};secure;SameSite=Lax`;
+  };
+
+  if (!document.cookie.includes(`${ANONYMOUS_COOKIE}=`)) {
+    setCookieIfMissing(ANONYMOUS_COOKIE, cookies.anonymous, ONE_YEAR_SECS);
+  }
+
+  // Always re-set session cookie to simulate sliding expiration
+  setCookieIfMissing(SESSION_COOKIE, cookies.session, THIRTY_MIN_SECS);
+};
+
 const snippet = (account: string, agent: string, cookies: ISCookies | null) => {
+  persistISCookies(cookies);
+
   const url = new URL(globalThis.location.href);
   const isSearch = url.searchParams.get("q");
   const apiUrl = `https://sp.vtex.com/event-api/v1/${account}/event`;
