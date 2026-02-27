@@ -40,3 +40,5 @@ const MatchDevice = (
   return devices.includes(device);
 };
 export default MatchDevice;
+
+export const cacheable = true;

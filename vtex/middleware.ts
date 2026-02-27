@@ -1,5 +1,5 @@
 import { getCookies } from "std/http/cookie.ts";
-import { PAGE_DIRTY_KEY } from "@deco/deco/blocks";
+import { PAGE_CACHE_ALLOWED_KEY, PAGE_DIRTY_KEY } from "@deco/deco/blocks";
 import { AppMiddlewareContext } from "./mod.ts";
 import {
   getISCookiesFromBag,
@@ -10,6 +10,7 @@ import {
   isCacheableSegment,
   setSegmentBag,
 } from "./utils/segment.ts";
+import { VTEX_ID_CLIENT_COOKIE } from "./utils/vtexId.ts";
 
 export const middleware = (
   _props: unknown,
@@ -18,24 +19,31 @@ export const middleware = (
 ) => {
   const segment = getSegmentFromBag(ctx);
   const isCookies = getISCookiesFromBag(ctx);
+  const cookies = getCookies(req.headers);
 
-  if (!isCookies || !segment) {
-    const cookies = getCookies(req.headers);
-
-    if (!isCookies) {
-      setISCookiesBag(cookies, ctx);
-    }
-
-    if (!segment) {
-      setSegmentBag(cookies, req, ctx);
-    }
+  if (!isCookies) {
+    setISCookiesBag(cookies, ctx);
   }
 
-  // Mark as dirty when the segment has fields that affect page content
-  // (campaigns, non-default sales channel, price tables, region).
-  // UTMs are excluded — they're marketing tracking and don't change content.
-  if (!isCacheableSegment(ctx)) {
+  if (!segment) {
+    setSegmentBag(cookies, req, ctx);
+  }
+
+  const isLoggedIn = Boolean(
+    cookies[VTEX_ID_CLIENT_COOKIE] ||
+    cookies[`${VTEX_ID_CLIENT_COOKIE}_${ctx.account}`]
+  );
+
+  const cacheable = isCacheableSegment(ctx) && !isLoggedIn;
+
+  // PAGE_DIRTY_KEY: marks page dirty for section-level caching and other consumers
+  if (!cacheable) {
     ctx.bag.set(PAGE_DIRTY_KEY, true);
+  }
+
+  // PAGE_CACHE_ALLOWED_KEY: opts in to CDN page caching (VTEX-only)
+  if (cacheable) {
+    ctx.bag.set(PAGE_CACHE_ALLOWED_KEY, true);
   }
 
   return ctx.next!();
