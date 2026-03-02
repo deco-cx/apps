@@ -1,9 +1,8 @@
 import type { Product } from "../../commerce/types.ts";
-import relatedProductsLoader from "../loaders/legacy/relatedProductsLoader.ts";
 import { AppContext } from "../mod.ts";
 
 export const withIsSimilarTo = async (
-  req: Request,
+  _req: Request,
   ctx: AppContext,
   product: Product,
 ) => {
@@ -13,14 +12,11 @@ export const withIsSimilarTo = async (
     return product;
   }
 
-  const isSimilarTo = await relatedProductsLoader(
-    {
+  const isSimilarTo = await ctx.invoke.vtex.loaders.legacy
+    .relatedProductsLoader({
       crossSelling: "similars",
       id: product.inProductGroupWithID,
-    },
-    req,
-    ctx,
-  );
+    });
 
   return {
     ...product,
