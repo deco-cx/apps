@@ -1,8 +1,12 @@
 import { AppContext } from "../../mod.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
 import { AuthResponse } from "../../utils/types.ts";
-import setLoginCookies from "../../utils/login/setLoginCookies.ts";
-import { getSetCookies } from "std/http/cookie.ts";
+import { getSetCookies, setCookie } from "std/http/cookie.ts";
+import {
+  buildCookieJar,
+  proxySetCookie,
+  REFRESH_TOKEN_COOKIE,
+} from "../../utils/cookies.ts";
 
 export interface Props {
   email: string;
@@ -16,7 +20,7 @@ export interface Props {
  */
 export default async function action(
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<AuthResponse> {
   const { vcsDeprecated, account } = ctx;
@@ -28,6 +32,9 @@ export default async function action(
 
   const startAuthentication = await ctx.invoke.vtex.actions.authentication
     .startAuthentication({});
+
+  const startSetCookies = getSetCookies(ctx.response.headers);
+  const { header: cookie } = buildCookieJar(req.headers, startSetCookies);
 
   if (!startAuthentication?.authenticationToken) {
     throw new Error(
@@ -54,6 +61,7 @@ export default async function action(
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/x-www-form-urlencoded",
+          cookie,
         },
       },
     );
@@ -65,8 +73,20 @@ export default async function action(
   }
 
   const data: AuthResponse = await response.json();
-  const setCookies = getSetCookies(response.headers);
-  await setLoginCookies(data, ctx, setCookies);
+
+  proxySetCookie(response.headers, ctx.response.headers, req.url);
+  await ctx.invoke.vtex.actions.session.validateSession();
+
+  // TODO: REMOVE THIS AFTER TESTING AND VALIDATE IF NEEDED REWRITE REFRESH_TOKEN_COOKIE
+  const setCookies = getSetCookies(ctx.response.headers);
+  for (const cookie of setCookies) {
+    if (cookie.name === REFRESH_TOKEN_COOKIE) {
+      setCookie(ctx.response.headers, {
+        ...cookie,
+        path: "/", // default path is /api/vtexid/refreshtoken/webstore, but browser dont send to backend headers
+      });
+    }
+  }
 
   return data;
 }

@@ -84,7 +84,6 @@ export interface Props {
    * @hide true
    */
   platform: "vtex";
-
   advancedConfigs?: {
     doNotFetchVariantsForRelatedProducts?: boolean;
     /**
