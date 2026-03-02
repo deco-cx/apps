@@ -63,9 +63,6 @@ const bypassDecoImageOptimization = () =>
     ? (globalThis as any).DECO?.featureFlags?.bypassDecoImageOptimization
     : Deno.env.get("BYPASS_DECO_IMAGE_OPTIMIZATION") === "true";
 
-const canShowWarning = () =>
-  IS_BROWSER ? false : !Deno.env.get("DENO_DEPLOYMENT_ID");
-
 export type QualityOptions = "low" | "medium" | "high" | "original"; // 60% - 70% - 80% - 100%
 
 interface OptimizationOptions {
@@ -204,17 +201,6 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
       )
     ) {
       return optimizeVTEX(opts);
-    }
-
-    if (
-      canShowWarning() &&
-      !originalSrc.startsWith(
-        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage",
-      )
-    ) {
-      console.warn(
-        `The following image ${originalSrc} requires automatic image optimization, but it's currently disabled. This may incur in additional costs. Please contact deco.cx for more information.`,
-      );
     }
   }
 
