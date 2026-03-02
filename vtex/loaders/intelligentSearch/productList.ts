@@ -7,7 +7,11 @@ import {
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentCacheKeyWithoutUTM,
+  getSegmentFromBag,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { sortProducts, toProduct } from "../../utils/transform.ts";
 import type {
@@ -322,11 +326,12 @@ export const cacheKey = (
   ) {
     return null;
   }
-
-  const segment = getSegmentFromBag(ctx)?.token ?? "";
+  const segmentCacheKey = ctx.advancedConfigs?.removeUTMFromCacheKey
+    ? getSegmentCacheKeyWithoutUTM(ctx)
+    : getSegmentFromBag(ctx)?.token;
   const params = new URLSearchParams([
     ...getSearchParams(props, url.searchParams),
-    ["segment", segment],
+    ["segment", segmentCacheKey],
   ]);
 
   if (

@@ -7,6 +7,7 @@ import {
   FACTORS,
   getEarlyHintFromSrcProps,
   getSrcSet,
+  type QualityOptions,
   type SetEarlyHint,
 } from "./Image.tsx";
 
@@ -30,6 +31,8 @@ type SourceProps =
     preload?: boolean;
     /** @description Improves Web Vitals (LCP). Use high for LCP image. Auto for other images */
     fetchPriority?: "high" | "low" | "auto";
+    /** @description Quality */
+    quality?: QualityOptions;
     setEarlyHint?: SetEarlyHint;
   };
 
@@ -44,6 +47,7 @@ export const Source = forwardRef<HTMLSourceElement, SourceProps>(
       props.height,
       undefined,
       shouldSetEarlyHint ? FACTORS.slice(-1) : FACTORS,
+      props.quality,
     );
     const linkProps = {
       imagesrcset: srcSet,
@@ -64,6 +68,7 @@ export const Source = forwardRef<HTMLSourceElement, SourceProps>(
           height: props.height,
           fetchpriority: props.fetchPriority,
           src: props.src,
+          quality: props.quality,
         }),
       );
     }
