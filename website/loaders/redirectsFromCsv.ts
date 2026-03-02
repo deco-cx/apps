@@ -54,49 +54,37 @@ const getRedirectFromFile = async (
     return [];
   }
 
-  const redirectsFromFiles: Redirects["redirects"] = redirectsRaw
-    ?.split(/\r\n|\r|\n/)
-    .slice(1)
-    .map((row) => {
-      // this regex is necessary to handle csv with comma as part of value
-      const parts = row.split(/,|;(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+  // this regex is necessary to handle csv with comma as part of value
+  const csvFieldSplit = /,|;(?=(?:(?:[^"]*"){2})*[^"]*$)/;
+  const lines = redirectsRaw.split(/\r\n|\r|\n/);
+  const routes: Route[] = [];
 
-      const type = findAndRemove(parts, REDIRECT_TYPE_ENUM) ??
-        (forcePermanentRedirects ? "permanent" : "temporary");
-      const discardQueryParameters =
-        findAndRemove(parts, CONCATENATE_PARAMS_VALUES) === "true";
-      const from = parts[0];
-      const to = parts[1];
+  for (let i = 1; i < lines.length; i++) {
+    const parts = lines[i].split(csvFieldSplit);
+    const type = findAndRemove(parts, REDIRECT_TYPE_ENUM) ??
+      (forcePermanentRedirects ? "permanent" : "temporary");
+    const discardQueryParameters =
+      findAndRemove(parts, CONCATENATE_PARAMS_VALUES) === "true";
+    const from = parts[0];
+    const to = parts[1];
 
-      return [
-        from,
-        to,
-        type,
-        discardQueryParameters,
-      ];
-    })
-    .filter(([from, to]) => from && to && from !== to)
-    .map(([from, to, type, discardQueryParameters]) => ({
-      from: from as string,
-      to: to as string,
-      type: type as Redirect["type"],
-      discardQueryParameters: discardQueryParameters as boolean,
-    }));
+    if (!from || !to || from === to) continue;
 
-  return redirectsFromFiles.map((
-    { from, to, type, discardQueryParameters },
-  ) => ({
-    pathTemplate: from,
-    isHref: true,
-    handler: {
-      value: {
-        __resolveType: "website/handlers/redirect.ts",
-        to,
-        type,
-        discardQueryParameters,
+    routes.push({
+      pathTemplate: from,
+      isHref: true,
+      handler: {
+        value: {
+          __resolveType: "website/handlers/redirect.ts",
+          to,
+          type: type as Redirect["type"],
+          discardQueryParameters,
+        },
       },
-    },
-  }));
+    });
+  }
+
+  return routes;
 };
 
 export const removeTrailingSlash = (path: string) =>
