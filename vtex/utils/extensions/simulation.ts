@@ -112,8 +112,10 @@ export const extension = async (products: Product[], ctx: AppContext) => {
       const listPrice = simulated.listPrice != null
         ? simulated.listPrice / 100
         : undefined;
-      o.price = salePrice;
-      changed = true;
+      if (salePrice !== o.price) {
+        o.price = salePrice;
+        changed = true;
+      }
 
       for (const spec of o.priceSpecification) {
         if (spec.priceType === SCHEMA_SALE_PRICE) {
