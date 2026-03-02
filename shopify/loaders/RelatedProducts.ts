@@ -104,14 +104,28 @@ export const cacheKey = (props: Props, req: Request): string => {
     count,
     languageCode = "PT",
     countryCode = "BR",
+    metafields,
   } = props;
 
-  const searchParams = new URLSearchParams({
-    slug,
-    count: count.toString(),
-    languageCode,
-    countryCode,
-  });
+  const searchParams = new URLSearchParams();
+
+  // Core parameters
+  searchParams.append("slug", slug);
+  searchParams.append("count", count.toString());
+  searchParams.append("languageCode", languageCode);
+  searchParams.append("countryCode", countryCode);
+
+  // Add metafields to cache key if they exist
+  if (metafields?.length) {
+    const metafieldsKey = metafields
+      .map((m) => `${m.namespace}.${m.key}`)
+      .sort()
+      .join(",");
+    searchParams.append("metafields", metafieldsKey);
+  }
+
+  // Sort parameters for consistent cache keys
+  searchParams.sort();
 
   const url = new URL(req.url);
   url.search = searchParams.toString();

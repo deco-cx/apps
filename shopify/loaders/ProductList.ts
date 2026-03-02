@@ -197,14 +197,17 @@ export const cacheKey = (expandedProps: Props, req: Request): string => {
   const sort = props.sort ?? "";
   const languageCode = expandedProps?.languageCode ?? "PT";
   const countryCode = expandedProps?.countryCode ?? "BR";
+  const { metafields, filters } = expandedProps;
 
-  const searchParams = new URLSearchParams({
-    count,
-    sort,
-    languageCode,
-    countryCode,
-  });
+  const searchParams = new URLSearchParams();
 
+  // Core parameters
+  searchParams.append("count", count);
+  searchParams.append("sort", sort);
+  searchParams.append("languageCode", languageCode);
+  searchParams.append("countryCode", countryCode);
+
+  // Query or collection specific parameters
   if ("collection" in props) {
     searchParams.append("collection", props.collection);
   }
@@ -212,6 +215,50 @@ export const cacheKey = (expandedProps: Props, req: Request): string => {
   if ("query" in props) {
     searchParams.append("query", props.query);
   }
+
+  // Add metafields to cache key if they exist
+  if (metafields?.length) {
+    const metafieldsKey = metafields
+      .map((m) => `${m.namespace}.${m.key}`)
+      .sort()
+      .join(",");
+    searchParams.append("metafields", metafieldsKey);
+  }
+
+  // Add filters to cache key if they exist
+  if (filters) {
+    if (filters.tags?.length) {
+      searchParams.append("tags", filters.tags.sort().join(","));
+    }
+    if (filters.productTypes?.length) {
+      searchParams.append(
+        "productTypes",
+        filters.productTypes.sort().join(","),
+      );
+    }
+    if (filters.productVendors?.length) {
+      searchParams.append(
+        "productVendors",
+        filters.productVendors.sort().join(","),
+      );
+    }
+    if (filters.priceMin !== undefined) {
+      searchParams.append("priceMin", filters.priceMin.toString());
+    }
+    if (filters.priceMax !== undefined) {
+      searchParams.append("priceMax", filters.priceMax.toString());
+    }
+    if (filters.variantOptions?.length) {
+      const variantOptionsKey = filters.variantOptions
+        .map((vo) => `${vo.name}:${vo.value}`)
+        .sort()
+        .join(",");
+      searchParams.append("variantOptions", variantOptionsKey);
+    }
+  }
+
+  // Sort parameters for consistent cache keys
+  searchParams.sort();
 
   const url = new URL(req.url);
   url.search = searchParams.toString();

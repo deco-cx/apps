@@ -260,7 +260,7 @@ const loader = async (
   };
 };
 
-export const cache = "no-cache";
+export const cache = "stale-while-revalidate";
 export const cacheKey = (props: Props, req: Request): string | null => {
   const url = new URL(props.pageHref || req.url);
 
@@ -274,6 +274,7 @@ export const cacheKey = (props: Props, req: Request): string | null => {
   const startCursor = props.startCursor ||
     url.searchParams.get("startCursor") || "";
   const sort = url.searchParams.get("sort") ?? "";
+
   const searchParams = new URLSearchParams({
     count,
     query,
@@ -282,6 +283,32 @@ export const cacheKey = (props: Props, req: Request): string | null => {
     startCursor,
     sort,
   });
+
+  // Add metafields to cache key if they exist
+  if (props.metafields?.length) {
+    const metafieldsKey = props.metafields
+      .map((m) => `${m.namespace}.${m.key}`)
+      .sort()
+      .join(",");
+    searchParams.append("metafields", metafieldsKey);
+  }
+
+  // Add language and country codes
+  const languageCode = props?.languageCode || "PT";
+  const countryCode = props?.countryCode || "BR";
+  searchParams.append("languageCode", languageCode);
+  searchParams.append("countryCode", countryCode);
+
+  // Add collection name if specified
+  if (props.collectionName) {
+    searchParams.append("collectionName", props.collectionName);
+  }
+
+  // Add page offset if different from default
+  const pageOffset = props.pageOffset ?? 1;
+  if (pageOffset !== 1) {
+    searchParams.append("pageOffset", pageOffset.toString());
+  }
 
   url.searchParams.forEach((value, key) => {
     if (!key.startsWith("filter.")) return;

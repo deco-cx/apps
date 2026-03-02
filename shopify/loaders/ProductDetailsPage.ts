@@ -69,13 +69,26 @@ const loader = async (
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request): string => {
-  const { slug, languageCode = "PT", countryCode = "BR" } = props;
+  const { slug, languageCode = "PT", countryCode = "BR", metafields } = props;
 
-  const searchParams = new URLSearchParams({
-    slug,
-    languageCode,
-    countryCode,
-  });
+  const searchParams = new URLSearchParams();
+
+  // Core parameters
+  searchParams.append("slug", slug);
+  searchParams.append("languageCode", languageCode);
+  searchParams.append("countryCode", countryCode);
+
+  // Add metafields to cache key if they exist
+  if (metafields?.length) {
+    const metafieldsKey = metafields
+      .map((m) => `${m.namespace}.${m.key}`)
+      .sort()
+      .join(",");
+    searchParams.append("metafields", metafieldsKey);
+  }
+
+  // Sort parameters for consistent cache keys
+  searchParams.sort();
 
   const url = new URL(req.url);
   url.search = searchParams.toString();
