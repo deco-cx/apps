@@ -25,3 +25,5 @@ const MatchDate = (props: Props) => {
 };
 
 export default MatchDate;
+
+export const cacheable = true;

@@ -6,7 +6,11 @@ import {
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentCacheKeyWithoutUTM,
+  getSegmentFromBag,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { AdvancedLoaderConfig } from "../../utils/types.ts";
@@ -103,7 +107,9 @@ const loaders = async (
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, _req: Request, ctx: AppContext) => {
-  const segment = getSegmentFromBag(ctx)?.token ?? "";
+  const segment = ctx.advancedConfigs?.removeUTMFromCacheKey
+    ? getSegmentCacheKeyWithoutUTM(ctx)
+    : getSegmentFromBag(ctx)?.token;
   return `suggestions-${props.query ?? ""}-${props.count ?? 4}-${segment}`;
 };
 

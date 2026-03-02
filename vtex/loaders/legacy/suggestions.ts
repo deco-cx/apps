@@ -1,6 +1,10 @@
 import { Product, Suggestion } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentCacheKeyWithoutUTM,
+  getSegmentFromBag,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 
 export interface Props {
   query?: string;
@@ -85,7 +89,9 @@ const loaders = async (
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, _req: Request, ctx: AppContext) => {
-  const segment = getSegmentFromBag(ctx)?.token ?? "";
+  const segment = ctx.advancedConfigs?.removeUTMFromCacheKey
+    ? getSegmentCacheKeyWithoutUTM(ctx)
+    : getSegmentFromBag(ctx)?.token;
   return `legacy-suggestions-${props.query ?? ""}-${
     props.count ?? 4
   }-${segment}`;
