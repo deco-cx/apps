@@ -212,6 +212,15 @@ export const setSegmentBag = (
     : {};
   const segmentFromRequest = buildSegmentFromRequest(req);
 
+  const locale = {
+    ...(ctx.defaultSegment?.countryCode && {
+      countryCode: ctx.defaultSegment.countryCode,
+    }),
+    ...(ctx.defaultSegment?.cultureInfo && {
+      cultureInfo: ctx.defaultSegment.cultureInfo,
+    }),
+  }
+
   const segment = {
     channel: ctx.salesChannel,
     ...DEFAULT_SEGMENT,
@@ -219,6 +228,7 @@ export const setSegmentBag = (
     ...segmentFromCookie,
     ...segmentFromSalesChannelCookie,
     ...segmentFromRequest,
+    ...locale,
   };
   const token = serialize(segment);
   setSegmentInBag(ctx, { payload: segment, token });
