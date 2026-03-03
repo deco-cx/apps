@@ -4,12 +4,14 @@ import {
   SelectItemEvent,
 } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
+import {
+  ANONYMOUS_COOKIE,
+  SESSION_COOKIE,
+} from "../../utils/intelligentSearch.ts";
 import { SPEvent } from "../../utils/types.ts";
 import { type SectionProps } from "@deco/deco";
 import { useScriptAsDataURI } from "@deco/deco/hooks";
 
-const ANONYMOUS_COOKIE = "vtex_is_anonymous";
-const SESSION_COOKIE = "vtex_is_session";
 const ONE_YEAR_SECS = 365 * 24 * 3600;
 const THIRTY_MIN_SECS = 30 * 60;
 
