@@ -173,8 +173,12 @@ export const setSegmentBag = (
   const segmentFromRequest = buildSegmentFromRequest(req);
 
   const locale = {
-    "countryCode": ctx.defaultSegment?.countryCode,
-    "cultureInfo": ctx.defaultSegment?.cultureInfo,
+    ...(ctx.defaultSegment?.countryCode && {
+      countryCode: ctx.defaultSegment.countryCode,
+    }),
+    ...(ctx.defaultSegment?.cultureInfo && {
+      cultureInfo: ctx.defaultSegment.cultureInfo,
+    }),
   }
 
   const segment = {
