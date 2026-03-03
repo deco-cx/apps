@@ -19,3 +19,5 @@ const MatchEnvironment = ({ environment }: Props) => {
 };
 
 export default MatchEnvironment;
+
+export const cacheable = true;

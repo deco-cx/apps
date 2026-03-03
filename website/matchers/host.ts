@@ -19,3 +19,5 @@ const MatchHost = ({ includes, match }: Props, { request }: MatchContext) => {
   return regexMatch && includesFound;
 };
 export default MatchHost;
+
+export const cacheable = true;
