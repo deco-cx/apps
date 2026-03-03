@@ -39,6 +39,7 @@ export const middleware = (
   // PAGE_DIRTY_KEY: marks page dirty for section-level caching and other consumers
   if (!cacheable) {
     ctx.bag.set(PAGE_DIRTY_KEY, true);
+    ctx.response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
   }
 
   // PAGE_CACHE_ALLOWED_KEY: opts in to CDN page caching (VTEX-only)
