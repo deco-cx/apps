@@ -1,5 +1,6 @@
 import { ImageWidget } from "../admin/widgets.ts";
 import { PageInfo, Person, Thing } from "../commerce/types.ts";
+import { type Section } from "@deco/deco/blocks";
 
 /**
  * @titleBy name
@@ -48,7 +49,13 @@ export interface BlogPost {
    * @title Post Content
    * @format rich-text
    */
-  content: string;
+  content?: string;
+  /**
+   * @title Sections
+   * @label hidden
+   * @changeable true
+   */
+  sections?: Section[];
   /**
    * @title Carousel in post content
    * @description add a carousel in the middle of the post. Must be implemented in frontEnd
