@@ -122,3 +122,5 @@ const MatchQueryString = (props: Props, { request }: MatchContext) => {
   return matches;
 };
 export default MatchQueryString;
+
+export const cacheable = true;

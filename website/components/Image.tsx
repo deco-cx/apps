@@ -63,9 +63,6 @@ const bypassDecoImageOptimization = () =>
     ? (globalThis as any).DECO?.featureFlags?.bypassDecoImageOptimization
     : Deno.env.get("BYPASS_DECO_IMAGE_OPTIMIZATION") === "true";
 
-const canShowWarning = () =>
-  IS_BROWSER ? false : !Deno.env.get("DENO_DEPLOYMENT_ID");
-
 export type QualityOptions = "low" | "medium" | "high" | "original"; // 60% - 70% - 80% - 100%
 
 interface OptimizationOptions {
@@ -205,7 +202,6 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     ) {
       return optimizeVTEX(opts);
     }
-
   }
 
   if (bypassDecoImageOptimization()) {

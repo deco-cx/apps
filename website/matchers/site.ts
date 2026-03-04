@@ -14,3 +14,5 @@ const MatchSite = ({ siteId }: Props, { siteId: currSiteId }: MatchContext) => {
   return siteId === currSiteId;
 };
 export default MatchSite;
+
+export const cacheable = true;
