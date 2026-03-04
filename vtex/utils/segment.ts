@@ -173,7 +173,13 @@ const serialize = ({
   return btoa(JSON.stringify(seg));
 };
 
-const parse = (cookie: string) => JSON.parse(atob(cookie));
+const parse = (cookie: string) => {
+  try {
+    return JSON.parse(atob(cookie));
+  } catch {
+    return null;
+  }
+};
 
 const SEGMENT_QUERY_PARAMS = [
   "utmi_campaign" as const,
@@ -239,7 +245,7 @@ export const setSegmentBag = (
     ...(ctx.defaultSegment?.cultureInfo && {
       cultureInfo: ctx.defaultSegment.cultureInfo,
     }),
-  }
+  };
 
   const segment = {
     channel: ctx.salesChannel,
