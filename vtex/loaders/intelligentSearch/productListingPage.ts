@@ -161,20 +161,27 @@ export interface Props {
 }
 const searchArgsOf = (props: Props, url: URL) => {
   const hideUnavailableItems = props.hideUnavailableItems;
+  const VALID_SIM_BEHAVIORS = new Set(["default", "skip", "only1P"]);
+  const rawSim = url.searchParams.get("simulationBehavior");
   const simulationBehavior =
-    url.searchParams.get("simulationBehavior") as SimulationBehavior ||
-    props.simulationBehavior || "default";
+    (rawSim && VALID_SIM_BEHAVIORS.has(rawSim)
+      ? rawSim
+      : props.simulationBehavior || "default") as SimulationBehavior;
   const countFromSearchParams = url.searchParams.get("PS");
-  const count = Number(countFromSearchParams ?? props.count ?? 12);
+  const rawCount = countFromSearchParams ? Number(countFromSearchParams) : NaN;
+  const count = Number.isFinite(rawCount) && rawCount > 0
+    ? Math.min(Math.floor(rawCount), 50)
+    : Number(props.count ?? 12);
   const query = props.query ?? url.searchParams.get("q") ?? "";
   const currentPageoffset = props.pageOffset ?? 1;
+  const rawPage = url.searchParams.get("page")
+    ? Number(url.searchParams.get("page"))
+    : NaN;
+  const parsedPage = Number.isFinite(rawPage) && rawPage >= currentPageoffset
+    ? rawPage - currentPageoffset
+    : 0;
   const page = props.page ??
-    Math.min(
-      url.searchParams.get("page")
-        ? Number(url.searchParams.get("page")) - currentPageoffset
-        : 0,
-      VTEX_MAX_PAGES - currentPageoffset,
-    );
+    Math.min(parsedPage, VTEX_MAX_PAGES - currentPageoffset);
   const sort = (url.searchParams.get("sort")) ??
     LEGACY_TO_IS[url.searchParams.get("O") ?? ""] ??
     props.sort ??
