@@ -31,7 +31,7 @@ export const middleware = (
 
   const isLoggedIn = Boolean(
     cookies[VTEX_ID_CLIENT_COOKIE] ||
-    cookies[`${VTEX_ID_CLIENT_COOKIE}_${ctx.account}`]
+      cookies[`${VTEX_ID_CLIENT_COOKIE}_${ctx.account}`],
   );
 
   const cacheable = isCacheableSegment(ctx) && !isLoggedIn;
@@ -39,7 +39,10 @@ export const middleware = (
   // PAGE_DIRTY_KEY: marks page dirty for section-level caching and other consumers
   if (!cacheable) {
     ctx.bag.set(PAGE_DIRTY_KEY, true);
-    ctx.response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+    ctx.response.headers.set(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate",
+    );
   }
 
   // PAGE_CACHE_ALLOWED_KEY: opts in to CDN page caching (VTEX-only)

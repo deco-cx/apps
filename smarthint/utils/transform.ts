@@ -226,7 +226,7 @@ export const toProduct = (product: SHProduct): Product => {
 
   return {
     "@type": "Product",
-    productID: firstAvailable.specificationId!,
+    productID: firstAvailable?.specificationId! || product.ProductId!,
     inProductGroupWithID: product.ProductId,
     name: product.Title,
     sku: product.Sku!,
