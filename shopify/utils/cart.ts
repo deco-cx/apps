@@ -12,13 +12,13 @@ export const getCartCookie = (headers: Headers): string | null => {
     return null;
   }
 
-  return decodeURIComponent(`${SHOPIFY_PREFIX}${cookies[CART_COOKIE]}`);
+  return `${SHOPIFY_PREFIX}${decodeURIComponent(cookies[CART_COOKIE])}`;
 };
 
 export const setCartCookie = (headers: Headers, cartId: string) => {
   setCookie(headers, {
     name: CART_COOKIE,
-    value: cartId.replace(SHOPIFY_PREFIX, ""),
+    value: encodeURIComponent(cartId.replace(SHOPIFY_PREFIX, "")),
     path: "/",
     expires: new Date(Date.now() + ONE_WEEK_MS),
     httpOnly: true,
