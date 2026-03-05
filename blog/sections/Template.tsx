@@ -21,7 +21,7 @@ export default function Template({ post }: Props) {
 
   return (
     <>
-      <link href="/styles.css" rel="stylesheet"/>
+      <link href="/styles.css" rel="stylesheet" />
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <div class="deco-post-preview">
         <h1>{title}</h1>
@@ -44,8 +44,8 @@ export default function Template({ post }: Props) {
         )}
         <div dangerouslySetInnerHTML={{ __html: content as string }} />
         <div class="content-sections">
-              {sections?.map(renderSection)}
-            </div>
+          {sections?.map(renderSection)}
+        </div>
       </div>
     </>
   );
