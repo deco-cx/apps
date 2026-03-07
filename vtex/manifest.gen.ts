@@ -30,21 +30,25 @@ import * as $$$$$$$$$24 from "./actions/cart/updateItemPrice.ts";
 import * as $$$$$$$$$25 from "./actions/cart/updateItems.ts";
 import * as $$$$$$$$$26 from "./actions/cart/updateProfile.ts";
 import * as $$$$$$$$$27 from "./actions/cart/updateUser.ts";
-import * as $$$$$$$$$28 from "./actions/masterdata/createDocument.ts";
-import * as $$$$$$$$$29 from "./actions/masterdata/updateDocument.ts";
-import * as $$$$$$$$$30 from "./actions/newsletter/subscribe.ts";
-import * as $$$$$$$$$31 from "./actions/newsletter/updateNewsletterOptIn.ts";
-import * as $$$$$$$$$32 from "./actions/notifyme.ts";
-import * as $$$$$$$$$33 from "./actions/orders/cancel.ts";
-import * as $$$$$$$$$34 from "./actions/payment/deletePaymentToken.ts";
-import * as $$$$$$$$$35 from "./actions/profile/updateProfile.ts";
-import * as $$$$$$$$$36 from "./actions/review/submit.ts";
-import * as $$$$$$$$$37 from "./actions/session/createSession.ts";
-import * as $$$$$$$$$38 from "./actions/session/deleteSession.ts";
-import * as $$$$$$$$$39 from "./actions/session/editSession.ts";
-import * as $$$$$$$$$40 from "./actions/trigger.ts";
-import * as $$$$$$$$$41 from "./actions/wishlist/addItem.ts";
-import * as $$$$$$$$$42 from "./actions/wishlist/removeItem.ts";
+import * as $$$$$$$$$28 from "./actions/events/productView.ts";
+import * as $$$$$$$$$29 from "./actions/events/recommendationClick.ts";
+import * as $$$$$$$$$30 from "./actions/events/recommendationView.ts";
+import * as $$$$$$$$$31 from "./actions/masterdata/createDocument.ts";
+import * as $$$$$$$$$32 from "./actions/masterdata/updateDocument.ts";
+import * as $$$$$$$$$33 from "./actions/newsletter/subscribe.ts";
+import * as $$$$$$$$$34 from "./actions/newsletter/updateNewsletterOptIn.ts";
+import * as $$$$$$$$$35 from "./actions/notifyme.ts";
+import * as $$$$$$$$$36 from "./actions/orders/cancel.ts";
+import * as $$$$$$$$$37 from "./actions/payment/deletePaymentToken.ts";
+import * as $$$$$$$$$38 from "./actions/profile/updateProfile.ts";
+import * as $$$$$$$$$39 from "./actions/recommendation/startSession.ts";
+import * as $$$$$$$$$40 from "./actions/review/submit.ts";
+import * as $$$$$$$$$41 from "./actions/session/createSession.ts";
+import * as $$$$$$$$$42 from "./actions/session/deleteSession.ts";
+import * as $$$$$$$$$43 from "./actions/session/editSession.ts";
+import * as $$$$$$$$$44 from "./actions/trigger.ts";
+import * as $$$$$$$$$45 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$46 from "./actions/wishlist/removeItem.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/address/getAddressByPostalCode.ts";
 import * as $$$1 from "./loaders/address/getUserAddresses.ts";
@@ -90,12 +94,15 @@ import * as $$$40 from "./loaders/profile/getCurrentProfile.ts";
 import * as $$$41 from "./loaders/profile/getProfileByEmail.ts";
 import * as $$$42 from "./loaders/promotion/getPromotionById.ts";
 import * as $$$43 from "./loaders/proxy.ts";
-import * as $$$44 from "./loaders/session/getSession.ts";
-import * as $$$45 from "./loaders/session/getUserSessions.ts";
-import * as $$$46 from "./loaders/user.ts";
-import * as $$$47 from "./loaders/wishlist.ts";
-import * as $$$48 from "./loaders/workflow/product.ts";
-import * as $$$49 from "./loaders/workflow/products.ts";
+import * as $$$44 from "./loaders/recommendations/productList.ts";
+import * as $$$45 from "./loaders/recommendations/productListFromCart.ts";
+import * as $$$46 from "./loaders/recommendations/productListFromPage.ts";
+import * as $$$47 from "./loaders/session/getSession.ts";
+import * as $$$48 from "./loaders/session/getUserSessions.ts";
+import * as $$$49 from "./loaders/user.ts";
+import * as $$$50 from "./loaders/wishlist.ts";
+import * as $$$51 from "./loaders/workflow/product.ts";
+import * as $$$52 from "./loaders/workflow/products.ts";
 import * as $$$$$$0 from "./sections/Analytics/Vtex.tsx";
 import * as $$$$$$$$$$0 from "./workflows/events.ts";
 import * as $$$$$$$$$$1 from "./workflows/product/index.ts";
@@ -146,12 +153,15 @@ const manifest = {
     "vtex/loaders/profile/getProfileByEmail.ts": $$$41,
     "vtex/loaders/promotion/getPromotionById.ts": $$$42,
     "vtex/loaders/proxy.ts": $$$43,
-    "vtex/loaders/session/getSession.ts": $$$44,
-    "vtex/loaders/session/getUserSessions.ts": $$$45,
-    "vtex/loaders/user.ts": $$$46,
-    "vtex/loaders/wishlist.ts": $$$47,
-    "vtex/loaders/workflow/product.ts": $$$48,
-    "vtex/loaders/workflow/products.ts": $$$49,
+    "vtex/loaders/recommendations/productList.ts": $$$44,
+    "vtex/loaders/recommendations/productListFromCart.ts": $$$45,
+    "vtex/loaders/recommendations/productListFromPage.ts": $$$46,
+    "vtex/loaders/session/getSession.ts": $$$47,
+    "vtex/loaders/session/getUserSessions.ts": $$$48,
+    "vtex/loaders/user.ts": $$$49,
+    "vtex/loaders/wishlist.ts": $$$50,
+    "vtex/loaders/workflow/product.ts": $$$51,
+    "vtex/loaders/workflow/products.ts": $$$52,
   },
   "handlers": {
     "vtex/handlers/sitemap.ts": $$$$0,
@@ -188,21 +198,25 @@ const manifest = {
     "vtex/actions/cart/updateItems.ts": $$$$$$$$$25,
     "vtex/actions/cart/updateProfile.ts": $$$$$$$$$26,
     "vtex/actions/cart/updateUser.ts": $$$$$$$$$27,
-    "vtex/actions/masterdata/createDocument.ts": $$$$$$$$$28,
-    "vtex/actions/masterdata/updateDocument.ts": $$$$$$$$$29,
-    "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$30,
-    "vtex/actions/newsletter/updateNewsletterOptIn.ts": $$$$$$$$$31,
-    "vtex/actions/notifyme.ts": $$$$$$$$$32,
-    "vtex/actions/orders/cancel.ts": $$$$$$$$$33,
-    "vtex/actions/payment/deletePaymentToken.ts": $$$$$$$$$34,
-    "vtex/actions/profile/updateProfile.ts": $$$$$$$$$35,
-    "vtex/actions/review/submit.ts": $$$$$$$$$36,
-    "vtex/actions/session/createSession.ts": $$$$$$$$$37,
-    "vtex/actions/session/deleteSession.ts": $$$$$$$$$38,
-    "vtex/actions/session/editSession.ts": $$$$$$$$$39,
-    "vtex/actions/trigger.ts": $$$$$$$$$40,
-    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$41,
-    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$42,
+    "vtex/actions/events/productView.ts": $$$$$$$$$28,
+    "vtex/actions/events/recommendationClick.ts": $$$$$$$$$29,
+    "vtex/actions/events/recommendationView.ts": $$$$$$$$$30,
+    "vtex/actions/masterdata/createDocument.ts": $$$$$$$$$31,
+    "vtex/actions/masterdata/updateDocument.ts": $$$$$$$$$32,
+    "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$33,
+    "vtex/actions/newsletter/updateNewsletterOptIn.ts": $$$$$$$$$34,
+    "vtex/actions/notifyme.ts": $$$$$$$$$35,
+    "vtex/actions/orders/cancel.ts": $$$$$$$$$36,
+    "vtex/actions/payment/deletePaymentToken.ts": $$$$$$$$$37,
+    "vtex/actions/profile/updateProfile.ts": $$$$$$$$$38,
+    "vtex/actions/recommendation/startSession.ts": $$$$$$$$$39,
+    "vtex/actions/review/submit.ts": $$$$$$$$$40,
+    "vtex/actions/session/createSession.ts": $$$$$$$$$41,
+    "vtex/actions/session/deleteSession.ts": $$$$$$$$$42,
+    "vtex/actions/session/editSession.ts": $$$$$$$$$43,
+    "vtex/actions/trigger.ts": $$$$$$$$$44,
+    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$45,
+    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$46,
   },
   "workflows": {
     "vtex/workflows/events.ts": $$$$$$$$$$0,
