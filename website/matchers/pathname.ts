@@ -71,3 +71,5 @@ const MatchPathname = (props: Props, { request }: MatchContext) => {
   return props.case.negate ? !result : result;
 };
 export default MatchPathname;
+
+export const cacheable = true;
