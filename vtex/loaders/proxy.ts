@@ -23,25 +23,59 @@ export const VTEX_PATHS_THAT_REQUIRES_SAME_REFERER = ["/no-cache/AviseMe.aspx"];
 
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
+/** @title {{__title}} */
+export interface IncludeSiteMapEntry {
+  /** @title Title (CMS only) */
+  __title?: string;
+  /** @title Path */
+  path: string;
+  /** @title Handler */
+  handler?: string;
+  /** @title Paths to exclude from the sitemap */
+  excludePaths?: string[];
+}
+
+const normalizeIncludeSiteMap = (
+  includeSiteMap?: IncludeSiteMapEntry[],
+): IncludeSiteMapEntry[] => (includeSiteMap ?? []);
+
+const includeEntriesToPaths = (entries: IncludeSiteMapEntry[]): string[] =>
+  entries.map((e) => e.path);
+
+const includeEntriesToRoutes = (entries: IncludeSiteMapEntry[]): Route[] =>
+  entries
+    .map(({ path, handler, excludePaths, ...rest }) => ({
+      pathTemplate: path,
+      handler: {
+        value: {
+          excludePaths,
+          __resolveType: handler ?? "website/handlers/sitemap.ts",
+          ...rest,
+        },
+      },
+    }));
+
 const buildProxyRoutes = (
   {
     publicUrl,
     extraPaths,
     includeSiteMap,
+    includeSiteMapWithHandler,
     includePathToDecoSitemap,
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
-    excludeSitemapEntry,
+    excludeSiteMapEntry,
     includeScriptsToHead,
     includeScriptsToBody,
   }: {
     publicUrl?: string;
     extraPaths: string[];
     includeSiteMap?: string[];
+    includeSiteMapWithHandler?: IncludeSiteMapEntry[];
     includePathToDecoSitemap?: string[];
     generateDecoSiteMap?: boolean;
     excludePathsFromDecoSiteMap: string[];
-    excludeSitemapEntry?: string[];
+    excludeSiteMapEntry?: string[];
     includeScriptsToHead?: {
       includes?: Script[];
     };
@@ -55,6 +89,8 @@ const buildProxyRoutes = (
   }
 
   try {
+    const entries = normalizeIncludeSiteMap(includeSiteMapWithHandler);
+    const customSitemapRoutes = includeEntriesToRoutes(entries);
     const hostname = (new URL(
       publicUrl?.startsWith("http") ? publicUrl : `https://${publicUrl}`,
     )).hostname;
@@ -93,17 +129,30 @@ const buildProxyRoutes = (
     );
 
     const [include, routes] = generateDecoSiteMap
-      ? [[...(includeSiteMap ?? []), decoSiteMapUrl], [{
-        pathTemplate: decoSiteMapUrl,
-        handler: {
-          value: {
-            excludePaths: excludePathsFromDecoSiteMap,
-            includePaths: includePathToDecoSitemap,
-            __resolveType: "website/handlers/sitemap.ts",
+      ? [
+        [
+          ...includeEntriesToPaths(entries),
+          ...(includeSiteMap ?? []),
+          decoSiteMapUrl,
+        ],
+        [
+          ...customSitemapRoutes,
+          {
+            pathTemplate: decoSiteMapUrl,
+            handler: {
+              value: {
+                excludePaths: excludePathsFromDecoSiteMap,
+                includePaths: includePathToDecoSitemap,
+                __resolveType: "website/handlers/sitemap.ts",
+              },
+            },
           },
-        },
-      }]]
-      : [includeSiteMap, []];
+        ],
+      ]
+      : [
+        [...includeEntriesToPaths(entries), ...(includeSiteMap ?? [])],
+        customSitemapRoutes,
+      ];
 
     return [
       ...routes,
@@ -112,7 +161,7 @@ const buildProxyRoutes = (
         handler: {
           value: {
             include,
-            excludeSitemapEntry,
+            excludeSiteMapEntry,
             __resolveType: "vtex/handlers/sitemap.ts",
           },
         },
@@ -141,6 +190,11 @@ export interface Props {
    */
   includeSiteMap?: string[];
   /**
+   * @title Other site maps to include
+   * @description URL path (e.g. "/sitemap/blog.xml") or object with path + handler (__resolveType) to register a route and add to the index. Use the object form for dynamic sitemaps (e.g. from Sanity).
+   */
+  includeSiteMapWithHandler?: IncludeSiteMapEntry[];
+  /**
    * @title Paths to include in the deco sitemap
    */
   includePathToDecoSitemap?: string[];
@@ -156,7 +210,7 @@ export interface Props {
    * @title Sitemap entries to remove from the sitemap index
    * @description Path or URL substrings; any &lt;sitemap&gt; in /sitemap.xml whose &lt;loc&gt; contains one of these will be removed.
    */
-  excludeSitemapEntry?: string[];
+  excludeSiteMapEntry?: string[];
   /**
    * @title Scripts to include on Html head
    */
@@ -179,10 +233,11 @@ function loader(
   {
     extraPathsToProxy = [],
     includeSiteMap = [],
+    includeSiteMapWithHandler = [],
     includePathToDecoSitemap = [],
     generateDecoSiteMap = true,
     excludePathsFromDecoSiteMap = [],
-    excludeSitemapEntry = [],
+    excludeSiteMapEntry = [],
     includeScriptsToHead = { includes: [] },
     includeScriptsToBody = { includes: [] },
   }: Props,
@@ -192,8 +247,9 @@ function loader(
   return buildProxyRoutes({
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
-    excludeSitemapEntry,
+    excludeSiteMapEntry,
     includeSiteMap,
+    includeSiteMapWithHandler,
     includePathToDecoSitemap,
     publicUrl: ctx.publicUrl,
     extraPaths: extraPathsToProxy,

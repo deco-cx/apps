@@ -49,13 +49,13 @@ export interface Props {
    * @title Sitemap entries to remove from the sitemap index
    * @description URLs or path suffixes to match; any <sitemap> whose <loc> contains or ends with one of these will be removed.
    */
-  excludeSitemapEntry?: string[];
+  excludeSiteMapEntry?: string[];
 }
 /**
  * @title Sitemap Proxy
  */
 export default function Sitemap(
-  { include, excludeSitemapEntry }: Props,
+  { include, excludeSiteMapEntry }: Props,
   { publicUrl: url, usePortalSitemap, account }: AppContext,
 ) {
   return async (
@@ -89,7 +89,7 @@ export default function Sitemap(
       include,
     );
 
-    const filtered = excludeSitemapEntries(withIncludes, excludeSitemapEntry);
+    const filtered = excludeSitemapEntries(withIncludes, excludeSiteMapEntry);
 
     return new Response(
       filtered,
