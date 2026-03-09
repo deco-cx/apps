@@ -31,6 +31,7 @@ const buildProxyRoutes = (
     includePathToDecoSitemap,
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
+    excludeSitemapEntry,
     includeScriptsToHead,
     includeScriptsToBody,
   }: {
@@ -40,6 +41,7 @@ const buildProxyRoutes = (
     includePathToDecoSitemap?: string[];
     generateDecoSiteMap?: boolean;
     excludePathsFromDecoSiteMap: string[];
+    excludeSitemapEntry?: string[];
     includeScriptsToHead?: {
       includes?: Script[];
     };
@@ -110,6 +112,7 @@ const buildProxyRoutes = (
         handler: {
           value: {
             include,
+            excludeSitemapEntry,
             __resolveType: "vtex/handlers/sitemap.ts",
           },
         },
@@ -150,6 +153,11 @@ export interface Props {
    */
   excludePathsFromDecoSiteMap?: string[];
   /**
+   * @title Sitemap entries to remove from the sitemap index
+   * @description Path or URL substrings; any &lt;sitemap&gt; in /sitemap.xml whose &lt;loc&gt; contains one of these will be removed.
+   */
+  excludeSitemapEntry?: string[];
+  /**
    * @title Scripts to include on Html head
    */
   includeScriptsToHead?: {
@@ -174,6 +182,7 @@ function loader(
     includePathToDecoSitemap = [],
     generateDecoSiteMap = true,
     excludePathsFromDecoSiteMap = [],
+    excludeSitemapEntry = [],
     includeScriptsToHead = { includes: [] },
     includeScriptsToBody = { includes: [] },
   }: Props,
@@ -183,6 +192,7 @@ function loader(
   return buildProxyRoutes({
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
+    excludeSitemapEntry,
     includeSiteMap,
     includePathToDecoSitemap,
     publicUrl: ctx.publicUrl,
