@@ -1,48 +1,54 @@
-import {
+import { type SectionProps } from "@deco/deco";
+import { useScriptAsDataURI } from "@deco/deco/hooks";
+import type {
   AddToCartEvent,
   AnalyticsItem,
   SelectItemEvent,
 } from "../../../commerce/types.ts";
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import {
   ANONYMOUS_COOKIE,
   SESSION_COOKIE,
 } from "../../utils/intelligentSearch.ts";
-import { SPEvent } from "../../utils/types.ts";
-import { type SectionProps } from "@deco/deco";
-import { useScriptAsDataURI } from "@deco/deco/hooks";
+import type { SPEvent } from "../../utils/types.ts";
 
-const ONE_YEAR_SECS = 365 * 24 * 3600;
-const THIRTY_MIN_SECS = 30 * 60;
+interface SnippetProps {
+  account: string;
+  anonymousCookie: string;
+  sessionCookie: string;
+}
 
-const getCookie = (name: string): string | null => {
-  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
-  return match ? match[1] : null;
-};
+const snippet = ({ account, anonymousCookie, sessionCookie }: SnippetProps) => {
+  const ONE_YEAR_SECS = 365 * 24 * 3600;
+  const THIRTY_MIN_SECS = 30 * 60;
 
-const setCookie = (name: string, value: string, maxAge: number) => {
-  document.cookie =
-    `${name}=${value};path=/;max-age=${maxAge};secure;SameSite=Lax`;
-};
+  const getCookie = (name: string): string | null => {
+    const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+    return match ? match[1] : null;
+  };
 
-const getOrCreateISCookies = () => {
-  let anonymous = getCookie(ANONYMOUS_COOKIE);
-  if (!anonymous) {
-    anonymous = crypto.randomUUID();
-    setCookie(ANONYMOUS_COOKIE, anonymous, ONE_YEAR_SECS);
-  }
+  const setCookie = (name: string, value: string, maxAge: number) => {
+    document.cookie =
+      `${name}=${value};path=/;max-age=${maxAge};secure;SameSite=Lax`;
+  };
 
-  let session = getCookie(SESSION_COOKIE);
-  if (!session) {
-    session = crypto.randomUUID();
-  }
-  // Always re-set session cookie to simulate sliding expiration
-  setCookie(SESSION_COOKIE, session, THIRTY_MIN_SECS);
+  const getOrCreateISCookies = () => {
+    let anonymous = getCookie(anonymousCookie);
+    if (!anonymous) {
+      anonymous = crypto.randomUUID();
+      setCookie(anonymousCookie, anonymous, ONE_YEAR_SECS);
+    }
 
-  return { anonymous, session };
-};
+    let session = getCookie(sessionCookie);
+    if (!session) {
+      session = crypto.randomUUID();
+    }
+    // Always re-set session cookie to simulate sliding expiration
+    setCookie(sessionCookie, session, THIRTY_MIN_SECS);
 
-const snippet = (account: string) => {
+    return { anonymous, session };
+  };
+
   const cookies = getOrCreateISCookies();
 
   const url = new URL(globalThis.location.href);
@@ -121,6 +127,7 @@ const snippet = (account: string) => {
     }
   });
 };
+
 export default function VtexAnalytics(
   { account }: SectionProps<typeof loader>,
 ) {
@@ -128,10 +135,15 @@ export default function VtexAnalytics(
     <script
       type="text/javascript"
       defer
-      src={useScriptAsDataURI(snippet, account)}
+      src={useScriptAsDataURI(snippet, {
+        account,
+        anonymousCookie: ANONYMOUS_COOKIE,
+        sessionCookie: SESSION_COOKIE,
+      })}
     />
   );
 }
+
 export const loader = (_props: unknown, _req: Request, ctx: AppContext) => {
   return {
     account: ctx.account,
