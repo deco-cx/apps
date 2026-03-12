@@ -17,9 +17,7 @@ export function parseCookie(headers: Headers) {
   const cookies = getCookies(headers);
   const userId = cookies[VTEX_RECOMMENDATIONS_COOKIE];
   if (!userId) {
-    return null;
+    return { userId: undefined };
   }
-  return {
-    userId: userId,
-  };
+  return { userId };
 }
