@@ -212,6 +212,12 @@ export interface VTEXCommerceStable {
       [x: string]: unknown;
     };
   };
+  "PUT /api/checkout/pub/orderForm/:orderFormId/customData/:appId": {
+    response: OrderForm;
+    body: {
+      [x: string]: unknown;
+    };
+  };
   "POST /api/checkout/pub/orderForm/:orderFormId/items": {
     response: OrderForm;
     searchParams: {
