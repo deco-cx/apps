@@ -24,7 +24,7 @@ interface Props {
   "x-vtex-rec-origin"?: string;
 }
 
-export default async function loader(
+export default async function action(
   props: Props,
   req: Request,
   ctx: AppContext,
@@ -54,6 +54,7 @@ export default async function loader(
     headers: {
       "x-vtex-rec-origin": origin,
       "user-agent": req.headers.get("user-agent") || "",
+      cookie: req.headers.get("cookie") || "",
     },
   });
 

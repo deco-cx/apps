@@ -1,7 +1,7 @@
 import { Product } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
 import { getOrigin, parseCookie } from "../../utils/recommendations.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegmentFromBag } from "../../utils/segment.ts";
 import { toProduct } from "../../utils/transform.ts";
 import {
   CampaignType,
@@ -86,9 +86,7 @@ export default async function loader(
 
     const origin = getOrigin(req, ctx.account, props["x-vtex-rec-origin"]);
     const segment = getSegmentFromBag(ctx);
-    const cookies = parseCookie(req.headers);
-
-    let userId = cookies?.userId;
+    let { userId } = parseCookie(req.headers);
 
     if (ctx.advancedConfigs?.autoStartRecommendationSession && !userId) {
       const response = await ctx.invoke.vtex.actions.recommendation
@@ -100,9 +98,12 @@ export default async function loader(
     const campaignVrn =
       `vrn:recommendations:${account}:${campaignType}:${props.campaignId}`;
 
-    // From vtex docs:
-    // "For similar items and cross-sell, send only one product ID.
-    // For cart recommendations, send all product IDs in the user's cart."
+    //
+    // https://developers.vtex.com/docs/api-reference/recommendations-bff-api#get-/api/recommend-bff/v2/recommendations
+    //
+    // For similar items and cross-sell, send only one product ID.
+    // For cart recommendations, send all product IDs in the user's cart.
+    //
     const products =
       campaignType === "rec-cross-v2" || campaignType === "rec-similar-v2"
         ? [props.products?.[0]]
@@ -120,7 +121,10 @@ export default async function loader(
       products: productIds,
       salesChannel: segment?.payload?.channel || ctx.salesChannel,
     }, {
-      headers: { ...withSegmentCookie(segment), "x-vtex-rec-origin": origin },
+      headers: {
+        cookie: req.headers.get("cookie") ?? "",
+        "x-vtex-rec-origin": origin,
+      },
     }).then((res) => res.json());
 
     const baseUrl = new URL(req.url).origin;
