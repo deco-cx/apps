@@ -1,7 +1,7 @@
-import { getSetCookies } from "std/http/cookie.ts";
 import type { AppContext } from "../../mod.ts";
 import { proxySetCookie } from "../../utils/cookies.ts";
-import { parseCookie } from "../../utils/orderForm.ts";
+import { parseCookie as parseOrderformCookie } from "../../utils/orderForm.ts";
+import { parseCookie as parseRecommendationsCookie } from "../../utils/recommendations.ts";
 
 export default async function action(
   _: unknown,
@@ -9,7 +9,11 @@ export default async function action(
   ctx: AppContext,
 ) {
   const { bff } = ctx;
-  const { orderFormId } = parseCookie(req.headers);
+  const { orderFormId } = parseOrderformCookie(req.headers);
+  const { userId } = parseRecommendationsCookie(req.headers);
+  if (userId) {
+    return { recommendationsUserId: userId };
+  }
 
   const url = new URL(req.url);
   const host = url.host;
@@ -36,7 +40,6 @@ export default async function action(
 
   const data = await response.json();
 
-  console.log(data, getSetCookies(response.headers));
   proxySetCookie(response.headers, ctx.response.headers, req.url);
 
   return data;
