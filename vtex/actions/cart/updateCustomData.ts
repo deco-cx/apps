@@ -2,19 +2,16 @@ import { AppContext } from "../../mod.ts";
 import { proxySetCookie } from "../../utils/cookies.ts";
 import { parseCookie } from "../../utils/orderForm.ts";
 import type { OrderForm } from "../../utils/types.ts";
-import { DEFAULT_EXPECTED_SECTIONS } from "./updateItemAttachment.ts";
-import { getSegmentFromBag } from "../../utils/segment.ts";
 
 export interface Props {
   appId: string;
-  expectedOrderFormSections?: string[];
   // deno-lint-ignore no-explicit-any
   body: any;
 }
 
 /**
- * @title Update Attachment
- * @description Update an attachment in the cart
+ * @title Update Custom Data
+ * @description Update the custom data in the cart
  */
 const action = async (
   props: Props,
@@ -25,7 +22,6 @@ const action = async (
   const {
     appId,
     body,
-    expectedOrderFormSections = DEFAULT_EXPECTED_SECTIONS,
   } = props;
   const { orderFormId } = parseCookie(req.headers);
 
@@ -40,7 +36,7 @@ const action = async (
       orderFormId,
       appId,
     }, {
-      body: { expectedOrderFormSections, ...body },
+      body,
       headers: {
         accept: "application/json",
         "content-type": "application/json",

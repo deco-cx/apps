@@ -33,13 +33,24 @@ export interface OrderForm {
   giftRegistryData: null;
   openTextField: null;
   invoiceData: null;
-  customData: null;
+  customData: CustomData | null;
   itemMetadata: ItemMetadata;
   hooksData: null;
   ratesAndBenefitsData: RatesAndBenefitsData;
   subscriptionData: null;
   merchantContextData: null;
   itemsOrdination: null;
+}
+
+export interface CustomApp {
+  fields: Record<string, unknown>;
+  id: string;
+  major: number;
+}
+
+export interface CustomData {
+  customApps: CustomApp[];
+  customFields: unknown[];
 }
 
 export interface ClientProfileData {
