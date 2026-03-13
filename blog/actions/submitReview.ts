@@ -72,8 +72,6 @@ export default async function submitReview(
       dateModified: isoDate,
     };
 
-    console.log("xxxxxxxxxxx insertData", insertData);
-
     await records.insert(review).values({
       ...insertData,
     });
