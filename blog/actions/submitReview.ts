@@ -1,4 +1,4 @@
-import { eq } from "npm:drizzle-orm@0.30.10";
+import { eq } from "npm:drizzle-orm@0.43.1";
 import { Person } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import { logger } from "@deco/deco/o11y";
