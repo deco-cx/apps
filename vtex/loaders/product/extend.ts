@@ -65,7 +65,7 @@ const kitItemsExt = async (
   const productsById = new Map<string, ProductLeaf>();
   for (const batch of batched) {
     for (const product of batch || []) {
-      for (const leaf of product.isVariantOf?.hasVariant || []) {
+      for (const leaf of product?.isVariantOf?.hasVariant || []) {
         productsById.set(leaf.productID, leaf);
       }
     }
