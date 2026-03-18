@@ -43,7 +43,14 @@
     "@deco/deco/hooks": "https://cdn.jsdelivr.net/gh/deco-cx/deco@e0c194cbee1fb6483f6a0da3f157f5471794ddfb/hooks/mod.ts",
     "@deco/deco/o11y": "https://cdn.jsdelivr.net/gh/deco-cx/deco@e0c194cbee1fb6483f6a0da3f157f5471794ddfb/observability/mod.ts",
     "@deco/deco/utils": "https://cdn.jsdelivr.net/gh/deco-cx/deco@e0c194cbee1fb6483f6a0da3f157f5471794ddfb/utils/mod.ts",
-    "@deco/deco/web": "https://cdn.jsdelivr.net/gh/deco-cx/deco@e0c194cbee1fb6483f6a0da3f157f5471794ddfb/mod.web.ts"
+    "@deco/deco/web": "https://cdn.jsdelivr.net/gh/deco-cx/deco@e0c194cbee1fb6483f6a0da3f157f5471794ddfb/mod.web.ts",
+    "@deco/deco/scripts/bundle": "https://cdn.jsdelivr.net/gh/deco-cx/deco@e0c194cbee1fb6483f6a0da3f157f5471794ddfb/scripts/apps/bundle.ts",
+    "@deco/deco/scripts/run": "https://cdn.jsdelivr.net/gh/deco-cx/deco@e0c194cbee1fb6483f6a0da3f157f5471794ddfb/daemon/main.ts",
+    "@deco/deco/scripts/dev": "https://cdn.jsdelivr.net/gh/deco-cx/deco@e0c194cbee1fb6483f6a0da3f157f5471794ddfb/scripts/dev.ts",
+    "@deco/deco/engine": "https://cdn.jsdelivr.net/gh/deco-cx/deco@e0c194cbee1fb6483f6a0da3f157f5471794ddfb/engine/mod.ts",
+    "@deco/deco/daemon": "https://cdn.jsdelivr.net/gh/deco-cx/deco@e0c194cbee1fb6483f6a0da3f157f5471794ddfb/daemon/mod.ts",
+    "@deco/deco/htmx": "https://cdn.jsdelivr.net/gh/deco-cx/deco@e0c194cbee1fb6483f6a0da3f157f5471794ddfb/runtime/htmx/mod.ts",
+    "@deco/deco/jwt": "https://cdn.jsdelivr.net/gh/deco-cx/deco@e0c194cbee1fb6483f6a0da3f157f5471794ddfb/commons/jwt/mod.ts"
   },
   "lock": false,
   "tasks": {
