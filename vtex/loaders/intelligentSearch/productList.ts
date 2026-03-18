@@ -326,6 +326,11 @@ export const cacheKey = (
   ) {
     return null;
   }
+
+  if (Array.from(url.searchParams.entries()).some(([key]) => key.startsWith("filter."))) {
+    return null;
+  }
+
   const segmentCacheKey = ctx.advancedConfigs?.removeUTMFromCacheKey
     ? getSegmentCacheKeyWithoutUTM(ctx)
     : getSegmentFromBag(ctx)?.token;
