@@ -328,7 +328,7 @@ export const cacheKey = (
   }
 
   if (
-    url.search.includes(".filter")
+    url.search.includes("filter.")
   ) {
     return null;
   }
