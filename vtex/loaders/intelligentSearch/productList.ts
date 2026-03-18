@@ -327,7 +327,9 @@ export const cacheKey = (
     return null;
   }
 
-  if (Array.from(url.searchParams.entries()).some(([key]) => key.startsWith("filter."))) {
+  if (
+    url.search.includes(".filter")
+  ) {
     return null;
   }
 

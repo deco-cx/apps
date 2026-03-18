@@ -444,7 +444,9 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     return null;
   }
 
-  if (Array.from(url.searchParams.entries()).some(([key]) => key.startsWith("filter."))) {
+  if (
+    url.search.includes(".filter")
+  ) {
     return null;
   }
 
