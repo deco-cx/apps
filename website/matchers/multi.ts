@@ -11,9 +11,17 @@ export interface Props {
  * @description Create more complex conditions by combining multiple matchers
  * @icon plus
  */
-const MatchMulti = ({ op, matchers }: Props) => (ctx: MatchContext) => {
-  return op === "or"
-    ? matchers.some((matcher) => matcher(ctx))
-    : matchers.every((matcher) => matcher(ctx));
+const MatchMulti = ({ op, matchers }: Props) => async (ctx: MatchContext) => {
+  if (op === "or") {
+    for (const matcher of matchers) {
+      if (await matcher(ctx)) return true;
+    }
+    return false;
+  } else {
+    for (const matcher of matchers) {
+      if (!await matcher(ctx)) return false;
+    }
+    return true;
+  }
 };
 export default MatchMulti;
