@@ -4,7 +4,11 @@ import {
   getSetCookies,
   setCookie,
 } from "std/http/cookie.ts";
-import { SEGMENT_COOKIE_NAME, setSegmentBag } from "./segment.ts";
+import {
+  getSegmentFromBag,
+  SEGMENT_COOKIE_NAME,
+  setSegmentBag,
+} from "./segment.ts";
 import type { AppContext } from "../mod.ts";
 
 export const stringify = (cookies: Record<string, string>) =>
@@ -46,6 +50,22 @@ export const setCookiesFromSession = ({
     if (cookie.name === SEGMENT_COOKIE_NAME) {
       const { cookies } = buildCookieJar(from, getSetCookies(from));
       setSegmentBag(cookies, req, ctx);
+
+      // Session API responses are authoritative.
+      // If the token changed (e.g. logout removed priceTables),
+      // force Set-Cookie even when the new segment is cacheable.
+      const newSegment = getSegmentFromBag(ctx);
+      const existingToken = getCookies(req.headers)?.[SEGMENT_COOKIE_NAME];
+      if (newSegment?.token && newSegment.token !== existingToken) {
+        setCookie(ctx.response.headers, {
+          value: newSegment.token,
+          name: SEGMENT_COOKIE_NAME,
+          path: "/",
+          secure: true,
+          httpOnly: true,
+        });
+      }
+
       continue;
     }
     const newCookie = {
