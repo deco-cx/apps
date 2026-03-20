@@ -3,7 +3,7 @@
   "specifiers": {
     "jsr:@core/asyncutil@^1.0.2": "1.2.0",
     "jsr:@deco/codemod-toolkit@~0.3.4": "0.3.4",
-    "jsr:@deco/deco@^1.179.0-alpha": "1.179.0-alpha",
+    "jsr:@deco/deco@1.179.0-alpha": "1.179.0-alpha",
     "jsr:@deco/durable@~0.5.3": "0.5.3",
     "jsr:@deco/inspect-vscode@0.2.1": "0.2.1",
     "jsr:@hono/hono@^4.5.4": "4.12.8",
@@ -2637,7 +2637,7 @@
     "dependencies": [
       "jsr:@cliffy/prompt@^1.0.0-rc.5",
       "jsr:@core/asyncutil@^1.0.2",
-      "jsr:@deco/deco@^1.179.0-alpha",
+      "jsr:@deco/deco@1.179.0-alpha",
       "jsr:@deco/durable@~0.5.3",
       "jsr:@deco/warp@0.3.6",
       "jsr:@hono/hono@^4.5.4",
