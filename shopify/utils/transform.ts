@@ -161,17 +161,27 @@ export const toProduct = (
     .filter((metafield) => metafield && metafield.key && metafield.value)
     .map((metafield): PropertyValue => {
       const { key, value, reference, references } = metafield || {};
-      const hasReferenceImage = reference && "image" in reference;
-      const referenceImageUrl = hasReferenceImage ? reference.image?.url : null;
 
-      const hasEdges = references?.edges && references.edges.length > 0;
-      const edgeImages = hasEdges
-        ? references.edges.map((edge) =>
-          edge.node && "image" in edge.node ? edge.node.image?.url : null
+      const referenceImageUrl =
+        (reference as { image?: { url?: string } } | undefined)?.image?.url ??
+          null;
+
+      const edgeImages = Array.isArray(references?.edges)
+        ? references.edges.map(
+          (edge) =>
+            (edge?.node as { image?: { url?: string } } | undefined)?.image
+              ?.url ?? null,
         )
         : null;
 
-      const valueToReturn = referenceImageUrl || edgeImages || value;
+      const validEdgeImages = edgeImages?.filter((url) => !!url) as
+        | string[]
+        | undefined;
+
+      const valueToReturn = referenceImageUrl ??
+        (validEdgeImages && validEdgeImages.length > 0
+          ? validEdgeImages.join(",")
+          : value);
 
       return {
         "@type": "PropertyValue",
