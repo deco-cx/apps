@@ -12,6 +12,7 @@ export interface Props {
   content: Record<string, string>;
   expectedOrderFormSections?: string[];
   noSplitItem?: boolean;
+  sc?: string;
 }
 
 export const DEFAULT_EXPECTED_SECTIONS = [
@@ -48,28 +49,34 @@ const action = async (
     content,
     noSplitItem = true,
     expectedOrderFormSections = DEFAULT_EXPECTED_SECTIONS,
+    sc,
   } = props;
   const { orderFormId } = parseCookie(req.headers);
   const cookie = req.headers.get("cookie") ?? "";
   const segment = getSegmentFromBag(ctx);
 
-  const response = await vcsDeprecated
-    ["POST /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment"](
-      {
-        orderFormId,
-        attachment,
-        index,
-        sc: segment?.payload.channel,
+  const response = await vcsDeprecated[
+    "POST /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment"
+  ](
+    {
+      orderFormId,
+      attachment,
+      index,
+      sc:
+        sc ? sc :
+        (ctx.allowMixedSegments
+          ? segment?.payload.channel
+          : ctx.salesChannel),
+    },
+    {
+      body: { content, noSplitItem, expectedOrderFormSections },
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        cookie,
       },
-      {
-        body: { content, noSplitItem, expectedOrderFormSections },
-        headers: {
-          accept: "application/json",
-          "content-type": "application/json",
-          cookie,
-        },
-      },
-    );
+    },
+  );
 
   proxySetCookie(response.headers, ctx.response.headers, req.url);
 
