@@ -13,4 +13,7 @@ export interface Props {
 const NegateMatcher = ({ matcher }: Props) => async (ctx: MatchContext) => {
   return !(await matcher(ctx));
 };
+
 export default NegateMatcher;
+
+export const cacheable = true;

@@ -25,3 +25,5 @@ const MatchMulti = ({ op, matchers }: Props) => async (ctx: MatchContext) => {
   }
 };
 export default MatchMulti;
+
+export const cacheable = true;
