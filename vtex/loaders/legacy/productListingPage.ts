@@ -1,4 +1,8 @@
 import { LegacyItem } from "../../utils/types.ts";
+import {
+  removeNonLatin1Chars,
+  removeScriptChars,
+} from "../../../utils/normalize.ts";
 import type { Filter, ProductListingPage } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
@@ -194,7 +198,10 @@ const loader = async (
   const filtersBehavior = props.filters || "dynamic";
 
   const countFromSearchParams = url.searchParams.get("PS");
-  const count = Number(countFromSearchParams ?? props.count ?? 12);
+  const rawCount = countFromSearchParams ? Number(countFromSearchParams) : NaN;
+  const count = Number.isFinite(rawCount) && rawCount > 0
+    ? Math.min(Math.floor(rawCount), 50)
+    : Number(props.count ?? 12);
 
   const maybeMap = props.map || url.searchParams.get("map") || undefined;
   let maybeTerm = props.term || url.pathname || "";
@@ -204,18 +211,25 @@ const loader = async (
     maybeTerm = result?.possiblePaths[0] ?? maybeTerm;
   }
 
-  const pageParam = url.searchParams.get("page")
-    ? Number(url.searchParams.get("page")) - currentPageoffset
+  const rawPage = url.searchParams.get("page")
+    ? Number(url.searchParams.get("page"))
+    : NaN;
+  const pageParam = Number.isFinite(rawPage) && rawPage >= currentPageoffset
+    ? rawPage - currentPageoffset
     : 0;
-  const page = props.page || pageParam;
-  const O: LegacySort = (url.searchParams.get("O") as LegacySort) ??
+  const page = props.page || Math.min(pageParam, MAX_ALLOWED_PAGES);
+  const rawSort = (url.searchParams.get("O") as LegacySort) ??
     IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
     props.sort ??
     sortOptions[0].value as LegacySort;
+  const isSortValid = sortOptions.some((opt) => opt.value === rawSort);
+  const O = isSortValid ? rawSort : sortOptions[0].value as LegacySort;
   const fq = [
     ...new Set([
       ...(props.fq ? [props.fq] : []),
-      ...url.searchParams.getAll("fq"),
+      ...url.searchParams.getAll("fq").map((v) =>
+        removeScriptChars(removeNonLatin1Chars(v))
+      ),
     ]),
   ];
   const _from = page * count;

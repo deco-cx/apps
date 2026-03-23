@@ -17,6 +17,36 @@ export const middleware = (
   req: Request,
   ctx: AppMiddlewareContext,
 ) => {
+  // Sanitize numeric query params early — invalid values (e.g. SSRF URLs
+  // passed as ?page=) cause NaN errors downstream in PLP loaders.
+  const url = new URL(req.url);
+  let dirty = false;
+
+  const page = url.searchParams.get("page");
+  if (page !== null) {
+    const num = Number(page);
+    if (!Number.isInteger(num) || num < 1) {
+      url.searchParams.delete("page");
+      dirty = true;
+    }
+  }
+
+  const ps = url.searchParams.get("PS");
+  if (ps !== null) {
+    const num = Number(ps);
+    if (!Number.isInteger(num) || num < 1 || num > 50) {
+      url.searchParams.delete("PS");
+      dirty = true;
+    }
+  }
+
+  if (dirty) {
+    return Promise.resolve(new Response(null, {
+      status: 301,
+      headers: { Location: url.pathname + url.search },
+    }));
+  }
+
   const segment = getSegmentFromBag(ctx);
   const isCookies = getISCookiesFromBag(ctx);
   const cookies = getCookies(req.headers);
