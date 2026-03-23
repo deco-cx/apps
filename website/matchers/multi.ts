@@ -17,3 +17,5 @@ const MatchMulti = ({ op, matchers }: Props) => (ctx: MatchContext) => {
     : matchers.every((matcher) => matcher(ctx));
 };
 export default MatchMulti;
+
+export const cacheable = true;
