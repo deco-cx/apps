@@ -19,7 +19,9 @@ export interface Props {
  * @title BlogpostList
  * @description Retrieves a list of Spire blog posts.
  */
-export const cache = "no-cache"
+export const cache = {
+  maxAge: 60 * 60 * 24, // 24 hours
+}
 
 /** Parse an integer from a value that may be a number, string, or null. Falls back to `fallback` on NaN/null. */
 function parseIntParam(
