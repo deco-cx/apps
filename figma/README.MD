@@ -212,12 +212,19 @@ const simplifiedDocument = simplifyDocument(document);
 
 ## Configuration
 
-To use this app, you need to provide a Figma API access token.
+To use this app, you need to configure OAuth 2.0 with your Figma application.
+
+First, set up the environment variables:
+- `FIGMA_CLIENT_ID`: Your Figma OAuth app client ID
+- `FIGMA_CLIENT_SECRET`: Your Figma OAuth app client secret
 
 ```typescript
 import { App } from "figma/mod.ts";
 
 const figmaApp = App({
-  accessToken: "your_token_here",
+  clientId: Deno.env.get("FIGMA_CLIENT_ID"),
+  clientSecret: Deno.env.get("FIGMA_CLIENT_SECRET"),
 });
 ```
+
+The OAuth flow will handle token management automatically, including refresh when needed.
