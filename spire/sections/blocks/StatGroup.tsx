@@ -14,7 +14,8 @@ const GRID_CLASS: Record<number, string> = {
 export default function StatGroup({ stats }: Props) {
   let items: StatItem[] = [];
   try {
-    items = JSON.parse(stats ?? "[]");
+    const parsed = JSON.parse(stats ?? "[]");
+    if (Array.isArray(parsed)) items = parsed;
   } catch { /* ignore */ }
 
   const clamped = items.slice(0, 3);

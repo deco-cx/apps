@@ -136,6 +136,8 @@ const fromProps = ({ props }: Props) => {
     O?: LegacySort;
   };
 
+  console.log("lEGACY", props);
+
   if (isSKUIDProps(props)) {
     const skuIds = props.ids || [];
 

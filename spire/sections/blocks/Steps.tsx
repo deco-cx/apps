@@ -9,7 +9,8 @@ export interface Props {
 export default function Steps({ title, steps }: Props) {
   let list: Step[] = [];
   try {
-    list = JSON.parse(steps ?? "[]");
+    const parsed = JSON.parse(steps ?? "[]");
+    if (Array.isArray(parsed)) list = parsed;
   } catch { /* ignore */ }
 
   return (

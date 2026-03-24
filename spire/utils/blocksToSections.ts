@@ -29,10 +29,10 @@ function blockToSection(
 
   if ("type" in block && block.type) {
     if (overrides[block.type]) {
-      console.log("overriding block", overrides[block.type]);
-      return toSection(overrides[block.type]?.__resolveType ?? block.type, {
-        ...(block.content as Record<string, unknown>),
-      });
+      return toSection(
+        overrides[block.type]?.__resolveType ?? block.type,
+        block.content as Record<string, unknown>,
+      );
     }
 
     switch (block.type) {

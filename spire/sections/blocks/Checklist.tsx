@@ -7,7 +7,8 @@ export interface Props {
 export default function Checklist({ title, items }: Props) {
   let list: string[] = [];
   try {
-    list = JSON.parse(items ?? "[]");
+    const parsed = JSON.parse(items ?? "[]");
+    if (Array.isArray(parsed)) list = parsed;
   } catch { /* ignore */ }
 
   return (

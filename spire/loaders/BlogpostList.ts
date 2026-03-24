@@ -1,5 +1,4 @@
 import { logger } from "@deco/deco/o11y";
-import { STALE } from "../../utils/fetch.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost, SpirePostSummary } from "../types.ts";
 
@@ -20,14 +19,21 @@ export interface Props {
  * @title BlogpostList
  * @description Retrieves a list of Spire blog posts.
  */
-export const cache = {
-  maxAge: 60 * 60 * 24, // 24 hours
-};
+export const cache = "no-cache"
+
+/** Parse an integer from a value that may be a number, string, or null. Falls back to `fallback` on NaN/null. */
+function parseIntParam(
+  value: number | string | null | undefined,
+  fallback: number,
+): number {
+  const n = parseInt(String(value ?? ""), 10);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(req.url);
-  const page = props.page ?? url.searchParams.get("page") ?? 1;
-  const count = props.count ?? url.searchParams.get("count") ?? 12;
+  const page = parseIntParam(props.page ?? url.searchParams.get("page"), 1);
+  const count = parseIntParam(props.count ?? url.searchParams.get("count"), 12);
   return `spire-list-${ctx.account}-page${page}-count${count}`;
 };
 
@@ -38,13 +44,12 @@ export default async function BlogpostList(
 ): Promise<BlogPost[]> {
   const { account, api } = ctx;
   const url = new URL(req.url);
-  const perPage = Number(count ?? url.searchParams.get("count") ?? 12);
-  const pageNumber = Number(page ?? url.searchParams.get("page") ?? 1);
+  const perPage = parseIntParam(count ?? url.searchParams.get("count"), 12);
+  const pageNumber = parseIntParam(page ?? url.searchParams.get("page"), 1);
 
   try {
     const response = await api["GET /blog/:account"](
       { account, page: pageNumber, perPage },
-      STALE,
     );
 
     if (!response.ok) {

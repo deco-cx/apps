@@ -68,7 +68,7 @@ interface State extends Props {
  * @title Spire Blog
  * @description Fetch and display blog posts from Spire.
  * @category Tool
- * @logo https://raw.githubusercontent.com/deco-cx/apps/main/weather/logo.png
+ * @logo https://spire.blog/favicon.ico
  */
 export default function Spire({ account, overrideSections }: Props) {
   const api = createHttpClient<SpireApi>({
@@ -94,8 +94,7 @@ export const preview = () => {
       name: "Spire Blog",
       owner: "spire.blog",
       description: "Fetch and display blog posts powered by Spire.",
-      logo:
-        "https://raw.githubusercontent.com/deco-cx/apps/main/weather/logo.png",
+      logo: "https://spire.blog/favicon.ico",
       images: [],
       tabs: [],
     },

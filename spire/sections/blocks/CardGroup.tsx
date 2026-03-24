@@ -2,7 +2,7 @@ type Card = { icon?: string; title: string; body: string };
 
 export interface Props {
   /** JSON-encoded Card[] (max 3) */
-  cards: string;
+  cards: Card[] | string;
 }
 
 const GRID_CLASS: Record<number, string> = {
@@ -13,9 +13,15 @@ const GRID_CLASS: Record<number, string> = {
 
 export default function CardGroup({ cards }: Props) {
   let items: Card[] = [];
-  try {
-    items = JSON.parse(cards ?? "[]");
-  } catch { /* ignore */ }
+
+  if (Array.isArray(cards)) {
+    items = cards;
+  } else if (typeof cards === "string") {
+    try {
+      const parsed = JSON.parse(cards);
+      if (Array.isArray(parsed)) items = parsed;
+    } catch { /* ignore */ }
+  }
 
   const clamped = items.slice(0, 3);
   const gridCols = GRID_CLASS[clamped.length] ?? GRID_CLASS[3];

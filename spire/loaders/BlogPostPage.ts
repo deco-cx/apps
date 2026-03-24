@@ -1,8 +1,9 @@
-import { STALE } from "../../utils/fetch.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost, BlogPostPage, SpirePost } from "../types.ts";
 import { blocksToSections } from "../utils/blocksToSections.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import { Resolved } from "@deco/deco";
+import { Section } from "@deco/deco/blocks";
 
 export interface Props {
   slug: RequestURLParam;
@@ -30,7 +31,6 @@ export default async function BlogPostPageLoader(
 
   const response = await api["GET /blog/:account/posts/:slug"](
     { account, slug },
-    STALE,
   );
 
   if (!response.ok) {
@@ -60,7 +60,7 @@ export default async function BlogPostPageLoader(
 
 export function spirePostToBlogPost(
   post: SpirePost,
-  overrides: Record<string, import("@deco/deco/blocks").Section> = {},
+  overrides: Record<string, Resolved<Section>> = {},
 ): BlogPost {
   return {
     id: post.id,
