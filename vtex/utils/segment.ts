@@ -272,20 +272,19 @@ export const setSegmentBag = (
   const token = serialize(segment);
   setSegmentInBag(ctx, { payload: segment, token });
 
-  // Skip Set-Cookie when the segment only differs by UTMs.
-  // UTMs don't affect page content, so the response can still be cached.
-  // Only set cookies when content-affecting fields differ (campaigns,
-  // non-default sales channel, price tables, region).
-  if (!isCacheableSegment(ctx)) {
-    if (segmentFromRequest.channel) {
-      setCookie(ctx.response.headers, {
-        value: `sc=${segmentFromRequest.channel}`,
-        name: SALES_CHANNEL_COOKIE,
-        path: "/",
-        secure: true,
-      });
-    }
+  // Always persist sales channel from request params for navigation continuity.
+  if (segmentFromRequest.channel) {
+    setCookie(ctx.response.headers, {
+      value: `sc=${segmentFromRequest.channel}`,
+      name: SALES_CHANNEL_COOKIE,
+      path: "/",
+      secure: true,
+    });
+  }
 
+  // Skip vtex_segment Set-Cookie when cacheable (no UTMs, campaigns, etc.)
+  // so CDN can cache the response.
+  if (!isCacheableSegment(ctx)) {
     if (vtex_segment !== token) {
       setCookie(ctx.response.headers, {
         value: token,
