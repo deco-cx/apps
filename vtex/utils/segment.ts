@@ -73,12 +73,25 @@ export const isCacheableSegment = (ctx: AppContext) => {
 
   if (ctx.advancedConfigs?.removeUTMFromCacheKey) {
     if (!payload) return true;
-    const { campaigns, channel, priceTables, regionId } = payload;
-    return !campaigns &&
-      (!channel || isDefautSalesChannel(ctx, channel)) &&
-      !priceTables && !regionId;
+    const { campaigns, priceTables, regionId } = payload;
+    return !campaigns && !priceTables && !regionId;
   }
-  return isAnonymous(ctx);
+
+  if (!payload) return true;
+  const {
+    campaigns,
+    utm_campaign,
+    utm_source,
+    utmi_campaign,
+    priceTables,
+    regionId,
+  } = payload;
+  return !campaigns &&
+    !utm_campaign &&
+    !utm_source &&
+    !utmi_campaign &&
+    !priceTables &&
+    !regionId;
 };
 
 const setSegmentInBag = (ctx: AppContext, data: WrappedSegment) =>
