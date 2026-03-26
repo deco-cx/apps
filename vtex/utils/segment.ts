@@ -284,19 +284,18 @@ export const setSegmentBag = (
   const token = serialize(segment);
   setSegmentInBag(ctx, { payload: segment, token });
 
-  // Always persist sales channel from request params for navigation continuity.
-  if (segmentFromRequest.channel) {
-    setCookie(ctx.response.headers, {
-      value: `sc=${segmentFromRequest.channel}`,
-      name: SALES_CHANNEL_COOKIE,
-      path: "/",
-      secure: true,
-    });
-  }
-
-  // Skip vtex_segment Set-Cookie when cacheable (no UTMs, campaigns, etc.)
-  // so CDN can cache the response.
+  // Skip all Set-Cookie on cacheable responses so CDN can cache them.
+  // On non-cacheable responses (first cold request, logged-in, etc.) we persist
+  // both cookies so the browser carries the right channel on future requests.
   if (!isCacheableSegment(ctx)) {
+    if (segmentFromRequest.channel) {
+      setCookie(ctx.response.headers, {
+        value: `sc=${segmentFromRequest.channel}`,
+        name: SALES_CHANNEL_COOKIE,
+        path: "/",
+        secure: true,
+      });
+    }
     if (vtex_segment !== token) {
       setCookie(ctx.response.headers, {
         value: token,
