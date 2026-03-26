@@ -73,12 +73,25 @@ export const isCacheableSegment = (ctx: AppContext) => {
 
   if (ctx.advancedConfigs?.removeUTMFromCacheKey) {
     if (!payload) return true;
-    const { campaigns, channel, priceTables, regionId } = payload;
-    return !campaigns &&
-      (!channel || isDefautSalesChannel(ctx, channel)) &&
-      !priceTables && !regionId;
+    const { campaigns, priceTables, regionId } = payload;
+    return !campaigns && !priceTables && !regionId;
   }
-  return isAnonymous(ctx);
+
+  if (!payload) return true;
+  const {
+    campaigns,
+    utm_campaign,
+    utm_source,
+    utmi_campaign,
+    priceTables,
+    regionId,
+  } = payload;
+  return !campaigns &&
+    !utm_campaign &&
+    !utm_source &&
+    !utmi_campaign &&
+    !priceTables &&
+    !regionId;
 };
 
 const setSegmentInBag = (ctx: AppContext, data: WrappedSegment) =>
@@ -259,28 +272,27 @@ export const setSegmentBag = (
   const token = serialize(segment);
   setSegmentInBag(ctx, { payload: segment, token });
 
-  // Skip Set-Cookie when the segment only differs by UTMs.
-  // UTMs don't affect page content, so the response can still be cached.
-  // Only set cookies when content-affecting fields differ (campaigns,
-  // non-default sales channel, price tables, region).
-  if (!isCacheableSegment(ctx)) {
-    if (segmentFromRequest.channel) {
-      setCookie(ctx.response.headers, {
-        value: `sc=${segmentFromRequest.channel}`,
-        name: SALES_CHANNEL_COOKIE,
-        path: "/",
-        secure: true,
-      });
-    }
+  // Always persist sales channel when it comes from request params so the
+  // browser carries it across navigation. The CDN varies its cache key by
+  // VTEXSC, so setting this cookie does not prevent CDN caching.
+  if (segmentFromRequest.channel) {
+    setCookie(ctx.response.headers, {
+      value: `sc=${segmentFromRequest.channel}`,
+      name: SALES_CHANNEL_COOKIE,
+      path: "/",
+      secure: true,
+    });
+  }
 
-    if (vtex_segment !== token) {
-      setCookie(ctx.response.headers, {
-        value: token,
-        name: SEGMENT_COOKIE_NAME,
-        path: "/",
-        secure: true,
-        httpOnly: true,
-      });
-    }
+  // Always keep vtex_segment fresh so the CDN vary key stays accurate.
+  // The CDN varies by this cookie, so setting it does not prevent caching.
+  if (vtex_segment !== token) {
+    setCookie(ctx.response.headers, {
+      value: token,
+      name: SEGMENT_COOKIE_NAME,
+      path: "/",
+      secure: true,
+      httpOnly: true,
+    });
   }
 };

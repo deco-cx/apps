@@ -1,5 +1,5 @@
 import { getCookies } from "std/http/cookie.ts";
-import { PAGE_CACHE_ALLOWED_KEY, PAGE_DIRTY_KEY } from "@deco/deco/blocks";
+import { PAGE_DIRTY_KEY } from "@deco/deco/blocks";
 import { AppMiddlewareContext } from "./mod.ts";
 import {
   getISCookiesFromBag,
@@ -43,11 +43,6 @@ export const middleware = (
       "Cache-Control",
       "no-store, no-cache, must-revalidate",
     );
-  }
-
-  // PAGE_CACHE_ALLOWED_KEY: opts in to CDN page caching (VTEX-only)
-  if (cacheable) {
-    ctx.bag.set(PAGE_CACHE_ALLOWED_KEY, true);
   }
 
   return ctx.next!();
