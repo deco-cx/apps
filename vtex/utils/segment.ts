@@ -71,6 +71,18 @@ export const isCacheableSegment = (ctx: AppContext) => {
   const payload = getSegmentFromBag(ctx)?.payload;
   if (payload?.channelPrivacy === "private") return false;
 
+  // Non-default channels are only cacheable when privacy is explicitly "public".
+  // If channelPrivacy is unknown (null/undefined), don't cache to avoid serving
+  // a private channel's response from CDN on the first request.
+  const channel = payload?.channel;
+  if (
+    channel &&
+    !isDefautSalesChannel(ctx, channel) &&
+    payload?.channelPrivacy !== "public"
+  ) {
+    return false;
+  }
+
   if (ctx.advancedConfigs?.removeUTMFromCacheKey) {
     if (!payload) return true;
     const { campaigns, priceTables, regionId } = payload;
