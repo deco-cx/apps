@@ -7733,7 +7733,7 @@ export type ProductFragment = { availableForSale: boolean, createdAt: any, descr
 
 export type FilterFragment = { id: string, label: string, type: FilterType, values: Array<{ count: number, id: string, input: any, label: string }> };
 
-export type CartFragment = { id: string, checkoutUrl: any, totalQuantity: number, lines: { nodes: Array<
+export type CartFragment = { id: string, checkoutUrl: any, totalQuantity: number, buyerIdentity: { countryCode?: CountryCode | null, email?: string | null }, lines: { nodes: Array<
       | { id: string, quantity: number, merchandise: { id: string, title: string, image?: { url: any, altText?: string | null } | null, product: { title: string, onlineStoreUrl?: any | null, handle: string }, price: { amount: any, currencyCode: CurrencyCode } }, discountAllocations: Array<
           | { code: string, discountedAmount: { amount: any, currencyCode: CurrencyCode } }
           | Record<PropertyKey, never>
@@ -7757,10 +7757,12 @@ export type CreateCartMutation = { payload?: { cart?: { id: string } | null } | 
 
 export type GetCartQueryVariables = Exact<{
   id: Scalars['ID']['input'];
+  languageCode?: InputMaybe<LanguageCode>;
+  countryCode?: InputMaybe<CountryCode>;
 }>;
 
 
-export type GetCartQuery = { cart?: { id: string, checkoutUrl: any, totalQuantity: number, lines: { nodes: Array<
+export type GetCartQuery = { cart?: { id: string, checkoutUrl: any, totalQuantity: number, buyerIdentity: { countryCode?: CountryCode | null, email?: string | null }, lines: { nodes: Array<
         | { id: string, quantity: number, merchandise: { id: string, title: string, image?: { url: any, altText?: string | null } | null, product: { title: string, onlineStoreUrl?: any | null, handle: string }, price: { amount: any, currencyCode: CurrencyCode } }, discountAllocations: Array<
             | { code: string, discountedAmount: { amount: any, currencyCode: CurrencyCode } }
             | Record<PropertyKey, never>
@@ -7778,6 +7780,8 @@ export type GetCartQuery = { cart?: { id: string, checkoutUrl: any, totalQuantit
 export type GetProductQueryVariables = Exact<{
   handle?: InputMaybe<Scalars['String']['input']>;
   identifiers: Array<HasMetafieldsIdentifier> | HasMetafieldsIdentifier;
+  languageCode?: InputMaybe<LanguageCode>;
+  countryCode?: InputMaybe<CountryCode>;
 }>;
 
 
@@ -7799,6 +7803,8 @@ export type ListProductsQueryVariables = Exact<{
   after?: InputMaybe<Scalars['String']['input']>;
   query?: InputMaybe<Scalars['String']['input']>;
   identifiers: Array<HasMetafieldsIdentifier> | HasMetafieldsIdentifier;
+  languageCode?: InputMaybe<LanguageCode>;
+  countryCode?: InputMaybe<CountryCode>;
 }>;
 
 
@@ -7825,6 +7831,8 @@ export type SearchWithFiltersQueryVariables = Exact<{
   sortKey?: InputMaybe<SearchSortKeys>;
   reverse?: InputMaybe<Scalars['Boolean']['input']>;
   identifiers: Array<HasMetafieldsIdentifier> | HasMetafieldsIdentifier;
+  languageCode?: InputMaybe<LanguageCode>;
+  countryCode?: InputMaybe<CountryCode>;
 }>;
 
 
@@ -7854,10 +7862,12 @@ export type AllProductsQueryVariables = Exact<{
   reverse?: InputMaybe<Scalars['Boolean']['input']>;
   filters?: InputMaybe<Array<ProductFilter> | ProductFilter>;
   identifiers: Array<HasMetafieldsIdentifier> | HasMetafieldsIdentifier;
+  languageCode?: InputMaybe<LanguageCode>;
+  countryCode?: InputMaybe<CountryCode>;
 }>;
 
 
-export type AllProductsQuery = { collection?: { handle: string, description: string, title: string, products: { pageInfo: { hasNextPage: boolean, hasPreviousPage: boolean, endCursor?: string | null, startCursor?: string | null }, filters: Array<{ id: string, label: string, type: FilterType, values: Array<{ count: number, id: string, input: any, label: string }> }>, nodes: Array<{ availableForSale: boolean, createdAt: any, description: string, descriptionHtml: any, handle: string, id: string, isGiftCard: boolean, onlineStoreUrl?: any | null, productType: string, publishedAt: any, requiresSellingPlan: boolean, tags: Array<string>, title: string, totalInventory?: number | null, updatedAt: any, vendor: string, featuredImage?: { altText?: string | null, url: any } | null, images: { nodes: Array<{ altText?: string | null, url: any }> }, media: { nodes: Array<
+export type AllProductsQuery = { collection?: { id: string, handle: string, description: string, title: string, products: { pageInfo: { hasNextPage: boolean, hasPreviousPage: boolean, endCursor?: string | null, startCursor?: string | null }, filters: Array<{ id: string, label: string, type: FilterType, values: Array<{ count: number, id: string, input: any, label: string }> }>, nodes: Array<{ availableForSale: boolean, createdAt: any, description: string, descriptionHtml: any, handle: string, id: string, isGiftCard: boolean, onlineStoreUrl?: any | null, productType: string, publishedAt: any, requiresSellingPlan: boolean, tags: Array<string>, title: string, totalInventory?: number | null, updatedAt: any, vendor: string, featuredImage?: { altText?: string | null, url: any } | null, images: { nodes: Array<{ altText?: string | null, url: any }> }, media: { nodes: Array<
             | { alt?: string | null, mediaContentType: MediaContentType, previewImage?: { altText?: string | null, url: any } | null }
             | { alt?: string | null, mediaContentType: MediaContentType, previewImage?: { altText?: string | null, url: any } | null }
             | { alt?: string | null, mediaContentType: MediaContentType, previewImage?: { altText?: string | null, url: any } | null }
@@ -7873,6 +7883,8 @@ export type AllProductsQuery = { collection?: { handle: string, description: str
 export type ProductRecommendationsQueryVariables = Exact<{
   productId: Scalars['ID']['input'];
   identifiers: Array<HasMetafieldsIdentifier> | HasMetafieldsIdentifier;
+  languageCode?: InputMaybe<LanguageCode>;
+  countryCode?: InputMaybe<CountryCode>;
 }>;
 
 
@@ -7891,6 +7903,8 @@ export type ProductRecommendationsQuery = { productRecommendations?: Array<{ ava
 
 export type GetShopInfoQueryVariables = Exact<{
   identifiers: Array<HasMetafieldsIdentifier> | HasMetafieldsIdentifier;
+  languageCode?: InputMaybe<LanguageCode>;
+  countryCode?: InputMaybe<CountryCode>;
 }>;
 
 
@@ -7915,7 +7929,7 @@ export type AddItemToCartMutationVariables = Exact<{
 }>;
 
 
-export type AddItemToCartMutation = { payload?: { cart?: { id: string, checkoutUrl: any, totalQuantity: number, lines: { nodes: Array<
+export type AddItemToCartMutation = { payload?: { cart?: { id: string, checkoutUrl: any, totalQuantity: number, buyerIdentity: { countryCode?: CountryCode | null, email?: string | null }, lines: { nodes: Array<
           | { id: string, quantity: number, merchandise: { id: string, title: string, image?: { url: any, altText?: string | null } | null, product: { title: string, onlineStoreUrl?: any | null, handle: string }, price: { amount: any, currencyCode: CurrencyCode } }, discountAllocations: Array<
               | { code: string, discountedAmount: { amount: any, currencyCode: CurrencyCode } }
               | Record<PropertyKey, never>
@@ -7947,7 +7961,7 @@ export type AddCouponMutationVariables = Exact<{
 }>;
 
 
-export type AddCouponMutation = { payload?: { cart?: { id: string, checkoutUrl: any, totalQuantity: number, lines: { nodes: Array<
+export type AddCouponMutation = { payload?: { cart?: { id: string, checkoutUrl: any, totalQuantity: number, buyerIdentity: { countryCode?: CountryCode | null, email?: string | null }, lines: { nodes: Array<
           | { id: string, quantity: number, merchandise: { id: string, title: string, image?: { url: any, altText?: string | null } | null, product: { title: string, onlineStoreUrl?: any | null, handle: string }, price: { amount: any, currencyCode: CurrencyCode } }, discountAllocations: Array<
               | { code: string, discountedAmount: { amount: any, currencyCode: CurrencyCode } }
               | Record<PropertyKey, never>
@@ -7968,7 +7982,7 @@ export type UpdateItemsMutationVariables = Exact<{
 }>;
 
 
-export type UpdateItemsMutation = { payload?: { cart?: { id: string, checkoutUrl: any, totalQuantity: number, lines: { nodes: Array<
+export type UpdateItemsMutation = { payload?: { cart?: { id: string, checkoutUrl: any, totalQuantity: number, buyerIdentity: { countryCode?: CountryCode | null, email?: string | null }, lines: { nodes: Array<
           | { id: string, quantity: number, merchandise: { id: string, title: string, image?: { url: any, altText?: string | null } | null, product: { title: string, onlineStoreUrl?: any | null, handle: string }, price: { amount: any, currencyCode: CurrencyCode } }, discountAllocations: Array<
               | { code: string, discountedAmount: { amount: any, currencyCode: CurrencyCode } }
               | Record<PropertyKey, never>
@@ -7982,6 +7996,27 @@ export type UpdateItemsMutation = { payload?: { cart?: { id: string, checkoutUrl
         | { discountedAmount: { amount: any, currencyCode: CurrencyCode } }
         | { discountedAmount: { amount: any, currencyCode: CurrencyCode } }
       > } | null } | null };
+
+export type CartBuyerIdentityUpdateMutationVariables = Exact<{
+  cartId: Scalars['ID']['input'];
+  buyerIdentity: CartBuyerIdentityInput;
+}>;
+
+
+export type CartBuyerIdentityUpdateMutation = { cartBuyerIdentityUpdate?: { cart?: { id: string, checkoutUrl: any, totalQuantity: number, buyerIdentity: { countryCode?: CountryCode | null, email?: string | null }, lines: { nodes: Array<
+          | { id: string, quantity: number, merchandise: { id: string, title: string, image?: { url: any, altText?: string | null } | null, product: { title: string, onlineStoreUrl?: any | null, handle: string }, price: { amount: any, currencyCode: CurrencyCode } }, discountAllocations: Array<
+              | { code: string, discountedAmount: { amount: any, currencyCode: CurrencyCode } }
+              | Record<PropertyKey, never>
+            >, cost: { totalAmount: { amount: any, currencyCode: CurrencyCode }, subtotalAmount: { amount: any, currencyCode: CurrencyCode }, amountPerQuantity: { amount: any, currencyCode: CurrencyCode }, compareAtAmountPerQuantity?: { amount: any, currencyCode: CurrencyCode } | null } }
+          | { id: string, quantity: number, merchandise: { id: string, title: string, image?: { url: any, altText?: string | null } | null, product: { title: string, onlineStoreUrl?: any | null, handle: string }, price: { amount: any, currencyCode: CurrencyCode } }, discountAllocations: Array<
+              | { code: string, discountedAmount: { amount: any, currencyCode: CurrencyCode } }
+              | Record<PropertyKey, never>
+            >, cost: { totalAmount: { amount: any, currencyCode: CurrencyCode }, subtotalAmount: { amount: any, currencyCode: CurrencyCode }, amountPerQuantity: { amount: any, currencyCode: CurrencyCode }, compareAtAmountPerQuantity?: { amount: any, currencyCode: CurrencyCode } | null } }
+        > }, cost: { totalTaxAmount?: { amount: any, currencyCode: CurrencyCode } | null, subtotalAmount: { amount: any, currencyCode: CurrencyCode }, totalAmount: { amount: any, currencyCode: CurrencyCode }, checkoutChargeAmount: { amount: any, currencyCode: CurrencyCode } }, discountCodes: Array<{ code: string, applicable: boolean }>, discountAllocations: Array<
+        | { discountedAmount: { amount: any, currencyCode: CurrencyCode } }
+        | { discountedAmount: { amount: any, currencyCode: CurrencyCode } }
+        | { discountedAmount: { amount: any, currencyCode: CurrencyCode } }
+      > } | null, userErrors: Array<{ field?: Array<string> | null, message: string }> } | null };
 
 export type SignInWithEmailAndPasswordMutationVariables = Exact<{
   email: Scalars['String']['input'];
