@@ -16,6 +16,11 @@ import {
 import { logger } from "@deco/deco/o11y";
 import { Component, JSX } from "preact";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
+import {
+  DECO_PAGE_CACHE_ALLOW_HEADER,
+  DECO_PAGE_CACHE_CONTROL_HEADER,
+  normalizeCacheControlHeader,
+} from "@deco/deco/utils";
 import OneDollarStats from "../components/OneDollarStats.tsx";
 import Events from "../components/Events.tsx";
 import { SEOSection } from "../components/Seo.tsx";
@@ -50,8 +55,54 @@ export interface Props {
   /** @hide true */
   seo?: Section<SEOSection>;
   sections: Sections;
+  /**
+   * @title Cache this page in CDN
+   * @description When enabled, the page is cached at the CDN edge. Only device and time variants are respected while caching; any other variant types will be ignored. If any uncached loader is preset, this will be automatically disabled.
+   * @default false
+   */
+  cacheControl?: boolean;
+  /**
+   * @title Cache-Control header
+   * @description Choose the default safe header or provide a custom one
+   */
+  cacheHeader?: CacheHeaderConfig;
   /** @hide true */
   unindexedDomain?: boolean;
+}
+/**
+ * @title Cache-Control header
+ */
+export type CacheHeaderConfig = CacheHeaderDefault | CacheHeaderCustom;
+
+/**
+ * @title Default
+ */
+interface CacheHeaderDefault {
+  /**
+   * @title Mode
+   * @default default
+   * @hide true
+   * @readOnly true
+   */
+  mode?: "default";
+}
+
+/**
+ * @title Custom
+ */
+interface CacheHeaderCustom {
+  /**
+   * @title Mode
+   * @default custom
+   * @hide true
+   * @readOnly true
+   */
+  mode?: "custom";
+  /**
+   * @title Cache-Control header
+   * @description Example: public, s-maxage=60, max-age=10, stale-while-revalidate=3600, stale-if-error=86400
+   */
+  value: string;
 }
 export function renderSection(section: Props["sections"][number]) {
   if (section === undefined || section === null) {
@@ -173,6 +224,50 @@ export const loader = async (
   const globalSections = ctx.theme
     ? [ctx.theme, ...resolvedGlobals]
     : resolvedGlobals;
+
+  // Page-level cache-control: if configured, set headers early so render-time matchers can react.
+  const normalizedCC = (() => {
+    // Primary: boolean|string cacheControl + header options
+    const cc = (restProps as unknown as { cacheControl?: boolean | string })
+      ?.cacheControl;
+    if (cc === true) {
+      const headerCfg = (restProps as unknown as {
+        cacheHeader?: CacheHeaderConfig;
+      })?.cacheHeader;
+      if (
+        (headerCfg as CacheHeaderCustom)?.mode === "custom" &&
+        (headerCfg as CacheHeaderCustom)?.value
+      ) {
+        return normalizeCacheControlHeader(
+          (headerCfg as CacheHeaderCustom).value,
+        );
+      }
+      return normalizeCacheControlHeader(true);
+    }
+
+    // Backward compatibility: union object previously used
+    const legacyUnion = (restProps as unknown as {
+      cache?:
+        | { mode?: "off" | "default" | "custom"; value?: string }
+        | undefined;
+    })?.cache;
+    if (legacyUnion?.mode === "default") {
+      return normalizeCacheControlHeader(true);
+    }
+    if (legacyUnion?.mode === "custom" && legacyUnion.value) {
+      return normalizeCacheControlHeader(legacyUnion.value);
+    }
+    // Legacy direct string support
+    if (typeof cc === "string") {
+      return normalizeCacheControlHeader(cc);
+    }
+    return undefined; // off or not set
+  })();
+  if (normalizedCC) {
+    ctx.response.headers.set(DECO_PAGE_CACHE_CONTROL_HEADER, normalizedCC);
+    // Only device/time variants are allowed when page cache-control is on
+    ctx.response.headers.set(DECO_PAGE_CACHE_ALLOW_HEADER, "device,time");
+  }
 
   return {
     ...restProps,
