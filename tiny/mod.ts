@@ -41,6 +41,7 @@ export interface State {
  * @logo https://assets.decocache.com/mcp/c073765e-e869-4244-9504-1edf6af02073/TinyERP.svg
  */
 export default function App(props: Props): App<Manifest, State> {
+  console.log(props);
   const { token, baseUrl = "https://api.tiny.com.br/public-api/v3" } = props;
 
   // Handle different token types
