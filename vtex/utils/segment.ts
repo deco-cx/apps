@@ -61,37 +61,13 @@ export const isAnonymous = (
     !regionId;
 };
 
-/**
- * Checks if the segment is cacheable for CDN purposes.
- * By default, uses isAnonymous (UTMs affect cacheability because prices
- * can vary by utm_source). With removeUTMFromCacheKey, UTMs are ignored
- * (opt-in for stores that don't vary prices by UTM).
- */
 export const isCacheableSegment = (ctx: AppContext) => {
   const payload = getSegmentFromBag(ctx)?.payload;
   if (payload?.channelPrivacy === "private") return false;
 
-  if (ctx.advancedConfigs?.removeUTMFromCacheKey) {
-    if (!payload) return true;
-    const { campaigns, priceTables, regionId } = payload;
-    return !campaigns && !priceTables && !regionId;
-  }
-
   if (!payload) return true;
-  const {
-    campaigns,
-    utm_campaign,
-    utm_source,
-    utmi_campaign,
-    priceTables,
-    regionId,
-  } = payload;
-  return !campaigns &&
-    !utm_campaign &&
-    !utm_source &&
-    !utmi_campaign &&
-    !priceTables &&
-    !regionId;
+  const { campaigns, priceTables, regionId } = payload;
+  return !campaigns && !priceTables && !regionId;
 };
 
 const setSegmentInBag = (ctx: AppContext, data: WrappedSegment) =>
