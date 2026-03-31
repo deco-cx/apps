@@ -10,8 +10,6 @@ import {
   isCacheableSegment,
   setSegmentBag,
 } from "./utils/segment.ts";
-import { VTEX_ID_CLIENT_COOKIE } from "./utils/vtexId.ts";
-
 export const middleware = (
   _props: unknown,
   req: Request,
@@ -29,12 +27,7 @@ export const middleware = (
     setSegmentBag(cookies, req, ctx);
   }
 
-  const isLoggedIn = Boolean(
-    cookies[VTEX_ID_CLIENT_COOKIE] ||
-      cookies[`${VTEX_ID_CLIENT_COOKIE}_${ctx.account}`],
-  );
-
-  const cacheable = isCacheableSegment(ctx) && !isLoggedIn;
+  const cacheable = isCacheableSegment(ctx);
 
   // PAGE_DIRTY_KEY: marks page dirty for section-level caching and other consumers
   if (!cacheable) {
