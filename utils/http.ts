@@ -1,5 +1,4 @@
-import { type RequestInit } from "@deco/deco";
-import { fetchSafe } from "./fetch.ts";
+import { type DecoRequestInit as RequestInit, fetchSafe } from "./fetch.ts";
 
 // Check if DEBUG_HTTP env var is set
 const DEBUG_HTTP = Deno.env.get("DEBUG_HTTP") === "true";
