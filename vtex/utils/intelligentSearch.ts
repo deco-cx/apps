@@ -148,7 +148,10 @@ export const pageTypesFromUrl = async (
     segments.map((_, index) =>
       vcsDeprecated["GET /api/catalog_system/pub/portal/pagetype/:term"]({
         term: segments.slice(0, index + 1).join("/"),
-      }, STALE).then((res) => res.json()).catch(() => ({ pageType: "NotFound" }))
+      }, STALE).then((res) => res.json()).catch((e) => {
+        if (e?.status === 400) return { pageType: "NotFound" };
+        throw e;
+      })
     ),
   );
 };
