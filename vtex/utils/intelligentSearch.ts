@@ -151,7 +151,14 @@ export const pageTypesFromUrl = async (
         term: segments.slice(0, index + 1).join("/"),
       }, STALE).then((res) => res.json()).catch((e) => {
         if (e?.status === 400) {
-          return { id: null, name: null, url: null, title: null, metaTagDescription: null, pageType: "NotFound" } satisfies PageType;
+          return {
+            id: null,
+            name: null,
+            url: null,
+            title: null,
+            metaTagDescription: null,
+            pageType: "NotFound",
+          } satisfies PageType;
         }
         throw e;
       })
