@@ -1,5 +1,4 @@
-import { type RequestInit } from "@deco/deco";
-import { fetchSafe } from "./fetch.ts";
+import { type DecoRequestInit, fetchSafe } from "./fetch.ts";
 
 // Check if DEBUG_HTTP env var is set
 const DEBUG_HTTP = Deno.env.get("DEBUG_HTTP") === "true";
@@ -25,7 +24,7 @@ export class HttpError extends Error {
   }
 }
 
-export interface TypedRequestInit<T> extends Omit<RequestInit, "body"> {
+export interface TypedRequestInit<T> extends Omit<DecoRequestInit, "body"> {
   body: T;
   excludeFromSearchParams?: string[];
   templateMarker?: string;
@@ -82,7 +81,7 @@ export type ClientOf<T> = {
       searchParams?: infer Params;
     } ? (
         params: URLPatternParams<`/${path}`> & Params,
-        init?: Omit<RequestInit, "body">,
+        init?: Omit<DecoRequestInit, "body">,
       ) => Promise<TypedResponse<ResBody>>
     : never
     : never;
@@ -241,7 +240,7 @@ export const createHttpClient = <T>(
       }
       return (
         params: Record<string, string | number | string[] | number[]>,
-        init?: RequestInit & {
+        init?: DecoRequestInit & {
           excludeFromSearchParams?: string[];
           templateMarker?: string;
         },
