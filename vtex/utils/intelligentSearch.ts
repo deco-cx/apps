@@ -1,6 +1,7 @@
 import { AppContext } from "../mod.ts";
 import { STALE } from "../../utils/fetch.ts";
 import type {
+  PageType,
   SelectedFacet,
   SimulationBehavior,
   Sort,
@@ -149,7 +150,9 @@ export const pageTypesFromUrl = async (
       vcsDeprecated["GET /api/catalog_system/pub/portal/pagetype/:term"]({
         term: segments.slice(0, index + 1).join("/"),
       }, STALE).then((res) => res.json()).catch((e) => {
-        if (e?.status === 400) return { pageType: "NotFound" };
+        if (e?.status === 400) {
+          return { id: null, name: null, url: null, title: null, metaTagDescription: null, pageType: "NotFound" } satisfies PageType;
+        }
         throw e;
       })
     ),
