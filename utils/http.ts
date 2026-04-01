@@ -1,4 +1,3 @@
-import { type RequestInit } from "@deco/deco";
 import { fetchSafe } from "./fetch.ts";
 
 // Check if DEBUG_HTTP env var is set
