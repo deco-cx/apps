@@ -29,6 +29,9 @@ function blockToSection(
 
   if ("type" in block && block.type) {
     if (overrides[block.type]) {
+      // Use the store's configured section type (__resolveType) but keep
+      // props coming from the Spire API (block.content). The override exists
+      // solely to remap the renderer — not to inject static props.
       return toSection(
         overrides[block.type]?.__resolveType ?? block.type,
         block.content as Record<string, unknown>,

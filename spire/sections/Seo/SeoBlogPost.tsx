@@ -17,8 +17,15 @@ export interface Props {
 
 /** @title Blog Post details */
 export function loader(props: Props, _req: Request, ctx: AppContext) {
-  const { titleTemplate = "%s", descriptionTemplate = "%s", ...seoSiteProps } =
-    (ctx as unknown as { seo: Record<string, unknown> }).seo ?? {};
+  const rawSeo = (ctx as unknown as { seo: Record<string, unknown> }).seo ?? {};
+  const titleTemplate = typeof rawSeo.titleTemplate === "string"
+    ? rawSeo.titleTemplate
+    : "%s";
+  const descriptionTemplate = typeof rawSeo.descriptionTemplate === "string"
+    ? rawSeo.descriptionTemplate
+    : "%s";
+  const { titleTemplate: _tt, descriptionTemplate: _dt, ...seoSiteProps } =
+    rawSeo;
 
   const { title: titleProp, description: descriptionProp, jsonLD } = props;
 

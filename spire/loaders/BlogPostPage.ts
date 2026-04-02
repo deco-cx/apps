@@ -1,3 +1,4 @@
+import { logger } from "@deco/deco/o11y";
 import { AppContext } from "../mod.ts";
 import { BlogPost, BlogPostPage, SpirePost } from "../types.ts";
 import { blocksToSections } from "../utils/blocksToSections.ts";
@@ -34,12 +35,16 @@ export default async function BlogPostPageLoader(
   );
 
   if (!response.ok) {
+    logger.error(
+      `BlogPostPage: fetch failed for slug "${slug}" — ${response.status} ${response.statusText}`,
+    );
     return null;
   }
 
   const { post } = await response.json();
 
   if (!post) {
+    logger.error(`BlogPostPage: no post found for slug "${slug}"`);
     return null;
   }
 
@@ -70,11 +75,11 @@ export function spirePostToBlogPost(
     alt: post.version.title,
     authors: post.authors.map((a) => ({
       name: a.name,
-      email: `${a.slug}@spire.blog`,
+      email: "",
       avatar: a.avatarUrl ?? undefined,
     })),
     categories: [],
-    date: post.publishedAt ?? new Date().toISOString(),
+    date: post.publishedAt ?? "",
     slug: post.slug,
     seo: {
       title: post.version.metaTitle,

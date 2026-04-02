@@ -1,3 +1,5 @@
+import { sanitizeHtml } from "../../utils/sanitizeHtml.ts";
+
 const ICONS: Record<string, string> = {
   info: "ℹ",
   tip: "✓",
@@ -59,7 +61,7 @@ export default function Callout({ title, body, variant = "info" }: Props) {
       {body && (
         <div
           class="text-[1.0625rem] leading-normal [&>*+*]:mt-2 [&_a]:text-accent [&_a]:underline [&_strong]:font-semibold [&_strong]:text-base"
-          dangerouslySetInnerHTML={{ __html: body }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(body) }}
         />
       )}
     </div>

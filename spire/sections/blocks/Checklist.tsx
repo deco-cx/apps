@@ -1,3 +1,5 @@
+import { sanitizeHtml } from "../../utils/sanitizeHtml.ts";
+
 export interface Props {
   title?: string;
   /** JSON-encoded string[] */
@@ -43,7 +45,7 @@ export default function Checklist({ title, items }: Props) {
             </span>
             <span
               class="text-[1.0625rem] leading-normal [&_a]:text-accent [&_strong]:font-semibold [&_strong]:text-base"
-              dangerouslySetInnerHTML={{ __html: item }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(item) }}
             />
           </li>
         ))}

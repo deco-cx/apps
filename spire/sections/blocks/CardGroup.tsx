@@ -1,3 +1,5 @@
+import { sanitizeHtml } from "../../utils/sanitizeHtml.ts";
+
 type Card = { icon?: string; title: string; body: string };
 
 export interface Props {
@@ -43,11 +45,11 @@ export default function CardGroup({ cards }: Props) {
           )}
           <strong
             class="text-[1.0625rem] font-semibold leading-snug"
-            dangerouslySetInnerHTML={{ __html: card.title }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(card.title) }}
           />
           <p
             class="text-sm leading-normal [text-wrap:pretty] m-0"
-            dangerouslySetInnerHTML={{ __html: card.body }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(card.body) }}
           />
         </div>
       ))}

@@ -1,3 +1,5 @@
+import { sanitizeHtml } from "../../utils/sanitizeHtml.ts";
+
 export interface Props {
   items: string;
   style?: "ordered" | "unordered";
@@ -16,7 +18,7 @@ export default function List({ items, style }: Props) {
           <li
             key={i}
             class="pl-1.5 marker:text-muted [&_a]:text-accent [&_strong]:font-semibold [&_strong]:text-base"
-            dangerouslySetInnerHTML={{ __html: item }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(item) }}
           />
         ))}
       </ol>
@@ -29,7 +31,7 @@ export default function List({ items, style }: Props) {
         <li
           key={i}
           class="pl-1.5 marker:text-muted [&_a]:text-accent [&_strong]:font-semibold [&_strong]:text-base"
-          dangerouslySetInnerHTML={{ __html: item }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(item) }}
         />
       ))}
     </ul>

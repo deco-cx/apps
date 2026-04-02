@@ -61,18 +61,14 @@ export default async function BlogpostListing(
       return null;
     }
 
-    const { posts: rawPosts, pagination } = await response.json();
+    const { posts: rawPosts, pagination, blog } = await response.json();
     const posts: BlogPost[] = (rawPosts ?? []).map(spirePostSummaryToBlogPost);
-
-    if (posts.length === 0) {
-      return null;
-    }
 
     return {
       posts,
       pageInfo: toPageInfo(pagination, params),
       seo: {
-        title: "",
+        title: blog?.name || "Blog",
         canonical: new URL(url.pathname, url.origin).href,
       },
     };

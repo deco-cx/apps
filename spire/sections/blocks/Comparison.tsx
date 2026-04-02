@@ -1,3 +1,5 @@
+import { sanitizeHtml } from "../../utils/sanitizeHtml.ts";
+
 type Col = { title: string; items: string[] };
 
 export interface Props {
@@ -11,10 +13,18 @@ export default function Comparison({ left, right }: Props) {
   let leftCol: Col = { title: "Option A", items: [] };
   let rightCol: Col = { title: "Option B", items: [] };
   try {
-    leftCol = JSON.parse(left ?? "{}");
+    const parsed = JSON.parse(left ?? "{}");
+    leftCol = {
+      title: typeof parsed?.title === "string" ? parsed.title : "Option A",
+      items: Array.isArray(parsed?.items) ? parsed.items : [],
+    };
   } catch { /* ignore */ }
   try {
-    rightCol = JSON.parse(right ?? "{}");
+    const parsed = JSON.parse(right ?? "{}");
+    rightCol = {
+      title: typeof parsed?.title === "string" ? parsed.title : "Option B",
+      items: Array.isArray(parsed?.items) ? parsed.items : [],
+    };
   } catch { /* ignore */ }
 
   return (
@@ -25,7 +35,7 @@ export default function Comparison({ left, right }: Props) {
           {leftCol.title}
         </div>
         <ul class="list-none p-0 m-0 flex flex-col gap-3">
-          {leftCol.items?.map((item, j) => (
+          {leftCol.items.map((item, j) => (
             <li key={j} class="flex items-start gap-2.5 text-sm leading-snug">
               <span
                 class="flex-shrink-0 text-emerald-500 font-bold mt-px leading-none"
@@ -33,7 +43,7 @@ export default function Comparison({ left, right }: Props) {
               >
                 ✓
               </span>
-              <span dangerouslySetInnerHTML={{ __html: item }} />
+              <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(item) }} />
             </li>
           ))}
         </ul>
@@ -45,7 +55,7 @@ export default function Comparison({ left, right }: Props) {
           {rightCol.title}
         </div>
         <ul class="list-none p-0 m-0 flex flex-col gap-3">
-          {rightCol.items?.map((item, j) => (
+          {rightCol.items.map((item, j) => (
             <li key={j} class="flex items-start gap-2.5 text-sm leading-snug">
               <span
                 class="flex-shrink-0 text-tertiary font-bold mt-px leading-none"
@@ -53,7 +63,7 @@ export default function Comparison({ left, right }: Props) {
               >
                 ✕
               </span>
-              <span dangerouslySetInnerHTML={{ __html: item }} />
+              <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(item) }} />
             </li>
           ))}
         </ul>

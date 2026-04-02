@@ -1,3 +1,5 @@
+import { sanitizeHtml } from "../../utils/sanitizeHtml.ts";
+
 type Step = { title: string; description?: string };
 
 export interface Props {
@@ -43,12 +45,14 @@ export default function Steps({ title, steps }: Props) {
             <div class="min-w-0 pt-2.5">
               <strong
                 class="font-semibold leading-snug block mb-1.5 [&_a]:text-inherit [&_a]:no-underline"
-                dangerouslySetInnerHTML={{ __html: step.title }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(step.title) }}
               />
               {step.description && (
                 <p
                   class="text-sm leading-normal m-0 [&_a]:text-accent [&_a]:underline"
-                  dangerouslySetInnerHTML={{ __html: step.description }}
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeHtml(step.description),
+                  }}
                 />
               )}
             </div>

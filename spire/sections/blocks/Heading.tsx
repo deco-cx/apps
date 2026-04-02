@@ -1,3 +1,5 @@
+import { sanitizeHtml } from "../../utils/sanitizeHtml.ts";
+
 export interface Props {
   text: string;
   level?: string;
@@ -21,11 +23,12 @@ export default function Heading({ text, level }: Props) {
 
   const cls = styles[tag] ?? styles.h2;
 
+  const safe = sanitizeHtml(text);
   if (tag === "h3") {
-    return <h3 class={cls} dangerouslySetInnerHTML={{ __html: text }} />;
+    return <h3 class={cls} dangerouslySetInnerHTML={{ __html: safe }} />;
   }
   if (tag === "h4") {
-    return <h4 class={cls} dangerouslySetInnerHTML={{ __html: text }} />;
+    return <h4 class={cls} dangerouslySetInnerHTML={{ __html: safe }} />;
   }
-  return <h2 class={cls} dangerouslySetInnerHTML={{ __html: text }} />;
+  return <h2 class={cls} dangerouslySetInnerHTML={{ __html: safe }} />;
 }

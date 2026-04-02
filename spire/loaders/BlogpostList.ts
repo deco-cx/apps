@@ -21,7 +21,9 @@ export interface Props {
  */
 export const cache = {
   maxAge: 60 * 60 * 24, // 24 hours
-}
+};
+
+const MAX_COUNT = 100;
 
 /** Parse an integer from a value that may be a number, string, or null. Falls back to `fallback` on NaN/null. */
 function parseIntParam(
@@ -35,7 +37,10 @@ function parseIntParam(
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(req.url);
   const page = parseIntParam(props.page ?? url.searchParams.get("page"), 1);
-  const count = parseIntParam(props.count ?? url.searchParams.get("count"), 12);
+  const count = Math.min(
+    parseIntParam(props.count ?? url.searchParams.get("count"), 12),
+    MAX_COUNT,
+  );
   return `spire-list-${ctx.account}-page${page}-count${count}`;
 };
 
@@ -46,7 +51,10 @@ export default async function BlogpostList(
 ): Promise<BlogPost[]> {
   const { account, api } = ctx;
   const url = new URL(req.url);
-  const perPage = parseIntParam(count ?? url.searchParams.get("count"), 12);
+  const perPage = Math.min(
+    parseIntParam(count ?? url.searchParams.get("count"), 12),
+    MAX_COUNT,
+  );
   const pageNumber = parseIntParam(page ?? url.searchParams.get("page"), 1);
 
   try {
