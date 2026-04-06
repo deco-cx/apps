@@ -260,9 +260,9 @@ export const setSegmentBag = (
     });
   }
 
-  // Always keep vtex_segment fresh so the CDN vary key stays accurate.
-  // The CDN varies by this cookie, so setting it does not prevent caching.
-  if (vtex_segment !== token) {
+  // Only set vtex_segment when the channel is non-default so that default-SC
+  // responses remain cacheable by the CDN without a Set-Cookie header.
+  if (vtex_segment !== token && !isDefautSalesChannel(ctx, segment.channel)) {
     setCookie(ctx.response.headers, {
       value: token,
       name: SEGMENT_COOKIE_NAME,
