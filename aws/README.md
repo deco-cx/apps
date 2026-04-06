@@ -22,6 +22,8 @@ A comprehensive AWS integration app for cost analysis, budget monitoring, and bi
 - **Risk Assessment**: Automated risk level calculation and actionable insights
 - **Trend Monitoring**: Track anomaly patterns over time
 
+
+
 ### 💾 Data Export
 - **Multiple Formats**: Export cost data in JSON or CSV formats
 - **Custom Grouping**: Export with various grouping dimensions
