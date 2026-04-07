@@ -1,5 +1,5 @@
 import { AppContext } from "../../mod.ts";
-import { proxySetCookie } from "../../utils/cookies.ts";
+import { getEffectiveCookieHeader, proxySetCookie } from "../../utils/cookies.ts";
 import { parseCookie } from "../../utils/orderForm.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
 import { logger } from "@deco/deco/o11y";
@@ -16,8 +16,15 @@ const action = async (
 ): Promise<boolean> => {
   try {
     const { vcsDeprecated } = ctx;
-    const { orderFormId } = parseCookie(req.headers);
-    const cookie = req.headers.get("cookie") ?? "";
+
+    const cookie = getEffectiveCookieHeader(req, ctx);
+    const effectiveHeaders = new Headers({ cookie });
+    const { orderFormId } = parseCookie(effectiveHeaders);
+
+    if (!orderFormId) {
+      return true;
+    }
+
     const segment = getSegmentFromBag(ctx);
     const response = await vcsDeprecated[
       "GET /checkout/changeToAnonymousUser/:orderFormId"
@@ -34,6 +41,7 @@ const action = async (
         },
       },
     );
+
     if (response.status >= 400) {
       logger.error(
         `Failed fetch request to change orderform to anonymous user: ${response.status} ${response.statusText}`,

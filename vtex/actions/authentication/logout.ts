@@ -1,7 +1,5 @@
-// import { getCookies, getSetCookies } from "std/http/cookie.ts";
 import type { AppContext } from "../../mod.ts";
 import { proxySetCookie, REFRESH_TOKEN_COOKIE } from "../../utils/cookies.ts";
-// import { setSegmentBag } from "../../utils/segment.ts";
 import { redirect } from "@deco/deco";
 import { LogoutResponse } from "../../utils/types.ts";
 import { deleteCookie } from "std/http/cookie.ts";

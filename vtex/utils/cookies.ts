@@ -113,6 +113,22 @@ export function buildCookieJar(
   };
 }
 
+/**
+ * Returns the effective cookie header for the current request,
+ * merging original request cookies with any Set-Cookies already
+ * accumulated on ctx.response.headers by earlier operations in the chain.
+ */
+export function getEffectiveCookieHeader(
+  req: Request,
+  ctx: { response: { headers: Headers } },
+): string {
+  const responseCookies = getSetCookies(ctx.response.headers);
+  if (responseCookies.length === 0) {
+    return req.headers.get("cookie") ?? "";
+  }
+  return buildCookieJar(req.headers, responseCookies).header;
+}
+
 export const CHECKOUT_DATA_ACCESS_COOKIE = "CheckoutDataAccess";
 export const VTEX_CHKO_AUTH = "Vtex_CHKO_Auth";
 export const REFRESH_TOKEN_COOKIE = "vid_rt";
