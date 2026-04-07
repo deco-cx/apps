@@ -7909,6 +7909,22 @@ export type FetchCustomerInfoQueryVariables = Exact<{
 
 export type FetchCustomerInfoQuery = { customer?: { id: string, email?: string | null, firstName?: string | null, lastName?: string | null } | null };
 
+export type FetchCustomerAddressesQueryVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+}>;
+
+
+export type FetchCustomerAddressesQuery = { customer?: { addresses: { edges: Array<{ node: { address1?: string | null, city?: string | null, country?: string | null, id: string, province?: string | null, zip?: string | null } }> } } | null };
+
+export type OrdersByCustomerQueryVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type OrdersByCustomerQuery = { customer?: { orders: { totalCount: any, pageInfo: { startCursor?: string | null, hasPreviousPage: boolean, hasNextPage: boolean, endCursor?: string | null }, nodes: Array<{ id: string, name: string, orderNumber: number, processedAt: any, financialStatus?: OrderFinancialStatus | null, fulfillmentStatus: OrderFulfillmentStatus, totalPrice: { amount: any, currencyCode: CurrencyCode }, lineItems: { nodes: Array<{ title: string, quantity: number, variant?: { id: string, title: string, image?: { url: any, altText?: string | null } | null, price: { amount: any, currencyCode: CurrencyCode }, product: { id: string, title: string, handle: string, vendor: string } } | null }> } }> } } | null };
+
 export type AddItemToCartMutationVariables = Exact<{
   cartId: Scalars['ID']['input'];
   lines: Array<CartLineInput> | CartLineInput;
@@ -7940,6 +7956,14 @@ export type RegisterAccountMutationVariables = Exact<{
 
 
 export type RegisterAccountMutation = { customerCreate?: { customer?: { id: string } | null, customerUserErrors: Array<{ code?: CustomerErrorCode | null, message: string }> } | null };
+
+export type UpdateCustomerInfoMutationVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+  customer: CustomerUpdateInput;
+}>;
+
+
+export type UpdateCustomerInfoMutation = { customerUpdate?: { customer?: { id: string } | null, customerUserErrors: Array<{ code?: CustomerErrorCode | null, message: string }>, userErrors: Array<{ message: string }> } | null };
 
 export type AddCouponMutationVariables = Exact<{
   cartId: Scalars['ID']['input'];
@@ -7990,3 +8014,43 @@ export type SignInWithEmailAndPasswordMutationVariables = Exact<{
 
 
 export type SignInWithEmailAndPasswordMutation = { customerAccessTokenCreate?: { customerAccessToken?: { accessToken: string, expiresAt: any } | null, customerUserErrors: Array<{ code?: CustomerErrorCode | null, message: string }> } | null };
+
+export type SendPasswordResetEmailMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+}>;
+
+
+export type SendPasswordResetEmailMutation = { customerRecover?: { customerUserErrors: Array<{ code?: CustomerErrorCode | null, message: string }>, userErrors: Array<{ message: string }> } | null };
+
+export type CreateAddressMutationVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+  address: MailingAddressInput;
+}>;
+
+
+export type CreateAddressMutation = { customerAddressCreate?: { customerAddress?: { id: string } | null, customerUserErrors: Array<{ code?: CustomerErrorCode | null, message: string }> } | null };
+
+export type UpdateAddressMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  customerAccessToken: Scalars['String']['input'];
+  address: MailingAddressInput;
+}>;
+
+
+export type UpdateAddressMutation = { customerAddressUpdate?: { customerAddress?: { id: string } | null, customerUserErrors: Array<{ code?: CustomerErrorCode | null, message: string }>, userErrors: Array<{ message: string }> } | null };
+
+export type SetDefaultAddressMutationVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+  addressId: Scalars['ID']['input'];
+}>;
+
+
+export type SetDefaultAddressMutation = { customerDefaultAddressUpdate?: { customer?: { defaultAddress?: { id: string } | null } | null, customerUserErrors: Array<{ code?: CustomerErrorCode | null, message: string }> } | null };
+
+export type DeleteAddressMutationVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteAddressMutation = { customerAddressDelete?: { deletedCustomerAddressId?: string | null, customerUserErrors: Array<{ code?: CustomerErrorCode | null, message: string }>, userErrors: Array<{ message: string }> } | null };
