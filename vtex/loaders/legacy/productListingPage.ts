@@ -449,8 +449,12 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(props.pageHref || req.url);
 
   const searchTerm = url.searchParams.get("ft") || url.searchParams.get("q");
+  const hasMap = url.search.includes("map=");
   const cachedSearchTerms = ctx.cachedSearchTerms ?? [];
-  if (searchTerm && !cachedSearchTerms.includes(searchTerm.toLowerCase())) {
+  if (
+    hasMap ||
+    (searchTerm && !cachedSearchTerms.includes(searchTerm.toLowerCase()))
+  ) {
     return null;
   }
   const fq = [
