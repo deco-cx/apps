@@ -28,7 +28,7 @@ export default function Template({ post }: Props) {
         <p class="text-xl">{excerpt}</p>
         <p>
           {date
-            ? new Date(date).toLocaleDateString("en-US", {
+            ? new Date(`${date}T00:00:00`).toLocaleDateString("en-US", {
               month: "long",
               day: "numeric",
               year: "numeric",

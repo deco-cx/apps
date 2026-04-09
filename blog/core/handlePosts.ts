@@ -86,8 +86,8 @@ export const sortPosts = async (
       return -1; // If post b doesn't have sort method, put it after post a
     }
     const comparison = sortMethod === "date"
-      ? new Date(b.date).getTime() -
-        new Date(a.date).getTime()
+      ? new Date(`${b.date}T00:00:00`).getTime() -
+        new Date(`${a.date}T00:00:00`).getTime()
       : a[sortMethod]?.toString().localeCompare(
         b[sortMethod]?.toString() ?? "",
       ) ?? 0;
