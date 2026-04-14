@@ -1,12 +1,15 @@
 import { BlogPost } from "../types.ts";
 import { CSS } from "../static/css.ts";
 import { renderSection } from "../../website/pages/Page.tsx";
+import { AppContext } from "../mod.ts";
 
 export interface Props {
   post: BlogPost | null;
 }
 
-export default function Template({ post }: Props) {
+export default function Template(
+  { post, pageSlug }: ReturnType<typeof loader>,
+) {
   if (!post) return null;
 
   const {
@@ -18,6 +21,21 @@ export default function Template({ post }: Props) {
     alt,
     sections,
   } = post;
+
+  if (pageSlug) {
+    const { slug, categories } = post;
+    const categorySlug = categories?.[0]?.slug ?? "";
+    const resolvedUrl = pageSlug
+      .replace(":category", categorySlug)
+      .replace(":slug", slug);
+
+    return (
+      <iframe
+        src={resolvedUrl}
+        style="width:100%;height:100%;border:none;height:100vh;"
+      />
+    );
+  }
 
   return (
     <>
@@ -50,3 +68,10 @@ export default function Template({ post }: Props) {
     </>
   );
 }
+
+export const loader = (props: Props, _req: Request, ctx: AppContext) => {
+  return {
+    ...props,
+    pageSlug: ctx.pageSlug,
+  };
+};
