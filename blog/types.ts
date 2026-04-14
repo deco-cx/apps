@@ -34,12 +34,12 @@ export interface BlogPost {
    * @widget blog
    * @collection authors
    */
-  authors: Author[];
+  authors?: Author[];
   /**
    * @widget blog
    * @collection categories
    */
-  categories: Category[];
+  categories?: Category[];
   /**
    * @format date
    */
