@@ -92,7 +92,7 @@ export default async function BlogPostList(
       return null;
     }
 
-    const category = slicedPosts[0].categories.find((c) => c.slug === slug);
+    const category = slicedPosts[0].categories?.find((c) => c.slug === slug);
     return {
       posts: slicedPosts,
       pageInfo: toPageInfo(handledPosts, postsPerPage, pageNumber, params),
