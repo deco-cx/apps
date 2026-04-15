@@ -1,8 +1,13 @@
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
 import { type App, type FnContext } from "@deco/deco";
-// deno-lint-ignore no-explicit-any
-export type State = any;
+export type State = {
+  /**
+   * @title Page Slug
+   * @description The slug of the BlogPostPage to embed. Use :category and :slug.
+   */
+  pageSlug?: string;
+};
 export type AppContext = FnContext<State, Manifest>;
 /**
  * @title Deco Blog
