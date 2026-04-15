@@ -14,6 +14,9 @@ export interface Author {
   company?: string;
 }
 
+/**
+ * @titleBy name
+ */
 export interface Category {
   name: string;
   slug: string;
@@ -35,10 +38,6 @@ export interface BlogPost {
    * @collection authors
    */
   authors?: Author[];
-  /**
-   * @widget blog
-   * @collection categories
-   */
   categories?: Category[];
   /**
    * @format date
