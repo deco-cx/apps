@@ -171,6 +171,10 @@ const optimizeMagento = (opts: OptimizationOptions) => {
 export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   const { originalSrc, width, height, fit, quality } = opts;
 
+  if (originalSrc.startsWith("https://dcdn-us.mitiendanube.com")) {
+    return originalSrc;
+  }
+
   if (originalSrc.startsWith("data:")) {
     return originalSrc;
   }
