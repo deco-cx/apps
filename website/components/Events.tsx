@@ -13,6 +13,7 @@ interface EventsAPI {
 interface FeatureFlags {
   bypassPlatformImageOptimization: boolean;
   bypassDecoImageOptimization: boolean;
+  cdnHost: string;
 }
 declare global {
   interface Window {
@@ -34,6 +35,7 @@ const BYPASS_PLATFORM_IMAGE_OPTIMIZATION =
   Deno.env.get("BYPASS_PLATFORM_IMAGE_OPTIMIZATION") === "true";
 const BYPASS_DECO_IMAGE_OPTIMIZATION =
   Deno.env.get("BYPASS_DECO_IMAGE_OPTIMIZATION") === "true";
+const DECO_CDN_HOST = Deno.env.get("DECO_CDN_HOST") ?? "https://decoims.com";
 /**
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
@@ -101,6 +103,7 @@ function Events({ deco }: {
           featureFlags: {
             bypassPlatformImageOptimization: BYPASS_PLATFORM_IMAGE_OPTIMIZATION,
             bypassDecoImageOptimization: BYPASS_DECO_IMAGE_OPTIMIZATION,
+            cdnHost: DECO_CDN_HOST,
           },
         })}
       />

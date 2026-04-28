@@ -2,10 +2,25 @@ import { Head, IS_BROWSER } from "$fresh/runtime.ts";
 import type { JSX } from "preact";
 import { forwardRef } from "preact/compat";
 
-// Strip these prefixes before passing the remainder to decoims `?src=` so the
-// worker hits GCS directly instead of doing an absolute-URL hop.
-const ASSET_URL_PREFIX_TO_STRIP = [
-  "https://decoims.com/",
+const DEFAULT_CDN_HOST = "https://decoims.com";
+
+// CDN host can be overridden via DECO_CDN_HOST env var (server) or
+// window.DECO.featureFlags.cdnHost (browser, injected by Events.tsx).
+const getCdnHost = (): string => {
+  if (IS_BROWSER) {
+    // deno-lint-ignore no-explicit-any
+    return (globalThis as any).DECO?.featureFlags?.cdnHost ?? DEFAULT_CDN_HOST;
+  }
+  return Deno.env.get("DECO_CDN_HOST") ?? DEFAULT_CDN_HOST;
+};
+
+// Strip these prefixes before passing the remainder to the CDN's `?src=` so
+// the worker hits GCS directly instead of doing an absolute-URL hop. The
+// configured CDN host is included so a non-default DECO_CDN_HOST still
+// strips correctly; the GCS deco-assets bucket is kept unconditionally as a
+// well-known origin.
+const getAssetUrlPrefixesToStrip = (): readonly string[] => [
+  `${getCdnHost()}/`,
   "https://storage.googleapis.com/deco-assets/",
 ];
 
@@ -211,13 +226,13 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   // signed URLs, cache busters, etc.) is preserved verbatim through
   // URLSearchParams encoding and recovered on the worker via
   // searchParams.get("src").
-  const src = ASSET_URL_PREFIX_TO_STRIP.reduce(
+  const src = getAssetUrlPrefixesToStrip().reduce(
     (acc, url) => acc.replace(url, ""),
     opts.originalSrc,
   );
   params.set("src", src);
 
-  return `https://decoims.com/image?${params}`;
+  return `${getCdnHost()}/image?${params}`;
 };
 
 export const getSrcSet = (
