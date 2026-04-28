@@ -37,7 +37,7 @@ export const color = 0xFF6A3B;
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/linx/logo.png
  */
 export default function App({ account, cdn, integrationToken }: State) {
-  const token = integrationToken.get();
+  const token = integrationToken?.get();
   const headers = new Headers({
     "Accept": "application/json",
     "User-Agent":
