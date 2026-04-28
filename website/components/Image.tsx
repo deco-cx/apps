@@ -206,13 +206,18 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   height && params.set("height", `${height}`);
   quality && params.set("quality", quality);
 
-  const stripped = ASSET_URL_PREFIX_TO_STRIP.reduce(
+  // Strip known CDN prefixes so the worker can hit GCS directly instead of
+  // doing an absolute-URL hop. Anything left (path + any query string —
+  // signed URLs, cache busters, etc.) is preserved verbatim through
+  // URLSearchParams encoding and recovered on the worker via
+  // searchParams.get("src").
+  const src = ASSET_URL_PREFIX_TO_STRIP.reduce(
     (acc, url) => acc.replace(url, ""),
     opts.originalSrc,
   );
-  const imageSource = stripped.split("?")[0];
-  // src is passed separately to avoid URL encoding issues
-  return `https://decoims.com/image?${params}&src=${imageSource}`;
+  params.set("src", src);
+
+  return `https://decoims.com/image?${params}`;
 };
 
 export const getSrcSet = (
