@@ -1,14 +1,12 @@
 import { Head, IS_BROWSER } from "$fresh/runtime.ts";
 import type { JSX } from "preact";
 import { forwardRef } from "preact/compat";
-import { Manifest } from "../manifest.gen.ts";
 
-export const PATH: `/live/invoke/${keyof Manifest["loaders"]}` =
-  "/live/invoke/website/loaders/image.ts";
-const ASSET_URLS_TO_REPLACE = [
-  "https://assets.decocache.com/",
-  "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/",
-  "https://data.decoassets.com/",
+// Strip these prefixes before passing the remainder to decoims `?src=` so the
+// worker hits GCS directly instead of doing an absolute-URL hop.
+const ASSET_URL_PREFIX_TO_STRIP = [
+  "https://decoims.com/",
+  "https://storage.googleapis.com/deco-assets/",
 ];
 
 export type SetEarlyHint = (hint: string) => void;
@@ -48,13 +46,6 @@ const bypassPlatformImageOptimization = () =>
     // deno-lint-ignore no-explicit-any
     ? (globalThis as any).DECO?.featureFlags?.bypassPlatformImageOptimization
     : Deno.env.get("BYPASS_PLATFORM_IMAGE_OPTIMIZATION") === "true";
-
-// Default is true
-const isAzionAssetsEnabled = () =>
-  IS_BROWSER
-    // deno-lint-ignore no-explicit-any
-    ? (globalThis as any).DECO?.featureFlags?.azionAssets
-    : Deno.env.get("ENABLE_AZION_ASSETS") !== "false";
 
 // Default is false
 const bypassDecoImageOptimization = () =>
@@ -213,23 +204,15 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   params.set("fit", fit);
   params.set("width", `${width}`);
   height && params.set("height", `${height}`);
+  quality && params.set("quality", quality);
 
-  if (isAzionAssetsEnabled()) {
-    // only accepted for Azion for now
-    quality && params.set("quality", quality);
-
-    const originalSrc = ASSET_URLS_TO_REPLACE.reduce(
-      (acc, url) => acc.replace(url, ""),
-      opts.originalSrc,
-    );
-    const imageSource = originalSrc.split("?")[0];
-    // src is being passed separately to avoid URL encoding issues
-    return `https://deco-assets.edgedeco.com/image?${params}&src=${imageSource}`;
-  }
-
-  params.set("src", originalSrc);
-
-  return `${PATH}?${params}`;
+  const stripped = ASSET_URL_PREFIX_TO_STRIP.reduce(
+    (acc, url) => acc.replace(url, ""),
+    opts.originalSrc,
+  );
+  const imageSource = stripped.split("?")[0];
+  // src is passed separately to avoid URL encoding issues
+  return `https://decoims.com/image?${params}&src=${imageSource}`;
 };
 
 export const getSrcSet = (

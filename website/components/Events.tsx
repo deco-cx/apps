@@ -12,7 +12,6 @@ interface EventsAPI {
 }
 interface FeatureFlags {
   bypassPlatformImageOptimization: boolean;
-  azionAssets: boolean;
   bypassDecoImageOptimization: boolean;
 }
 declare global {
@@ -33,7 +32,6 @@ declare global {
 }
 const BYPASS_PLATFORM_IMAGE_OPTIMIZATION =
   Deno.env.get("BYPASS_PLATFORM_IMAGE_OPTIMIZATION") === "true";
-const ENABLE_AZION_ASSETS = Deno.env.get("ENABLE_AZION_ASSETS") !== "false";
 const BYPASS_DECO_IMAGE_OPTIMIZATION =
   Deno.env.get("BYPASS_DECO_IMAGE_OPTIMIZATION") === "true";
 /**
@@ -102,7 +100,6 @@ function Events({ deco }: {
           segmentCookie: DECO_SEGMENT,
           featureFlags: {
             bypassPlatformImageOptimization: BYPASS_PLATFORM_IMAGE_OPTIMIZATION,
-            azionAssets: ENABLE_AZION_ASSETS,
             bypassDecoImageOptimization: BYPASS_DECO_IMAGE_OPTIMIZATION,
           },
         })}

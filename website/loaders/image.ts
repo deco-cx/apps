@@ -1,11 +1,13 @@
 import { HttpError } from "../../utils/http.ts";
-import { PATH } from "../components/Image.tsx";
 import { Params as Props } from "../utils/image/engine.ts";
 import { engine as cloudflare } from "../utils/image/engines/cloudflare/engine.ts";
 import { engine as deco } from "../utils/image/engines/deco/engine.ts";
 import { engine as passThrough } from "../utils/image/engines/passThrough/engine.ts";
 import { engine as wasm } from "../utils/image/engines/wasm/engine.ts";
 import { AppContext } from "../mod.ts";
+
+// Cache namespace key for this loader. Matches the route this file is served at.
+const PATH = "/live/invoke/website/loaders/image.ts";
 
 const ENGINES = [
   passThrough,
