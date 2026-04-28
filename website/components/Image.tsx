@@ -22,6 +22,9 @@ const getCdnHost = (): string => {
 const getAssetUrlPrefixesToStrip = (): readonly string[] => [
   `${getCdnHost()}/`,
   "https://storage.googleapis.com/deco-assets/",
+  "https://assets.decocache.com/",
+  "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/",
+  "https://data.decoassets.com/",
 ];
 
 export type SetEarlyHint = (hint: string) => void;
