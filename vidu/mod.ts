@@ -25,7 +25,7 @@ export interface State {
  * @appName vidu
  * @description Transform text or images into video using Vidu's AI tools.
  * @category AI & Generative
- * @logo https://assets.decocache.com/mcp/551c6502-caaf-498a-82b5-d6c586244fbd/Vidu.svg
+ * @logo https://decoims.com/mcp/551c6502-caaf-498a-82b5-d6c586244fbd/Vidu.svg
  */
 export default function App(
   props: Props,

@@ -24,7 +24,7 @@ interface Props {
  * @appName tiptap-cloud
  * @description Enable rich text editing with real-time collaboration.
  * @category Content
- * @logo https://assets.decocache.com/mcp/d22f78d5-354f-4dd0-a8f3-226ef05c7a9e/TiptapCloud.svg
+ * @logo https://decoims.com/mcp/d22f78d5-354f-4dd0-a8f3-226ef05c7a9e/TiptapCloud.svg
  */
 export default function TiptapCloud(props: Props): App<Manifest, State> {
   const { appId, apiSecret } = props;

@@ -15,7 +15,7 @@ export interface State {
  * @appName discohook
  * @description Send rich, formatted messages to Discord channels.
  * @category Communication
- * @logo https://assets.decocache.com/mcp/a626d828-e641-4931-8557-850276e91702/DiscordWebhook.svg
+ * @logo https://decoims.com/mcp/a626d828-e641-4931-8557-850276e91702/DiscordWebhook.svg
  */
 export default function App(): App<Manifest, State> {
   const api = createHttpClient<DiscordWebhookClient>({

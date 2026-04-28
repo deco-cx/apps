@@ -19,7 +19,7 @@ export interface Props {
  * @appName 1001fx
  * @description Process and transform audio and video using AI-powered tools.
  * @category Media
- * @logo https://assets.decocache.com/mcp/b9109fab-421a-4275-911d-cec5651737d2/1001fx.svg
+ * @logo https://decoims.com/mcp/b9109fab-421a-4275-911d-cec5651737d2/1001fx.svg
  */
 export default function FX1001App(props: Props): App<Manifest, State> {
   const { apiKey } = props;

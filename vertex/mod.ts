@@ -30,7 +30,7 @@ interface Props {
  * @appName vertex
  * @description Use Google’s Vertex AI for language, vision, and generative tasks.
  * @category Tool
- * @logo https://assets.decocache.com/mcp/156feb88-2648-43e0-b7d9-40c1bc2e1d1d/Vertex.svg
+ * @logo https://decoims.com/mcp/156feb88-2648-43e0-b7d9-40c1bc2e1d1d/Vertex.svg
  */
 export default function Vertex(props: Props): App<Manifest, State> {
   const { googleCredentials, location, project } = props;

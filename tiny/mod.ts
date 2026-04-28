@@ -38,7 +38,7 @@ export interface State {
  * @appName tiny
  * @description Sync products, contacts, invoices, and financial data.
  * @category ERP
- * @logo https://assets.decocache.com/mcp/c073765e-e869-4244-9504-1edf6af02073/TinyERP.svg
+ * @logo https://decoims.com/mcp/c073765e-e869-4244-9504-1edf6af02073/TinyERP.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { token, baseUrl = "https://api.tiny.com.br/public-api/v3" } = props;

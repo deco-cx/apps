@@ -22,7 +22,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
  * @appName github
  * @title GitHub
  * @description Create and manage issues, repositories, and pull requests.
- * @logo https://assets.decocache.com/mcp/02e06fe6-a820-4c42-b960-bce022362702/GitHub.svg
+ * @logo https://decoims.com/mcp/02e06fe6-a820-4c42-b960-bce022362702/GitHub.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { access_token } = props;

@@ -55,7 +55,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
  * @appName google-sheets
  * @description Create, read, and update spreadsheets with structured data.
  * @category Productivity
- * @logo https://assets.decocache.com/mcp/0b05c082-ce9d-4879-9258-1acbecf9bf68/Google-Sheets.svg
+ * @logo https://decoims.com/mcp/0b05c082-ce9d-4879-9258-1acbecf9bf68/Google-Sheets.svg
  */
 export default function App(
   props: Props,

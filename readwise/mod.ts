@@ -26,7 +26,7 @@ export interface State {
  * @appName readwise
  * @description Access highlights and notes synced from your favorite reading sources.
  * @category Productivity
- * @logo https://assets.decocache.com/mcp/609eb29f-fa70-4170-ae1c-4108f3a42ea0/Readwise.svg
+ * @logo https://decoims.com/mcp/609eb29f-fa70-4170-ae1c-4108f3a42ea0/Readwise.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { token } = props;

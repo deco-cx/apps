@@ -33,7 +33,7 @@ export interface State {
  * @appName exa
  * @description Run semantic web searches powered by Exa’s intelligent retrieval.
  * @category AI Tools
- * @logo https://assets.decocache.com/mcp/e71a6d5a-81e1-486d-91f9-8f950c8b9f91/ExaAI.svg
+ * @logo https://decoims.com/mcp/e71a6d5a-81e1-486d-91f9-8f950c8b9f91/ExaAI.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { apiKey } = props;

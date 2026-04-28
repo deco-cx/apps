@@ -34,7 +34,7 @@ export interface State extends Props {
  * @appName resend
  * @title Resend
  * @description Send transactional or marketing emails with a reliable delivery API.
- * @logo https://assets.decocache.com/mcp/932e4c3a-6045-40af-9fd1-42894bdd138e/Resend.svg
+ * @logo https://decoims.com/mcp/932e4c3a-6045-40af-9fd1-42894bdd138e/Resend.svg
  */
 export default function App({
   apiKey,

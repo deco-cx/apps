@@ -64,7 +64,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
  * @appName airtable
  * @description Access and manage data from Airtable bases, tables, and records.
  * @category Productivity
- * @logo https://assets.decocache.com/mcp/e724f447-3b98-46c4-9194-6b79841305a2/Airtable.svg
+ * @logo https://decoims.com/mcp/e724f447-3b98-46c4-9194-6b79841305a2/Airtable.svg
  */
 export default function App(
   props: Props,

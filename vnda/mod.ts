@@ -52,7 +52,7 @@ export const color = 0x0C29D0;
  * @appName vnda
  * @description Manage your e-commerce catalog and sales using VNDA by Olist.
  * @category Ecommmerce
- * @logo https://assets.decocache.com/mcp/d15a3dfb-145f-4d13-8bdf-a9568b5a33a1/VNDA.svg
+ * @logo https://decoims.com/mcp/d15a3dfb-145f-4d13-8bdf-a9568b5a33a1/VNDA.svg
  */
 export default function VNDA(props: Props): App<Manifest, State> {
   const { authToken, publicUrl, sandbox } = props;

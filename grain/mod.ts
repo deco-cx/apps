@@ -22,7 +22,7 @@ export type AppContext = FnContext<State, Manifest>;
  * @appName grain
  * @title Grain
  * @description Capture and summarize meetings with AI-powered transcriptions.
- * @logo https://assets.decocache.com/mcp/1bfc7176-e7be-487c-83e6-4b9e970a8e10/Grain.svg
+ * @logo https://decoims.com/mcp/1bfc7176-e7be-487c-83e6-4b9e970a8e10/Grain.svg
  * @version 1.0.0
  */
 export default function App(props: Props): App<Manifest, State> {

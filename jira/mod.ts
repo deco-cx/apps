@@ -28,7 +28,7 @@ export type AppContext = FnContext<State, Manifest>;
  * @appName jira
  * @title Jira
  * @description Create and update issues and comments in your Jira projects.
- * @logo https://assets.decocache.com/mcp/7bae17a9-cfdb-4969-99ca-436b7a4dcf40/Jira.svg
+ * @logo https://decoims.com/mcp/7bae17a9-cfdb-4969-99ca-436b7a4dcf40/Jira.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const jira = new JiraClient({

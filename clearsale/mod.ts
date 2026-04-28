@@ -36,7 +36,7 @@ export interface State {
  * @appName clearsale
  * @description Evaluate risk and prevent fraud in online transactions.
  * @category Payment
- * @logo https://assets.decocache.com/mcp/ac358fdd-be54-4656-b1e8-28e37198fb86/Clearsale.svg
+ * @logo https://decoims.com/mcp/ac358fdd-be54-4656-b1e8-28e37198fb86/Clearsale.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { username, password, homolog } = props;

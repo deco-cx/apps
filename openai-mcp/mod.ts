@@ -19,7 +19,7 @@ export interface Props {
  * @name OpenAI Imagen
  * @description Generate detailed images from natural language prompts.
  * @category AI
- * @logo https://assets.decocache.com/mcp/1449ff20-a110-4753-81a1-4c116ba39336/OpenAI-Imagen.svg
+ * @logo https://decoims.com/mcp/1449ff20-a110-4753-81a1-4c116ba39336/OpenAI-Imagen.svg
  */
 export default function OpenAIApp(props: Props): App<Manifest, State> {
   const { apiKey } = props;

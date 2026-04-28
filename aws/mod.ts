@@ -65,7 +65,7 @@ export interface State extends Props {
  * @appName aws
  * @description Track cloud costs, budgets, and billing insights using AWS tools.
  * @category Analytics
- * @logo https://assets.decocache.com/mcp/ece686cd-c380-41e8-97c8-34616a3bf5ba/AWS.svg
+ * @logo https://decoims.com/mcp/ece686cd-c380-41e8-97c8-34616a3bf5ba/AWS.svg
  */
 export default function App(state: Props): App<Manifest, State> {
   // Validate required credentials

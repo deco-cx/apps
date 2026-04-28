@@ -65,7 +65,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
  * @appName google-drive
  * @description Access, organize, and manage files in Google Drive.
  * @category Productivity
- * @logo https://assets.decocache.com/mcp/bc609f7d-e7c7-433d-b432-93639c5c84bf/Google-Drive.svg
+ * @logo https://decoims.com/mcp/bc609f7d-e7c7-433d-b432-93639c5c84bf/Google-Drive.svg
  */
 export default function App(
   props: Props,

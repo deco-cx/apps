@@ -26,7 +26,7 @@ export interface State {
  * @appName serper
  * @description Perform intelligent Google searches with structured results.
  * @category SEO
- * @logo https://assets.decocache.com/mcp/ffd61ea7-851d-4a8b-8a02-dedb0d5156ed/Serper.svg
+ * @logo https://decoims.com/mcp/ffd61ea7-851d-4a8b-8a02-dedb0d5156ed/Serper.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { apiKey } = props;

@@ -40,7 +40,7 @@ export interface State extends Omit<Props, "token"> {
  * @appName superfrete
  * @description Calculate shipping prices and manage freight logistics.
  * @category Logistics
- * @logo https://assets.decocache.com/mcp/2fdb628e-c10c-4fac-8985-b55e383a64b2/SuperFrete.svg
+ * @logo https://decoims.com/mcp/2fdb628e-c10c-4fac-8985-b55e383a64b2/SuperFrete.svg
  */
 export default function SuperFreteApp(props: Props): App<Manifest, State> {
   const { token, environment = "sandbox", timeout = 30000 } = props;

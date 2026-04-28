@@ -33,7 +33,7 @@ export interface State {
  * @appName deno-deploy
  * @description Deploy edge functions globally with Deno’s cloud platform.
  * @category Cloud Services
- * @logo https://assets.decocache.com/mcp/f8ee96b7-9d64-4680-a2a8-008bf5f0a6e9/Deno-Deploy.svg
+ * @logo https://decoims.com/mcp/f8ee96b7-9d64-4680-a2a8-008bf5f0a6e9/Deno-Deploy.svg
  */
 export default function App(props: Props): App<Manifest, State> {
   const { token, apiVersion = "v1" } = props;

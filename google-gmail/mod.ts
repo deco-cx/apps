@@ -56,7 +56,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
  * @appName google-gmail
  * @description Send and retrieve messages from your Gmail inbox.
  * @category Produtividade
- * @logo https://assets.decocache.com/mcp/b4dbd04f-2d03-4e29-a881-f924f5946c4e/Gmail.svg
+ * @logo https://decoims.com/mcp/b4dbd04f-2d03-4e29-a881-f924f5946c4e/Gmail.svg
  */
 export default function App(
   props: Props,
