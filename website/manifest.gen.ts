@@ -31,8 +31,7 @@ import * as $$$10 from "./loaders/redirect.ts";
 import * as $$$11 from "./loaders/redirects.ts";
 import * as $$$12 from "./loaders/redirectsFromCsv.ts";
 import * as $$$13 from "./loaders/secret.ts";
-import * as $$$14 from "./loaders/secretString.ts";
-import * as $$$15 from "./loaders/whitelistAssets.ts";
+import * as $$$14 from "./loaders/whitelistAssets.ts";
 import * as $$$$$$$0 from "./matchers/always.ts";
 import * as $$$$$$$1 from "./matchers/cookie.ts";
 import * as $$$$$$$2 from "./matchers/cron.ts";
@@ -76,8 +75,7 @@ const manifest = {
     "website/loaders/redirects.ts": $$$11,
     "website/loaders/redirectsFromCsv.ts": $$$12,
     "website/loaders/secret.ts": $$$13,
-    "website/loaders/secretString.ts": $$$14,
-    "website/loaders/whitelistAssets.ts": $$$15,
+    "website/loaders/whitelistAssets.ts": $$$14,
   },
   "handlers": {
     "website/handlers/fresh.ts": $$$$0,
