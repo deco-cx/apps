@@ -102,6 +102,7 @@ interface ProductOptions {
   imagesByKey?: Map<string, string>;
   /** Original attributes to be included in the transformed product */
   includeOriginalAttributes?: string[];
+  isVariantOfAdditionalProperty?: PropertyValue[];
 }
 
 /** Returns first available sku */
@@ -412,6 +413,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       url: getProductGroupURL(baseUrl, product).href,
       name: product.productName,
       additionalProperty: [
+        ...(options.isVariantOfAdditionalProperty ?? []),
         ...groupAdditionalProperty,
         ...originalAttributesAdditionalProperties,
       ],
