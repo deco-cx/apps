@@ -60,7 +60,7 @@ const MatchBirthday = async (
         return birthMonth === todayMonth;
 
       case "day":
-        return birthDay === todayDay;
+        return birthMonth === todayMonth && birthDay === todayDay;
 
       case "week": {
         const currentYear = today.getFullYear();
