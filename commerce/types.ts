@@ -413,6 +413,8 @@ export interface Person extends Omit<Thing, "@type"> {
   taxID?: string;
   /** The telephone number. */
   telephone?: string;
+  /** A property-value pair representing an additional characteristic of the entity. */
+  additionalProperty?: PropertyValue[];
 }
 // NON SCHEMA.ORG Compliant. Should be removed ASAP
 export interface Author extends Omit<Thing, "@type"> {

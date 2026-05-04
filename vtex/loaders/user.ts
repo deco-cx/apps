@@ -2,6 +2,11 @@ import { Person } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import { parseCookie } from "../utils/vtexId.ts";
 
+interface ProfileCustomField {
+  key: string;
+  value: string;
+}
+
 interface User {
   id: string;
   userId: string;
@@ -13,6 +18,8 @@ interface User {
   document?: string;
   homePhone?: string;
   businessPhone?: string;
+  birthDate?: string;
+  customFields?: ProfileCustomField[];
 }
 
 /**
@@ -32,7 +39,7 @@ async function loader(
   }
 
   const query =
-    "query getUserProfile { profile { id userId email firstName lastName profilePicture gender document homePhone businessPhone }}";
+    "query getUserProfile { profile { id userId email firstName lastName profilePicture gender birthDate document homePhone businessPhone customFields { key value } }}";
 
   try {
     const { profile: user } = await io.query<{ profile: User }, null>(
@@ -52,6 +59,20 @@ async function loader(
           : "https://schema.org/Male"
         : undefined,
       telephone: user.homePhone ?? user.businessPhone,
+      additionalProperty: [
+        ...(user.birthDate
+          ? [{
+            "@type": "PropertyValue" as const,
+            name: "birthDate",
+            value: user.birthDate,
+          }]
+          : []),
+        ...(user.customFields?.map((field) => ({
+          "@type": "PropertyValue" as const,
+          name: field.key,
+          value: field.value,
+        })) ?? []),
+      ],
     };
   } catch (_) {
     return null;
