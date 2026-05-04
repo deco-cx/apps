@@ -11,7 +11,7 @@ interface Profile {
 export interface Props {
   /**
    * @title Match mode
-   * @description "day" matches exact day, "week" matches 7 days around birthday, "month" matches entire birth month
+   * @description "day" matches exact birthday, "week" matches the calendar week (Sun-Sat) containing the birthday, "month" matches entire birth month
    * @default day
    */
   match?: "day" | "month" | "week";
