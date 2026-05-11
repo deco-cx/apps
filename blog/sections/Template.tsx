@@ -1,6 +1,5 @@
 import { BlogPost } from "../types.ts";
 import { CSS } from "../static/css.ts";
-import { renderSection } from "../../website/pages/Page.tsx";
 import { AppContext } from "../mod.ts";
 
 export interface Props {
@@ -42,27 +41,37 @@ export default function Template(
       <link href="/styles.css" rel="stylesheet" />
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <div class="deco-post-preview">
-        <h1>{title}</h1>
-        <p class="text-xl">{excerpt}</p>
-        <p>
-          {date
-            ? new Date(`${date}T00:00:00`).toLocaleDateString("en-US", {
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            })
-            : ""}
-        </p>
+        <h1 class="text-4xl font-bold mb-4">{title}</h1>
+        <p class="text-xl mb-4 italic">{excerpt}</p>
+        
         {image && (
           <img
-            class="w-full rounded-2xl bg-cover"
+            class="w-full rounded-2xl mb-8"
             src={image}
             alt={alt ?? title}
           />
         )}
-        <div dangerouslySetInnerHTML={{ __html: content as string }} />
-        <div class="content-sections">
-          {sections?.map(renderSection)}
+        
+        <div 
+          class="prose max-w-none mb-10" 
+          dangerouslySetInnerHTML={{ __html: content as string }} 
+        />
+
+        <div class="content-sections flex flex-col gap-8">
+          {sections?.map((section, index) => {
+            if (!section || !section.Component) {
+              console.warn(`Section na posição ${index} está indefinida.`);
+              return null;
+            }
+
+            const { Component, props } = section;
+            
+            return (
+              <div key={index} class="section-wrapper">
+                <Component {...props} />
+              </div>
+            );
+          })}
         </div>
       </div>
     </>

@@ -1,6 +1,7 @@
 import { ImageWidget } from "../admin/widgets.ts";
 import { PageInfo, Person, Thing } from "../commerce/types.ts";
 import { type Section } from "@deco/deco/blocks";
+import { Product } from "../commerce/types.ts";
 
 /**
  * @titleBy name
@@ -19,6 +20,9 @@ export interface Category {
   slug: string;
 }
 
+/**
+ * @titleBy title
+ */
 export interface BlogPost {
   title: string;
   excerpt: string;
@@ -52,11 +56,22 @@ export interface BlogPost {
   content?: string;
   /**
    * @title Sections
-   * @label hidden
-   * @changeable true
+   * @description Adicione seções de conteúdo (PostTitle, PostText, PostImage)
    */
   sections?: Section[];
   /**
+   * @title Posts Relacionados
+   * @description Busque posts já cadastrados pelo título
+   * @format dynamic-options
+   * @options apps/blog/loaders/BlogPostList.ts
+   */
+  relatedPosts?: BlogPost[];
+  /**
+   * @title Produtos Relacionados
+   * @description Selecione produtos do catálogo para exibir neste post
+   */
+  relatedProducts?: Product[] | null;
+ /**
    * @title Carousel in post content
    * @description add a carousel in the middle of the post. Must be implemented in frontEnd
    */
