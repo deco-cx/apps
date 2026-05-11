@@ -43,7 +43,7 @@ const snippet = () => {
   }
   // 2000 bytes limit
   const truncate = (str: string) => `${str}`.slice(0, 990);
-  // setup plausible script and unsubscribe
+  // setup tracking script and unsubscribe
   globalThis.window.DECO.events.subscribe((event) => {
     if (!event || event.name !== "deco") {
       return;
