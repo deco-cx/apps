@@ -2,17 +2,11 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/DecoAnalyticsScript.ts";
-import * as $$$1 from "./loaders/OneDollarScript.ts";
-import * as $$$$$$0 from "./sections/Analytics/DecoAnalytics.tsx";
+import * as $$$0 from "./loaders/OneDollarScript.ts";
 
 const manifest = {
   "loaders": {
-    "analytics/loaders/DecoAnalyticsScript.ts": $$$0,
-    "analytics/loaders/OneDollarScript.ts": $$$1,
-  },
-  "sections": {
-    "analytics/sections/Analytics/DecoAnalytics.tsx": $$$$$$0,
+    "analytics/loaders/OneDollarScript.ts": $$$0,
   },
   "name": "analytics",
   "baseUrl": import.meta.url,

@@ -257,7 +257,7 @@ const snippet = ({ siteId, siteName, serviceEndpoint, userId, sessionId }: {
       utm_content: getUrlParam("utm_content"),
       utm_term: getUrlParam("utm_term"),
       referrer: document.referrer,
-      referrer_source: getReferrerSource(document.referrer), // benchmark: plausible
+      referrer_source: getReferrerSource(document.referrer),
       ip_city: undefined, // get server side
       ip_continent: undefined, // get server side
       ip_country: undefined, // get server side
