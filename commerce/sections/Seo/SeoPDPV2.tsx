@@ -114,11 +114,11 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
 }
 
 function Section(props: Props): SEOSection {
-  return <Seo {...props} />;
+  return <Seo {...props} type="product" />;
 }
 
 export function LoadingFallback(props: Partial<Props>) {
-  return <Seo {...props} />;
+  return <Seo {...props} type="product" />;
 }
 
 export { default as Preview } from "../../../website/components/_seo/Preview.tsx";
