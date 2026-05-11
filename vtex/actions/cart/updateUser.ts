@@ -1,5 +1,8 @@
 import { AppContext } from "../../mod.ts";
-import { getEffectiveCookieHeader, proxySetCookie } from "../../utils/cookies.ts";
+import {
+  getEffectiveCookieHeader,
+  proxySetCookie,
+} from "../../utils/cookies.ts";
 import { parseCookie } from "../../utils/orderForm.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
 import { logger } from "@deco/deco/o11y";

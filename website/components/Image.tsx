@@ -1,6 +1,10 @@
 import { Head, IS_BROWSER } from "$fresh/runtime.ts";
 import type { JSX } from "preact";
 import { forwardRef } from "preact/compat";
+import { Manifest } from "../manifest.gen.ts";
+
+export const PATH: `/live/invoke/${keyof Manifest["loaders"]}` =
+  "/live/invoke/website/loaders/image.ts";
 
 const DEFAULT_CDN_HOST = "https://decoims.com";
 
