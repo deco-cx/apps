@@ -1,6 +1,8 @@
 import { Head, IS_BROWSER } from "$fresh/runtime.ts";
 import type { JSX } from "preact";
+import { createContext } from "preact";
 import { forwardRef } from "preact/compat";
+import { useContext } from "preact/hooks";
 
 const DEFAULT_CDN_HOST = "https://decoims.com";
 
@@ -73,6 +75,10 @@ const bypassDecoImageOptimization = () =>
     : Deno.env.get("BYPASS_DECO_IMAGE_OPTIMIZATION") === "true";
 
 export type QualityOptions = "low" | "medium" | "high" | "original"; // 60% - 70% - 80% - 100%
+
+export const DefaultImageQualityContext = createContext<
+  QualityOptions | undefined
+>(undefined);
 
 interface OptimizationOptions {
   originalSrc: string;
@@ -302,6 +308,8 @@ export const getEarlyHintFromSrcProps = (srcProps: {
 
 const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
   const { preload, loading = "lazy" } = props;
+  const defaultQuality = useContext(DefaultImageQualityContext);
+  const quality = props.quality ?? defaultQuality;
 
   const shouldSetEarlyHint = !!props.setEarlyHint && preload;
   const srcSet = props.srcSet ??
@@ -311,7 +319,7 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
       props.height,
       props.fit,
       shouldSetEarlyHint ? FACTORS.slice(-1) : FACTORS,
-      props.quality,
+      quality,
     );
 
   const linkProps = srcSet &&
@@ -337,7 +345,7 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
         height: props.height,
         fetchpriority: props.fetchPriority,
         src: props.src,
-        quality: props.quality,
+        quality,
       }),
     );
   }

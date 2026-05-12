@@ -14,6 +14,7 @@ interface FeatureFlags {
   bypassPlatformImageOptimization: boolean;
   bypassDecoImageOptimization: boolean;
   cdnHost: string;
+  defaultImageQuality?: string;
 }
 declare global {
   interface Window {
