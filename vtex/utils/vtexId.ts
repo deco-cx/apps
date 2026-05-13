@@ -13,6 +13,19 @@ interface CookiePayload {
   userId: string;
 }
 
+export const parseAuthCookie = (headers: Headers) => {
+  const cookies = getCookies(headers);
+  const token = cookies[VTEX_ID_CLIENT_COOKIE] ||
+    Object.entries(cookies).find(([k]) =>
+      k.startsWith(`${VTEX_ID_CLIENT_COOKIE}_`)
+    )?.[1];
+
+  if (!token) return null;
+
+  const decoded = decode(token);
+  return decoded?.[1] as CookiePayload | undefined ?? null;
+};
+
 export const parseCookie = (headers: Headers, account: string) => {
   const cookies = getCookies(headers);
   const cookie = cookies[VTEX_ID_CLIENT_COOKIE] ||
