@@ -1,6 +1,6 @@
 import "./utils/unhandledRejection.ts";
 import type { Props as Seo } from "./components/Seo.tsx";
-import type { QualityOptions } from "./components/Image.tsx";
+import type { DefaultQualityOptions } from "./components/Image.tsx";
 import { Routes } from "./flags/audience.ts";
 import { TextReplace } from "./handlers/proxy.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
@@ -148,7 +148,7 @@ export interface Props {
    * @title Default Image Quality
    * @description The default quality for images when not explicitly set per component
    */
-  defaultImageQuality?: QualityOptions;
+  defaultImageQuality?: DefaultQualityOptions;
 
   /**
    * @title Disable image/asset proxy for this site

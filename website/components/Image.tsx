@@ -75,6 +75,7 @@ const bypassDecoImageOptimization = () =>
     : Deno.env.get("BYPASS_DECO_IMAGE_OPTIMIZATION") === "true";
 
 export type QualityOptions = "low" | "medium" | "high" | "original"; // 60% - 70% - 80% - 100%
+export type DefaultQualityOptions = "low" | "medium" | "high";
 
 export const DefaultImageQualityContext = createContext<
   QualityOptions | undefined
@@ -228,7 +229,9 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   params.set("fit", fit);
   params.set("width", `${width}`);
   height && params.set("height", `${height}`);
-  quality && params.set("quality", quality);
+  const srcQuality = quality ||
+    new URL(originalSrc).searchParams.get("quality");
+  srcQuality && params.set("quality", srcQuality);
 
   // Strip known CDN prefixes so the worker can hit GCS directly instead of
   // doing an absolute-URL hop. Anything left (path + any query string —
