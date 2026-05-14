@@ -21,6 +21,17 @@ const PATHS_TO_PROXY = [
 
 export const VTEX_PATHS_THAT_REQUIRES_SAME_REFERER = ["/no-cache/AviseMe.aspx"];
 
+/**
+ * Per-pattern Cache-Control overrides for VTEX-proxied paths that ship
+ * `no-store` defensively but are safe to cache for several minutes.
+ * Patterns must match an entry in PATHS_TO_PROXY (or extraPaths) verbatim.
+ * The override is applied only on 2xx responses and strips Set-Cookie.
+ */
+const DEFAULT_CACHE_OVERRIDES: Record<string, string> = {
+  "/XMLData/*":
+    "public, max-age=300, s-maxage=300, stale-while-revalidate=600",
+};
+
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
 const buildProxyRoutes = (
@@ -33,6 +44,7 @@ const buildProxyRoutes = (
     excludePathsFromDecoSiteMap,
     includeScriptsToHead,
     includeScriptsToBody,
+    cacheOverrides,
   }: {
     publicUrl?: string;
     extraPaths: string[];
@@ -46,6 +58,7 @@ const buildProxyRoutes = (
     includeScriptsToBody?: {
       includes?: Script[];
     };
+    cacheOverrides?: Record<string, string>;
   },
 ) => {
   if (!publicUrl) {
@@ -68,7 +81,11 @@ const buildProxyRoutes = (
     const urlToProxy = `https://${hostname}`;
     const hostToUse = hostname;
 
+    const overrides = { ...DEFAULT_CACHE_OVERRIDES, ...(cacheOverrides ?? {}) };
+
     const routeFromPath = (pathTemplate: string): Route => {
+      const cacheControlOverride = overrides[pathTemplate];
+
       const handlerValue = {
         __resolveType: "website/handlers/proxy.ts",
         url: urlToProxy,
@@ -77,6 +94,7 @@ const buildProxyRoutes = (
         includeScriptsToBody,
         removeDirtyCookies: true,
         pathsThatRequireSameReferer: VTEX_PATHS_THAT_REQUIRES_SAME_REFERER,
+        ...(cacheControlOverride ? { cacheControlOverride } : {}),
       };
 
       return ({
@@ -161,6 +179,14 @@ export interface Props {
   includeScriptsToBody?: {
     includes?: Script[];
   };
+  /**
+   * @title Cache-Control overrides per proxied path
+   * @description Map of path patterns to Cache-Control values. Applied only
+   * on 2xx responses; strips Set-Cookie. Use for VTEX endpoints that return
+   * `no-store` defensively but are safe to cache (e.g. /XMLData/*).
+   * Defaults already include /XMLData/* with a 5-min TTL.
+   */
+  cacheOverrides?: Record<string, string>;
 }
 
 /**
@@ -176,6 +202,7 @@ function loader(
     excludePathsFromDecoSiteMap = [],
     includeScriptsToHead = { includes: [] },
     includeScriptsToBody = { includes: [] },
+    cacheOverrides,
   }: Props,
   _req: Request,
   ctx: AppContext,
@@ -189,6 +216,7 @@ function loader(
     extraPaths: extraPathsToProxy,
     includeScriptsToHead,
     includeScriptsToBody,
+    cacheOverrides,
   });
 }
 
