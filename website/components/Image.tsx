@@ -74,9 +74,15 @@ const bypassDecoImageOptimization = () =>
     ? (globalThis as any).DECO?.featureFlags?.bypassDecoImageOptimization
     : Deno.env.get("BYPASS_DECO_IMAGE_OPTIMIZATION") === "true";
 
+/** Quality options available per component (includes "original" = 100%). */
 export type QualityOptions = "low" | "medium" | "high" | "original"; // 60% - 70% - 80% - 100%
+
+/** Quality options for the site-wide default in mod.ts — "original" is excluded
+ *  because a global 100% quality default would hurt performance. */
 export type DefaultQualityOptions = "low" | "medium" | "high";
 
+/** Provides the site-wide default quality to Image/Picture components.
+ *  Typed as QualityOptions because components may override with "original". */
 export const DefaultImageQualityContext = createContext<
   QualityOptions | undefined
 >(undefined);
