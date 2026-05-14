@@ -4,6 +4,7 @@ import { ComponentChildren, createContext, JSX } from "preact";
 import { Head, IS_BROWSER } from "$fresh/runtime.ts";
 
 import {
+  DefaultImageQualityContext,
   FACTORS,
   getEarlyHintFromSrcProps,
   getSrcSet,
@@ -39,6 +40,8 @@ type SourceProps =
 export const Source = forwardRef<HTMLSourceElement, SourceProps>(
   (props, ref) => {
     const { preload } = useContext(Context);
+    const defaultQuality = useContext(DefaultImageQualityContext);
+    const quality = props.quality ?? defaultQuality;
 
     const shouldSetEarlyHint = !!props.setEarlyHint && preload;
     const srcSet = getSrcSet(
@@ -47,7 +50,7 @@ export const Source = forwardRef<HTMLSourceElement, SourceProps>(
       props.height,
       undefined,
       shouldSetEarlyHint ? FACTORS.slice(-1) : FACTORS,
-      props.quality,
+      quality,
     );
     const linkProps = {
       imagesrcset: srcSet,
@@ -68,7 +71,7 @@ export const Source = forwardRef<HTMLSourceElement, SourceProps>(
           height: props.height,
           fetchpriority: props.fetchPriority,
           src: props.src,
-          quality: props.quality,
+          quality,
         }),
       );
     }

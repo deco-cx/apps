@@ -16,6 +16,7 @@ import {
 import { logger } from "@deco/deco/o11y";
 import { Component, JSX } from "preact";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
+import { DefaultImageQualityContext } from "../components/Image.tsx";
 import OneDollarStats from "../components/OneDollarStats.tsx";
 import Events from "../components/Events.tsx";
 import { SEOSection } from "../components/Seo.tsx";
@@ -106,13 +107,14 @@ function Page(
     seo,
     unindexedDomain,
     avoidRedirectingToEditor,
+    defaultImageQuality,
   }: SectionProps<typeof loader>,
 ): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
   return (
-    <>
+    <DefaultImageQualityContext.Provider value={defaultImageQuality}>
       {unindexedDomain && (
         <Head>
           <meta name="robots" content="noindex, nofollow" />
@@ -148,7 +150,7 @@ function Page(
         )}
         {sections?.map(renderSection)}
       </ErrorBoundary>
-    </>
+    </DefaultImageQualityContext.Provider>
   );
 }
 
@@ -183,13 +185,14 @@ export const loader = async (
     devMode,
     unindexedDomain,
     avoidRedirectingToEditor: ctx.avoidRedirectingToEditor,
+    defaultImageQuality: ctx.defaultImageQuality,
   };
 };
 export function Preview(props: SectionProps<typeof loader>) {
-  const { sections, seo } = props;
+  const { sections, seo, defaultImageQuality } = props;
   const deco = useDeco();
   return (
-    <>
+    <DefaultImageQualityContext.Provider value={defaultImageQuality}>
       <Head>
         <meta name="robots" content="noindex, nofollow" />
       </Head>
@@ -197,7 +200,7 @@ export function Preview(props: SectionProps<typeof loader>) {
       {seo && renderSection(seo)}
       <Events deco={deco} />
       {sections?.map(renderSection)}
-    </>
+    </DefaultImageQualityContext.Provider>
   );
 }
 const PAGE_NOT_FOUND = -1;
