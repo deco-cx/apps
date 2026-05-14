@@ -230,7 +230,7 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   params.set("width", `${width}`);
   height && params.set("height", `${height}`);
   const srcQuality = quality ||
-    new URL(originalSrc).searchParams.get("quality");
+    new URL(originalSrc, "https://a.com").searchParams.get("quality");
   srcQuality && params.set("quality", srcQuality);
 
   // Strip known CDN prefixes so the worker can hit GCS directly instead of
