@@ -78,7 +78,7 @@ export type QualityOptions = "low" | "medium" | "high" | "original"; // 60% - 70
 export type DefaultQualityOptions = "low" | "medium" | "high";
 
 export const DefaultImageQualityContext = createContext<
-  QualityOptions | undefined
+  DefaultQualityOptions | undefined
 >(undefined);
 
 interface OptimizationOptions {
