@@ -21,6 +21,16 @@ Open this repo in an AI Editor and use [NewAppPrompt.md](NewAppPrompt.md) as pro
 
 ---
 
+## Pre-release channel
+
+Stable releases ship from `main` (`apps@X.Y.Z`). Pre-releases ship from the `next` branch as `apps@X.Y.Z-next.N` and let you opt-in to in-progress changes. Pin an exact tag:
+
+```jsonc
+"apps/": "https://cdn.jsdelivr.net/gh/deco-cx/apps@<X.Y.Z-next.N>/"
+```
+
+`deno task update` filters out semver prereleases by default, so sites stay on stable unless you explicitly pin a `-next.N` version.
+
 ## Debugging HTTP Requests
 
 To enable verbose HTTP request debugging logs, set the environment variable `DEBUG_HTTP` to `true` when running this repo:
