@@ -86,6 +86,15 @@ export interface Props {
   removeDirtyCookies?: boolean;
   excludeHeaders?: string[];
   pathsThatRequireSameReferer?: string[];
+  /**
+   * @description Override the upstream Cache-Control header. When set, also
+   * strips Set-Cookie from the response (since a cacheable proxy response can
+   * never carry per-user cookies). Use this for VTEX passthrough endpoints
+   * that return public static data (e.g. /XMLData/*, /ads.txt) but ship
+   * `no-store` defensively.
+   * @example public, max-age=300, s-maxage=300, stale-while-revalidate=600
+   */
+  cacheControlOverride?: string;
 }
 /**
  * @title Proxy
@@ -104,6 +113,7 @@ export default function Proxy({
   replaces,
   removeDirtyCookies = false,
   pathsThatRequireSameReferer = [],
+  cacheControlOverride,
 }: Props): Handler {
   return async (req, _ctx) => {
     const url = new URL(req.url);
@@ -226,6 +236,14 @@ export default function Proxy({
           text = text?.replaceAll(from, to);
         });
       }
+    }
+    // Override Cache-Control for proxied static data endpoints (e.g. VTEX
+    // /XMLData/*) that defensively ship `no-store` from upstream. We must also
+    // strip Set-Cookie because a cacheable response cannot carry per-user
+    // cookies. Only applied on 2xx — never override error responses.
+    if (cacheControlOverride && response.ok) {
+      responseHeaders.delete("set-cookie");
+      responseHeaders.set("cache-control", cacheControlOverride);
     }
     return new Response(text || newBody, {
       status: response.status,

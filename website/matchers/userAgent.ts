@@ -21,3 +21,10 @@ const MatchUserAgent = (
   return regexMatch && includesFound;
 };
 export default MatchUserAgent;
+
+// Deterministic per UA (same input → same result), and the framework's edge
+// already discriminates by device/UA when needed (see `device.ts`, also
+// cacheable). Marking this cacheable lets pages that use UA-based bot/browser
+// splits stay cacheable instead of being globally killed by the
+// `allFlagsCacheable` gate in deco runtime middleware.
+export const cacheable = true;
