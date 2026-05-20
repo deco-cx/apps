@@ -148,7 +148,7 @@ export default function VTEX(
     fetcher: fetchSafe,
   });
   const vcsDeprecated = createHttpClient<VTEXCommerceStable>({
-    base: publicUrl,
+    base: `https://${account}.vtexcommercestable.com.br`,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
