@@ -19,7 +19,7 @@ REPO="${SITE_OWNER}/${SITE_REPO}"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "${TMP_DIR}"' EXIT
 
-log() { echo "[${REPO}] $*"; }
+log() { echo "[${REPO}] $*" >&2; }
 
 # api METHOD PATH [JSON_BODY] [OUTPUT_FILE]
 # Prints HTTP status. Writes body to OUTPUT_FILE (default /dev/null).
@@ -113,7 +113,12 @@ if [[ "${status}" == "404" ]]; then
   CREATE_REF_FILE="${TMP_DIR}/create-ref.json"
   status=$(api_retry POST "/repos/${REPO}/git/refs" "${create_body}" "${CREATE_REF_FILE}")
   [[ "${status}" == "201" ]] || fail "Failed to create branch (HTTP ${status})" "${CREATE_REF_FILE}"
-  BRANCH_FILE_SHA="${MAIN_FILE_SHA}"
+
+  # Re-fetch SHA from the new branch (main may have moved since we last read it)
+  BRANCH_FILE="${TMP_DIR}/branch-file.json"
+  status=$(api_retry GET "/repos/${REPO}/contents/${APP_PATH}?ref=${BRANCH_NAME}" "" "${BRANCH_FILE}")
+  [[ "${status}" == "200" ]] || fail "Failed to read ${APP_PATH} from ${BRANCH_NAME} (HTTP ${status})" "${BRANCH_FILE}"
+  BRANCH_FILE_SHA=$(jq -r '.sha' "${BRANCH_FILE}")
 
 elif [[ "${status}" == "200" ]]; then
   BRANCH_FILE="${TMP_DIR}/branch-file.json"
@@ -184,13 +189,23 @@ if [[ -n "${PR_NUMBER}" ]]; then
   status=$(api_retry PATCH "/repos/${REPO}/pulls/${PR_NUMBER}" "${patch_body}" "${PATCH_FILE}")
   [[ "${status}" == "200" ]] || fail "Failed to update PR (HTTP ${status})" "${PATCH_FILE}"
 
-  # Convert to draft via GraphQL
+  # Ensure label is present on reused PRs too
+  add_label_body=$(jq -n --arg l "${LABEL_NAME}" '{labels: [$l]}')
+  ADD_LABEL_FILE="${TMP_DIR}/add-label-update.json"
+  status=$(api_retry POST "/repos/${REPO}/issues/${PR_NUMBER}/labels" "${add_label_body}" "${ADD_LABEL_FILE}")
+  [[ "${status}" == "200" ]] || log "  Warning: could not add label (HTTP ${status})"
+
+  # Convert to draft via GraphQL (using variables to avoid unquoted ID)
   if [[ -n "${PR_NODE_ID}" ]]; then
     DRAFT_FILE="${TMP_DIR}/draft.json"
     draft_query=$(jq -n --arg id "${PR_NODE_ID}" \
-      '{query: "mutation { convertPullRequestToDraft(input: {pullRequestId: \($id)}) { pullRequest { isDraft } } }"}')
+      '{query: "mutation ConvertToDraft($id: ID!) { convertPullRequestToDraft(input: {pullRequestId: $id}) { pullRequest { isDraft } } }", variables: {id: $id}}')
     status=$(api_retry POST "/graphql" "${draft_query}" "${DRAFT_FILE}")
-    [[ "${status}" == "200" ]] || log "  Warning: could not convert PR to draft (HTTP ${status})"
+    if [[ "${status}" != "200" ]]; then
+      log "  Warning: could not convert PR to draft (HTTP ${status})"
+    elif jq -e '.errors' "${DRAFT_FILE}" > /dev/null 2>&1; then
+      log "  Warning: GraphQL error: $(jq -r '.errors[0].message // "unknown"' "${DRAFT_FILE}")"
+    fi
   fi
 else
   log "  Opening new draft PR"
