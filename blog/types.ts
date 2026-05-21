@@ -26,9 +26,6 @@ export interface Category {
   parent?: Category;
 }
 
-/**
- * @titleBy title
- */
 export interface BlogPost {
   title: string;
   excerpt: string;
@@ -62,7 +59,8 @@ export interface BlogPost {
   content?: string;
   /**
    * @title Sections
-   * @description Adicione seções de conteúdo (PostTitle, PostText, PostImage)
+   * @label hidden
+   * @changeable true
    */
   sections?: Section[];
   /**
@@ -74,6 +72,7 @@ export interface BlogPost {
   relatedPosts?: BlogPost[];
   /**
    * @title Carousel in post content
+   * @description add a carousel in the middle of the post. Must be implemented in frontEnd
    */
   imageCarousel?: ImageCarousel;
   /**
