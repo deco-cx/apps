@@ -1,7 +1,6 @@
 import { ImageWidget } from "../admin/widgets.ts";
 import { PageInfo, Person, Thing } from "../commerce/types.ts";
 import { type Section } from "@deco/deco/blocks";
-import { Product } from "../commerce/types.ts";
 
 /**
  * @titleBy name
