@@ -86,26 +86,6 @@ export interface Props {
   removeDirtyCookies?: boolean;
   excludeHeaders?: string[];
   pathsThatRequireSameReferer?: string[];
-  /**
-   * @description Override Cache-Control on proxied responses. Use when the
-   *              upstream (e.g. VTEX IO) sends a Cache-Control that does not
-   *              match the resource's true cacheability — for example
-   *              versioned static assets at /files/*?v=HASH which are
-   *              immutable but get short upstream TTLs.
-   *
-   *              When matchQueryParam is set, the override only applies if
-   *              that query param is present on the incoming request URL.
-   *              This lets you safely opt in only the versioned variant of a
-   *              path (e.g. matchQueryParam: "v" → /files/x.js?v=abc gets
-   *              overridden, /files/x.js does not).
-   *
-   *              Only applied when the upstream response is 2xx, so error
-   *              responses retain their upstream caching semantics.
-   */
-  cacheControl?: {
-    value: string;
-    matchQueryParam?: string;
-  };
 }
 /**
  * @title Proxy
@@ -124,7 +104,6 @@ export default function Proxy({
   replaces,
   removeDirtyCookies = false,
   pathsThatRequireSameReferer = [],
-  cacheControl,
 }: Props): Handler {
   return async (req, _ctx) => {
     const url = new URL(req.url);
@@ -237,13 +216,6 @@ export default function Proxy({
       const location = responseHeaders.get("location");
       if (location) {
         responseHeaders.set("location", location.replace(proxyUrl, url.origin));
-      }
-    }
-    if (cacheControl && response.ok) {
-      const matches = !cacheControl.matchQueryParam ||
-        url.searchParams.has(cacheControl.matchQueryParam);
-      if (matches) {
-        responseHeaders.set("Cache-Control", cacheControl.value);
       }
     }
     let text: undefined | string = undefined;

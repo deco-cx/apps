@@ -68,17 +68,6 @@ const buildProxyRoutes = (
     const urlToProxy = `https://${hostname}`;
     const hostToUse = hostname;
 
-    // Versioned VTEX static assets (e.g. /files/foo.css?v=HASH) are immutable
-    // by definition: the hash changes whenever the content does. VTEX upstream
-    // serves them with short TTLs, so we force `immutable` on the proxy hop
-    // when the request carries a `v` query param. Unversioned variants of the
-    // same path keep upstream Cache-Control.
-    const IMMUTABLE_ASSET_PATHS = new Set([
-      "/files/*",
-      "/assets/*",
-      "/arquivos/*",
-    ]);
-
     const routeFromPath = (pathTemplate: string): Route => {
       const handlerValue = {
         __resolveType: "website/handlers/proxy.ts",
@@ -88,12 +77,6 @@ const buildProxyRoutes = (
         includeScriptsToBody,
         removeDirtyCookies: true,
         pathsThatRequireSameReferer: VTEX_PATHS_THAT_REQUIRES_SAME_REFERER,
-        ...(IMMUTABLE_ASSET_PATHS.has(pathTemplate) && {
-          cacheControl: {
-            value: "public, max-age=31536000, immutable",
-            matchQueryParam: "v",
-          },
-        }),
       };
 
       return ({
