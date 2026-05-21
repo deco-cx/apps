@@ -56,17 +56,6 @@ export const FACTORS = [1, 2];
 
 type FitOptions = "contain" | "cover";
 
-// By default we use the platform image optimization, with functions like:
-// optimizeVTEX, optimizeWake, optmizeShopify
-// if you want to use deco optimization
-// you can set the BYPASS_PLATFORM_IMAGE_OPTIMIZATION environment variable to true
-// Default is false
-const bypassPlatformImageOptimization = () =>
-  IS_BROWSER
-    // deno-lint-ignore no-explicit-any
-    ? (globalThis as any).DECO?.featureFlags?.bypassPlatformImageOptimization
-    : Deno.env.get("BYPASS_PLATFORM_IMAGE_OPTIMIZATION") === "true";
-
 // Default is false
 const bypassDecoImageOptimization = () =>
   IS_BROWSER
@@ -196,34 +185,32 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
   if (originalSrc.startsWith("data:")) {
     return originalSrc;
   }
-  if (!bypassPlatformImageOptimization()) {
-    if (originalSrc.startsWith("https://media-storage.soureicdn.com")) {
-      return optimizeSourei(opts);
-    }
+  if (originalSrc.startsWith("https://media-storage.soureicdn.com")) {
+    return optimizeSourei(opts);
+  }
 
-    if (originalSrc.includes("media/catalog/product")) {
-      return optimizeMagento(opts);
-    }
+  if (originalSrc.includes("media/catalog/product")) {
+    return optimizeMagento(opts);
+  }
 
-    if (originalSrc.includes("fbitsstatic.net/img/")) {
-      return optimizeWake(opts);
-    }
+  if (originalSrc.includes("fbitsstatic.net/img/")) {
+    return optimizeWake(opts);
+  }
 
-    if (originalSrc.startsWith("https://cdn.vnda.")) {
-      return optmizeVNDA(opts);
-    }
+  if (originalSrc.startsWith("https://cdn.vnda.")) {
+    return optmizeVNDA(opts);
+  }
 
-    if (originalSrc.startsWith("https://cdn.shopify.com")) {
-      return optmizeShopify(opts);
-    }
+  if (originalSrc.startsWith("https://cdn.shopify.com")) {
+    return optmizeShopify(opts);
+  }
 
-    if (
-      /(vteximg.com.br|vtexassets.com|myvtex.com)\/arquivos\/ids\/\d+/.test(
-        originalSrc,
-      )
-    ) {
-      return optimizeVTEX(opts);
-    }
+  if (
+    /(vteximg.com.br|vtexassets.com|myvtex.com)\/arquivos\/ids\/\d+/.test(
+      originalSrc,
+    )
+  ) {
+    return optimizeVTEX(opts);
   }
 
   if (bypassDecoImageOptimization()) {
