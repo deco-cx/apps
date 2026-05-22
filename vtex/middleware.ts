@@ -1,5 +1,5 @@
 import { getCookies } from "std/http/cookie.ts";
-import { PAGE_DIRTY_KEY } from "@deco/deco/blocks";
+import { PAGE_CACHE_ALLOWED_KEY } from "@deco/deco/blocks";
 import { AppMiddlewareContext } from "./mod.ts";
 import {
   getISCookiesFromBag,
@@ -36,9 +36,9 @@ export const middleware = (
 
   const cacheable = isCacheableSegment(ctx) && !isLoggedIn;
 
-  // PAGE_DIRTY_KEY: marks page dirty for section-level caching and other consumers
-  if (!cacheable) {
-    ctx.bag.set(PAGE_DIRTY_KEY, true);
+  if (cacheable) {
+    ctx.bag.set(PAGE_CACHE_ALLOWED_KEY, true);
+  } else {
     ctx.response.headers.set(
       "Cache-Control",
       "no-store, no-cache, must-revalidate",
