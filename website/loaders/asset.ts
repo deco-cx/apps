@@ -36,7 +36,24 @@ const loader = async (
     });
   }
 
-  const original = await fetchSafe(url.href, STALE);
+  // Some origins (notably fonts.gstatic.com, which declares
+  // `Vary: Sec-Fetch-Dest, Sec-Fetch-Mode, Sec-Fetch-Site`) degrade the
+  // response Content-Type when Fetch Metadata headers are missing — e.g.
+  // returning `text/html` for a `wOF2` binary, which then trips the
+  // Content-Type guard below and surfaces as a 403 to the client. Preserve
+  // the browser's original Fetch Metadata so upstream behaves the same as
+  // it would for a direct request.
+  const forwardedHeaders = new Headers();
+  for (const [name, value] of request.headers) {
+    if (name.toLowerCase().startsWith("sec-fetch-")) {
+      forwardedHeaders.set(name, value);
+    }
+  }
+
+  const original = await fetchSafe(url.href, {
+    ...STALE,
+    headers: forwardedHeaders,
+  });
   const response = new Response(original.body, original);
 
   // Check if the request's Accept header includes "text/html"
