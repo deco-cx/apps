@@ -16,6 +16,7 @@ import {
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toProduct } from "../utils/transform.ts";
 import { LanguageContextArgs, Metafield } from "../utils/types.ts";
+import { parseProductSlug } from "../utils/utils.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -55,9 +56,7 @@ const loader = async (
   const { storefront } = ctx;
   const { slug, count, languageCode = "PT", countryCode = "BR" } = props;
 
-  const splitted = slug?.split("-");
-  const maybeSkuId = Number(splitted[splitted.length - 1]);
-  const handle = splitted.slice(0, maybeSkuId ? -1 : undefined).join("-");
+  const { handle } = parseProductSlug(slug);
   const metafields = props.metafields || [];
 
   const query = await storefront.query<
@@ -109,13 +108,11 @@ export const cacheKey = (props: Props, req: Request): string => {
 
   const searchParams = new URLSearchParams();
 
-  // Core parameters
   searchParams.append("slug", slug);
   searchParams.append("count", count.toString());
   searchParams.append("languageCode", languageCode);
   searchParams.append("countryCode", countryCode);
 
-  // Add metafields to cache key if they exist
   if (metafields?.length) {
     const metafieldsKey = metafields
       .map((m) => `${m.namespace}.${m.key}`)
@@ -124,7 +121,6 @@ export const cacheKey = (props: Props, req: Request): string => {
     searchParams.append("metafields", metafieldsKey);
   }
 
-  // Sort parameters for consistent cache keys
   searchParams.sort();
 
   const url = new URL(req.url);
