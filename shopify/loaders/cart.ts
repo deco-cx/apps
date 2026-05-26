@@ -4,26 +4,68 @@ import { CreateCart, GetCart } from "../utils/storefront/queries.ts";
 import {
   CountryCode,
   CreateCartMutation,
+  CreateCartMutationVariables,
   GetCartQuery,
   GetCartQueryVariables,
   LanguageCode,
 } from "../utils/storefront/storefront.graphql.gen.ts";
-import { LanguageContextArgs } from "../utils/types.ts";
 
 export interface Props {
   /**
    * @title Language Code
-   * @description Language code for the storefront API
-   * @example "EN" for English, "FR" for French, etc.
+   * @example "EN" for English, "IT" for Italian, "FR" for French.
    */
   languageCode?: LanguageCode;
   /**
    * @title Country Code
-   * @description Country code for the storefront API
-   * @example "US" for United States, "FR" for France, etc.
+   * @description Must match an active market in Shopify Admin.
+   * @example "IT" for Italy/Europe, "FR" for France.
    */
   countryCode?: CountryCode;
 }
+
+interface GraphQLError {
+  message: string;
+  extensions?: { code?: string };
+}
+
+const isGraphQLError = (e: unknown): e is GraphQLError =>
+  typeof e === "object" && e !== null && "message" in e;
+
+const isNotFoundError = (errors: unknown): boolean =>
+  Array.isArray(errors) &&
+  errors.some(
+    (e) =>
+      isGraphQLError(e) &&
+      (e.extensions?.code === "NOT_FOUND" || e.message === "Not Found"),
+  );
+
+const createNewCart = async (
+  storefront: AppContext["storefront"],
+  countryCode: CountryCode,
+  languageCode: LanguageCode,
+): Promise<string | null> => {
+  const result = await storefront.query<
+    CreateCartMutation,
+    CreateCartMutationVariables
+  >({
+    variables: { countryCode, languageCode },
+    ...CreateCart,
+  });
+
+  return result.payload?.cart?.id ?? null;
+};
+
+const fetchCart = (
+  storefront: AppContext["storefront"],
+  cartId: string,
+  countryCode: CountryCode,
+  languageCode: LanguageCode,
+): Promise<GetCartQuery["cart"]> =>
+  storefront.query<GetCartQuery, GetCartQueryVariables>({
+    variables: { id: cartId, languageCode, countryCode },
+    ...GetCart,
+  }).then((data) => data.cart);
 
 const loader = async (
   props: Props,
@@ -32,36 +74,30 @@ const loader = async (
 ): Promise<GetCartQuery["cart"]> => {
   const { languageCode = "PT", countryCode = "BR" } = props;
   const { storefront } = ctx;
-  const maybeCartId = getCartCookie(req.headers);
 
-  let cartId: string | null = maybeCartId;
+  let cartId: string | null = getCartCookie(req.headers);
 
   if (!cartId) {
-    const createResult = await storefront.query<
-      CreateCartMutation,
-      LanguageContextArgs
-    >({
-      variables: { languageCode, countryCode },
-      ...CreateCart,
-    });
-    console.log("[CreateCart] Result:", JSON.stringify(createResult));
-    cartId = createResult.payload?.cart?.id ?? null;
+    cartId = await createNewCart(storefront, countryCode, languageCode);
   }
 
   if (!cartId) {
     throw new Error("Missing cart id");
   }
 
-  const cart = await storefront.query<
-    GetCartQuery,
-    GetCartQueryVariables & LanguageContextArgs
-  >({
-    variables: { id: cartId, languageCode, countryCode },
-    ...GetCart,
-  }).then((data) => data.cart);
+  let cart: GetCartQuery["cart"];
+  try {
+    cart = await fetchCart(storefront, cartId, countryCode, languageCode);
+  } catch (errors) {
+    if (!isNotFoundError(errors)) throw errors;
+
+    cartId = await createNewCart(storefront, countryCode, languageCode);
+    if (!cartId) throw new Error("Failed to create replacement cart");
+
+    cart = await fetchCart(storefront, cartId, countryCode, languageCode);
+  }
 
   setCartCookie(ctx.response.headers, cartId);
-
   return cart;
 };
 

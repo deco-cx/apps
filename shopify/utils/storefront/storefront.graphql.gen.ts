@@ -7751,12 +7751,12 @@ export type CartFragment = { id: string, checkoutUrl: any, totalQuantity: number
 export type CustomerFragment = { id: string, email?: string | null, firstName?: string | null, lastName?: string | null };
 
 export type CreateCartMutationVariables = Exact<{
-  languageCode?: InputMaybe<LanguageCode>;
   countryCode?: InputMaybe<CountryCode>;
+  languageCode?: InputMaybe<LanguageCode>;
 }>;
 
 
-export type CreateCartMutation = { payload?: { cart?: { id: string } | null } | null };
+export type CreateCartMutation = { payload?: { cart?: { id: string } | null, userErrors: Array<{ field?: Array<string> | null, message: string }> } | null };
 
 export type GetCartQueryVariables = Exact<{
   id: Scalars['ID']['input'];
