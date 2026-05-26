@@ -45,6 +45,11 @@ export interface Props {
    * @description VTEX Account name. For more info, read here: https://help.vtex.com/en/tutorial/o-que-e-account-name--i0mIGLcg3QyEy8OCicEoC.
    */
   account: string;
+    /**
+   * @title Store Name
+   * @description VTEX Store name For more info, read here: https://help.vtex.com/en/tutorial/account-details-page--2vhUVOKfCaswqLguT2F9xq#stores
+   */
+    subAccount?: string;
   /**
    * @title Public store URL
    * @description Domain that is registered on License Manager (e.g: secure.mystore.com.br) to enable account/checkout/api proxy. Important: dont use the same domain as the public store url, or it will create a loop and break the app.
@@ -70,12 +75,6 @@ export interface Props {
   /**
    * @title Default Segment
    */
-  /**
-   * @title Set Refresh Token
-   * @description Set the refresh token in the cookies in headless login actions (actions/authentication/*)
-   * @default false
-   */
-  setRefreshToken?: boolean;
   defaultSegment?: SegmentCulture;
   usePortalSitemap?: boolean;
   /**
@@ -120,7 +119,7 @@ export const color = 0xf71963;
  * @logo https://decoims.com/mcp/0d6e795b-cefd-4853-9a51-93b346c52c3f/VTEX.svg
  */
 export default function VTEX(
-  { appKey, appToken, account, publicUrl: _publicUrl, salesChannel, ...props }:
+  { appKey, appToken, account, subAccount, publicUrl: _publicUrl, salesChannel, ...props }:
     Props,
 ) {
   const publicUrl = _publicUrl?.startsWith("https://")
@@ -152,16 +151,13 @@ export default function VTEX(
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
-  const ioUrl = publicUrl.endsWith("/")
-    ? `${publicUrl}api/io/_v/private/graphql/v1`
-    : `${publicUrl}/api/io/_v/private/graphql/v1`;
   const io = createGraphqlClient({
-    endpoint: ioUrl,
+    endpoint:  `https://${subAccount || account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
   const vcs = createHttpClient<VCS>({
-    base: publicUrl,
+    base: `https://${account}.vtexcommercestable.com.br`,
     fetcher: fetchSafe,
     processHeaders: removeDirtyCookies,
     headers: headers,

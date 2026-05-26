@@ -17,7 +17,7 @@ const action = async (
   ctx: AppContext,
 ): Promise<WishlistItem[]> => {
   const { io } = ctx;
-  const { cookie, payload } = parseCookie(req.headers, ctx.account);
+  const { cookie, payload } = parseCookie(req.headers);
   const user = payload?.sub;
 
   if (!user) {

@@ -32,7 +32,7 @@ async function loader(
   ctx: AppContext,
 ): Promise<Person | null> {
   const { io } = ctx;
-  const { cookie, payload } = parseCookie(req.headers, ctx.account);
+  const { cookie, payload } = parseCookie(req.headers);
 
   if (!payload?.sub || !payload?.userId) {
     return null;

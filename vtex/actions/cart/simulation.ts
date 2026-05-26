@@ -1,4 +1,5 @@
 import { AppContext } from "../../mod.ts";
+import { parseCookieWithoutAuth } from "../../utils/orderForm.ts";
 import type { SimulationOrderForm } from "../../utils/types.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
 
@@ -25,7 +26,7 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<SimulationOrderForm> => {
-  const cookie = req.headers.get("cookie") ?? "";
+  const { cookie } = parseCookieWithoutAuth(req.headers);
   const { vcsDeprecated } = ctx;
   const { items, postalCode, country, RnbBehavior = 1 } = props;
   const segment = getSegmentFromBag(ctx);
