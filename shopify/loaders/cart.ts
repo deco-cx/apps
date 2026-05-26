@@ -4,7 +4,6 @@ import { CreateCart, GetCart } from "../utils/storefront/queries.ts";
 import {
   CountryCode,
   CreateCartMutation,
-  CreateCartMutationVariables,
   GetCartQuery,
   GetCartQueryVariables,
   LanguageCode,
@@ -35,10 +34,19 @@ const loader = async (
   const { storefront } = ctx;
   const maybeCartId = getCartCookie(req.headers);
 
-  const cartId = maybeCartId ||
-    await storefront.query<CreateCartMutation, CreateCartMutationVariables>(
-      CreateCart,
-    ).then((data) => data.payload?.cart?.id);
+  let cartId: string | null = maybeCartId;
+
+  if (!cartId) {
+    const createResult = await storefront.query<
+      CreateCartMutation,
+      LanguageContextArgs
+    >({
+      variables: { languageCode, countryCode },
+      ...CreateCart,
+    });
+    console.log("[CreateCart] Result:", JSON.stringify(createResult));
+    cartId = createResult.payload?.cart?.id ?? null;
+  }
 
   if (!cartId) {
     throw new Error("Missing cart id");

@@ -270,7 +270,10 @@ const Customer = gql`
 `;
 
 export const CreateCart = {
-  query: gql`mutation CreateCart {
+  query: gql`mutation CreateCart(
+    $languageCode: LanguageCode,
+    $countryCode: CountryCode
+  ) @inContext(language: $languageCode, country: $countryCode) {
     payload: cartCreate { 
       cart { id } 
     }

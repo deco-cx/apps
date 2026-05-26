@@ -7750,7 +7750,10 @@ export type CartFragment = { id: string, checkoutUrl: any, totalQuantity: number
 
 export type CustomerFragment = { id: string, email?: string | null, firstName?: string | null, lastName?: string | null };
 
-export type CreateCartMutationVariables = Exact<{ [key: string]: never; }>;
+export type CreateCartMutationVariables = Exact<{
+  languageCode?: InputMaybe<LanguageCode>;
+  countryCode?: InputMaybe<CountryCode>;
+}>;
 
 
 export type CreateCartMutation = { payload?: { cart?: { id: string } | null } | null };
