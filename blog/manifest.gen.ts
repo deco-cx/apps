@@ -2,9 +2,10 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/submitRating.ts";
-import * as $$$$$$$$$1 from "./actions/submitReview.ts";
-import * as $$$$$$$$$2 from "./actions/submitView.ts";
+import * as $$$$$$$$$0 from "./actions/importSpirePost.ts";
+import * as $$$$$$$$$1 from "./actions/submitRating.ts";
+import * as $$$$$$$$$2 from "./actions/submitReview.ts";
+import * as $$$$$$$$$3 from "./actions/submitView.ts";
 import * as $$$0 from "./loaders/Author.ts";
 import * as $$$4 from "./loaders/Blogpost.ts";
 import * as $$$1 from "./loaders/BlogPostItem.ts";
@@ -54,9 +55,10 @@ const manifest = {
     "blog/sections/Template.tsx": $$$$$$2,
   },
   "actions": {
-    "blog/actions/submitRating.ts": $$$$$$$$$0,
-    "blog/actions/submitReview.ts": $$$$$$$$$1,
-    "blog/actions/submitView.ts": $$$$$$$$$2,
+    "blog/actions/importSpirePost.ts": $$$$$$$$$0,
+    "blog/actions/submitRating.ts": $$$$$$$$$1,
+    "blog/actions/submitReview.ts": $$$$$$$$$2,
+    "blog/actions/submitView.ts": $$$$$$$$$3,
   },
   "name": "blog",
   "baseUrl": import.meta.url,
