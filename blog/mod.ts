@@ -199,6 +199,10 @@ export const preview = (
       : state.spireWebhookSecret?.get?.()
   );
 
+  const syncSecret = (typeof state?.spireWebhookSecret === "string"
+    ? state.spireWebhookSecret
+    : state?.spireWebhookSecret?.get?.()) || undefined;
+
   return {
     Component: PreviewContainer,
     props: {
@@ -214,6 +218,7 @@ export const preview = (
           content: h(SpireSyncPreviewTab, {
             isConfigured,
             blogSlug: state?.allowedBlogSlug,
+            syncSecret,
           }),
         },
       ],

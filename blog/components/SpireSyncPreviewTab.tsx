@@ -7,6 +7,7 @@ export interface Props {
   isConfigured: boolean;
   blogSlug?: string;
   spireUrl?: string;
+  syncSecret?: string;
 }
 
 /**
@@ -17,6 +18,7 @@ export default function SpireSyncPreviewTab({
   isConfigured,
   blogSlug,
   spireUrl = "https://spire.blog",
+  syncSecret,
 }: Props) {
   const id = useId();
 
@@ -235,9 +237,12 @@ export default function SpireSyncPreviewTab({
     resultEl.innerHTML = 'Importing posts from Spire, please wait…';
 
     try {
+      var secret = ${JSON.stringify(syncSecret ?? "")};
+      var headers = { 'Content-Type': 'application/json' };
+      if (secret) headers['Authorization'] = 'Bearer ' + secret;
       var res = await fetch('/live/invoke/blog/actions/syncAllPosts.ts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
         body: JSON.stringify({}),
       });
       var data = await res.json();

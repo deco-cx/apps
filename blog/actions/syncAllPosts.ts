@@ -1,7 +1,5 @@
 import { logger } from "@deco/deco/o11y";
-import { isAdmin } from "@deco/deco/utils";
-import { AppContext } from "../mod.ts";
-import { activeSyncs } from "../mod.ts";
+import { AppContext, activeSyncs } from "../mod.ts";
 import { importSpirePost, SPIRE_BASE_URL } from "../utils/spireImport.ts";
 
 export interface Props {
@@ -31,16 +29,24 @@ export default async function syncAllPosts(
   req: Request,
   ctx: AppContext,
 ): Promise<SyncResult> {
-  // 1. Admin-only guard
-  const origin = req.headers.get("origin") ?? req.headers.get("referer") ?? "";
-  if (!isAdmin(origin) && Deno.env.get("DECO_ENV") !== "development") {
+  // 1. Auth guard — accept webhook secret (from ctx or env) or dev mode
+  const expectedSecret = (typeof ctx.spireWebhookSecret === "string"
+    ? ctx.spireWebhookSecret
+    : ctx.spireWebhookSecret?.get?.()) ||
+    Deno.env.get("SPIRE_WEBHOOK_SECRET");
+
+  const providedToken = req.headers.get("Authorization")?.replace("Bearer ", "");
+  const isAuthenticated = (!!expectedSecret && providedToken === expectedSecret) ||
+    Deno.env.get("DECO_ENV") === "development";
+
+  if (!isAuthenticated) {
     return {
       success: false,
       synced: 0,
       failed: 0,
       skipped: 0,
       errors: [],
-      message: "Unauthorized: admin access required.",
+      message: "Unauthorized: configure Spire Webhook Secret in app settings.",
     };
   }
 
