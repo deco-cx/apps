@@ -20,8 +20,10 @@ export type State = {
 export type AppContext = FnContext<State, Manifest>;
 
 let isWatcherStarted = false;
+let latestState: State | null = null;
 
 function startBlogWatcher(state: State) {
+  latestState = state; // Sempre atualiza a referência com as credenciais/configurações mais recentes do Admin
   if (isWatcherStarted) return;
   isWatcherStarted = true;
 
@@ -78,7 +80,7 @@ function startBlogWatcher(state: State) {
                   }
 
                   // 3. Sync manual content updates back to Spire
-                  await notifySpireOfManualUpdate(post, state);
+                  await notifySpireOfManualUpdate(post);
                 }
               } catch {
                 // Ignore transient JSON parse or read conflicts on fast saves
@@ -91,25 +93,35 @@ function startBlogWatcher(state: State) {
       console.error("[BlogWatcher] Error in watchFs loop:", err);
       // Restart watcher in case of unexpected file system handle drops
       isWatcherStarted = false;
-      setTimeout(() => startBlogWatcher(state), 5000);
+      setTimeout(() => {
+        if (latestState) startBlogWatcher(latestState);
+      }, 5000);
     }
   })();
 }
 
-async function notifySpireOfManualUpdate(post: BlogPost, state: State) {
+async function notifySpireOfManualUpdate(post: BlogPost) {
+  const currentState = latestState;
+  if (!currentState) return;
+
   const expectedSecret =
-    (typeof state.spireWebhookSecret === "string"
-      ? state.spireWebhookSecret
-      : state.spireWebhookSecret?.get?.()) ||
+    (typeof currentState.spireWebhookSecret === "string"
+      ? currentState.spireWebhookSecret
+      : currentState.spireWebhookSecret?.get?.()) ||
     Deno.env.get("SPIRE_WEBHOOK_SECRET");
 
   if (!expectedSecret) return;
 
   const spireUrl = Deno.env.get("SPIRE_URL") || "https://spire.blog";
 
+  // Implement AbortController timeout to prevent watcher stall
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000); // 8-second limit
+
   try {
     const response = await fetch(`${spireUrl}/api/blog/posts/sync-manual`, {
       method: "POST",
+      signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${expectedSecret}`,
@@ -123,6 +135,8 @@ async function notifySpireOfManualUpdate(post: BlogPost, state: State) {
       }),
     });
 
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
       console.error(
         `[BlogWatcher] Failed to sync manual edit back to Spire: ${response.status}`,
@@ -133,10 +147,17 @@ async function notifySpireOfManualUpdate(post: BlogPost, state: State) {
       );
     }
   } catch (err) {
-    console.error(
-      "[BlogWatcher] Error sending manual sync update back to Spire:",
-      err,
-    );
+    clearTimeout(timeoutId);
+    if (err instanceof DOMException && err.name === "AbortError") {
+      console.error(
+        `[BlogWatcher] Request timed out (8s limit) syncing post: ${post.slug}`,
+      );
+    } else {
+      console.error(
+        "[BlogWatcher] Error sending manual sync update back to Spire:",
+        err,
+      );
+    }
   }
 }
 

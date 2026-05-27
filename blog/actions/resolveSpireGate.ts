@@ -1,4 +1,5 @@
 import { AppContext } from "../mod.ts";
+import { isAdmin } from "@deco/deco/utils";
 
 export interface Props {
   gateId: string;
@@ -14,12 +15,24 @@ export interface Props {
  */
 export default async function resolveSpireGate(
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<{ success: boolean; message?: string }> {
   const { gateId, gateType, blogSlug, campaignId, postId } = props;
 
-  // 1. Retrieve the Spire Webhook Secret configured on the Blog app state
+  // 1. Inbound Request Authorization Validation (Previne Privilege Bypass)
+  const referer = req.headers.get("origin") ?? req.headers.get("referer");
+  const isUserAdmin = referer && isAdmin(referer);
+
+  if (!isUserAdmin && Deno.env.get("DECO_ENV") !== "development") {
+    return {
+      success: false,
+      message:
+        "Unauthorized: Only authenticated Deco Admins are allowed to resolve Spire gates.",
+    };
+  }
+
+  // 2. Retrieve the Spire Webhook Secret configured on the Blog app state
   const expectedSecret =
     (typeof ctx.spireWebhookSecret === "string"
       ? ctx.spireWebhookSecret
@@ -33,14 +46,19 @@ export default async function resolveSpireGate(
     };
   }
 
-  // 2. Fetch the target Spire Base URL (default: https://spire.blog)
+  // 3. Fetch the target Spire Base URL (default: https://spire.blog)
   const spireUrl = Deno.env.get("SPIRE_URL") || "https://spire.blog";
+
+  // 4. Implement AbortController timeout to prevent hanging requests
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000); // 8-second limit
 
   try {
     const response = await fetch(
       `${spireUrl}/api/blog/${encodeURIComponent(blogSlug)}/gates/resolve`,
       {
         method: "POST",
+        signal: controller.signal,
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${expectedSecret}`,
@@ -54,6 +72,8 @@ export default async function resolveSpireGate(
       },
     );
 
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
       const errorText = await response.text();
       return {
@@ -64,6 +84,17 @@ export default async function resolveSpireGate(
 
     return { success: true, message: "Gate approved successfully!" };
   } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof DOMException && error.name === "AbortError") {
+      console.warn(
+        `[DecoResolveSpireGate] Request timed out (8s limit) resolving gate ${gateId}.`,
+      );
+      return {
+        success: false,
+        message: "Request to Spire timed out (8s limit). Please try again.",
+      };
+    }
+
     console.error("[DecoResolveSpireGate] Error:", error);
     return {
       success: false,

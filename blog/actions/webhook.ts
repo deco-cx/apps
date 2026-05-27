@@ -169,7 +169,16 @@ export default async function webhook(
     };
 
     // Set transient sync flag to prevent loop feedback in Deno watchFs
-    Deno.env.set(`SPIRE_SYNC_ACTIVE_${sanitizedSlug}`, Date.now().toString());
+    const envKey = `SPIRE_SYNC_ACTIVE_${sanitizedSlug}`;
+    Deno.env.set(envKey, Date.now().toString());
+    // Evita acúmulo de variáveis de ambiente no processo limpando-as após 15 segundos
+    setTimeout(() => {
+      try {
+        Deno.env.delete(envKey);
+      } catch {
+        // Ignora em caso de concorrência
+      }
+    }, 15000);
 
     // 7. Write natively to filesystem as local JSON block (.deco/blocks/collections/blog/posts/<slug>.json)
     const blocksDir = join(
@@ -236,12 +245,20 @@ function escapeHtml(value?: string): string {
 }
 
 /**
- * Helper to robustly parse JSON strings with fallbacks
+ * Helper to robustly parse JSON strings with fallbacks and runtime type validation
  */
-function safeJsonParse<T>(value: unknown, fallback: T): T {
+function safeJsonParse<T>(
+  value: unknown,
+  fallback: T,
+  validator?: (val: unknown) => boolean,
+): T {
   if (typeof value !== "string") return fallback;
   try {
-    return JSON.parse(value) as T;
+    const parsed = JSON.parse(value);
+    if (validator && !validator(parsed)) {
+      return fallback;
+    }
+    return parsed as T;
   } catch (e) {
     console.error("[Webhook] JSON parse error:", e);
     return fallback;
@@ -266,14 +283,16 @@ function compileBlocksToHtml(blocks?: Block[]): string {
           ? sanitizeHtml(content.html)
           : `<p>${escapeHtml(content.text)}</p>`;
       case "heading": {
-        const level = content.level || "2";
+        // Validação estrita para evitar injeção de markup/tags inválidas
+        const rawLevel = String(content.level || "2").trim();
+        const level = /^[1-6]$/.test(rawLevel) ? rawLevel : "2";
         return `<h${level}>${escapeHtml(content.text)}</h${level}>`;
       }
       case "list": {
         const style = content.style === "ordered" ? "ol" : "ul";
         const items = Array.isArray(content.items)
           ? content.items
-          : safeJsonParse<string[]>(content.items, []);
+          : safeJsonParse<string[]>(content.items, [], Array.isArray);
         const listItems = items.map((item: string) =>
           `<li>${sanitizeHtml(item)}</li>`
         ).join("");
@@ -290,7 +309,21 @@ function compileBlocksToHtml(blocks?: Block[]): string {
             : ""
         }</blockquote>`;
       case "callout": {
-        const variant = content.variant || "info";
+        // Validação estrita para evitar injeção de classes arbitrárias ou quebras
+        const rawVariant = String(content.variant || "info").trim();
+        const allowedVariants = [
+          "info",
+          "warning",
+          "success",
+          "danger",
+          "note",
+          "tip",
+          "important",
+          "caution",
+        ];
+        const variant = allowedVariants.includes(rawVariant)
+          ? rawVariant
+          : "info";
         return `<div class="callout callout-${variant}"><strong>${
           escapeHtml(content.title)
         }</strong><p>${sanitizeHtml(content.body)}</p></div>`;
@@ -298,7 +331,7 @@ function compileBlocksToHtml(blocks?: Block[]): string {
       case "checklist": {
         const checkItems = Array.isArray(content.items)
           ? content.items
-          : safeJsonParse<string[]>(content.items, []);
+          : safeJsonParse<string[]>(content.items, [], Array.isArray);
         const checkList = checkItems.map((item: string) =>
           `<li><input type="checkbox" disabled /> ${sanitizeHtml(item)}</li>`
         ).join("");
@@ -312,6 +345,7 @@ function compileBlocksToHtml(blocks?: Block[]): string {
           : safeJsonParse<Array<{ title?: string; description?: string }>>(
             content.steps,
             [],
+            Array.isArray,
           );
         const stepList = stepItems.map((
           step: { title?: string; description?: string },

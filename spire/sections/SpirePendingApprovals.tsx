@@ -215,6 +215,7 @@ export default function SpirePendingApprovals({
                       Quick View
                     </a>
                     <button
+                      type="button"
                       data-gate-id={gate.id}
                       data-gate-type={gate.gateType === "product_review"
                         ? "post"
@@ -241,7 +242,7 @@ export default function SpirePendingApprovals({
             const gateType = button.getAttribute('data-gate-type');
             const campaignId = button.getAttribute('data-campaign-id');
             const postId = button.getAttribute('data-post-id');
-            const blogSlug = "${blogSlug}";
+            const blogSlug = ${JSON.stringify(blogSlug)};
             
             button.disabled = true;
             button.innerText = "Approving...";
