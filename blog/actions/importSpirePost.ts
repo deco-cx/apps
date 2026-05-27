@@ -21,7 +21,7 @@ export default async function importSpirePost(
   ctx: AppContext,
 ): Promise<{ success: boolean; path?: string; message?: string }> {
   try {
-    // 1. Security Authorization Header & Query Parameter Verification
+    // 1. Security HMAC-SHA256 Signature or Authorization Header Verification
     const expectedSecret = (typeof ctx.spireWebhookSecret === "string"
       ? ctx.spireWebhookSecret
       : ctx.spireWebhookSecret?.get?.()) ||
@@ -32,15 +32,35 @@ export default async function importSpirePost(
         message: "Unauthorized: webhook secret not configured.",
       };
     }
-    const authHeader = req.headers.get("Authorization");
-    const url = new URL(req.url);
-    const querySecret = url.searchParams.get("secret");
-    const providedToken = authHeader?.replace("Bearer ", "") || querySecret;
 
-    if (!providedToken || providedToken !== expectedSecret) {
+    const spireSignature = req.headers.get("X-Spire-Signature");
+    let isAuthorized = false;
+
+    if (spireSignature) {
+      try {
+        const rawBody = await req.clone().text();
+        isAuthorized = await verifyHmacSignature(
+          rawBody,
+          spireSignature,
+          expectedSecret,
+        );
+      } catch (err) {
+        console.error("[Webhook] Failed to verify HMAC signature:", err);
+      }
+    } else {
+      // Fallback para token Bearer clássico ou Query Parameter (retrocompatibilidade)
+      const authHeader = req.headers.get("Authorization");
+      const url = new URL(req.url);
+      const querySecret = url.searchParams.get("secret");
+      const providedToken = authHeader?.replace("Bearer ", "") || querySecret;
+      isAuthorized = !!providedToken && providedToken === expectedSecret;
+    }
+
+    if (!isAuthorized) {
       return {
         success: false,
-        message: "Unauthorized: Webhook token verification failed.",
+        message:
+          "Unauthorized: Webhook signature or token verification failed.",
       };
     }
 
@@ -335,4 +355,43 @@ function compileBlocksToHtml(blocks?: Block[]): string {
         return "";
     }
   }).join("\n");
+}
+
+/**
+ * Verifies the HMAC-SHA256 signature of a request payload using Deno's native Web Crypto.
+ */
+async function verifyHmacSignature(
+  rawBody: string,
+  signature: string,
+  secret: string,
+): Promise<boolean> {
+  try {
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(secret);
+    const messageData = encoder.encode(rawBody);
+
+    const cryptoKey = await crypto.subtle.importKey(
+      "raw",
+      keyData,
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["verify", "sign"],
+    );
+
+    const signatureBuffer = await crypto.subtle.sign(
+      "HMAC",
+      cryptoKey,
+      messageData,
+    );
+
+    const signatureArray = Array.from(new Uint8Array(signatureBuffer));
+    const computedSignature = signatureArray
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+
+    return computedSignature === signature.toLowerCase();
+  } catch (e) {
+    console.error("[Webhook] HMAC computation error:", e);
+    return false;
+  }
 }
