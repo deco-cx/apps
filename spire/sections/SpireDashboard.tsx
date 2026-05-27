@@ -19,6 +19,28 @@ export interface Props {
 }
 
 /**
+ * Validate that the spireUrl is a trusted origin (spire.blog, subdomains, or local dev)
+ */
+function getSafeSpireUrl(urlStr: string): string {
+  try {
+    const parsed = new URL(urlStr);
+    const isTrusted = (
+      parsed.protocol === "https:" &&
+      (parsed.hostname === "spire.blog" || parsed.hostname.endsWith(".spire.blog"))
+    ) || (
+      parsed.protocol === "http:" &&
+      parsed.hostname === "localhost"
+    );
+    if (isTrusted) {
+      return urlStr;
+    }
+  } catch {
+    // Fall back to default on invalid URL
+  }
+  return "https://spire.blog";
+}
+
+/**
  * @title Spire Dashboard
  * @description Embeds your Spire AI Blog Dashboard natively inside Deco Admin for seamless content generation and campaign management.
  */
@@ -40,8 +62,10 @@ export default function SpireDashboard({
     );
   }
 
-  // Construct the embedded URL passing the embed=true search param
-  const embeddedUrl = `${spireUrl}/app/${blogSlug}?embed=true`;
+  const safeSpireUrl = getSafeSpireUrl(spireUrl);
+
+  // Construct the embedded URL passing the embed=true search param and encoding the slug
+  const embeddedUrl = `${safeSpireUrl}/app/${encodeURIComponent(blogSlug)}?embed=true`;
 
   return (
     <div 
@@ -55,7 +79,7 @@ export default function SpireDashboard({
           src={embeddedUrl}
           title="Spire Dashboard"
           class="w-full h-full border-none bg-black"
-          allow="clipboard-write; camera; microphone; geolocation"
+          allow="clipboard-write"
           sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"
         />
       </div>
