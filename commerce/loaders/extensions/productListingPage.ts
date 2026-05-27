@@ -4,3 +4,5 @@ import loader from "../product/extensions/listingPage.ts";
 const deprecated = (...args: Parameters<typeof loader>) => loader(...args);
 
 export default deprecated;
+
+export const cache = "no-cache";
