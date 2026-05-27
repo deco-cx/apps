@@ -3,6 +3,7 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$$$$0 from "./actions/resolveSpireGate.ts";
+import * as $$$$$$$$$5 from "./actions/syncAllPosts.ts";
 import * as $$$$$$$$$1 from "./actions/submitRating.ts";
 import * as $$$$$$$$$2 from "./actions/submitReview.ts";
 import * as $$$$$$$$$3 from "./actions/submitView.ts";
@@ -27,6 +28,7 @@ import * as $$$17 from "./loaders/extensions/BlogpostPage/reviews.ts";
 import * as $$$8 from "./loaders/GetCategories.ts";
 import * as $$$$$$0 from "./sections/Seo/SeoBlogPost.tsx";
 import * as $$$$$$1 from "./sections/Seo/SeoBlogPostListing.tsx";
+import * as $$$$$$3 from "./sections/SpireSync.tsx";
 import * as $$$$$$2 from "./sections/Template.tsx";
 
 const manifest = {
@@ -53,10 +55,12 @@ const manifest = {
   "sections": {
     "blog/sections/Seo/SeoBlogPost.tsx": $$$$$$0,
     "blog/sections/Seo/SeoBlogPostListing.tsx": $$$$$$1,
+    "blog/sections/SpireSync.tsx": $$$$$$3,
     "blog/sections/Template.tsx": $$$$$$2,
   },
   "actions": {
     "blog/actions/resolveSpireGate.ts": $$$$$$$$$0,
+    "blog/actions/syncAllPosts.ts": $$$$$$$$$5,
     "blog/actions/submitRating.ts": $$$$$$$$$1,
     "blog/actions/submitReview.ts": $$$$$$$$$2,
     "blog/actions/submitView.ts": $$$$$$$$$3,

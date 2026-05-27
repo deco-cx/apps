@@ -248,7 +248,7 @@ export default function SpirePendingApprovals({
             button.innerText = "Approving...";
             
             try {
-              const response = await fetch("/live/action/blog/actions/resolveSpireGate", {
+              const response = await fetch("/live/invoke/blog/actions/resolveSpireGate.ts", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ gateId, gateType, blogSlug, campaignId, postId }),

@@ -57,6 +57,23 @@ export interface SpireAuthor {
   bio: string | null;
 }
 
+export interface SpireAuthorFull extends SpireAuthor {
+  id: string;
+  twitterUrl: string | null;
+  linkedinUrl: string | null;
+  websiteUrl: string | null;
+  instagramUrl: string | null;
+  youtubeUrl: string | null;
+  githubUrl: string | null;
+}
+
+export interface SpireTagWithCount {
+  id: string;
+  name: string;
+  slug: string;
+  postCount: number;
+}
+
 export interface SpirePostVersion {
   title: string;
   description: string;
@@ -66,13 +83,18 @@ export interface SpirePostVersion {
   blocks: Block[];
 }
 
+export interface SpirePostTag {
+  name: string;
+  slug: string;
+}
+
 export interface SpirePost {
   id: string;
   slug: string;
   publishedAt: string | null;
   version: SpirePostVersion;
   authors: SpireAuthor[];
-  tags: string[];
+  tags: SpirePostTag[];
 }
 
 export interface SpirePostSummary {

@@ -1,31 +1,32 @@
-import { AppContext } from "../mod.ts";
-import { BlogPost } from "../types.ts";
-import { join } from "std/path/mod.ts";
-import { Block, SpirePost } from "../../spire/types.ts";
-import { sanitizeHref, sanitizeHtml } from "../../spire/utils/sanitizeHtml.ts";
+import { logger } from "@deco/deco/o11y";
+import { activeSyncs, AppContext } from "../mod.ts";
+import { importSpirePost } from "../utils/spireImport.ts";
 
 export interface Props {
   postId: string;
   postSlug: string;
   blogSlug: string;
-  event: "post.published" | "post.unpublished" | "event.saved" | "post.saved";
+  event: "post.published" | "post.unpublished" | "post.saved";
 }
 
 /**
  * @title Blog Webhook Router Gateway
- * @description Securely receives incoming webhooks from Spire (signed with HMAC-SHA256), validates the signature, and routes the events appropriately.
+ * @description Securely receives incoming webhooks from Spire (signed with HMAC-SHA256),
+ *   validates the signature, enforces the configured blog-slug tenant boundary,
+ *   and routes events to import or remove posts from native Deco block storage.
  */
 export default async function webhook(
-  { postSlug, blogSlug, event }: Props,
+  { postId, postSlug, blogSlug, event }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<{ success: boolean; path?: string; message?: string }> {
   try {
-    // 1. Security HMAC-SHA256 Signature or Authorization Header Verification
+    // 1. Resolve expected secret
     const expectedSecret = (typeof ctx.spireWebhookSecret === "string"
       ? ctx.spireWebhookSecret
       : ctx.spireWebhookSecret?.get?.()) ||
       Deno.env.get("SPIRE_WEBHOOK_SECRET");
+
     if (!expectedSecret) {
       return {
         success: false,
@@ -33,177 +34,79 @@ export default async function webhook(
       };
     }
 
+    // 2. Tenant isolation — reject webhooks from any blog other than the configured one.
+    //    This prevents a valid-secret holder from injecting a different tenant's content.
+    const allowedBlogSlug = ctx.allowedBlogSlug;
+    if (allowedBlogSlug && blogSlug !== allowedBlogSlug) {
+      logger.error(
+        `[Webhook] Rejected: blogSlug "${blogSlug}" does not match allowedBlogSlug "${allowedBlogSlug}"`,
+      );
+      return {
+        success: false,
+        message: "Unauthorized: blog slug does not match site configuration.",
+      };
+    }
+
+    // 3. Authenticate — HMAC-SHA256 first, Bearer token fallback.
+    //
+    //    Note: the Deco /live/invoke/* handler reads req.body to extract Props before this
+    //    action runs, so the body stream is already consumed. We reconstruct the canonical
+    //    payload from the already-parsed props (field order must match Spire's JSON.stringify).
     const spireSignature = req.headers.get("X-Spire-Signature");
+    const authHeader = req.headers.get("Authorization");
+    const querySecret = new URL(req.url).searchParams.get("secret");
+
     let isAuthorized = false;
 
     if (spireSignature) {
+      const canonicalPayload = JSON.stringify({
+        postId,
+        postSlug,
+        blogSlug,
+        event,
+      });
       try {
-        const rawBody = await req.clone().text();
-        isAuthorized = await verifyHmacSignature(
-          rawBody,
+        isAuthorized = await verifyHmac(
+          canonicalPayload,
           spireSignature,
           expectedSecret,
         );
       } catch (err) {
-        console.error("[Webhook] Failed to verify HMAC signature:", err);
+        logger.error("[Webhook] HMAC verification error:", err);
       }
-    } else {
-      // Fallback para token Bearer clássico ou Query Parameter (retrocompatibilidade)
-      const authHeader = req.headers.get("Authorization");
-      const url = new URL(req.url);
-      const querySecret = url.searchParams.get("secret");
-      const providedToken = authHeader?.replace("Bearer ", "") || querySecret;
-      isAuthorized = !!providedToken && providedToken === expectedSecret;
+    }
+
+    if (!isAuthorized) {
+      const token = authHeader?.replace("Bearer ", "") || querySecret;
+      isAuthorized = !!token && token === expectedSecret;
     }
 
     if (!isAuthorized) {
       return {
         success: false,
-        message:
-          "Unauthorized: Webhook signature or token verification failed.",
+        message: "Unauthorized: signature or token verification failed.",
       };
     }
 
-    // 2. Validate and sanitize postSlug to prevent directory/path traversal
-    if (
-      !postSlug || typeof postSlug !== "string" ||
-      !/^[a-zA-Z0-9_-]+$/.test(postSlug)
-    ) {
-      throw new Error("Invalid post slug format");
+    // 4. Validate slug (path-traversal guard)
+    if (!postSlug || !/^[a-zA-Z0-9_-]+$/.test(postSlug)) {
+      return { success: false, message: "Invalid post slug format." };
     }
-    const sanitizedSlug = postSlug;
 
+    // 5. Route event
     if (event === "post.unpublished") {
-      // Handle unpublishing/deletion: Remove block file
-      const blocksDir = join(
-        Deno.cwd(),
-        ".deco",
-        "blocks",
-        "collections",
-        "blog",
-        "posts",
-      );
-      const filePath = join(blocksDir, `${sanitizedSlug}.json`);
-      try {
-        await Deno.remove(filePath);
-        console.info(
-          `[Webhook] Successfully removed unpublished post at: ${filePath}`,
-        );
-        return { success: true, message: "Post unpublished successfully" };
-      } catch (err) {
-        if (err instanceof Deno.errors.NotFound) {
-          return {
-            success: true,
-            message: "Post already unpublished or not found",
-          };
-        }
-        throw err;
-      }
+      return await removePostBlock(postSlug);
     }
 
-    // 3. Fetch full post content from Spire API with URL encoding and AbortController timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() =>
-      controller.abort(), 5000); // 5s timeout
-    let response;
-    try {
-      response = await fetch(
-        `https://spire.blog/api/blog/${encodeURIComponent(blogSlug)}/posts/${
-          encodeURIComponent(postSlug)
-        }`,
-        { signal: controller.signal },
-      );
-    } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") {
-        throw new Error("Request to Spire API timed out");
-      }
-      throw err;
-    } finally {
-      clearTimeout(timeoutId);
-    }
+    // 6. Import post — register anti-loop flag before writing the file
+    activeSyncs.add(postSlug);
+    setTimeout(() =>
+      activeSyncs.delete(postSlug), 15_000);
 
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch post from Spire: ${response.status} ${response.statusText}`,
-      );
-    }
-
-    const { post } = (await response.json()) as { post?: SpirePost };
-    if (!post) {
-      throw new Error("No post content returned from Spire API");
-    }
-
-    // 4. Compile Spire content blocks into a clean semantic HTML string for Deco Admin WYSIWYG
-    const htmlContent = compileBlocksToHtml(post.version.blocks);
-
-    // 5. Convert SpirePost schema to native BlogPost
-    const blogPost: BlogPost = {
-      id: post.id,
-      title: post.version.title,
-      excerpt: post.version.description,
-      image: post.version.imageUrl,
-      alt: post.version.title,
-      authors: post.authors.map((a) => ({
-        name: a.name,
-        email: "",
-        avatar: a.avatarUrl ?? undefined,
-      })),
-      categories: [],
-      date: post.publishedAt ?? "",
-      slug: post.slug,
-      seo: {
-        title: post.version.metaTitle,
-        description: post.version.metaDescription,
-        image: post.version.imageUrl,
-      },
-      content: htmlContent,
-      spirePostId: post.id,
-      spireWarning:
-        "This post is automatically synchronized by Spire. Any manual edits made in this form will be overwritten during the next sync.",
-    };
-
-    // 6. Build Deco Block Resolvable
-    const resolvable = {
-      __resolveType: "blog/loaders/Blogpost.ts",
-      post: blogPost,
-    };
-
-    // Set transient sync flag to prevent loop feedback in Deno watchFs
-    const envKey = `SPIRE_SYNC_ACTIVE_${sanitizedSlug}`;
-    Deno.env.set(envKey, Date.now().toString());
-    // Evita acúmulo de variáveis de ambiente no processo limpando-as após 15 segundos
-    setTimeout(() => {
-      try {
-        Deno.env.delete(envKey);
-      } catch {
-        // Ignora em caso de concorrência
-      }
-    }, 15000);
-
-    // 7. Write natively to filesystem as local JSON block (.deco/blocks/collections/blog/posts/<slug>.json)
-    const blocksDir = join(
-      Deno.cwd(),
-      ".deco",
-      "blocks",
-      "collections",
-      "blog",
-      "posts",
-    );
-    await Deno.mkdir(blocksDir, { recursive: true });
-    const filePath = join(blocksDir, `${sanitizedSlug}.json`);
-    await Deno.writeTextFile(filePath, JSON.stringify(resolvable, null, 2));
-
-    console.info(
-      `[Webhook] Successfully imported post and saved to ${filePath}`,
-    );
-
-    return {
-      success: true,
-      path: filePath,
-      message: "Post imported and compiled successfully",
-    };
+    const spireUrl = Deno.env.get("SPIRE_URL");
+    return await importSpirePost(blogSlug, postSlug, spireUrl);
   } catch (error) {
-    console.error("[Webhook] Error importing Spire post:", error);
+    logger.error("[Webhook] Unexpected error:", error);
     return {
       success: false,
       message: error instanceof Error ? error.message : "Internal Server Error",
@@ -211,221 +114,51 @@ export default async function webhook(
   }
 }
 
-export interface SpireBlockContent {
-  html?: string;
-  text?: string;
-  level?: string | number;
-  style?: string;
-  items?: string | string[];
-  quote?: string;
-  attribution?: string;
-  variant?: string;
-  title?: string;
-  body?: string;
-  steps?: string | Array<{ title?: string; description?: string }>;
-  url?: string;
-  alt?: string;
-  caption?: string;
-  language?: string;
-  code?: string;
-  href?: string;
-}
-
-/**
- * Helper to escape HTML in plain text strings
- */
-function escapeHtml(value?: string): string {
-  if (!value) return "";
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-/**
- * Helper to robustly parse JSON strings with fallbacks and runtime type validation
- */
-function safeJsonParse<T>(
-  value: unknown,
-  fallback: T,
-  validator?: (val: unknown) => boolean,
-): T {
-  if (typeof value !== "string") return fallback;
+async function removePostBlock(
+  slug: string,
+): Promise<{ success: boolean; message: string }> {
+  const { join } = await import("std/path/mod.ts");
+  const filePath = join(
+    Deno.cwd(),
+    ".deco",
+    "blocks",
+    "collections",
+    "blog",
+    "posts",
+    `${slug}.json`,
+  );
   try {
-    const parsed = JSON.parse(value);
-    if (validator && !validator(parsed)) {
-      return fallback;
+    await Deno.remove(filePath);
+    logger.info(`[Webhook] Removed unpublished post: ${filePath}`);
+    return { success: true, message: "Post unpublished successfully" };
+  } catch (err) {
+    if (err instanceof Deno.errors.NotFound) {
+      return {
+        success: true,
+        message: "Post already unpublished or not found",
+      };
     }
-    return parsed as T;
-  } catch (e) {
-    console.error("[Webhook] JSON parse error:", e);
-    return fallback;
+    throw err;
   }
 }
 
-/**
- * Compiles Spire's modular block arrays to semantic standard HTML with XSS prevention
- */
-function compileBlocksToHtml(blocks?: Block[]): string {
-  if (!blocks || !Array.isArray(blocks)) return "";
-
-  const sorted = [...blocks].sort((a, b) =>
-    (a.position ?? 0) - (b.position ?? 0)
-  );
-
-  return sorted.map((block) => {
-    const content = (block.content || {}) as SpireBlockContent;
-    switch (block.type) {
-      case "paragraph":
-        return content.html
-          ? sanitizeHtml(content.html)
-          : `<p>${escapeHtml(content.text)}</p>`;
-      case "heading": {
-        // Validação estrita para evitar injeção de markup/tags inválidas
-        const rawLevel = String(content.level || "2").trim();
-        const level = /^[1-6]$/.test(rawLevel) ? rawLevel : "2";
-        return `<h${level}>${escapeHtml(content.text)}</h${level}>`;
-      }
-      case "list": {
-        const style = content.style === "ordered" ? "ol" : "ul";
-        const items = Array.isArray(content.items)
-          ? content.items
-          : safeJsonParse<string[]>(content.items, [], Array.isArray);
-        const listItems = items.map((item: string) =>
-          `<li>${sanitizeHtml(item)}</li>`
-        ).join("");
-        return `<${style}>${listItems}</${style}>`;
-      }
-      case "divider":
-        return "<hr />";
-      case "quote":
-        return `<blockquote><p>${
-          escapeHtml(content.quote || content.text)
-        }</p>${
-          content.attribution
-            ? `<cite>${escapeHtml(content.attribution)}</cite>`
-            : ""
-        }</blockquote>`;
-      case "callout": {
-        // Validação estrita para evitar injeção de classes arbitrárias ou quebras
-        const rawVariant = String(content.variant || "info").trim();
-        const allowedVariants = [
-          "info",
-          "warning",
-          "success",
-          "danger",
-          "note",
-          "tip",
-          "important",
-          "caution",
-        ];
-        const variant = allowedVariants.includes(rawVariant)
-          ? rawVariant
-          : "info";
-        return `<div class="callout callout-${variant}"><strong>${
-          escapeHtml(content.title)
-        }</strong><p>${sanitizeHtml(content.body)}</p></div>`;
-      }
-      case "checklist": {
-        const checkItems = Array.isArray(content.items)
-          ? content.items
-          : safeJsonParse<string[]>(content.items, [], Array.isArray);
-        const checkList = checkItems.map((item: string) =>
-          `<li><input type="checkbox" disabled /> ${sanitizeHtml(item)}</li>`
-        ).join("");
-        return `<ul class="checklist">${
-          content.title ? `<h3>${escapeHtml(content.title)}</h3>` : ""
-        }${checkList}</ul>`;
-      }
-      case "steps": {
-        const stepItems = Array.isArray(content.steps)
-          ? content.steps
-          : safeJsonParse<Array<{ title?: string; description?: string }>>(
-            content.steps,
-            [],
-            Array.isArray,
-          );
-        const stepList = stepItems.map((
-          step: { title?: string; description?: string },
-          index: number,
-        ) =>
-          `<li><strong>${index + 1}. ${escapeHtml(step.title)}</strong>${
-            step.description ? `<p>${sanitizeHtml(step.description)}</p>` : ""
-          }</li>`
-        ).join("");
-        return `<ol class="steps">${
-          content.title ? `<h3>${escapeHtml(content.title)}</h3>` : ""
-        }${stepList}</ol>`;
-      }
-      case "image":
-        return `<figure><img src="${sanitizeHref(content.url)}" alt="${
-          escapeHtml(content.alt)
-        }" />${
-          content.caption
-            ? `<figcaption>${escapeHtml(content.caption)}</figcaption>`
-            : ""
-        }</figure>`;
-      case "video":
-        return `<figure><video src="${
-          sanitizeHref(content.url)
-        }" controls></video>${
-          content.caption
-            ? `<figcaption>${escapeHtml(content.caption)}</figcaption>`
-            : ""
-        }</figure>`;
-      case "code":
-        return `<pre><code class="language-${escapeHtml(content.language)}">${
-          escapeHtml(content.code)
-        }</code></pre>`;
-      case "cta":
-        return `<div class="cta"><a href="${
-          sanitizeHref(content.href)
-        }" class="btn">${escapeHtml(content.text)}</a></div>`;
-      default:
-        if (content.html) return sanitizeHtml(content.html);
-        if (content.text) return `<p>${escapeHtml(content.text)}</p>`;
-        return "";
-    }
-  }).join("\n");
-}
-
-/**
- * Verifies the HMAC-SHA256 signature of a request payload using Deno's native Web Crypto.
- */
-async function verifyHmacSignature(
-  rawBody: string,
+/** Verifies HMAC-SHA256 signature using Web Crypto. */
+async function verifyHmac(
+  payload: string,
   signature: string,
   secret: string,
 ): Promise<boolean> {
-  try {
-    const encoder = new TextEncoder();
-    const keyData = encoder.encode(secret);
-    const messageData = encoder.encode(rawBody);
-
-    const cryptoKey = await crypto.subtle.importKey(
-      "raw",
-      keyData,
-      { name: "HMAC", hash: "SHA-256" },
-      false,
-      ["verify", "sign"],
-    );
-
-    const signatureBuffer = await crypto.subtle.sign(
-      "HMAC",
-      cryptoKey,
-      messageData,
-    );
-
-    const signatureArray = Array.from(new Uint8Array(signatureBuffer));
-    const computedSignature = signatureArray
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-
-    return computedSignature === signature.toLowerCase();
-  } catch (e) {
-    console.error("[Webhook] HMAC computation error:", e);
-    return false;
-  }
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const buf = await crypto.subtle.sign("HMAC", key, encoder.encode(payload));
+  const computed = Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return computed === signature.toLowerCase();
 }

@@ -2,9 +2,13 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$3 from "./loaders/BlogsByAuthor.ts";
+import * as $$$4 from "./loaders/BlogsByTag.ts";
 import * as $$$1 from "./loaders/BlogpostList.ts";
 import * as $$$2 from "./loaders/BlogpostListing.ts";
 import * as $$$0 from "./loaders/BlogPostPage.ts";
+import * as $$$5 from "./loaders/GetAuthors.ts";
+import * as $$$6 from "./loaders/GetTags.ts";
 import * as $$$$$$5 from "./sections/blocks/BlockImage.tsx";
 import * as $$$$$$6 from "./sections/blocks/Callout.tsx";
 import * as $$$$$$7 from "./sections/blocks/CardGroup.tsx";
@@ -29,9 +33,13 @@ import * as $$$$$$4 from "./sections/Template.tsx";
 
 const manifest = {
   "loaders": {
+    "spire/loaders/BlogPostPage.ts": $$$0,
     "spire/loaders/BlogpostList.ts": $$$1,
     "spire/loaders/BlogpostListing.ts": $$$2,
-    "spire/loaders/BlogPostPage.ts": $$$0,
+    "spire/loaders/BlogsByAuthor.ts": $$$3,
+    "spire/loaders/BlogsByTag.ts": $$$4,
+    "spire/loaders/GetAuthors.ts": $$$5,
+    "spire/loaders/GetTags.ts": $$$6,
   },
   "sections": {
     "spire/sections/blocks/BlockImage.tsx": $$$$$$5,

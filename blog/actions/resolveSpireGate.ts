@@ -1,3 +1,4 @@
+import { logger } from "@deco/deco/o11y";
 import { AppContext } from "../mod.ts";
 import { isAdmin } from "@deco/deco/utils";
 
@@ -86,7 +87,7 @@ export default async function resolveSpireGate(
   } catch (error) {
     clearTimeout(timeoutId);
     if (error instanceof DOMException && error.name === "AbortError") {
-      console.warn(
+      logger.warn(
         `[DecoResolveSpireGate] Request timed out (8s limit) resolving gate ${gateId}.`,
       );
       return {
@@ -95,7 +96,7 @@ export default async function resolveSpireGate(
       };
     }
 
-    console.error("[DecoResolveSpireGate] Error:", error);
+    logger.error("[DecoResolveSpireGate] Error:", error);
     return {
       success: false,
       message: error instanceof Error ? error.message : "Internal Server Error",

@@ -78,7 +78,7 @@ export function spirePostToBlogPost(
       email: "",
       avatar: a.avatarUrl ?? undefined,
     })),
-    categories: [],
+    categories: post.tags.map((t) => ({ name: t.name, slug: t.slug })),
     date: post.publishedAt ?? "",
     slug: post.slug,
     seo: {
