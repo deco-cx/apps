@@ -7,7 +7,6 @@ export interface Props {
   isConfigured: boolean;
   blogSlug?: string;
   spireUrl?: string;
-  syncSecret?: string;
 }
 
 /**
@@ -18,7 +17,6 @@ export default function SpireSyncPreviewTab({
   isConfigured,
   blogSlug,
   spireUrl = "https://spire.blog",
-  syncSecret,
 }: Props) {
   const id = useId();
 
@@ -237,26 +235,24 @@ export default function SpireSyncPreviewTab({
     resultEl.innerHTML = 'Importing posts from Spire, please wait…';
 
     try {
-      var secret = ${JSON.stringify(syncSecret ?? "")};
-      var headers = { 'Content-Type': 'application/json' };
-      if (secret) headers['Authorization'] = 'Bearer ' + secret;
       var res = await fetch('/live/invoke/blog/actions/syncAllPosts.ts', {
         method: 'POST',
-        headers: headers,
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'deco-preview-tab' },
         body: JSON.stringify({}),
       });
       var data = await res.json();
+      var esc = function(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
 
       if (data.success || data.synced > 0) {
         resultEl.style.color = '#6ee7b7';
-        resultEl.innerHTML = '✓ ' + (data.message || 'Sync complete');
+        resultEl.innerHTML = '✓ ' + esc(data.message || 'Sync complete');
       } else {
         resultEl.style.color = '#f87171';
-        resultEl.innerHTML = '✗ ' + (data.message || 'Sync failed');
+        resultEl.innerHTML = '✗ ' + esc(data.message || 'Sync failed');
       }
     } catch (err) {
       resultEl.style.color = '#f87171';
-      resultEl.innerHTML = 'Error: ' + String(err);
+      resultEl.innerHTML = 'Error: ' + esc(String(err));
     } finally {
       btn.disabled = false;
       btn.style.opacity = '1';

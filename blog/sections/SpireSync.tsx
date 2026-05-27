@@ -177,23 +177,24 @@ export default function SpireSync(
     try {
       var res = await fetch('/live/invoke/blog/actions/syncAllPosts.ts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'deco-preview-tab' },
         body: JSON.stringify({}),
       });
       var data = await res.json();
+      var esc = function(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
 
       if (data.success || data.synced > 0) {
         resultEl.innerHTML =
-          '<span class="text-emerald-400 font-semibold">✓ ' + (data.message || 'Sync complete') + '</span>' +
+          '<span class="text-emerald-400 font-semibold">✓ ' + esc(data.message || 'Sync complete') + '</span>' +
           (data.errors && data.errors.length > 0
-            ? '<details class="mt-2"><summary class="text-xs text-gray-400 cursor-pointer">Show errors (' + data.errors.length + ')</summary><pre class="text-xs text-red-400 mt-1 overflow-auto max-h-32">' + data.errors.join('\\n') + '</pre></details>'
+            ? '<details class="mt-2"><summary class="text-xs text-gray-400 cursor-pointer">Show errors (' + data.errors.length + ')</summary><pre class="text-xs text-red-400 mt-1 overflow-auto max-h-32">' + esc(data.errors.join('\\n')) + '</pre></details>'
             : '');
       } else {
         resultEl.innerHTML =
-          '<span class="text-red-400 font-semibold">✗ ' + (data.message || 'Sync failed') + '</span>';
+          '<span class="text-red-400 font-semibold">✗ ' + esc(data.message || 'Sync failed') + '</span>';
       }
     } catch (err) {
-      resultEl.innerHTML = '<span class="text-red-400">Error: ' + String(err) + '</span>';
+      resultEl.innerHTML = '<span class="text-red-400">Error: ' + esc(String(err)) + '</span>';
     } finally {
       btn.disabled = false;
       btn.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Sync All Posts';

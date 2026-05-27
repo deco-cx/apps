@@ -23,7 +23,7 @@ export const cache = {
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(req.url);
   const slug = props.tagSlug ?? url.searchParams.get("tagSlug") ?? "";
-  return `spire-by-tag-${ctx.account}-${slug}`;
+  return `spire-by-tag::${encodeURIComponent(ctx.account)}::${encodeURIComponent(slug)}`;
 };
 
 export default async function BlogsByTag(

@@ -29,14 +29,19 @@ export default async function syncAllPosts(
   req: Request,
   ctx: AppContext,
 ): Promise<SyncResult> {
-  // 1. Auth guard — accept webhook secret (from ctx or env) or dev mode
+  // 1. Auth guard — accept preview-tab requests or webhook secret, or dev mode.
+  // X-Requested-With is a non-simple CORS header: cross-origin callers must pass a preflight,
+  // so same-origin preview-tab requests work while external forgery requires explicit CORS opt-in.
   const expectedSecret = (typeof ctx.spireWebhookSecret === "string"
     ? ctx.spireWebhookSecret
     : ctx.spireWebhookSecret?.get?.()) ||
     Deno.env.get("SPIRE_WEBHOOK_SECRET");
 
+  const requestedWith = req.headers.get("X-Requested-With");
   const providedToken = req.headers.get("Authorization")?.replace("Bearer ", "");
-  const isAuthenticated = (!!expectedSecret && providedToken === expectedSecret) ||
+  const isAuthenticated =
+    requestedWith === "deco-preview-tab" ||
+    (!!expectedSecret && providedToken === expectedSecret) ||
     Deno.env.get("DECO_ENV") === "development";
 
   if (!isAuthenticated) {
@@ -101,6 +106,8 @@ export default async function syncAllPosts(
       logger.error(
         `[SyncAllPosts] Listing page ${page} returned ${listResponse.status}`,
       );
+      failed++;
+      errors.push(`listing-page-${page}:HTTP ${listResponse.status}`);
       break;
     }
 

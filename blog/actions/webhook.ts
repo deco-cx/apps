@@ -34,7 +34,12 @@ export default async function webhook(
       };
     }
 
-    // 2. Tenant isolation — reject webhooks from any blog other than the configured one.
+    // 2. Validate required fields — catches missing body (e.g., direct GET/test calls)
+    if (!blogSlug || !postSlug || !event) {
+      return { success: false, message: "Missing required webhook fields." };
+    }
+
+    // 3. Tenant isolation — reject webhooks from any blog other than the configured one.
     //    This prevents a valid-secret holder from injecting a different tenant's content.
     const allowedBlogSlug = ctx.allowedBlogSlug;
     if (allowedBlogSlug && blogSlug !== allowedBlogSlug) {
@@ -47,7 +52,7 @@ export default async function webhook(
       };
     }
 
-    // 3. Authenticate — HMAC-SHA256 first, Bearer token fallback.
+    // 4. Authenticate — HMAC-SHA256 first, Bearer token fallback.
     //
     //    Note: the Deco /live/invoke/* handler reads req.body to extract Props before this
     //    action runs, so the body stream is already consumed. We reconstruct the canonical
@@ -88,17 +93,17 @@ export default async function webhook(
       };
     }
 
-    // 4. Validate slug (path-traversal guard)
+    // 5. Validate slug (path-traversal guard)
     if (!postSlug || !/^[a-zA-Z0-9_-]+$/.test(postSlug)) {
       return { success: false, message: "Invalid post slug format." };
     }
 
-    // 5. Route event
+    // 6. Route event
     if (event === "post.unpublished") {
       return await removePostBlock(postSlug);
     }
 
-    // 6. Import post — register anti-loop flag before writing the file
+    // 7. Import post — register anti-loop flag before writing the file
     activeSyncs.add(postSlug);
     setTimeout(() =>
       activeSyncs.delete(postSlug), 15_000);

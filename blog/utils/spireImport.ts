@@ -89,7 +89,13 @@ export async function importSpirePost(
     };
   }
 
-  const body = (await response.json()) as { post?: SpirePost };
+  let body: { post?: SpirePost };
+  try {
+    body = (await response.json()) as { post?: SpirePost };
+  } catch {
+    return { success: false, message: "Failed to parse Spire API response" };
+  }
+
   if (!body.post) {
     return {
       success: false,
@@ -103,13 +109,19 @@ export async function importSpirePost(
     post: blogPost,
   };
 
-  const blocksDir = join(Deno.cwd(), BLOCKS_BASE);
-  await Deno.mkdir(blocksDir, { recursive: true });
-  const filePath = join(blocksDir, `${postSlug}.json`);
-  await Deno.writeTextFile(filePath, JSON.stringify(resolvable, null, 2));
-
-  logger.info(`[SpireImport] Imported "${postSlug}" → ${filePath}`);
-  return { success: true, path: filePath };
+  try {
+    const blocksDir = join(Deno.cwd(), BLOCKS_BASE);
+    await Deno.mkdir(blocksDir, { recursive: true });
+    const filePath = join(blocksDir, `${postSlug}.json`);
+    await Deno.writeTextFile(filePath, JSON.stringify(resolvable, null, 2));
+    logger.info(`[SpireImport] Imported "${postSlug}" → ${filePath}`);
+    return { success: true, path: filePath };
+  } catch (err) {
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : "Failed to write post file",
+    };
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -253,9 +265,7 @@ export function compileBlocksToHtml(blocks?: Block[]): string {
           const items = Array.isArray(content.items)
             ? content.items
             : safeJsonParse<string[]>(content.items, [], Array.isArray);
-          return `<ul class="checklist">${
-            content.title ? `<h3>${escapeHtml(content.title)}</h3>` : ""
-          }${
+          return `${content.title ? `<h3>${escapeHtml(content.title)}</h3>` : ""}<ul class="checklist">${
             items.map((i: string) =>
               `<li><input type="checkbox" disabled /> ${sanitizeHtml(i)}</li>`
             ).join("")
@@ -267,9 +277,7 @@ export function compileBlocksToHtml(blocks?: Block[]): string {
           const steps = Array.isArray(content.steps)
             ? content.steps as Step[]
             : safeJsonParse<Step[]>(content.steps, [], Array.isArray);
-          return `<ol class="steps">${
-            content.title ? `<h3>${escapeHtml(content.title)}</h3>` : ""
-          }${
+          return `${content.title ? `<h3>${escapeHtml(content.title)}</h3>` : ""}<ol class="steps">${
             steps.map((s, i) =>
               `<li><strong>${i + 1}. ${escapeHtml(s.title)}</strong>${
                 s.description ? `<p>${sanitizeHtml(s.description)}</p>` : ""
@@ -321,7 +329,9 @@ export function compileBlocksToHtml(blocks?: Block[]): string {
             `<div class="comparison-side"><strong>${
               escapeHtml(s.title)
             }</strong><ul>${
-              (s.items ?? []).map((i) => `<li>${sanitizeHtml(i)}</li>`).join("")
+              (Array.isArray(s.items) ? s.items : []).map((i) =>
+                `<li>${sanitizeHtml(i)}</li>`
+              ).join("")
             }</ul></div>`;
           return `<div class="comparison">${renderSide(left)}${
             renderSide(right)
