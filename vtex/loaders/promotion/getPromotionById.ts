@@ -37,3 +37,5 @@ export default async function loader(
 
   return promotionById;
 }
+
+export const cache = "no-store";

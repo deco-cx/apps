@@ -24,3 +24,5 @@ const loader = async (
 };
 
 export default loader;
+
+export const cache = "no-store";

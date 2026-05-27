@@ -54,3 +54,5 @@ async function loader(
 
 export const defaultVisibility = "private";
 export default loader;
+
+export const cache = "no-store";
