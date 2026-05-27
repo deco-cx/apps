@@ -144,6 +144,9 @@ export default async function importSpirePost(
       post: blogPost,
     };
 
+    // Set transient sync flag to prevent loop feedback in Deno watchFs
+    Deno.env.set(`SPIRE_SYNC_ACTIVE_${sanitizedSlug}`, Date.now().toString());
+
     // 7. Write natively to filesystem as local JSON block (.deco/blocks/collections/blog/posts/<slug>.json)
     const blocksDir = join(
       Deno.cwd(),

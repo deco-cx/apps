@@ -197,29 +197,89 @@ export default function SpirePendingApprovals({
                   </p>
 
                   {/* Actions */}
-                  <div class="flex gap-2 pl-1 border-t border-gray-800/50 pt-3">
+                  <div class="flex flex-wrap gap-2 pl-1 border-t border-gray-800/50 pt-3">
                     <a
                       href={`${spireUrl}/app/${blogSlug}/campaigns`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="flex-1 inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-violet-600 hover:bg-violet-500 text-xs font-semibold text-white transition-all shadow-lg shadow-violet-600/10 hover:shadow-violet-500/20"
+                      class="flex-1 inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-violet-600 hover:bg-violet-500 text-xs font-semibold text-white transition-all shadow-lg shadow-violet-600/10 hover:shadow-violet-500/20 text-center"
                     >
-                      Review in Spire
+                      Review
                     </a>
                     <a
                       href={`${spireUrl}/app/${blogSlug}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-gray-800 hover:bg-gray-700 text-xs font-semibold text-gray-300 transition-all border border-gray-700/50"
+                      class="inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-gray-800 hover:bg-gray-700 text-xs font-semibold text-gray-300 transition-all border border-gray-700/50 text-center"
                     >
                       Quick View
                     </a>
+                    <button
+                      data-gate-id={gate.id}
+                      data-gate-type={gate.gateType === "product_review"
+                        ? "post"
+                        : "campaign"}
+                      data-campaign-id={gate.campaignId || ""}
+                      data-post-id={gate.postId || ""}
+                      class="gate-approve-btn flex-1 inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white transition-all shadow-lg shadow-emerald-600/10 hover:shadow-emerald-500/20 text-center cursor-pointer"
+                    >
+                      Quick Approve
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
           )}
       </div>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+        document.querySelectorAll('.gate-approve-btn').forEach(button => {
+          button.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const gateId = button.getAttribute('data-gate-id');
+            const gateType = button.getAttribute('data-gate-type');
+            const campaignId = button.getAttribute('data-campaign-id');
+            const postId = button.getAttribute('data-post-id');
+            const blogSlug = "${blogSlug}";
+            
+            button.disabled = true;
+            button.innerText = "Approving...";
+            
+            try {
+              const response = await fetch("/live/action/blog/actions/resolveSpireGate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ gateId, gateType, blogSlug, campaignId, postId }),
+              });
+              if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                  button.innerText = "Approved! \\u2705";
+                  button.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
+                  button.classList.add('bg-emerald-800', 'cursor-default');
+                  setTimeout(() => window.location.reload(), 1500);
+                } else {
+                  button.innerText = "Failed \\u274C";
+                  button.disabled = false;
+                  console.error(data.message);
+                  setTimeout(() => button.innerText = "Quick Approve", 2500);
+                }
+              } else {
+                button.innerText = "Failed \\u274C";
+                button.disabled = false;
+                setTimeout(() => button.innerText = "Quick Approve", 2500);
+              }
+            } catch (err) {
+              button.innerText = "Error \\u274C";
+              button.disabled = false;
+              setTimeout(() => button.innerText = "Quick Approve", 2500);
+            }
+          });
+        });
+      `,
+        }}
+      />
     </div>
   );
 }
