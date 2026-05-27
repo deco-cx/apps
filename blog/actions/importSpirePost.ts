@@ -21,7 +21,7 @@ export default async function importSpirePost(
   ctx: AppContext,
 ): Promise<{ success: boolean; path?: string; message?: string }> {
   try {
-    // 1. Security Authorization Header Verification
+    // 1. Security Authorization Header & Query Parameter Verification
     const expectedSecret = (typeof ctx.spireWebhookSecret === "string"
       ? ctx.spireWebhookSecret
       : ctx.spireWebhookSecret?.get?.()) ||
@@ -33,7 +33,11 @@ export default async function importSpirePost(
       };
     }
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader || authHeader !== `Bearer ${expectedSecret}`) {
+    const url = new URL(req.url);
+    const querySecret = url.searchParams.get("secret");
+    const providedToken = authHeader?.replace("Bearer ", "") || querySecret;
+
+    if (!providedToken || providedToken !== expectedSecret) {
       return {
         success: false,
         message: "Unauthorized: Webhook token verification failed.",
