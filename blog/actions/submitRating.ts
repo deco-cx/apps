@@ -17,7 +17,8 @@ export default async function submitRating(
   _req: Request,
   ctx: AppContext,
 ): Promise<Rating | null> {
-  const records = await ctx.invoke.records.loaders.drizzle();
+  // deno-lint-ignore no-explicit-any
+  const records = await (ctx.invoke as any).records.loaders.drizzle();
 
   try {
     const storedRating = await records.select({
