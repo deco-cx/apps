@@ -85,7 +85,7 @@ export function spirePostToBlogPost(post: SpirePost): BlogPost {
       avatar: a.avatarUrl ?? undefined,
     })),
     categories: post.tags.map((t) => ({ name: t.name, slug: t.slug })),
-    date: post.publishedAt ?? new Date().toISOString(),
+    date: (post.publishedAt ?? new Date().toISOString()).slice(0, 10),
     slug: post.slug,
     seo: {
       title: post.version.metaTitle || post.version.title,
@@ -94,8 +94,7 @@ export function spirePostToBlogPost(post: SpirePost): BlogPost {
     },
     content: compileBlocksToHtml(post.version.blocks),
     spirePostId: post.id,
-    spireWarning:
-      "This post is automatically synchronized by Spire. Any manual edits made in this form will be overwritten during the next sync.",
+    spireWarning: true,
   };
 }
 

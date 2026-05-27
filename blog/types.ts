@@ -24,7 +24,7 @@ export interface BlogPost {
    * @title AI-MANAGED POST (SPIRE)
    * @description This post is automatically synchronized by Spire AI. Any manual edits made in this form will be overwritten during the next Spire synchronization.
    */
-  spireWarning?: string;
+  spireWarning?: boolean;
   /**
    * @hide true
    */
