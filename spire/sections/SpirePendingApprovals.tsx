@@ -37,34 +37,32 @@ export const loader = async (
     return { ...props, gates: [] };
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 seconds timeout
+
   try {
-    const response = await fetch(`${spireUrl}/api/blog/${blogSlug}/gates/pending`);
+    const response = await fetch(
+      `${spireUrl}/api/blog/${encodeURIComponent(blogSlug)}/gates/pending`,
+      {
+        signal: controller.signal,
+        headers: {
+          "Accept": "application/json; charset=utf-8",
+        },
+      }
+    );
+    clearTimeout(timeoutId);
     if (!response.ok) {
       throw new Error(`Failed to fetch pending gates: ${response.status}`);
     }
     const { gates } = await response.json();
     return { ...props, gates: gates || [] };
   } catch (error) {
-    console.warn("[SpirePendingApprovals] Error fetching gates from Spire (using fallback mock data in development):", error);
-    
-    // Fallback/Mock data to ensure stunning UI rendering in development/testing
-    const mockGates: PendingGate[] = [
-      {
-        id: "gate-1",
-        gateType: "brief",
-        title: "E-commerce Strategy Brief for Bagaggio",
-        reasoning: "The campaign requires review of the SEO intent (Informational) targeting winter travel trends.",
-        createdAt: new Date(Date.now() - 3600000 * 2).toISOString(), // 2 hours ago
-      },
-      {
-        id: "gate-2",
-        gateType: "post_plan",
-        title: "Post Outline: 5 Best Travel Accessories for 2026",
-        reasoning: "Approve the generated outline gates and key terms before starting AI content drafting.",
-        createdAt: new Date(Date.now() - 3600000 * 24).toISOString(), // 1 day ago
-      }
-    ];
-    return { ...props, gates: mockGates };
+    clearTimeout(timeoutId);
+    if (error instanceof DOMException && error.name === "AbortError") {
+      console.warn("[SpirePendingApprovals] Request timed out while fetching pending gates.");
+    }
+    console.error("[SpirePendingApprovals] Error fetching gates from Spire:", error);
+    return { ...props, gates: [] };
   }
 };
 
