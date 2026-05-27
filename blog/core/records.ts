@@ -10,9 +10,9 @@ export async function getRecordsByPath<T>(
   path: string,
   accessor: string,
 ): Promise<T[]> {
-  const resolvables: Record<string, Resolvable<T>> = await ctx.get({
+  const resolvables = await ctx.get({
     __resolveType: "resolvables",
-  });
+  }) as unknown as Record<string, Resolvable<T>>;
   const current = Object.entries(resolvables).flatMap(([key, value]) => {
     return key.startsWith(path) ? value : [];
   });
@@ -28,7 +28,8 @@ export async function getRecordsByPath<T>(
 export async function getRatingsBySlug(
   { ctx, slug }: { ctx: AppContext; slug: string },
 ): Promise<Rating[]> {
-  const records = await ctx.invoke.records.loaders.drizzle();
+  // deno-lint-ignore no-explicit-any
+  const records = await (ctx.invoke as any).records.loaders.drizzle();
   try {
     const currentRatings = await records.select({
       id: rating.id,
@@ -103,7 +104,8 @@ export const getReviewById = async (
   if (!id) {
     return null;
   }
-  const records = await ctx.invoke.records.loaders.drizzle();
+  // deno-lint-ignore no-explicit-any
+  const records = await (ctx.invoke as any).records.loaders.drizzle();
   try {
     const targetReview = await records.select({
       itemReviewed: review.itemReviewed,
@@ -132,7 +134,8 @@ export async function getReviewsBySlug(
     orderBy?: "date_asc" | "date_desc";
   },
 ): Promise<Review[]> {
-  const records = await ctx.invoke.records.loaders.drizzle();
+  // deno-lint-ignore no-explicit-any
+  const records = await (ctx.invoke as any).records.loaders.drizzle();
 
   const whereClause = ignoreReviews?.active && ignoreReviews?.markedAs &&
       ignoreReviews?.markedAs?.length > 0

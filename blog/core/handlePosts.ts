@@ -19,7 +19,8 @@ export const sortPosts = async (
   if (splittedSort[0] === "view") {
     //If sort is "view_asc" or "view_desc"
 
-    const records = await ctx.invoke.records.loaders.drizzle();
+    // deno-lint-ignore no-explicit-any
+    const records = await (ctx.invoke as any).records.loaders.drizzle();
     //Deco records not installed
     if (records.__resolveType) {
       throw new Error("Deco Records not installed!");

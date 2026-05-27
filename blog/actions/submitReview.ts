@@ -33,7 +33,8 @@ export default async function submitReview(
   ctx: AppContext,
 ): Promise<Review | null> {
   const isoDate = new Date().toISOString();
-  const records = await ctx.invoke.records.loaders.drizzle();
+  // deno-lint-ignore no-explicit-any
+  const records = await (ctx.invoke as any).records.loaders.drizzle();
 
   try {
     if (action != "create") {
