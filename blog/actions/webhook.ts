@@ -1,6 +1,6 @@
 import { logger } from "@deco/deco/o11y";
 import { activeSyncs, AppContext } from "../mod.ts";
-import { importSpirePost } from "../utils/spireImport.ts";
+import { importSpirePost, postBlockPath } from "../utils/spireImport.ts";
 
 export interface Props {
   postId: string;
@@ -122,16 +122,7 @@ export default async function webhook(
 async function removePostBlock(
   slug: string,
 ): Promise<{ success: boolean; message: string }> {
-  const { join } = await import("std/path/mod.ts");
-  const filePath = join(
-    Deno.cwd(),
-    ".deco",
-    "blocks",
-    "collections",
-    "blog",
-    "posts",
-    `${slug}.json`,
-  );
+  const filePath = postBlockPath(slug);
   try {
     await Deno.remove(filePath);
     logger.info(`[Webhook] Removed unpublished post: ${filePath}`);

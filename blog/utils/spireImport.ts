@@ -1,6 +1,14 @@
 /**
  * Shared utilities for importing Spire blog posts into Deco's native block storage.
  * Used by both the webhook action (individual post) and syncAllPosts action (bulk).
+ *
+ * Block storage convention (matches Deco Admin / CMS browser):
+ *   .deco/blocks/collections%2Fblog%2Fposts%2F{slug}.json
+ *   .deco/blocks/collections%2Fblog%2Fcategories%2F{slug}.json
+ *   .deco/blocks/collections%2Fblog%2Fauthors%2F{author-id}.json
+ *
+ * Each file must include a "name" field with the decoded collection path so
+ * Deco Studio's CMS browser can index and display the block.
  */
 
 import { logger } from "@deco/deco/o11y";
@@ -10,11 +18,57 @@ import { Block, SpirePost } from "../../spire/types.ts";
 import { sanitizeHref, sanitizeHtml } from "../../spire/utils/sanitizeHtml.ts";
 
 export const SPIRE_BASE_URL = "https://spire.blog";
-export const BLOCKS_BASE = ".deco/blocks/collections/blog/posts";
 
-/** Build the absolute filesystem path for a post's JSON block file. */
+/** Absolute path to the Deco blocks directory. */
+export const BLOCKS_DIR_ABS = join(Deno.cwd(), ".deco", "blocks");
+
+/**
+ * Returns the absolute filesystem path for a Deco block using the native
+ * URL-encoded flat filename format expected by Deco Admin.
+ * e.g. "collections/blog/posts/my-slug" →
+ *      ".deco/blocks/collections%2Fblog%2Fposts%2Fmy-slug.json"
+ */
+function blockFilePath(collectionPath: string): string {
+  const encoded = collectionPath.replace(/\//g, "%2F");
+  return join(BLOCKS_DIR_ABS, `${encoded}.json`);
+}
+
+/** Returns the absolute path for a synced blog post block. */
 export function postBlockPath(slug: string): string {
-  return join(Deno.cwd(), BLOCKS_BASE, `${slug}.json`);
+  return blockFilePath(`collections/blog/posts/${slug}`);
+}
+
+/**
+ * Writes a block JSON only if the file does not already exist.
+ * Used for categories and authors to avoid overwriting admin customisations.
+ */
+async function upsertBlock(
+  collectionPath: string,
+  resolveType: string,
+  data: Record<string, unknown>,
+): Promise<void> {
+  const filePath = blockFilePath(collectionPath);
+  try {
+    await Deno.stat(filePath);
+    // Already exists — skip to preserve any admin customisations.
+  } catch {
+    const resolvable = { name: collectionPath, __resolveType: resolveType, ...data };
+    try {
+      await Deno.writeTextFile(filePath, JSON.stringify(resolvable, null, 2));
+    } catch (err) {
+      logger.error(`[SpireImport] Failed to write block "${collectionPath}":`, err);
+    }
+  }
+}
+
+/** Slugifies a string for use as a Deco block identifier. */
+function toId(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 /** Convert a Spire API post to Deco BlogPost, ready to persist as a resolvable. */
@@ -47,7 +101,11 @@ export function spirePostToBlogPost(post: SpirePost): BlogPost {
 
 /**
  * Fetch a single published post from the Spire API, convert it and write it to
- * `.deco/blocks/collections/blog/posts/<slug>.json`.
+ * the Deco-native block storage format in `.deco/blocks/`.
+ *
+ * Also upserts separate Category and Author blocks so they appear in the Deco
+ * Studio CMS collections browser. Cleans up any legacy subdirectory-format file
+ * left by older versions of this integration.
  *
  * Returns `{ success: true, path }` on success, or `{ success: false, message }` on error.
  * Does NOT set the activeSyncs flag — callers are responsible for that if needed.
@@ -104,17 +162,64 @@ export async function importSpirePost(
   }
 
   const blogPost = spirePostToBlogPost(body.post);
+  const postCollectionPath = `collections/blog/posts/${postSlug}`;
+
   const resolvable = {
+    name: postCollectionPath,
     __resolveType: "blog/loaders/Blogpost.ts",
     post: blogPost,
   };
 
   try {
-    const blocksDir = join(Deno.cwd(), BLOCKS_BASE);
-    await Deno.mkdir(blocksDir, { recursive: true });
-    const filePath = join(blocksDir, `${postSlug}.json`);
+    await Deno.mkdir(BLOCKS_DIR_ABS, { recursive: true });
+
+    // Write the post block in Deco-native URL-encoded flat format
+    const filePath = blockFilePath(postCollectionPath);
     await Deno.writeTextFile(filePath, JSON.stringify(resolvable, null, 2));
     logger.info(`[SpireImport] Imported "${postSlug}" → ${filePath}`);
+
+    // Upsert category blocks (insert-only — never overwrite admin customisations)
+    for (const cat of blogPost.categories ?? []) {
+      await upsertBlock(
+        `collections/blog/categories/${cat.slug}`,
+        "blog/loaders/Category.ts",
+        { category: { name: cat.name, slug: cat.slug } },
+      );
+    }
+
+    // Upsert author blocks
+    for (const author of blogPost.authors ?? []) {
+      const authorId = toId(author.name) || "unknown-author";
+      await upsertBlock(
+        `collections/blog/authors/${authorId}`,
+        "blog/loaders/Author.ts",
+        {
+          author: {
+            name: author.name,
+            email: author.email || "",
+            ...(author.avatar ? { avatar: author.avatar } : {}),
+          },
+        },
+      );
+    }
+
+    // Migrate: remove legacy subdirectory-format file from older sync versions
+    const legacyPath = join(
+      Deno.cwd(),
+      ".deco",
+      "blocks",
+      "collections",
+      "blog",
+      "posts",
+      `${postSlug}.json`,
+    );
+    try {
+      await Deno.remove(legacyPath);
+      logger.info(`[SpireImport] Removed legacy file: ${legacyPath}`);
+    } catch {
+      // Not found — nothing to migrate
+    }
+
     return { success: true, path: filePath };
   } catch (err) {
     return {
@@ -265,7 +370,9 @@ export function compileBlocksToHtml(blocks?: Block[]): string {
           const items = Array.isArray(content.items)
             ? content.items
             : safeJsonParse<string[]>(content.items, [], Array.isArray);
-          return `${content.title ? `<h3>${escapeHtml(content.title)}</h3>` : ""}<ul class="checklist">${
+          return `${
+            content.title ? `<h3>${escapeHtml(content.title)}</h3>` : ""
+          }<ul class="checklist">${
             items.map((i: string) =>
               `<li><input type="checkbox" disabled /> ${sanitizeHtml(i)}</li>`
             ).join("")
@@ -277,7 +384,9 @@ export function compileBlocksToHtml(blocks?: Block[]): string {
           const steps = Array.isArray(content.steps)
             ? content.steps as Step[]
             : safeJsonParse<Step[]>(content.steps, [], Array.isArray);
-          return `${content.title ? `<h3>${escapeHtml(content.title)}</h3>` : ""}<ol class="steps">${
+          return `${
+            content.title ? `<h3>${escapeHtml(content.title)}</h3>` : ""
+          }<ol class="steps">${
             steps.map((s, i) =>
               `<li><strong>${i + 1}. ${escapeHtml(s.title)}</strong>${
                 s.description ? `<p>${sanitizeHtml(s.description)}</p>` : ""
