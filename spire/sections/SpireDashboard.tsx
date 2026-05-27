@@ -26,7 +26,8 @@ function getSafeSpireUrl(urlStr: string): string {
     const parsed = new URL(urlStr);
     const isTrusted = (
       parsed.protocol === "https:" &&
-      (parsed.hostname === "spire.blog" || parsed.hostname.endsWith(".spire.blog"))
+      (parsed.hostname === "spire.blog" ||
+        parsed.hostname.endsWith(".spire.blog"))
     ) || (
       parsed.protocol === "http:" &&
       parsed.hostname === "localhost"
@@ -56,7 +57,8 @@ export default function SpireDashboard({
       <div class="max-w-6xl mx-auto my-8 p-8 text-center bg-gray-900 text-white rounded-xl border border-gray-800">
         <h3 class="text-lg font-bold text-red-400">Configuration Required</h3>
         <p class="text-sm text-gray-400 mt-2">
-          Please configure your Spire Blog Slug in the section properties to embed the dashboard.
+          Please configure your Spire Blog Slug in the section properties to
+          embed the dashboard.
         </p>
       </div>
     );
@@ -65,11 +67,13 @@ export default function SpireDashboard({
   const safeSpireUrl = getSafeSpireUrl(spireUrl);
 
   // Construct the embedded URL passing the embed=true search param and encoding the slug
-  const embeddedUrl = `${safeSpireUrl}/app/${encodeURIComponent(blogSlug)}?embed=true`;
+  const embeddedUrl = `${safeSpireUrl}/app/${
+    encodeURIComponent(blogSlug)
+  }?embed=true`;
 
   return (
-    <div 
-      id={id} 
+    <div
+      id={id}
       class="max-w-7xl mx-auto my-6 bg-black rounded-2xl border border-gray-800 shadow-2xl overflow-hidden flex flex-col"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
