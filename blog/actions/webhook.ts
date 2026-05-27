@@ -12,10 +12,10 @@ export interface Props {
 }
 
 /**
- * @title Import Spire Post Webhook
- * @description Securely receives a post update webhook from Spire, fetches the full post, compiles it to HTML, and saves it natively in Deco.
+ * @title Blog Webhook Router Gateway
+ * @description Securely receives incoming webhooks from Spire (signed with HMAC-SHA256), validates the signature, and routes the events appropriately.
  */
-export default async function importSpirePost(
+export default async function webhook(
   { postSlug, blogSlug, event }: Props,
   req: Request,
   ctx: AppContext,
