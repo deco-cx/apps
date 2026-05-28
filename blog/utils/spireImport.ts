@@ -22,6 +22,13 @@ export const SPIRE_BASE_URL = "https://spire.blog";
 /** Absolute path to the Deco blocks directory. */
 export const BLOCKS_DIR_ABS = join(Deno.cwd(), ".deco", "blocks");
 
+export interface SyncResult {
+  synced: number;
+  failed: number;
+  skipped: number;
+  errors: string[];
+}
+
 /**
  * Returns the absolute filesystem path for a Deco block using the native
  * URL-encoded flat filename format expected by Deco Admin.
@@ -52,11 +59,18 @@ async function upsertBlock(
     await Deno.stat(filePath);
     // Already exists — skip to preserve any admin customisations.
   } catch {
-    const resolvable = { name: collectionPath, __resolveType: resolveType, ...data };
+    const resolvable = {
+      name: collectionPath,
+      __resolveType: resolveType,
+      ...data,
+    };
     try {
       await Deno.writeTextFile(filePath, JSON.stringify(resolvable, null, 2));
     } catch (err) {
-      logger.error(`[SpireImport] Failed to write block "${collectionPath}":`, err);
+      logger.error(
+        `[SpireImport] Failed to write block "${collectionPath}":`,
+        err,
+      );
     }
   }
 }
@@ -226,6 +240,103 @@ export async function importSpirePost(
       message: err instanceof Error ? err.message : "Failed to write post file",
     };
   }
+}
+
+/**
+ * Fetches and imports all published posts from a Spire blog (paginated).
+ * Shared core used by the syncAllPosts action and the startup/cron auto-sync.
+ *
+ * Pass the `activeSyncs` Set from mod.ts to prevent the file-watcher from
+ * bouncing imported posts back to Spire.
+ */
+export async function syncBlogPosts(
+  blogSlug: string,
+  options: {
+    spireUrl?: string;
+    limit?: number;
+    activeSyncs?: Set<string>;
+    logPrefix?: string;
+  } = {},
+): Promise<SyncResult> {
+  const {
+    spireUrl = SPIRE_BASE_URL,
+    limit = 500,
+    activeSyncs,
+    logPrefix = "[SyncBlog]",
+  } = options;
+
+  let page = 1;
+  let totalPages = 1;
+  let synced = 0;
+  let failed = 0;
+  let skipped = 0;
+  const errors: string[] = [];
+
+  while (page <= totalPages && (synced + failed) < limit) {
+    const listController = new AbortController();
+    const listTimeout = setTimeout(() => listController.abort(), 15_000);
+    let listResponse: Response;
+
+    try {
+      listResponse = await fetch(
+        `${spireUrl}/api/blog/${
+          encodeURIComponent(blogSlug)
+        }?page=${page}&perPage=50`,
+        { signal: listController.signal },
+      );
+    } catch (err) {
+      clearTimeout(listTimeout);
+      logger.error(`${logPrefix} Listing page ${page} fetch error:`, err);
+      errors.push(`page:${page}`);
+      failed++;
+      break;
+    } finally {
+      clearTimeout(listTimeout);
+    }
+
+    if (!listResponse.ok) {
+      logger.error(
+        `${logPrefix} Listing page ${page} returned ${listResponse.status}`,
+      );
+      failed++;
+      errors.push(`listing-page-${page}:HTTP ${listResponse.status}`);
+      break;
+    }
+
+    const { posts, pagination } = await listResponse.json() as {
+      posts: Array<{ slug: string }>;
+      pagination: { totalPages: number };
+    };
+
+    totalPages = pagination?.totalPages ?? 1;
+
+    for (const summary of posts ?? []) {
+      if ((synced + failed) >= limit) {
+        skipped++;
+        continue;
+      }
+
+      if (activeSyncs) {
+        activeSyncs.add(summary.slug);
+        setTimeout(() => activeSyncs.delete(summary.slug), 15_000);
+      }
+
+      const result = await importSpirePost(blogSlug, summary.slug, spireUrl);
+      if (result.success) {
+        synced++;
+      } else {
+        failed++;
+        errors.push(`${summary.slug}: ${result.message ?? "unknown error"}`);
+        logger.error(
+          `${logPrefix} Failed to import "${summary.slug}": ${result.message}`,
+        );
+      }
+    }
+
+    page++;
+  }
+
+  return { synced, failed, skipped, errors };
 }
 
 // ---------------------------------------------------------------------------

@@ -7,6 +7,7 @@ import { type App, type FnContext } from "@deco/deco";
 import { h } from "preact";
 import { join } from "std/path/mod.ts";
 import { BlogPost } from "./types.ts";
+import { SPIRE_BASE_URL, syncBlogPosts } from "./utils/spireImport.ts";
 
 export type State = {
   /**
@@ -32,6 +33,7 @@ export type AppContext = FnContext<State, Manifest>;
 
 let isWatcherStarted = false;
 let latestState: State | null = null;
+let startupSyncDone = false;
 
 /**
  * In-process set of slugs currently being synced FROM Spire → Deco.
@@ -39,6 +41,50 @@ let latestState: State | null = null;
  * Exported so the webhook action can register its slug before writing the JSON file.
  */
 export const activeSyncs = new Set<string>();
+
+/**
+ * Runs a full Spire → Deco sync in the background (fire-and-forget).
+ * Safe to call from App() because it's non-blocking and idempotent.
+ */
+function triggerBackgroundSync(state: State, label: string) {
+  const blogSlug = state.allowedBlogSlug;
+  if (!blogSlug) return;
+
+  const spireUrl = Deno.env.get("SPIRE_URL") ?? SPIRE_BASE_URL;
+  logger.info(`[AutoSync:${label}] Starting Spire sync for "${blogSlug}"…`);
+
+  syncBlogPosts(blogSlug, {
+    spireUrl,
+    activeSyncs,
+    logPrefix: `[AutoSync:${label}]`,
+  })
+    .then(({ synced, failed }) => {
+      logger.info(
+        `[AutoSync:${label}] Done: ${synced} synced, ${failed} failed.`,
+      );
+    })
+    .catch((err) => {
+      logger.error(`[AutoSync:${label}] Error:`, err);
+    });
+}
+
+// Register a periodic reconciliation cron if Deno.cron is available (Deno Deploy).
+// Runs every 6 hours to catch any posts that missed their webhook.
+const denoWithCron = Deno as typeof Deno & {
+  cron?: (
+    name: string,
+    schedule: string,
+    handler: () => void | Promise<void>,
+  ) => void;
+};
+if (typeof denoWithCron.cron === "function") {
+  denoWithCron.cron("spire-auto-sync", "0 */6 * * *", () => {
+    if (latestState) triggerBackgroundSync(latestState, "cron");
+  });
+  logger.info(
+    "[AutoSync] Registered Deno.cron for periodic Spire sync (every 6h).",
+  );
+}
 
 function startBlogWatcher(state: State) {
   latestState = state; // Sempre atualiza a referência com as credenciais/configurações mais recentes do Admin
@@ -187,7 +233,17 @@ async function notifySpireOfManualUpdate(post: BlogPost) {
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/weather/logo.png
  */
 export default function App(state: State): App<Manifest, State> {
+  latestState = state;
   startBlogWatcher(state);
+
+  // Startup sync: runs once per process (cold start) when the app is configured.
+  // Handles initial import and recovery after outages. The webhook covers real-time updates;
+  // this is a safety net that runs in the background without blocking the server.
+  if (!startupSyncDone && state.allowedBlogSlug) {
+    startupSyncDone = true;
+    setTimeout(() => triggerBackgroundSync(state, "startup"), 5_000);
+  }
+
   return { manifest, state };
 }
 export const preview = (

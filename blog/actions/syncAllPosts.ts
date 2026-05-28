@@ -1,6 +1,6 @@
 import { logger } from "@deco/deco/o11y";
-import { AppContext, activeSyncs } from "../mod.ts";
-import { importSpirePost, SPIRE_BASE_URL } from "../utils/spireImport.ts";
+import { activeSyncs, AppContext } from "../mod.ts";
+import { SPIRE_BASE_URL, syncBlogPosts } from "../utils/spireImport.ts";
 
 export interface Props {
   /**
@@ -22,7 +22,7 @@ export interface SyncResult {
 /**
  * @title Sync All Posts from Spire
  * @description Bulk-imports all published posts from the configured Spire blog into
- *   Deco's native block storage. Admin-only. Uses `allowedBlogSlug` from app state.
+ *   Deco's native block storage. Uses `allowedBlogSlug` from app state.
  */
 export default async function syncAllPosts(
   { limit = 500 }: Props,
@@ -32,15 +32,18 @@ export default async function syncAllPosts(
   // 1. Auth guard — accept preview-tab requests or webhook secret, or dev mode.
   // X-Requested-With is a non-simple CORS header: cross-origin callers must pass a preflight,
   // so same-origin preview-tab requests work while external forgery requires explicit CORS opt-in.
-  const expectedSecret = (typeof ctx.spireWebhookSecret === "string"
-    ? ctx.spireWebhookSecret
-    : ctx.spireWebhookSecret?.get?.()) ||
+  const expectedSecret =
+    (typeof ctx.spireWebhookSecret === "string"
+      ? ctx.spireWebhookSecret
+      : ctx.spireWebhookSecret?.get?.()) ||
     Deno.env.get("SPIRE_WEBHOOK_SECRET");
 
   const requestedWith = req.headers.get("X-Requested-With");
-  const providedToken = req.headers.get("Authorization")?.replace("Bearer ", "");
-  const isAuthenticated =
-    requestedWith === "deco-preview-tab" ||
+  const providedToken = req.headers.get("Authorization")?.replace(
+    "Bearer ",
+    "",
+  );
+  const isAuthenticated = requestedWith === "deco-preview-tab" ||
     (!!expectedSecret && providedToken === expectedSecret) ||
     Deno.env.get("DECO_ENV") === "development";
 
@@ -70,81 +73,15 @@ export default async function syncAllPosts(
   }
 
   const spireUrl = Deno.env.get("SPIRE_URL") ?? SPIRE_BASE_URL;
-  let page = 1;
-  let totalPages = 1;
-  let synced = 0;
-  let failed = 0;
-  let skipped = 0;
-  const errors: string[] = [];
 
   logger.info(`[SyncAllPosts] Starting full sync for blog "${blogSlug}"…`);
 
-  while (page <= totalPages && (synced + failed) < limit) {
-    // Fetch post listing page
-    const listController = new AbortController();
-    const listTimeout = setTimeout(() => listController.abort(), 15_000);
-    let listResponse: Response;
-
-    try {
-      listResponse = await fetch(
-        `${spireUrl}/api/blog/${
-          encodeURIComponent(blogSlug)
-        }?page=${page}&perPage=50`,
-        { signal: listController.signal },
-      );
-    } catch (err) {
-      clearTimeout(listTimeout);
-      logger.error(`[SyncAllPosts] Listing page ${page} fetch error:`, err);
-      errors.push(`page:${page}`);
-      failed++;
-      break;
-    } finally {
-      clearTimeout(listTimeout);
-    }
-
-    if (!listResponse.ok) {
-      logger.error(
-        `[SyncAllPosts] Listing page ${page} returned ${listResponse.status}`,
-      );
-      failed++;
-      errors.push(`listing-page-${page}:HTTP ${listResponse.status}`);
-      break;
-    }
-
-    const {
-      posts,
-      pagination,
-    } = await listResponse.json() as {
-      posts: Array<{ slug: string }>;
-      pagination: { totalPages: number };
-    };
-
-    totalPages = pagination?.totalPages ?? 1;
-
-    for (const summary of posts ?? []) {
-      if ((synced + failed) >= limit) {
-        skipped++;
-        continue;
-      }
-
-      // Register anti-loop flag so the file watcher skips this write
-      activeSyncs.add(summary.slug);
-      setTimeout(() => activeSyncs.delete(summary.slug), 15_000);
-
-      const result = await importSpirePost(blogSlug, summary.slug, spireUrl);
-      if (result.success) {
-        synced++;
-      } else {
-        failed++;
-        errors.push(`${summary.slug}: ${result.message ?? "unknown error"}`);
-        logger.error(
-          `[SyncAllPosts] Failed to import "${summary.slug}": ${result.message}`,
-        );
-      }
-    }
-
-    page++;
-  }
+  const { synced, failed, skipped, errors } = await syncBlogPosts(blogSlug, {
+    spireUrl,
+    limit,
+    activeSyncs,
+    logPrefix: "[SyncAllPosts]",
+  });
 
   const message = skipped > 0
     ? `Synced ${synced}, failed ${failed}, skipped ${skipped} (limit reached).`
