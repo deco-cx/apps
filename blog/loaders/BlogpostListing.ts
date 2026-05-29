@@ -1,4 +1,5 @@
 import { logger } from "@deco/deco/o11y";
+import { HttpError } from "../../utils/http.ts";
 import { PageInfo } from "../../commerce/types.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
@@ -116,18 +117,9 @@ async function fetchSpirePosts(
   if (!allowedBlogSlug || !spireApi) return [];
   try {
     if (categorySlug) {
-      const response = await spireApi["GET /blog/:account/tags/:tagSlug"](
+      const { posts, tag } = await spireApi["GET /blog/:account/tags/:tagSlug"](
         { account: allowedBlogSlug, tagSlug: categorySlug },
-      );
-      if (!response.ok) {
-        if (response.status !== 404) {
-          logger.error(
-            `[BlogpostListing] Spire tag API ${response.status} for "${categorySlug}"`,
-          );
-        }
-        return [];
-      }
-      const { posts, tag } = await response.json();
+      ).then((r) => r.json());
       const category = { name: tag?.name ?? categorySlug, slug: categorySlug };
       return (posts ?? []).map((
         p: Parameters<typeof spirePostSummaryToBlogPost>[0],
@@ -137,19 +129,16 @@ async function fetchSpirePosts(
       }));
     }
 
-    const response = await spireApi["GET /blog/:account"](
+    const { posts } = await spireApi["GET /blog/:account"](
       { account: allowedBlogSlug, perPage: 100 },
-    );
-    if (!response.ok) {
-      logger.error(
-        `[BlogpostListing] Spire API ${response.status} for "${allowedBlogSlug}"`,
-      );
-      return [];
-    }
-    const { posts } = await response.json();
+    ).then((r) => r.json());
     return (posts ?? []).map(spirePostSummaryToBlogPost);
   } catch (e) {
-    logger.error("[BlogpostListing] Failed to fetch Spire posts:", e);
+    if (e instanceof HttpError && e.status === 404) return [];
+    logger.error(
+      `[BlogpostListing] Failed to fetch Spire posts for "${allowedBlogSlug}":`,
+      e,
+    );
     return [];
   }
 }

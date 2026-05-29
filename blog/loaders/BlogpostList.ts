@@ -5,6 +5,7 @@ import { BlogPost, SortBy } from "../types.ts";
 import handlePosts, { slicePosts } from "../core/handlePosts.ts";
 import { getRecordsByPath } from "../core/records.ts";
 import { spirePostSummaryToBlogPost } from "../utils/spireImport.ts";
+import { HttpError } from "../../utils/http.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
@@ -130,18 +131,9 @@ async function fetchSpirePosts(
 
   try {
     if (categorySlug) {
-      const response = await spireApi["GET /blog/:account/tags/:tagSlug"](
+      const { posts, tag } = await spireApi["GET /blog/:account/tags/:tagSlug"](
         { account: allowedBlogSlug, tagSlug: categorySlug },
-      );
-      if (!response.ok) {
-        if (response.status !== 404) {
-          logger.error(
-            `[BlogpostList] Spire tag API ${response.status} for tag "${categorySlug}"`,
-          );
-        }
-        return [];
-      }
-      const { posts, tag } = await response.json();
+      ).then((r) => r.json());
       const category = { name: tag?.name ?? categorySlug, slug: categorySlug };
       return (posts ?? []).map((
         p: Parameters<typeof spirePostSummaryToBlogPost>[0],
@@ -151,19 +143,17 @@ async function fetchSpirePosts(
       }));
     }
 
-    const response = await spireApi["GET /blog/:account"](
+    const { posts } = await spireApi["GET /blog/:account"](
       { account: allowedBlogSlug, perPage: 100 },
-    );
-    if (!response.ok) {
-      logger.error(
-        `[BlogpostList] Spire API ${response.status} for "${allowedBlogSlug}"`,
-      );
-      return [];
-    }
-    const { posts } = await response.json();
+    ).then((r) => r.json());
     return (posts ?? []).map(spirePostSummaryToBlogPost);
   } catch (e) {
-    logger.error("[BlogpostList] Failed to fetch Spire posts:", e);
+    // fetchSafe throws HttpError on non-2xx — treat 404 as "no posts" (not an error)
+    if (e instanceof HttpError && e.status === 404) return [];
+    logger.error(
+      `[BlogpostList] Failed to fetch Spire posts for "${allowedBlogSlug}":`,
+      e,
+    );
     return [];
   }
 }
