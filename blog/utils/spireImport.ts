@@ -1,14 +1,95 @@
 /**
- * Utilities for converting Spire API data to Deco BlogPost format.
- * Used by blog loaders (for Spire API integration) and spire app loaders.
+ * Utilities for converting Spire API data to Deco BlogPost format and for
+ * writing Spire posts to Deco's native block storage (Studio CMS visibility).
+ *
+ * Block storage path: .deco/blocks/collections%2Fblog%2Fposts%2F{slug}.json
+ *
+ * Dual-purpose architecture:
+ *   • Loaders:  fetch from Spire API in real-time (live site, no deploy needed)
+ *   • Webhook:  also write to blocks so posts appear in Deco Studio CMS browser
  */
 
 import { logger } from "@deco/deco/o11y";
+import { join } from "std/path/mod.ts";
 import { BlogPost } from "../types.ts";
 import { Block, SpirePost, SpirePostSummary } from "../../spire/types.ts";
 import { sanitizeHref, sanitizeHtml } from "../../spire/utils/sanitizeHtml.ts";
 
 export const SPIRE_BASE_URL = "https://spire.blog";
+
+// ---------------------------------------------------------------------------
+// Block filesystem helpers (for Studio CMS visibility)
+// ---------------------------------------------------------------------------
+
+const BLOCKS_DIR = join(Deno.cwd(), ".deco", "blocks");
+
+function blockFilePath(collectionPath: string): string {
+  return join(BLOCKS_DIR, `${collectionPath.replace(/\//g, "%2F")}.json`);
+}
+
+export function postBlockPath(slug: string): string {
+  return blockFilePath(`collections/blog/posts/${slug}`);
+}
+
+/**
+ * Fetch a post from the Spire API and write it to .deco/blocks/ so it
+ * appears in Deco Studio's CMS collection browser. The live site does NOT
+ * depend on this — loaders fetch from the API independently.
+ */
+export async function syncPostToBlocks(
+  blogSlug: string,
+  postSlug: string,
+  spireBaseUrl = SPIRE_BASE_URL,
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const res = await fetch(
+      `${spireBaseUrl}/api/blog/${encodeURIComponent(blogSlug)}/posts/${
+        encodeURIComponent(postSlug)
+      }`,
+      { signal: AbortSignal.timeout(10_000) },
+    );
+
+    if (!res.ok) {
+      return { success: false, message: `Spire API returned ${res.status}` };
+    }
+
+    const { post } = (await res.json()) as { post?: SpirePost };
+    if (!post) return { success: false, message: "No post in API response" };
+
+    const blogPost = spirePostToBlogPost(post);
+    const collectionPath = `collections/blog/posts/${postSlug}`;
+    const resolvable = {
+      name: collectionPath,
+      __resolveType: "blog/loaders/Blogpost.ts",
+      post: blogPost,
+    };
+
+    await Deno.mkdir(BLOCKS_DIR, { recursive: true });
+    await Deno.writeTextFile(
+      blockFilePath(collectionPath),
+      JSON.stringify(resolvable, null, 2),
+    );
+
+    logger.info(`[SpireSync] Wrote block for "${postSlug}"`);
+    return { success: true };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    logger.error(`[SpireSync] Failed to sync "${postSlug}":`, err);
+    return { success: false, message: msg };
+  }
+}
+
+/**
+ * Remove a post block when it is unpublished from Spire.
+ */
+export async function removePostBlock(slug: string): Promise<void> {
+  try {
+    await Deno.remove(postBlockPath(slug));
+    logger.info(`[SpireSync] Removed block for unpublished post "${slug}"`);
+  } catch (err) {
+    if (!(err instanceof Deno.errors.NotFound)) throw err;
+  }
+}
 
 /** Convert a full Spire API post (with blocks) to a Deco BlogPost. */
 export function spirePostToBlogPost(post: SpirePost): BlogPost {

@@ -1,5 +1,6 @@
 import { logger } from "@deco/deco/o11y";
 import { AppContext } from "../mod.ts";
+import { removePostBlock, syncPostToBlocks } from "../utils/spireImport.ts";
 
 export interface Props {
   postId: string;
@@ -10,11 +11,11 @@ export interface Props {
 
 /**
  * @title Spire Webhook
- * @description Receives event notifications from Spire (HMAC-SHA256 signed).
- *   Validates the signature and tenant boundary. No storage is performed — the
- *   blog loaders fetch Spire content live from the API on each request (with CDN
- *   caching). This endpoint exists to authenticate inbound Spire events and can
- *   be extended for cache invalidation or audit logging in the future.
+ * @description Receives event notifications from Spire (HMAC-SHA256 signed),
+ *   validates the signature and tenant boundary, then:
+ *   • Writes the post to .deco/blocks/ so it appears in Deco Studio's CMS browser.
+ *   • The live site renders posts directly from the Spire API (via loaders), so
+ *     there is no dependency on this block write for public content delivery.
  */
 export default async function webhook(
   { postId, postSlug, blogSlug, event }: Props,
@@ -81,10 +82,23 @@ export default async function webhook(
     return { success: false, message: "Invalid post slug format." };
   }
 
-  logger.info(`[Webhook] Acknowledged: event="${event}" slug="${postSlug}"`);
+  // 6. Sync to blocks for Studio CMS visibility (fire-and-forget)
+  //    The live site fetches posts from the Spire API via loaders — this write
+  //    is purely so the post appears in Deco Studio's CMS collection browser.
+  if (event === "post.unpublished") {
+    void removePostBlock(postSlug).catch((err) =>
+      logger.error("[Webhook] Failed to remove block:", err)
+    );
+  } else {
+    const spireUrl = Deno.env.get("SPIRE_URL") ?? "https://spire.blog";
+    void syncPostToBlocks(blogSlug, postSlug, spireUrl).then(
+      ({ success, message }) => {
+        if (!success) logger.error(`[Webhook] Block sync failed: ${message}`);
+      },
+    );
+  }
 
-  // Content delivery is handled by the Spire API in real-time — no file writes needed.
-  // New/updated posts appear in the blog listing within the loader's cache TTL (default 60s).
+  logger.info(`[Webhook] Acknowledged: event="${event}" slug="${postSlug}"`);
   return { success: true };
 }
 
