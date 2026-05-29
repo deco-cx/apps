@@ -37,6 +37,10 @@ export interface VTEXCommerceStable {
     };
     response: StartAuthentication;
   };
+  "POST /api/vtexid/pub/authentication/startlogin": {
+    body: FormData;
+    response: unknown;
+  };
   "POST /api/vtexid/refreshtoken/webstore": {
     response: {
       status: string;
@@ -56,8 +60,8 @@ export interface VTEXCommerceStable {
     response: AuthResponse;
   };
   "POST /api/vtexid/pub/authentication/classic/setpassword": {
-    searchParams: { scope?: string; locale?: string };
-    body: URLSearchParams;
+    searchParams: { scope?: string; locale?: string; expireSessions?: boolean };
+    body: URLSearchParams | FormData;
     response: AuthResponse;
   };
   "POST /api/vtexid/pub/authentication/accesskey/send": {

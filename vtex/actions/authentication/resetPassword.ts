@@ -1,5 +1,4 @@
 import { AppContext } from "../../mod.ts";
-import { getSegmentFromBag } from "../../utils/segment.ts";
 import { AuthResponse } from "../../utils/types.ts";
 import { getSetCookies, setCookie } from "std/http/cookie.ts";
 import {
@@ -24,45 +23,53 @@ export default async function action(
   ctx: AppContext,
 ): Promise<AuthResponse> {
   const { vcsDeprecated, account } = ctx;
-  const segment = getSegmentFromBag(ctx);
 
   if (!props.email || !props.currentPassword || !props.newPassword) {
     throw new Error("Email and/or password is missing");
   }
 
-  const startAuthentication = await ctx.invoke.vtex.actions.authentication
-    .startAuthentication({});
+  // setpassword needs the session from `startlogin` (sent via the _vss cookie);
+  // the plain `/start` token is no longer accepted.
+  const startLoginBody = new FormData();
+  startLoginBody.append("user", props.email);
+  startLoginBody.append("scope", account);
+  startLoginBody.append("accountName", account);
+  startLoginBody.append("returnUrl", "/");
+  startLoginBody.append("callbackUrl", "/");
+  startLoginBody.append("fingerprint", "");
 
-  const startSetCookies = getSetCookies(ctx.response.headers);
-  const { header: cookie } = buildCookieJar(req.headers, startSetCookies);
+  const startLoginResponse = await vcsDeprecated
+    ["POST /api/vtexid/pub/authentication/startlogin"](
+      {},
+      {
+        body: startLoginBody,
+        headers: { cookie: req.headers.get("cookie") || "" },
+      },
+    );
 
-  if (!startAuthentication?.authenticationToken) {
+  if (!startLoginResponse.ok) {
     throw new Error(
-      "No authentication token returned from startAuthentication",
+      `Failed to start login. ${startLoginResponse.status} ${startLoginResponse.statusText}`,
     );
   }
 
-  const authenticationToken = startAuthentication.authenticationToken;
+  proxySetCookie(startLoginResponse.headers, ctx.response.headers, req.url);
+  const startSetCookies = getSetCookies(ctx.response.headers);
+  const { header: cookie } = buildCookieJar(req.headers, startSetCookies);
 
-  const urlencoded = new URLSearchParams();
-  urlencoded.append("login", props.email);
-  urlencoded.append("currentPassword", props.currentPassword);
-  urlencoded.append("newPassword", props.newPassword);
-  urlencoded.append("authenticationToken", authenticationToken);
+  const setPasswordBody = new FormData();
+  setPasswordBody.append("login", props.email);
+  setPasswordBody.append("currentPassword", props.currentPassword);
+  setPasswordBody.append("newPassword", props.newPassword);
+  setPasswordBody.append("accesskey", "");
+  setPasswordBody.append("recaptcha", "");
 
   const response = await vcsDeprecated
     ["POST /api/vtexid/pub/authentication/classic/setpassword"](
+      { expireSessions: true },
       {
-        locale: segment?.payload.cultureInfo || "pt-BR",
-        scope: account,
-      },
-      {
-        body: urlencoded,
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/x-www-form-urlencoded",
-          cookie,
-        },
+        body: setPasswordBody,
+        headers: { "Accept": "application/json", cookie },
       },
     );
 
@@ -77,13 +84,14 @@ export default async function action(
   proxySetCookie(response.headers, ctx.response.headers, req.url);
   await ctx.invoke.vtex.actions.session.validateSession();
 
-  // TODO: REMOVE THIS AFTER TESTING AND VALIDATE IF NEEDED REWRITE REFRESH_TOKEN_COOKIE
   const setCookies = getSetCookies(ctx.response.headers);
-  for (const cookie of setCookies) {
-    if (cookie.name === REFRESH_TOKEN_COOKIE) {
+  for (const responseCookie of setCookies) {
+    if (responseCookie.name === REFRESH_TOKEN_COOKIE) {
+      // default path is /api/vtexid/refreshtoken/webstore; rewrite to / so the
+      // browser sends it back to the backend.
       setCookie(ctx.response.headers, {
-        ...cookie,
-        path: "/", // default path is /api/vtexid/refreshtoken/webstore, but browser dont send to backend headers
+        ...responseCookie,
+        path: "/",
       });
     }
   }
