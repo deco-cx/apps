@@ -6,6 +6,7 @@ import { ClientOf } from "../utils/http.ts";
 import { SpireApi } from "./utils/client.ts";
 import { type App as A, type AppContext as AC, Resolved } from "@deco/deco";
 import { type Section } from "@deco/deco/blocks";
+import { Secret } from "../website/loaders/secret.ts";
 
 export type App = ReturnType<typeof Spire>;
 export type AppContext = AC<App>;
@@ -53,6 +54,11 @@ export interface Props {
    */
   account: string;
   /**
+   * @title API Key (optional)
+   * @description Read-only API key for accessing private Spire blogs. Leave empty for public blogs.
+   */
+  apiKey?: Secret;
+  /**
    * @title Override Sections
    * @description Map block type keys to custom sections, replacing the default spire/sections/blocks/* components
    */
@@ -66,11 +72,14 @@ interface State extends Props {
 
 /**
  * @title Spire Blog
- * @description Fetch and display blog posts from Spire.
+ * @description Connect your Deco.cx site directly to Spire as a live content source.
+ *   Posts are fetched in real-time from the Spire API — no sync or storage needed.
+ *   Use this as an alternative to the Deco Blog app when you want Spire to remain the
+ *   single source of truth while customising the layout entirely in Deco Studio.
  * @category Tool
  * @logo https://spire.blog/favicon.ico
  */
-export default function Spire({ account, overrideSections }: Props) {
+export default function Spire({ account, apiKey, overrideSections }: Props) {
   const api = createHttpClient<SpireApi>({
     base: BASE_URL,
     fetcher: fetchSafe,
@@ -80,7 +89,7 @@ export default function Spire({ account, overrideSections }: Props) {
     (overrideSections ?? []).map(({ key, value }) => [key, value]),
   );
 
-  const state: State = { account, api, overrideMap };
+  const state: State = { account, apiKey, api, overrideMap };
 
   const app: A<Manifest, State> = { manifest, state };
 
@@ -91,9 +100,10 @@ export const preview = () => {
   return {
     Component: PreviewContainer,
     props: {
-      name: "Spire Blog",
+      name: "Spire Live API",
       owner: "spire.blog",
-      description: "Fetch and display blog posts powered by Spire.",
+      description:
+        "Real-time blog content from Spire. No sync needed — Deco renders posts directly from the Spire API. Customise the layout freely in Deco Studio.",
       logo: "https://spire.blog/favicon.ico",
       images: [],
       tabs: [],

@@ -7,7 +7,7 @@ import { Category, SpireTagWithCount } from "../types.ts";
  * @description Retrieves all tags from a Spire blog as blog categories.
  */
 export const cache = {
-  maxAge: 60 * 60 * 24, // 24 hours
+  maxAge: 60, // 1 minute — near-real-time for Spire publish
 };
 
 export const cacheKey = (

@@ -22,7 +22,7 @@ export interface Props {
  * @description Retrieves a paginated listing page of Spire blog posts.
  */
 export const cache = {
-  maxAge: 60 * 60 * 24, // 24 hours
+  maxAge: 60, // 1 minute — near-real-time for Spire publish
 };
 
 /** Parse an integer from a value that may be a number, string, or null. Falls back to `fallback` on NaN/null. */

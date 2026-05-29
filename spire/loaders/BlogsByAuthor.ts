@@ -17,7 +17,7 @@ export interface Props {
  * @description Retrieves all published posts for a specific Spire blog author.
  */
 export const cache = {
-  maxAge: 60 * 60 * 24, // 24 hours
+  maxAge: 60, // 1 minute — near-real-time for Spire publish
 };
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {

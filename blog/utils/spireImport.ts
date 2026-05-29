@@ -1,91 +1,16 @@
 /**
- * Shared utilities for importing Spire blog posts into Deco's native block storage.
- * Used by both the webhook action (individual post) and syncAllPosts action (bulk).
- *
- * Block storage convention (matches Deco Admin / CMS browser):
- *   .deco/blocks/collections%2Fblog%2Fposts%2F{slug}.json
- *   .deco/blocks/collections%2Fblog%2Fcategories%2F{slug}.json
- *   .deco/blocks/collections%2Fblog%2Fauthors%2F{author-id}.json
- *
- * Each file must include a "name" field with the decoded collection path so
- * Deco Studio's CMS browser can index and display the block.
+ * Utilities for converting Spire API data to Deco BlogPost format.
+ * Used by blog loaders (for Spire API integration) and spire app loaders.
  */
 
 import { logger } from "@deco/deco/o11y";
-import { join } from "std/path/mod.ts";
 import { BlogPost } from "../types.ts";
-import { Block, SpirePost } from "../../spire/types.ts";
+import { Block, SpirePost, SpirePostSummary } from "../../spire/types.ts";
 import { sanitizeHref, sanitizeHtml } from "../../spire/utils/sanitizeHtml.ts";
 
 export const SPIRE_BASE_URL = "https://spire.blog";
 
-/** Absolute path to the Deco blocks directory. */
-export const BLOCKS_DIR_ABS = join(Deno.cwd(), ".deco", "blocks");
-
-export interface SyncResult {
-  synced: number;
-  failed: number;
-  skipped: number;
-  errors: string[];
-}
-
-/**
- * Returns the absolute filesystem path for a Deco block using the native
- * URL-encoded flat filename format expected by Deco Admin.
- * e.g. "collections/blog/posts/my-slug" →
- *      ".deco/blocks/collections%2Fblog%2Fposts%2Fmy-slug.json"
- */
-function blockFilePath(collectionPath: string): string {
-  const encoded = collectionPath.replace(/\//g, "%2F");
-  return join(BLOCKS_DIR_ABS, `${encoded}.json`);
-}
-
-/** Returns the absolute path for a synced blog post block. */
-export function postBlockPath(slug: string): string {
-  return blockFilePath(`collections/blog/posts/${slug}`);
-}
-
-/**
- * Writes a block JSON only if the file does not already exist.
- * Used for categories and authors to avoid overwriting admin customisations.
- */
-async function upsertBlock(
-  collectionPath: string,
-  resolveType: string,
-  data: Record<string, unknown>,
-): Promise<void> {
-  const filePath = blockFilePath(collectionPath);
-  try {
-    await Deno.stat(filePath);
-    // Already exists — skip to preserve any admin customisations.
-  } catch {
-    const resolvable = {
-      name: collectionPath,
-      __resolveType: resolveType,
-      ...data,
-    };
-    try {
-      await Deno.writeTextFile(filePath, JSON.stringify(resolvable, null, 2));
-    } catch (err) {
-      logger.error(
-        `[SpireImport] Failed to write block "${collectionPath}":`,
-        err,
-      );
-    }
-  }
-}
-
-/** Slugifies a string for use as a Deco block identifier. */
-function toId(value: string): string {
-  return value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-/** Convert a Spire API post to Deco BlogPost, ready to persist as a resolvable. */
+/** Convert a full Spire API post (with blocks) to a Deco BlogPost. */
 export function spirePostToBlogPost(post: SpirePost): BlogPost {
   return {
     id: post.id,
@@ -108,235 +33,25 @@ export function spirePostToBlogPost(post: SpirePost): BlogPost {
     },
     content: compileBlocksToHtml(post.version.blocks),
     spirePostId: post.id,
-    spireWarning: true,
   };
 }
 
-/**
- * Fetch a single published post from the Spire API, convert it and write it to
- * the Deco-native block storage format in `.deco/blocks/`.
- *
- * Also upserts separate Category and Author blocks so they appear in the Deco
- * Studio CMS collections browser. Cleans up any legacy subdirectory-format file
- * left by older versions of this integration.
- *
- * Returns `{ success: true, path }` on success, or `{ success: false, message }` on error.
- * Does NOT set the activeSyncs flag — callers are responsible for that if needed.
- */
-export async function importSpirePost(
-  blogSlug: string,
-  postSlug: string,
-  spireUrl: string = SPIRE_BASE_URL,
-  timeoutMs = 10_000,
-): Promise<{ success: boolean; path?: string; message?: string }> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-  let response: Response;
-  try {
-    response = await fetch(
-      `${spireUrl}/api/blog/${encodeURIComponent(blogSlug)}/posts/${
-        encodeURIComponent(postSlug)
-      }`,
-      { signal: controller.signal },
-    );
-  } catch (err) {
-    clearTimeout(timeoutId);
-    if (err instanceof DOMException && err.name === "AbortError") {
-      return { success: false, message: "Request to Spire API timed out" };
-    }
-    return {
-      success: false,
-      message: err instanceof Error ? err.message : "Network error",
-    };
-  } finally {
-    clearTimeout(timeoutId);
-  }
-
-  if (!response.ok) {
-    return {
-      success: false,
-      message: `Spire API returned ${response.status} for "${postSlug}"`,
-    };
-  }
-
-  let body: { post?: SpirePost };
-  try {
-    body = (await response.json()) as { post?: SpirePost };
-  } catch {
-    return { success: false, message: "Failed to parse Spire API response" };
-  }
-
-  if (!body.post) {
-    return {
-      success: false,
-      message: "No post content returned from Spire API",
-    };
-  }
-
-  const blogPost = spirePostToBlogPost(body.post);
-  const postCollectionPath = `collections/blog/posts/${postSlug}`;
-
-  const resolvable = {
-    name: postCollectionPath,
-    __resolveType: "blog/loaders/Blogpost.ts",
-    post: blogPost,
+/** Convert a Spire post summary (listing) to a Deco BlogPost. */
+export function spirePostSummaryToBlogPost(
+  summary: SpirePostSummary,
+): BlogPost {
+  return {
+    id: summary.id,
+    title: summary.title,
+    excerpt: summary.description,
+    image: summary.imageUrl,
+    alt: summary.title,
+    authors: [],
+    categories: [],
+    date: (summary.publishedAt ?? "").slice(0, 10),
+    slug: summary.slug,
+    spirePostId: summary.id,
   };
-
-  try {
-    await Deno.mkdir(BLOCKS_DIR_ABS, { recursive: true });
-
-    // Write the post block in Deco-native URL-encoded flat format
-    const filePath = blockFilePath(postCollectionPath);
-    await Deno.writeTextFile(filePath, JSON.stringify(resolvable, null, 2));
-    logger.info(`[SpireImport] Imported "${postSlug}" → ${filePath}`);
-
-    // Upsert category blocks (insert-only — never overwrite admin customisations)
-    for (const cat of blogPost.categories ?? []) {
-      await upsertBlock(
-        `collections/blog/categories/${cat.slug}`,
-        "blog/loaders/Category.ts",
-        { category: { name: cat.name, slug: cat.slug } },
-      );
-    }
-
-    // Upsert author blocks
-    for (const author of blogPost.authors ?? []) {
-      const authorId = toId(author.name) || "unknown-author";
-      await upsertBlock(
-        `collections/blog/authors/${authorId}`,
-        "blog/loaders/Author.ts",
-        {
-          author: {
-            name: author.name,
-            email: author.email || "",
-            ...(author.avatar ? { avatar: author.avatar } : {}),
-          },
-        },
-      );
-    }
-
-    // Migrate: remove legacy subdirectory-format file from older sync versions
-    const legacyPath = join(
-      Deno.cwd(),
-      ".deco",
-      "blocks",
-      "collections",
-      "blog",
-      "posts",
-      `${postSlug}.json`,
-    );
-    try {
-      await Deno.remove(legacyPath);
-      logger.info(`[SpireImport] Removed legacy file: ${legacyPath}`);
-    } catch {
-      // Not found — nothing to migrate
-    }
-
-    return { success: true, path: filePath };
-  } catch (err) {
-    return {
-      success: false,
-      message: err instanceof Error ? err.message : "Failed to write post file",
-    };
-  }
-}
-
-/**
- * Fetches and imports all published posts from a Spire blog (paginated).
- * Shared core used by the syncAllPosts action and the startup/cron auto-sync.
- *
- * Pass the `activeSyncs` Set from mod.ts to prevent the file-watcher from
- * bouncing imported posts back to Spire.
- */
-export async function syncBlogPosts(
-  blogSlug: string,
-  options: {
-    spireUrl?: string;
-    limit?: number;
-    activeSyncs?: Set<string>;
-    logPrefix?: string;
-  } = {},
-): Promise<SyncResult> {
-  const {
-    spireUrl = SPIRE_BASE_URL,
-    limit = 500,
-    activeSyncs,
-    logPrefix = "[SyncBlog]",
-  } = options;
-
-  let page = 1;
-  let totalPages = 1;
-  let synced = 0;
-  let failed = 0;
-  let skipped = 0;
-  const errors: string[] = [];
-
-  while (page <= totalPages && (synced + failed) < limit) {
-    const listController = new AbortController();
-    const listTimeout = setTimeout(() => listController.abort(), 15_000);
-    let listResponse: Response;
-
-    try {
-      listResponse = await fetch(
-        `${spireUrl}/api/blog/${
-          encodeURIComponent(blogSlug)
-        }?page=${page}&perPage=50`,
-        { signal: listController.signal },
-      );
-    } catch (err) {
-      clearTimeout(listTimeout);
-      logger.error(`${logPrefix} Listing page ${page} fetch error:`, err);
-      errors.push(`page:${page}`);
-      failed++;
-      break;
-    } finally {
-      clearTimeout(listTimeout);
-    }
-
-    if (!listResponse.ok) {
-      logger.error(
-        `${logPrefix} Listing page ${page} returned ${listResponse.status}`,
-      );
-      failed++;
-      errors.push(`listing-page-${page}:HTTP ${listResponse.status}`);
-      break;
-    }
-
-    const { posts, pagination } = await listResponse.json() as {
-      posts: Array<{ slug: string }>;
-      pagination: { totalPages: number };
-    };
-
-    totalPages = pagination?.totalPages ?? 1;
-
-    for (const summary of posts ?? []) {
-      if ((synced + failed) >= limit) {
-        skipped++;
-        continue;
-      }
-
-      if (activeSyncs) {
-        activeSyncs.add(summary.slug);
-        setTimeout(() => activeSyncs.delete(summary.slug), 15_000);
-      }
-
-      const result = await importSpirePost(blogSlug, summary.slug, spireUrl);
-      if (result.success) {
-        synced++;
-      } else {
-        failed++;
-        errors.push(`${summary.slug}: ${result.message ?? "unknown error"}`);
-        logger.error(
-          `${logPrefix} Failed to import "${summary.slug}": ${result.message}`,
-        );
-      }
-    }
-
-    page++;
-  }
-
-  return { synced, failed, skipped, errors };
 }
 
 // ---------------------------------------------------------------------------
@@ -450,11 +165,10 @@ export function compileBlocksToHtml(blocks?: Block[]): string {
             "important",
             "caution",
           ];
-          const variant = allowedVariants.includes(
-              String(content.variant || "").trim(),
-            )
-            ? String(content.variant).trim()
-            : "info";
+          const variant =
+            allowedVariants.includes(String(content.variant || "").trim())
+              ? String(content.variant).trim()
+              : "info";
           return `<div class="callout callout-${variant}"><strong>${
             escapeHtml(content.title)
           }</strong><p>${sanitizeHtml(content.body)}</p></div>`;
@@ -522,11 +236,7 @@ export function compileBlocksToHtml(blocks?: Block[]): string {
 
         case "stat-group": {
           type Stat = { value?: string; label?: string };
-          const stats = safeJsonParse<Stat[]>(
-            content.stats,
-            [],
-            Array.isArray,
-          );
+          const stats = safeJsonParse<Stat[]>(content.stats, [], Array.isArray);
           return `<div class="stat-group">${
             stats.map((s) =>
               `<div class="stat"><span class="stat-value">${
@@ -586,7 +296,6 @@ export function compileBlocksToHtml(blocks?: Block[]): string {
           }" class="btn">${escapeHtml(content.text)}</a></div>`;
 
         default:
-          // SystemBlock, CustomBlock, and unknown future types
           if (content.html) return sanitizeHtml(content.html);
           if (content.text) return `<p>${escapeHtml(content.text)}</p>`;
           return "";

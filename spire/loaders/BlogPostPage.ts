@@ -2,6 +2,7 @@ import { logger } from "@deco/deco/o11y";
 import { AppContext } from "../mod.ts";
 import { BlogPost, BlogPostPage, SpirePost } from "../types.ts";
 import { blocksToSections } from "../utils/blocksToSections.ts";
+import { compileBlocksToHtml } from "../../blog/utils/spireImport.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { Resolved } from "@deco/deco";
 import { Section } from "@deco/deco/blocks";
@@ -15,7 +16,7 @@ export interface Props {
  * @description Fetches a specific Spire blog post page by its slug.
  */
 export const cache = {
-  maxAge: 60 * 60 * 24, // 24 hours
+  maxAge: 60, // 1 minute — near-real-time for Spire publish
 };
 
 export const cacheKey = (props: Props, _req: Request, ctx: AppContext) => {
@@ -86,6 +87,7 @@ export function spirePostToBlogPost(
       description: post.version.metaDescription,
       image: post.version.imageUrl,
     },
+    content: compileBlocksToHtml(post.version.blocks),
     sections: blocksToSections(post.version.blocks, overrides),
   };
 }

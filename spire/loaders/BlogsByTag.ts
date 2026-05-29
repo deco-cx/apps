@@ -17,13 +17,15 @@ export interface Props {
  * @description Retrieves all published posts for a specific Spire blog tag.
  */
 export const cache = {
-  maxAge: 60 * 60 * 24, // 24 hours
+  maxAge: 60, // 1 minute — near-real-time for Spire publish
 };
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(req.url);
   const slug = props.tagSlug ?? url.searchParams.get("tagSlug") ?? "";
-  return `spire-by-tag::${encodeURIComponent(ctx.account)}::${encodeURIComponent(slug)}`;
+  return `spire-by-tag::${encodeURIComponent(ctx.account)}::${
+    encodeURIComponent(slug)
+  }`;
 };
 
 export default async function BlogsByTag(

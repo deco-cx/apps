@@ -20,7 +20,7 @@ export interface Props {
  * @description Retrieves a list of Spire blog posts.
  */
 export const cache = {
-  maxAge: 60 * 60 * 24, // 24 hours
+  maxAge: 60, // 1 minute — near-real-time for Spire publish
 };
 
 const MAX_COUNT = 100;

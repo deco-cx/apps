@@ -7,7 +7,7 @@ import { Author, SpireAuthorFull } from "../types.ts";
  * @description Retrieves all authors from a Spire blog.
  */
 export const cache = {
-  maxAge: 60 * 60 * 24, // 24 hours
+  maxAge: 60, // 1 minute — near-real-time for Spire publish
 };
 
 export const cacheKey = (
