@@ -101,6 +101,48 @@ function runStartupSync(blogSlug: string, spireUrl: string): void {
 }
 
 // ---------------------------------------------------------------------------
+// Periodic reconciliation — catches edits missed by webhooks (Deno Deploy only)
+// ---------------------------------------------------------------------------
+
+/** Tracks the latest configured slug/base so the hourly cron always uses current values. */
+let latestBlogSlug: string | null = null;
+let latestSpireBase = "https://spire.blog";
+let reconcileCronRegistered = false;
+
+/**
+ * Registers a Deno.cron that re-syncs all Spire posts once per hour.
+ * Only runs in Deno Deploy (where Deno.cron is available).
+ *
+ * Why hourly and not shorter: each sync makes 1 listing call + N post calls
+ * (one per post). Hourly keeps API load reasonable (24×N calls/day vs 288×N
+ * at 5-minute intervals). Webhooks handle real-time updates; this is a
+ * safety-net for missed webhooks and edited-but-not-published changes.
+ *
+ * Local daemon: watchFs already reloads blocks on disk change. A webhook
+ * configured with a tunnel (e.g. ngrok) or a server restart covers edits.
+ */
+function registerReconcileCron(): void {
+  if (reconcileCronRegistered) return;
+
+  const denoWithCron = Deno as typeof Deno & {
+    cron?: (
+      name: string,
+      schedule: string,
+      handler: () => void | Promise<void>,
+    ) => void;
+  };
+
+  if (typeof denoWithCron.cron !== "function") return; // local daemon — skip
+
+  reconcileCronRegistered = true;
+  denoWithCron.cron("spire-reconcile", "0 * * * *", () => {
+    // Re-read slug at cron time so config changes are respected.
+    if (latestBlogSlug) runStartupSync(latestBlogSlug, latestSpireBase);
+  });
+  logger.info("[SpireAutoSync] Registered hourly Deno.cron reconciliation.");
+}
+
+// ---------------------------------------------------------------------------
 // App entry point
 // ---------------------------------------------------------------------------
 
@@ -109,7 +151,7 @@ function runStartupSync(blogSlug: string, spireUrl: string): void {
  * @description A blog app for Deco.cx. Supports native block-based posts and
  *   Spire AI integration: when a Spire Blog Slug is configured, all published
  *   Spire posts are automatically synced to Deco Studio's CMS collection browser
- *   on startup, and new posts are synced via webhook when published in Spire.
+ *   on startup and every 5 minutes (picks up edits even without webhooks).
  *   The live site always fetches from both sources in real-time.
  * @category Tool
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/weather/logo.png
@@ -128,11 +170,22 @@ export default function App(state: State): App<Manifest, BlogState> {
     })
     : undefined;
 
-  // Automatically sync all published Spire posts to blocks on first load
-  // (or when the configured slug changes) so they appear in Studio CMS.
-  if (state.allowedBlogSlug && state.allowedBlogSlug !== lastSyncedSlug) {
-    lastSyncedSlug = state.allowedBlogSlug;
-    setTimeout(() => runStartupSync(state.allowedBlogSlug!, spireBase), 3_000);
+  if (state.allowedBlogSlug) {
+    // Keep latest values so the hourly cron always uses current config.
+    latestBlogSlug = state.allowedBlogSlug;
+    latestSpireBase = spireBase;
+
+    // Startup sync: runs once per process on first configuration or slug change.
+    if (state.allowedBlogSlug !== lastSyncedSlug) {
+      lastSyncedSlug = state.allowedBlogSlug;
+      setTimeout(
+        () => runStartupSync(state.allowedBlogSlug!, spireBase),
+        3_000,
+      );
+    }
+
+    // Register the hourly Deno.cron reconciliation (Deno Deploy only, once per process).
+    registerReconcileCron();
   }
 
   return { manifest, state: { ...state, spireApi } };
