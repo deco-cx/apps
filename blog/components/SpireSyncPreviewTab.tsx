@@ -145,9 +145,9 @@ export default function SpireSyncPreviewTab({
           color: "#6ee7b7",
         }}
       >
-        Optional webhook URL for event notifications:{" "}
+        Webhook URL for Spire notifications (configure in Spire Settings):{" "}
         <code style={{ fontFamily: "monospace", color: "#a7f3d0" }}>
-          /live/invoke/blog/actions/webhook.ts
+          https://your-site.deco.site/live/invoke/blog/actions/webhook.ts
         </code>
       </div>
     </div>
