@@ -50,8 +50,45 @@ export type AppContext = FnContext<BlogState, Manifest>;
 // Auto-sync: write Spire posts to .deco/blocks/ so they appear in Studio CMS
 // ---------------------------------------------------------------------------
 
-/** Last slug that triggered a full startup sync — prevents redundant syncs. */
+/**
+ * Last slug seen in this module session. Used only to detect slug CHANGES
+ * between App() calls within the same process lifetime. It resets to null
+ * on every HMR reload — that is intentional and handled by spireBlocksExist().
+ */
 let lastSyncedSlug: string | null = null;
+
+/**
+ * Guards against double sync when Deco calls App() multiple times rapidly
+ * (e.g. on dependency resolution). Set to true when a sync is scheduled;
+ * cleared after the async check+run completes so future slug changes can
+ * trigger a new sync.
+ */
+let syncScheduled = false;
+
+/**
+ * Returns true if any Spire post block files already exist on disk.
+ * Avoids redundant syncs on HMR restarts and server restarts when posts
+ * are already present in .deco/blocks/.
+ */
+async function spireBlocksExist(): Promise<boolean> {
+  try {
+    // Use Deno.cwd() directly — avoids importing 'join' which causes
+    // HMR "blocked by top-level ES module change" on first run.
+    const blocksDir = `${Deno.cwd()}/.deco/blocks`;
+    for await (const entry of Deno.readDir(blocksDir)) {
+      if (
+        entry.isFile &&
+        entry.name.includes("posts%2F") &&
+        entry.name.endsWith(".json")
+      ) {
+        return true;
+      }
+    }
+  } catch {
+    // Directory absent or unreadable — treat as empty
+  }
+  return false;
+}
 
 /**
  * Fetches all published posts from the Spire API and writes them to blocks
@@ -163,10 +200,18 @@ export default function App(state: State): App<Manifest, BlogState> {
     .replace(/\/+$/, "")
     .replace(/\/api$/, "");
 
+  // Wrap fetchSafe with a 10-second timeout so loader requests to the Spire
+  // API never hang indefinitely (which would cause infinite loading in Studio).
+  const fetchWithTimeout: typeof fetchSafe = (url, init) =>
+    fetchSafe(url, {
+      ...init,
+      signal: init?.signal ?? AbortSignal.timeout(10_000),
+    });
+
   const spireApi = state.allowedBlogSlug
     ? createHttpClient<SpireApi>({
       base: `${spireBase}/api`,
-      fetcher: fetchSafe,
+      fetcher: fetchWithTimeout,
     })
     : undefined;
 
@@ -175,13 +220,38 @@ export default function App(state: State): App<Manifest, BlogState> {
     latestBlogSlug = state.allowedBlogSlug;
     latestSpireBase = spireBase;
 
-    // Startup sync: runs once per process on first configuration or slug change.
-    if (state.allowedBlogSlug !== lastSyncedSlug) {
-      lastSyncedSlug = state.allowedBlogSlug;
-      setTimeout(
-        () => runStartupSync(state.allowedBlogSlug!, spireBase),
-        3_000,
-      );
+    // Detect a real slug change within the same process session.
+    // lastSyncedSlug === null means "first call this session" OR "HMR reload" —
+    // both are resolved by the filesystem check in the deferred callback.
+    const slugChangedFromKnownValue = lastSyncedSlug !== null &&
+      lastSyncedSlug !== state.allowedBlogSlug;
+    lastSyncedSlug = state.allowedBlogSlug;
+
+    // Guard: Deco calls App() multiple times during dependency resolution.
+    // syncScheduled prevents concurrent setTimeouts from triggering two syncs.
+    if (!syncScheduled || slugChangedFromKnownValue) {
+      syncScheduled = true;
+      setTimeout(async () => {
+        try {
+          // Slug changed from a known value → always sync (new blog configured).
+          if (slugChangedFromKnownValue) {
+            runStartupSync(state.allowedBlogSlug!, spireBase);
+            return;
+          }
+          // First call or HMR reset: only sync if no blocks exist yet.
+          const hasBlocks = await spireBlocksExist();
+          if (hasBlocks) {
+            logger.info(
+              `[SpireAutoSync] Blocks exist — skipping startup sync for "${state.allowedBlogSlug}".`,
+            );
+          } else {
+            runStartupSync(state.allowedBlogSlug!, spireBase);
+          }
+        } finally {
+          // Release the guard so the next slug change can schedule a sync.
+          syncScheduled = false;
+        }
+      }, 3_000);
     }
 
     // Register the hourly Deno.cron reconciliation (Deno Deploy only, once per process).
