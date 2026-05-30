@@ -60,7 +60,7 @@ export default function SpireSync(
 
             {/* Link to Spire dashboard */}
             <a
-              href={`${spireUrl}/app/${blogSlug}`}
+              href={`${spireUrl}/app/${encodeURIComponent(blogSlug ?? "")}`}
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-600/20 text-violet-300 border border-violet-500/30 hover:bg-violet-600/30 transition-colors"

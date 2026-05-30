@@ -99,12 +99,12 @@ export function spirePostToBlogPost(post: SpirePost): BlogPost {
     excerpt: post.version.description,
     image: post.version.imageUrl,
     alt: post.version.title,
-    authors: post.authors.map((a) => ({
+    authors: (post.authors ?? []).map((a) => ({
       name: a.name,
       email: "",
       avatar: a.avatarUrl ?? undefined,
     })),
-    categories: post.tags.map((t) => ({ name: t.name, slug: t.slug })),
+    categories: (post.tags ?? []).map((t) => ({ name: t.name, slug: t.slug })),
     date: (post.publishedAt ?? new Date().toISOString()).slice(0, 10),
     slug: post.slug,
     seo: {
@@ -129,7 +129,7 @@ export function spirePostSummaryToBlogPost(
     alt: summary.title,
     authors: [],
     categories: [],
-    date: (summary.publishedAt ?? "").slice(0, 10),
+    date: (summary.publishedAt ?? new Date().toISOString()).slice(0, 10),
     slug: summary.slug,
     spirePostId: summary.id,
   };

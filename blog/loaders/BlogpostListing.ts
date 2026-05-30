@@ -50,8 +50,9 @@ export const cacheKey = (
   const sort = String(
     props.sortBy ?? url.searchParams.get("sortBy") ?? "date_desc",
   );
+  const query = String(props.query ?? url.searchParams.get("q") ?? "");
   const spire = ctx.allowedBlogSlug ?? "native";
-  return `blog-listing-${spire}-p${page}-c${count}-s${slug}-${sort}`;
+  return `blog-listing-${spire}-p${page}-c${count}-s${slug}-${sort}-q${query}`;
 };
 
 /**
@@ -130,7 +131,7 @@ async function fetchSpirePosts(
     }
 
     const { posts } = await spireApi["GET /blog/:account"](
-      { account: allowedBlogSlug, perPage: 100 },
+      { account: allowedBlogSlug, perPage: 500 },
     ).then((r) => r.json());
     return (posts ?? []).map(spirePostSummaryToBlogPost);
   } catch (e) {

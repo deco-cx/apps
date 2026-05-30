@@ -22,7 +22,9 @@ export const cache = {
 };
 
 export const cacheKey = (props: Props, _req: Request, ctx: AppContext) => {
-  return `spire-item-${ctx.account}-${props.slug}`;
+  return `spire-item-${encodeURIComponent(ctx.account)}-${
+    encodeURIComponent(String(props.slug))
+  }`;
 };
 
 export default async function BlogPostItem(

@@ -56,8 +56,10 @@ export const cacheKey = (
   const sort = String(
     props.sortBy ?? url.searchParams.get("sortBy") ?? "date_desc",
   );
+  const query = String(props.query ?? url.searchParams.get("q") ?? "");
+  const slugs = JSON.stringify(props.postSlugs ?? []);
   const spire = ctx.allowedBlogSlug ?? "native";
-  return `blog-list-${spire}-p${page}-c${count}-s${slug}-${sort}`;
+  return `blog-list-${spire}-p${page}-c${count}-s${slug}-${sort}-q${query}-${slugs}`;
 };
 
 /**
@@ -143,8 +145,10 @@ async function fetchSpirePosts(
       }));
     }
 
+    // Fetch up to 500 Spire posts — covers the vast majority of blogs.
+    // For blogs >500 posts, only the first 500 Spire posts are returned.
     const { posts } = await spireApi["GET /blog/:account"](
-      { account: allowedBlogSlug, perPage: 100 },
+      { account: allowedBlogSlug, perPage: 500 },
     ).then((r) => r.json());
     return (posts ?? []).map(spirePostSummaryToBlogPost);
   } catch (e) {

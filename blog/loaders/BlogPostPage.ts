@@ -16,11 +16,12 @@ export const cache = { maxAge: 60 };
 
 export const cacheKey = (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): string => {
   const spire = ctx.allowedBlogSlug ?? "native";
-  return `blog-page-${spire}-${props.slug}`;
+  const host = new URL(req.url).hostname;
+  return `blog-page-${spire}-${props.slug}-${host}`;
 };
 
 /**

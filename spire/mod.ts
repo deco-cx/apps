@@ -80,9 +80,20 @@ interface State extends Props {
  * @logo https://spire.blog/favicon.ico
  */
 export default function Spire({ account, apiKey, overrideSections }: Props) {
+  const resolvedApiKey = typeof apiKey === "string" ? apiKey : apiKey?.get?.();
+
   const api = createHttpClient<SpireApi>({
     base: BASE_URL,
-    fetcher: fetchSafe,
+    fetcher: resolvedApiKey
+      ? (url, init) =>
+        fetchSafe(url, {
+          ...init,
+          headers: {
+            ...(init?.headers as Record<string, string> | undefined),
+            Authorization: `Bearer ${resolvedApiKey}`,
+          },
+        })
+      : fetchSafe,
   });
 
   const overrideMap = Object.fromEntries(

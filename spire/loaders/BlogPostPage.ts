@@ -74,12 +74,12 @@ export function spirePostToBlogPost(
     excerpt: post.version.description,
     image: post.version.imageUrl,
     alt: post.version.title,
-    authors: post.authors.map((a) => ({
+    authors: (post.authors ?? []).map((a) => ({
       name: a.name,
       email: "",
       avatar: a.avatarUrl ?? undefined,
     })),
-    categories: post.tags.map((t) => ({ name: t.name, slug: t.slug })),
+    categories: (post.tags ?? []).map((t) => ({ name: t.name, slug: t.slug })),
     date: post.publishedAt ?? "",
     slug: post.slug,
     seo: {

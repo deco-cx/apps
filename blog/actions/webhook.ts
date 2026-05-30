@@ -52,7 +52,6 @@ export default async function webhook(
   // 4. Authenticate — HMAC-SHA256 first, Bearer token fallback
   const spireSignature = req.headers.get("X-Spire-Signature");
   const authHeader = req.headers.get("Authorization");
-  const querySecret = new URL(req.url).searchParams.get("secret");
 
   let authorized = false;
 
@@ -66,7 +65,9 @@ export default async function webhook(
   }
 
   if (!authorized) {
-    const token = authHeader?.replace("Bearer ", "") || querySecret;
+    // Bearer token fallback — never accept credentials via URL query params
+    // as they appear in server logs and browser history.
+    const token = authHeader?.replace("Bearer ", "");
     authorized = !!token && token === secret;
   }
 

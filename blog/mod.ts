@@ -115,7 +115,11 @@ function runStartupSync(blogSlug: string, spireUrl: string): void {
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/weather/logo.png
  */
 export default function App(state: State): App<Manifest, BlogState> {
-  const spireBase = (state.spireUrl ?? "https://spire.blog").replace(/\/$/, "");
+  // Normalize: strip trailing slash and any trailing "/api" so users can enter
+  // either "https://spire.blog" or "https://spire.blog/api" without double-path.
+  const spireBase = (state.spireUrl ?? "https://spire.blog")
+    .replace(/\/+$/, "")
+    .replace(/\/api$/, "");
 
   const spireApi = state.allowedBlogSlug
     ? createHttpClient<SpireApi>({
