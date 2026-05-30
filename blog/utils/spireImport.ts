@@ -180,16 +180,50 @@ function safeJsonParse<T>(
   value: unknown,
   fallback: T,
   validator?: (v: unknown) => boolean,
+  context?: string,
 ): T {
   if (typeof value !== "string") return fallback;
   try {
     const parsed = JSON.parse(value);
     if (validator && !validator(parsed)) return fallback;
     return parsed as T;
-  } catch (e) {
-    logger.error("[SpireImport] JSON parse error in block content:", e);
+  } catch {
+    const preview = value.length > 80 ? value.slice(0, 80) + "…" : value;
+    logger.warn(
+      `[SpireImport] JSON parse failed${
+        context ? ` (${context})` : ""
+      }: ${preview}`,
+    );
     return fallback;
   }
+}
+
+/**
+ * Parse a string that is either a JSON array or a plain newline/comma-separated
+ * list. Used for block content fields like `list.items` and `checklist.items`
+ * where Spire may send either format.
+ */
+function parseStringList(
+  value: unknown,
+  context: string,
+): string[] {
+  if (Array.isArray(value)) return value as string[];
+  if (typeof value !== "string" || !value.trim()) return [];
+
+  // Try JSON array first
+  const parsed = safeJsonParse<string[]>(
+    value,
+    null as unknown as string[],
+    Array.isArray,
+    context,
+  );
+  if (parsed !== null && Array.isArray(parsed)) return parsed;
+
+  // Fallback: split by newlines, then by commas if single-line
+  const lines = value.split("\n").map((s) => s.trim()).filter(Boolean);
+  return lines.length > 1
+    ? lines
+    : value.split(",").map((s) => s.trim()).filter(Boolean);
 }
 
 /** Converts Spire's modular block array to semantic HTML. XSS-safe. */
@@ -215,9 +249,7 @@ export function compileBlocksToHtml(blocks?: Block[]): string {
 
         case "list": {
           const tag = content.style === "ordered" ? "ol" : "ul";
-          const items = Array.isArray(content.items)
-            ? content.items
-            : safeJsonParse<string[]>(content.items, [], Array.isArray);
+          const items = parseStringList(content.items, "list.items");
           return `<${tag}>${
             items.map((i: string) => `<li>${sanitizeHtml(i)}</li>`).join("")
           }</${tag}>`;
@@ -257,7 +289,12 @@ export function compileBlocksToHtml(blocks?: Block[]): string {
 
         case "card-group": {
           type Card = { icon?: string; title?: string; body?: string };
-          const cards = safeJsonParse<Card[]>(content.cards, [], Array.isArray);
+          const cards = safeJsonParse<Card[]>(
+            content.cards,
+            [],
+            Array.isArray,
+            "card-group.cards",
+          );
           return `<div class="card-group">${
             cards.map((c) =>
               `<div class="card">${
@@ -272,9 +309,7 @@ export function compileBlocksToHtml(blocks?: Block[]): string {
         }
 
         case "checklist": {
-          const items = Array.isArray(content.items)
-            ? content.items
-            : safeJsonParse<string[]>(content.items, [], Array.isArray);
+          const items = parseStringList(content.items, "checklist.items");
           return `${
             content.title ? `<h3>${escapeHtml(content.title)}</h3>` : ""
           }<ul class="checklist">${
@@ -288,7 +323,12 @@ export function compileBlocksToHtml(blocks?: Block[]): string {
           type Step = { title?: string; description?: string };
           const steps = Array.isArray(content.steps)
             ? content.steps as Step[]
-            : safeJsonParse<Step[]>(content.steps, [], Array.isArray);
+            : safeJsonParse<Step[]>(
+              content.steps,
+              [],
+              Array.isArray,
+              "steps.steps",
+            );
           return `${
             content.title ? `<h3>${escapeHtml(content.title)}</h3>` : ""
           }<ol class="steps">${
@@ -317,7 +357,12 @@ export function compileBlocksToHtml(blocks?: Block[]): string {
 
         case "stat-group": {
           type Stat = { value?: string; label?: string };
-          const stats = safeJsonParse<Stat[]>(content.stats, [], Array.isArray);
+          const stats = safeJsonParse<Stat[]>(
+            content.stats,
+            [],
+            Array.isArray,
+            "stat-group.stats",
+          );
           return `<div class="stat-group">${
             stats.map((s) =>
               `<div class="stat"><span class="stat-value">${
@@ -333,8 +378,18 @@ export function compileBlocksToHtml(blocks?: Block[]): string {
 
         case "comparison": {
           type Side = { title?: string; items?: string[] };
-          const left = safeJsonParse<Side>(content.left, {});
-          const right = safeJsonParse<Side>(content.right, {});
+          const left = safeJsonParse<Side>(
+            content.left,
+            {},
+            undefined,
+            "comparison.left",
+          );
+          const right = safeJsonParse<Side>(
+            content.right,
+            {},
+            undefined,
+            "comparison.right",
+          );
           const renderSide = (s: Side) =>
             `<div class="comparison-side"><strong>${
               escapeHtml(s.title)
