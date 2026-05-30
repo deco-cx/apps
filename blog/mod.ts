@@ -169,14 +169,25 @@ function registerReconcileCron(): void {
     ) => void;
   };
 
-  if (typeof denoWithCron.cron !== "function") return; // local daemon — skip
-
   reconcileCronRegistered = true;
-  denoWithCron.cron("spire-reconcile", "0 * * * *", () => {
-    // Re-read slug at cron time so config changes are respected.
-    if (latestBlogSlug) runStartupSync(latestBlogSlug, latestSpireBase);
-  });
-  logger.info("[SpireAutoSync] Registered hourly Deno.cron reconciliation.");
+
+  if (typeof denoWithCron.cron === "function") {
+    // Deno Deploy: use cron for reliable hourly scheduling.
+    denoWithCron.cron("spire-reconcile", "0 * * * *", () => {
+      if (latestBlogSlug) runStartupSync(latestBlogSlug, latestSpireBase);
+    });
+    logger.info("[SpireAutoSync] Registered hourly Deno.cron reconciliation.");
+  } else {
+    // Local daemon: webhooks can't reach localhost from cloud Spire servers,
+    // so use a 30-minute interval as a fallback to pick up post edits.
+    // 30 min = 48×N calls/day (much cheaper than the rejected 5-min / 288×N).
+    setInterval(() => {
+      if (latestBlogSlug) runStartupSync(latestBlogSlug, latestSpireBase);
+    }, 30 * 60 * 1_000);
+    logger.info(
+      "[SpireAutoSync] Registered 30-min setInterval fallback (local dev).",
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------
