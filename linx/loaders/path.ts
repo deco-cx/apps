@@ -1,4 +1,6 @@
+import { logger } from "@deco/deco/o11y";
 import { STALE } from "../../utils/fetch.ts";
+import { cleanResponse } from "../../utils/http.ts";
 import type { AppContext } from "../mod.ts";
 import type { API } from "../utils/client.ts";
 import { redirect } from "@deco/deco";
@@ -58,6 +60,14 @@ async function loader(
     const redirectUrl = new URL(redirectUrlRaw);
     throw redirect(redirectUrl);
   }
-  return response.json();
+
+  const data = await cleanResponse<API["GET /*splat"]["response"]>(response);
+
+  if (typeof data !== "object") {
+    logger.error(`Failed to parse response from linx as JSON: ${data}`);
+    return null;
+  }
+
+  return data;
 }
 export default loader;

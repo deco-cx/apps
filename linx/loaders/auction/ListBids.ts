@@ -1,6 +1,7 @@
+import { logger } from "@deco/deco/o11y";
 import type { AppContext } from "../../../linx/mod.ts";
-import { nullOnNotFound } from "../../../utils/http.ts";
-import { Bids } from "../../utils/types/ListBidsJSON.ts";
+import { cleanResponse, nullOnNotFound } from "../../../utils/http.ts";
+import { Bids, WebPage } from "../../utils/types/ListBidsJSON.ts";
 
 /**
  * @title Linx Integration
@@ -26,7 +27,12 @@ const bidsloader = async (
     return null;
   }
 
-  const auction = await response.json();
+  const auction = await cleanResponse<WebPage>(response);
+
+  if (typeof auction !== "object") {
+    logger.error(`Failed to parse response from linx as JSON: ${auction}`);
+    return null;
+  }
 
   return auction.Bids;
 };
