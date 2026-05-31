@@ -4,9 +4,10 @@
  *
  * Block storage path: .deco/blocks/collections%2Fblog%2Fposts%2F{slug}.json
  *
- * Dual-purpose architecture:
- *   • Loaders:  fetch from Spire API in real-time (live site, no deploy needed)
- *   • Webhook:  also write to blocks so posts appear in Deco Studio CMS browser
+ * Architecture:
+ *   • Loaders: read from .deco/blocks/ only (pure, no external calls)
+ *   • Webhook + sync: write to .deco/blocks/ so posts appear in Studio CMS
+ *   • File watcher (mod.ts): detects Studio edits and syncs metadata back to Spire
  */
 
 import { logger } from "@deco/deco/o11y";
@@ -16,6 +17,16 @@ import { Block, SpirePost, SpirePostSummary } from "../../spire/types.ts";
 import { sanitizeHref, sanitizeHtml } from "../../spire/utils/sanitizeHtml.ts";
 
 export const SPIRE_BASE_URL = "https://spire.blog";
+
+/**
+ * Set of post slugs currently being written by syncPostToBlocks.
+ * The file watcher in mod.ts checks this set before calling sync-manual
+ * to prevent a feedback loop: sync writes block → watcher detects change
+ * → watcher would call sync-manual → which is redundant and potentially loops.
+ *
+ * Also exported to webhook.ts for the same reason.
+ */
+export const activeSyncs = new Set<string>();
 
 // ---------------------------------------------------------------------------
 // Block filesystem helpers (for Studio CMS visibility)
@@ -58,13 +69,21 @@ export async function syncPostToBlocks(
 
     const blogPost = spirePostToBlogPost(post);
     const collectionPath = `collections/blog/posts/${postSlug}`;
+    // SpirePost.ts loader: content/id/spirePostId are @hide, only
+    // title/excerpt/seo are editable so Studio edits can be synced back.
     const resolvable = {
       name: collectionPath,
-      __resolveType: "blog/loaders/Blogpost.ts",
+      __resolveType: "blog/loaders/SpirePost.ts",
       post: blogPost,
     };
 
     await Deno.mkdir(BLOCKS_DIR, { recursive: true });
+
+    // Register in activeSyncs BEFORE writing so the file watcher in mod.ts
+    // skips this slug and does not call sync-manual immediately after the write.
+    activeSyncs.add(postSlug);
+    setTimeout(() => activeSyncs.delete(postSlug), 15_000);
+
     await Deno.writeTextFile(
       blockFilePath(collectionPath),
       JSON.stringify(resolvable, null, 2),
@@ -97,8 +116,8 @@ export function spirePostToBlogPost(post: SpirePost): BlogPost {
     id: post.id,
     title: post.version.title,
     excerpt: post.version.description,
-    image: post.version.imageUrl,
-    alt: post.version.title,
+    image: post.version.imageUrl || undefined,
+    alt: post.version.title || undefined,
     authors: (post.authors ?? []).map((a) => ({
       name: a.name,
       email: "",
@@ -110,7 +129,8 @@ export function spirePostToBlogPost(post: SpirePost): BlogPost {
     seo: {
       title: post.version.metaTitle || post.version.title,
       description: post.version.metaDescription || post.version.description,
-      image: post.version.imageUrl,
+      // Avoid passing empty string — ImageWidget validator requires a non-empty URL.
+      image: post.version.imageUrl || undefined,
     },
     content: compileBlocksToHtml(post.version.blocks),
     spirePostId: post.id,

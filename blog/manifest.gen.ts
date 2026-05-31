@@ -25,6 +25,7 @@ import * as $$$15 from "./loaders/extensions/BlogpostPage.ts";
 import * as $$$16 from "./loaders/extensions/BlogpostPage/ratings.ts";
 import * as $$$17 from "./loaders/extensions/BlogpostPage/reviews.ts";
 import * as $$$8 from "./loaders/GetCategories.ts";
+import * as $$$18 from "./loaders/SpirePost.ts";
 import * as $$$$$$0 from "./sections/Seo/SeoBlogPost.tsx";
 import * as $$$$$$1 from "./sections/Seo/SeoBlogPostListing.tsx";
 import * as $$$$$$2 from "./sections/SpireSync.tsx";
@@ -50,6 +51,7 @@ const manifest = {
     "blog/loaders/extensions/BlogpostPage/ratings.ts": $$$16,
     "blog/loaders/extensions/BlogpostPage/reviews.ts": $$$17,
     "blog/loaders/GetCategories.ts": $$$8,
+    "blog/loaders/SpirePost.ts": $$$18,
   },
   "sections": {
     "blog/sections/Seo/SeoBlogPost.tsx": $$$$$$0,

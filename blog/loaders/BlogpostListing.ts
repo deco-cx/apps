@@ -1,12 +1,10 @@
 import { logger } from "@deco/deco/o11y";
-import { HttpError } from "../../utils/http.ts";
 import { PageInfo } from "../../commerce/types.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost, BlogPostListingPage, SortBy } from "../types.ts";
 import handlePosts, { slicePosts } from "../core/handlePosts.ts";
 import { getRecordsByPath } from "../core/records.ts";
-import { spirePostSummaryToBlogPost } from "../utils/spireImport.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
@@ -41,7 +39,7 @@ export const cache = { maxAge: 60 };
 export const cacheKey = (
   props: Props,
   req: Request,
-  ctx: AppContext,
+  _ctx: AppContext,
 ): string => {
   const url = new URL(req.url);
   const page = Number(props.page ?? url.searchParams.get("page") ?? 1);
@@ -51,14 +49,13 @@ export const cacheKey = (
     props.sortBy ?? url.searchParams.get("sortBy") ?? "date_desc",
   );
   const query = String(props.query ?? url.searchParams.get("q") ?? "");
-  const spire = ctx.allowedBlogSlug ?? "native";
-  return `blog-listing-${spire}-p${page}-c${count}-s${slug}-${sort}-q${query}`;
+  return `blog-listing-p${page}-c${count}-s${slug}-${sort}-q${query}`;
 };
 
 /**
  * @title BlogPostListing
- * @description Returns a paginated listing page merging native Deco posts with
- *   live Spire posts (when a Spire Blog Slug is configured).
+ * @description Returns a paginated listing page of blog posts from native
+ *   Deco block storage. Spire posts are included automatically when synced.
  */
 export default async function BlogPostListing(
   { page, count, slug, sortBy, query }: Props,
@@ -72,18 +69,15 @@ export default async function BlogPostListing(
   const pageSort = (sortBy ?? params.get("sortBy") ?? "date_desc") as SortBy;
   const term = query ?? params.get("q") ?? undefined;
 
-  const nativePosts = await getRecordsByPath<BlogPost>(
+  const posts = await getRecordsByPath<BlogPost>(
     ctx,
     COLLECTION_PATH,
     ACCESSOR,
   );
-  const categoryFilter = typeof slug === "string" ? slug : undefined;
-  const spirePosts = await fetchSpirePosts(ctx, categoryFilter);
-  const merged = mergeBySlug(nativePosts, spirePosts);
 
   try {
     const handled = await handlePosts(
-      merged,
+      posts,
       pageSort,
       ctx,
       slug,
@@ -108,45 +102,6 @@ export default async function BlogPostListing(
     logger.error(e);
     return null;
   }
-}
-
-async function fetchSpirePosts(
-  ctx: AppContext,
-  categorySlug?: string,
-): Promise<BlogPost[]> {
-  const { allowedBlogSlug, spireApi } = ctx;
-  if (!allowedBlogSlug || !spireApi) return [];
-  try {
-    if (categorySlug) {
-      const { posts, tag } = await spireApi["GET /blog/:account/tags/:tagSlug"](
-        { account: allowedBlogSlug, tagSlug: categorySlug },
-      ).then((r) => r.json());
-      const category = { name: tag?.name ?? categorySlug, slug: categorySlug };
-      return (posts ?? []).map((
-        p: Parameters<typeof spirePostSummaryToBlogPost>[0],
-      ) => ({
-        ...spirePostSummaryToBlogPost(p),
-        categories: [category],
-      }));
-    }
-
-    const { posts } = await spireApi["GET /blog/:account"](
-      { account: allowedBlogSlug, perPage: 500 },
-    ).then((r) => r.json());
-    return (posts ?? []).map(spirePostSummaryToBlogPost);
-  } catch (e) {
-    if (e instanceof HttpError && e.status === 404) return [];
-    logger.error(
-      `[BlogpostListing] Failed to fetch Spire posts for "${allowedBlogSlug}":`,
-      e,
-    );
-    return [];
-  }
-}
-
-function mergeBySlug(native: BlogPost[], spire: BlogPost[]): BlogPost[] {
-  const slugs = new Set(native.map((p) => p.slug));
-  return [...native, ...spire.filter((p) => !slugs.has(p.slug))];
 }
 
 const toPageInfo = (

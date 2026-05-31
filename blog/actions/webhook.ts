@@ -65,10 +65,9 @@ export default async function webhook(
   }
 
   if (!authorized) {
-    // Bearer token fallback — never accept credentials via URL query params
-    // as they appear in server logs and browser history.
+    // Bearer token fallback — constant-time compare to prevent timing attacks.
     const token = authHeader?.replace("Bearer ", "");
-    authorized = !!token && token === secret;
+    authorized = !!token && timingSafeCompare(token, secret);
   }
 
   if (!authorized) {
@@ -103,6 +102,19 @@ export default async function webhook(
   return { success: true };
 }
 
+/**
+ * Constant-time string comparison — XORs every byte without short-circuit
+ * to prevent timing-based secret extraction.
+ */
+function timingSafeCompare(a: string, b: string): boolean {
+  const ae = new TextEncoder().encode(a);
+  const be = new TextEncoder().encode(b);
+  if (ae.length !== be.length) return false;
+  let diff = 0;
+  for (let i = 0; i < ae.length; i++) diff |= ae[i] ^ be[i];
+  return diff === 0;
+}
+
 async function verifyHmac(
   payload: string,
   signature: string,
@@ -120,5 +132,6 @@ async function verifyHmac(
   const computed = Array.from(new Uint8Array(buf))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
-  return computed === signature.toLowerCase();
+  // Use constant-time compare to prevent timing-based HMAC oracle attacks.
+  return timingSafeCompare(computed, signature.toLowerCase());
 }

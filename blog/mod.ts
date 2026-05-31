@@ -4,11 +4,9 @@ import { Secret } from "../website/loaders/secret.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
 import { type App, type FnContext } from "@deco/deco";
 import { h } from "preact";
-import { type ClientOf, createHttpClient } from "../utils/http.ts";
-import { fetchSafe } from "../utils/fetch.ts";
-import { SpireApi } from "../spire/utils/client.ts";
 import SpireSyncPreviewTab from "./components/SpireSyncPreviewTab.tsx";
-import { syncPostToBlocks } from "./utils/spireImport.ts";
+import { activeSyncs, syncPostToBlocks } from "./utils/spireImport.ts";
+import type { BlogPost } from "./types.ts";
 
 /** Configurable by the site owner in Deco Studio settings. */
 export type State = {
@@ -38,17 +36,17 @@ export type State = {
   spireUrl?: string;
 };
 
-/** Internal state derived in App() — not user-configured. */
-interface BlogState extends State {
-  /** Typed Spire API HTTP client. Present only when allowedBlogSlug is set. */
-  spireApi?: ClientOf<SpireApi>;
-}
-
-export type AppContext = FnContext<BlogState, Manifest>;
+export type AppContext = FnContext<State, Manifest>;
 
 // ---------------------------------------------------------------------------
 // Auto-sync: write Spire posts to .deco/blocks/ so they appear in Studio CMS
 // ---------------------------------------------------------------------------
+
+/**
+ * Current app state — refreshed on every App() call so the file watcher
+ * always uses up-to-date credentials even after Studio config changes.
+ */
+let latestState: State | null = null;
 
 /**
  * Last slug seen in this module session. Used only to detect slug CHANGES
@@ -56,6 +54,120 @@ export type AppContext = FnContext<BlogState, Manifest>;
  * on every HMR reload — that is intentional and handled by spireBlocksExist().
  */
 let lastSyncedSlug: string | null = null;
+
+let watcherStarted = false;
+
+// ---------------------------------------------------------------------------
+// File watcher — syncs Studio metadata edits back to Spire via sync-manual
+// ---------------------------------------------------------------------------
+
+/**
+ * Starts a Deno.watchFs loop on .deco/blocks/ that detects when a Studio
+ * user edits a SpirePost block (title, excerpt, SEO) and pushes those
+ * changes back to Spire via the sync-manual endpoint.
+ *
+ * Only runs when:
+ *   - Deno.watchFs is available (daemon context, not Deno Deploy serverless)
+ *   - allowedBlogSlug + spireWebhookSecret are configured
+ *   - Not already running (watcherStarted guard)
+ *
+ * Anti-loop: checks activeSyncs so writes from syncPostToBlocks() are ignored.
+ */
+function startFileWatcher(): void {
+  if (watcherStarted) return;
+  if (typeof Deno.watchFs !== "function") return;
+
+  watcherStarted = true;
+  const blocksDir = `${Deno.cwd()}/.deco/blocks`;
+
+  (async () => {
+    let retries = 0;
+    while (retries < 5) {
+      try {
+        await Deno.mkdir(blocksDir, { recursive: true });
+        const watcher = Deno.watchFs(blocksDir);
+
+        for await (const event of watcher) {
+          if (event.kind !== "modify" && event.kind !== "create") continue;
+
+          for (const path of event.paths) {
+            if (!path.endsWith(".json")) continue;
+            if (!path.includes("posts%2F")) continue;
+
+            try {
+              const text = await Deno.readTextFile(path);
+              const data = JSON.parse(text);
+
+              // Only process SpirePost blocks (Spire-sourced posts)
+              if (data?.__resolveType !== "blog/loaders/SpirePost.ts") continue;
+              const post = data?.post as BlogPost | undefined;
+              if (!post?.spirePostId) continue;
+
+              // Skip if this write came from syncPostToBlocks (anti-loop)
+              if (activeSyncs.has(post.slug)) continue;
+
+              // Sync editable metadata back to Spire
+              await notifySpireOfEdit(post);
+            } catch {
+              // Ignore transient read/parse errors on rapid saves
+            }
+          }
+        }
+
+        retries = 0; // reset on clean exit
+      } catch (err) {
+        logger.error("[FileWatcher] Error:", err);
+        watcherStarted = false;
+        retries++;
+        await new Promise((r) => setTimeout(r, 5_000 * retries));
+        watcherStarted = true;
+      }
+    }
+    logger.warn("[FileWatcher] Max retries reached — watcher stopped.");
+    watcherStarted = false;
+  })();
+}
+
+async function notifySpireOfEdit(post: BlogPost): Promise<void> {
+  const state = latestState;
+  if (!state?.allowedBlogSlug || !state.spireWebhookSecret) return;
+
+  const secret = typeof state.spireWebhookSecret === "string"
+    ? state.spireWebhookSecret
+    : state.spireWebhookSecret?.get?.();
+  if (!secret) return;
+
+  const base = (state.spireUrl ?? "https://spire.blog")
+    .replace(/\/+$/, "")
+    .replace(/\/api$/, "");
+
+  try {
+    const res = await fetch(`${base}/api/blog/posts/sync-manual`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${secret}`,
+      },
+      body: JSON.stringify({
+        spirePostId: post.spirePostId,
+        title: post.title,
+        excerpt: post.excerpt,
+        seoTitle: post.seo?.title,
+        seoDescription: post.seo?.description,
+      }),
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (res.ok) {
+      logger.info(`[FileWatcher] Synced metadata for "${post.slug}" to Spire.`);
+    } else {
+      logger.warn(
+        `[FileWatcher] sync-manual returned ${res.status} for "${post.slug}".`,
+      );
+    }
+  } catch (err) {
+    logger.error(`[FileWatcher] sync-manual error for "${post.slug}":`, err);
+  }
+}
 
 /**
  * Guards against double sync when Deco calls App() multiple times rapidly
@@ -204,32 +316,23 @@ function registerReconcileCron(): void {
  * @category Tool
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/weather/logo.png
  */
-export default function App(state: State): App<Manifest, BlogState> {
+export default function App(state: State): App<Manifest, State> {
   // Normalize: strip trailing slash and any trailing "/api" so users can enter
   // either "https://spire.blog" or "https://spire.blog/api" without double-path.
   const spireBase = (state.spireUrl ?? "https://spire.blog")
     .replace(/\/+$/, "")
     .replace(/\/api$/, "");
 
-  // Wrap fetchSafe with a 10-second timeout so loader requests to the Spire
-  // API never hang indefinitely (which would cause infinite loading in Studio).
-  const fetchWithTimeout: typeof fetchSafe = (url, init) =>
-    fetchSafe(url, {
-      ...init,
-      signal: init?.signal ?? AbortSignal.timeout(10_000),
-    });
-
-  const spireApi = state.allowedBlogSlug
-    ? createHttpClient<SpireApi>({
-      base: `${spireBase}/api`,
-      fetcher: fetchWithTimeout,
-    })
-    : undefined;
+  // Always keep latestState fresh so file watcher uses current credentials.
+  latestState = state;
 
   if (state.allowedBlogSlug) {
     // Keep latest values so the hourly cron always uses current config.
     latestBlogSlug = state.allowedBlogSlug;
     latestSpireBase = spireBase;
+
+    // Start the file watcher that syncs Studio metadata edits → Spire.
+    startFileWatcher();
 
     // Detect a real slug change within the same process session.
     // lastSyncedSlug === null means "first call this session" OR "HMR reload" —
@@ -269,7 +372,7 @@ export default function App(state: State): App<Manifest, BlogState> {
     registerReconcileCron();
   }
 
-  return { manifest, state: { ...state, spireApi } };
+  return { manifest, state };
 }
 
 export const preview = (

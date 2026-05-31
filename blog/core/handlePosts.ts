@@ -2,6 +2,7 @@ import { postViews } from "../db/schema.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost, SortBy, ViewFromDatabase } from "../types.ts";
 import { VALID_SORT_ORDERS } from "../utils/constants.ts";
+import { drizzle } from "./records.ts";
 
 /**
  * Returns an sorted BlogPost list
@@ -19,7 +20,7 @@ export const sortPosts = async (
   if (splittedSort[0] === "view") {
     //If sort is "view_asc" or "view_desc"
 
-    const records = await ctx.invoke.records.loaders.drizzle();
+    const records = await drizzle(ctx);
     //Deco records not installed
     if (records.__resolveType) {
       throw new Error("Deco Records not installed!");

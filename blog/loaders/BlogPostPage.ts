@@ -1,14 +1,15 @@
-import { logger } from "@deco/deco/o11y";
 import { AppContext } from "../mod.ts";
 import { BlogPost, BlogPostPage } from "../types.ts";
 import { getRecordsByPath } from "../core/records.ts";
-import { spirePostToBlogPost } from "../utils/spireImport.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
 
 export interface Props {
+  /**
+   * @title Post slug
+   */
   slug: RequestURLParam;
 }
 
@@ -16,18 +17,15 @@ export const cache = { maxAge: 60 };
 
 export const cacheKey = (
   props: Props,
-  req: Request,
-  ctx: AppContext,
-): string => {
-  const spire = ctx.allowedBlogSlug ?? "native";
-  const host = new URL(req.url).hostname;
-  return `blog-page-${spire}-${props.slug}-${host}`;
-};
+  _req: Request,
+  _ctx: AppContext,
+): string => `blog-page-${props.slug}`;
 
 /**
  * @title BlogPostPage
- * @description Fetches a blog post page by slug. Checks native .deco/blocks first;
- *   if not found and Spire is configured, falls back to the Spire API in real-time.
+ * @description Fetches a blog post page by slug from native Deco block storage.
+ *   Spire posts are included automatically when they have been synced to
+ *   .deco/blocks/ via webhook or the startup/periodic reconciliation.
  */
 export default async function BlogPostPageLoader(
   { slug }: Props,
@@ -36,44 +34,15 @@ export default async function BlogPostPageLoader(
 ): Promise<BlogPostPage | null> {
   const url = new URL(req.url);
 
-  // 1. Check native blocks first
   const posts = await getRecordsByPath<BlogPost>(
     ctx,
     COLLECTION_PATH,
     ACCESSOR,
   );
-  const nativePost = posts.find((p) => p?.slug === slug);
+  const post = posts.find((p) => p?.slug === slug);
 
-  if (nativePost) {
-    return buildPage(nativePost, url);
-  }
+  if (!post) return null;
 
-  // 2. Fall back to Spire API when configured
-  const { allowedBlogSlug, spireApi } = ctx;
-  if (!allowedBlogSlug || !spireApi) return null;
-
-  try {
-    const response = await spireApi["GET /blog/:account/posts/:slug"](
-      { account: allowedBlogSlug, slug },
-    );
-    if (!response.ok) {
-      if (response.status !== 404) {
-        logger.error(
-          `[BlogPostPage] Spire API ${response.status} for slug "${slug}"`,
-        );
-      }
-      return null;
-    }
-    const { post } = await response.json();
-    if (!post) return null;
-    return buildPage(spirePostToBlogPost(post), url);
-  } catch (e) {
-    logger.error("[BlogPostPage] Failed to fetch Spire post:", e);
-    return null;
-  }
-}
-
-function buildPage(post: BlogPost, url: URL): BlogPostPage {
   return {
     "@type": "BlogPostPage",
     post,
