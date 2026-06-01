@@ -1,4 +1,4 @@
-import { sanitizeHtml } from "../../../spire/utils/sanitizeHtml.ts";
+import { sanitizeHtml } from "../../utils/sanitizeHtml.ts";
 
 const ICONS: Record<string, string> = {
   info: "ℹ",

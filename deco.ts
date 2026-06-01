@@ -61,7 +61,6 @@ const config = {
     app("implementation"),
     app("weather"),
     app("blog"),
-    app("spire"),
     app("analytics"),
     app("sourei"),
     app("typesense"),

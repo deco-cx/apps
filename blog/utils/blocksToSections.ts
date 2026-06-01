@@ -1,6 +1,14 @@
 import { type Section } from "@deco/deco/blocks";
 import { Resolved } from "@deco/deco";
-import { Block } from "../../spire/types.ts";
+
+/** Minimal Block type — matches the structure returned by the Spire API. */
+interface Block {
+  type?: string;
+  position?: number;
+  content?: Record<string, unknown>;
+  system_block_id?: string;
+  custom_block_id?: string;
+}
 
 const BASE = "blog/sections/blocks";
 
