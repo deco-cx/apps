@@ -2,7 +2,9 @@ import { type Section } from "@deco/deco/blocks";
 import { Block } from "../types.ts";
 import { Resolved } from "@deco/deco";
 
-const BASE = "spire/sections/blocks";
+// Block section components now live in the blog app (single source of truth).
+// Sites using the spire app must also have the blog app installed.
+const BASE = "blog/sections/blocks";
 
 function toSection(
   resolveType: string,

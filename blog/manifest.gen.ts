@@ -25,11 +25,6 @@ import * as $$$17 from "./loaders/extensions/BlogpostPage/ratings.ts";
 import * as $$$18 from "./loaders/extensions/BlogpostPage/reviews.ts";
 import * as $$$8 from "./loaders/GetCategories.ts";
 import * as $$$9 from "./loaders/SpirePost.ts";
-import * as $$$$$$0 from "./sections/Seo/SeoBlogPost.tsx";
-import * as $$$$$$1 from "./sections/Seo/SeoBlogPostListing.tsx";
-import * as $$$$$$2 from "./sections/Template.tsx";
-// Block sections: local files (migrated from spire app — blog is now the source of truth).
-// Spire app imports these same files from ../blog/sections/blocks/ for backward compat.
 import * as $$$$$$3 from "./sections/blocks/BlockImage.tsx";
 import * as $$$$$$4 from "./sections/blocks/Callout.tsx";
 import * as $$$$$$5 from "./sections/blocks/CardGroup.tsx";
@@ -46,6 +41,9 @@ import * as $$$$$$15 from "./sections/blocks/Stat.tsx";
 import * as $$$$$$16 from "./sections/blocks/StatGroup.tsx";
 import * as $$$$$$17 from "./sections/blocks/Steps.tsx";
 import * as $$$$$$18 from "./sections/blocks/Video.tsx";
+import * as $$$$$$0 from "./sections/Seo/SeoBlogPost.tsx";
+import * as $$$$$$1 from "./sections/Seo/SeoBlogPostListing.tsx";
+import * as $$$$$$2 from "./sections/Template.tsx";
 
 const manifest = {
   "loaders": {
@@ -70,9 +68,6 @@ const manifest = {
     "blog/loaders/SpirePost.ts": $$$9,
   },
   "sections": {
-    "blog/sections/Seo/SeoBlogPost.tsx": $$$$$$0,
-    "blog/sections/Seo/SeoBlogPostListing.tsx": $$$$$$1,
-    "blog/sections/Template.tsx": $$$$$$2,
     "blog/sections/blocks/BlockImage.tsx": $$$$$$3,
     "blog/sections/blocks/Callout.tsx": $$$$$$4,
     "blog/sections/blocks/CardGroup.tsx": $$$$$$5,
@@ -89,6 +84,9 @@ const manifest = {
     "blog/sections/blocks/StatGroup.tsx": $$$$$$16,
     "blog/sections/blocks/Steps.tsx": $$$$$$17,
     "blog/sections/blocks/Video.tsx": $$$$$$18,
+    "blog/sections/Seo/SeoBlogPost.tsx": $$$$$$0,
+    "blog/sections/Seo/SeoBlogPostListing.tsx": $$$$$$1,
+    "blog/sections/Template.tsx": $$$$$$2,
   },
   "actions": {
     "blog/actions/resolveSpireGate.ts": $$$$$$$$$0,
