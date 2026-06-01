@@ -1,4 +1,4 @@
-import { sanitizeHtml } from "../../utils/sanitizeHtml.ts";
+import { sanitizeHtml } from "../../../spire/utils/sanitizeHtml.ts";
 
 type Step = { title: string; description?: string };
 

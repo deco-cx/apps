@@ -1,4 +1,4 @@
-import { sanitizeHtml } from "../../utils/sanitizeHtml.ts";
+import { sanitizeHtml } from "../../../spire/utils/sanitizeHtml.ts";
 
 type Card = { icon?: string; title: string; body: string };
 

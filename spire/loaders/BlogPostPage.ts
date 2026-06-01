@@ -2,7 +2,6 @@ import { logger } from "@deco/deco/o11y";
 import { AppContext } from "../mod.ts";
 import { BlogPost, BlogPostPage, SpirePost } from "../types.ts";
 import { blocksToSections } from "../utils/blocksToSections.ts";
-import { compileBlocksToHtml } from "../../blog/utils/spireImport.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { Resolved } from "@deco/deco";
 import { Section } from "@deco/deco/blocks";
@@ -87,7 +86,6 @@ export function spirePostToBlogPost(
       description: post.version.metaDescription,
       image: post.version.imageUrl,
     },
-    content: compileBlocksToHtml(post.version.blocks),
     sections: blocksToSections(post.version.blocks, overrides),
   };
 }

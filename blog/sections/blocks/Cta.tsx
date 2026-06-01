@@ -1,4 +1,4 @@
-import { sanitizeHref } from "../../utils/sanitizeHtml.ts";
+import { sanitizeHref } from "../../../spire/utils/sanitizeHtml.ts";
 
 export interface Props {
   text: string;
