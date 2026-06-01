@@ -35,7 +35,9 @@ export interface Props {
    */
   sortBy?: SortBy;
   /**
-   * @description Search term (also read from ?q= query param).
+   * @title Search term
+   * @description Full-text search across title, excerpt, and content.
+   *   Also read from the ?q= query parameter.
    */
   query?: string;
 }
@@ -64,6 +66,8 @@ export const cacheKey = (
  * @description Returns a list of blog posts from native Deco block storage.
  *   Spire posts are included automatically when they have been synced to
  *   .deco/blocks/ via webhook or the startup/periodic reconciliation.
+ *   Always returns a normalized BlogPost[] regardless of origin — the `source`
+ *   field discriminates native vs Spire at runtime.
  */
 export default async function BlogPostList(
   { page, count, slug, sortBy, postSlugs, query }: Props,
@@ -77,21 +81,10 @@ export default async function BlogPostList(
     (sortBy ?? url.searchParams.get("sortBy") ?? "date_desc") as SortBy;
   const term = query ?? url.searchParams.get("q") ?? undefined;
 
-  const posts = await getRecordsByPath<BlogPost>(
-    ctx,
-    COLLECTION_PATH,
-    ACCESSOR,
-  );
+  const posts = await getRecordsByPath<BlogPost>(ctx, COLLECTION_PATH, ACCESSOR);
 
   try {
-    const handled = await handlePosts(
-      posts,
-      pageSort,
-      ctx,
-      slug,
-      postSlugs,
-      term,
-    );
+    const handled = await handlePosts(posts, pageSort, ctx, slug, postSlugs, term);
     if (!handled) return null;
     const sliced = slicePosts(handled, pageNumber, postsPerPage);
     return sliced.length > 0 ? sliced : null;

@@ -15,17 +15,17 @@ import * as $$$6 from "./loaders/BlogpostListing.ts";
 import * as $$$2 from "./loaders/BlogPostPage.ts";
 import * as $$$3 from "./loaders/BlogRelatedPosts.ts";
 import * as $$$7 from "./loaders/Category.ts";
-import * as $$$9 from "./loaders/extensions/BlogpostList.ts";
-import * as $$$10 from "./loaders/extensions/BlogpostList/ratings.ts";
-import * as $$$11 from "./loaders/extensions/BlogpostList/reviews.ts";
-import * as $$$12 from "./loaders/extensions/BlogpostListing.ts";
-import * as $$$13 from "./loaders/extensions/BlogpostListing/ratings.ts";
-import * as $$$14 from "./loaders/extensions/BlogpostListing/reviews.ts";
-import * as $$$15 from "./loaders/extensions/BlogpostPage.ts";
-import * as $$$16 from "./loaders/extensions/BlogpostPage/ratings.ts";
-import * as $$$17 from "./loaders/extensions/BlogpostPage/reviews.ts";
+import * as $$$10 from "./loaders/extensions/BlogpostList.ts";
+import * as $$$11 from "./loaders/extensions/BlogpostList/ratings.ts";
+import * as $$$12 from "./loaders/extensions/BlogpostList/reviews.ts";
+import * as $$$13 from "./loaders/extensions/BlogpostListing.ts";
+import * as $$$14 from "./loaders/extensions/BlogpostListing/ratings.ts";
+import * as $$$15 from "./loaders/extensions/BlogpostListing/reviews.ts";
+import * as $$$16 from "./loaders/extensions/BlogpostPage.ts";
+import * as $$$17 from "./loaders/extensions/BlogpostPage/ratings.ts";
+import * as $$$18 from "./loaders/extensions/BlogpostPage/reviews.ts";
 import * as $$$8 from "./loaders/GetCategories.ts";
-import * as $$$18 from "./loaders/SpirePost.ts";
+import * as $$$9 from "./loaders/SpirePost.ts";
 import * as $$$$$$0 from "./sections/Seo/SeoBlogPost.tsx";
 import * as $$$$$$1 from "./sections/Seo/SeoBlogPostListing.tsx";
 import * as $$$$$$2 from "./sections/SpireSync.tsx";
@@ -41,17 +41,17 @@ const manifest = {
     "blog/loaders/BlogPostPage.ts": $$$2,
     "blog/loaders/BlogRelatedPosts.ts": $$$3,
     "blog/loaders/Category.ts": $$$7,
-    "blog/loaders/extensions/BlogpostList.ts": $$$9,
-    "blog/loaders/extensions/BlogpostList/ratings.ts": $$$10,
-    "blog/loaders/extensions/BlogpostList/reviews.ts": $$$11,
-    "blog/loaders/extensions/BlogpostListing.ts": $$$12,
-    "blog/loaders/extensions/BlogpostListing/ratings.ts": $$$13,
-    "blog/loaders/extensions/BlogpostListing/reviews.ts": $$$14,
-    "blog/loaders/extensions/BlogpostPage.ts": $$$15,
-    "blog/loaders/extensions/BlogpostPage/ratings.ts": $$$16,
-    "blog/loaders/extensions/BlogpostPage/reviews.ts": $$$17,
+    "blog/loaders/extensions/BlogpostList.ts": $$$10,
+    "blog/loaders/extensions/BlogpostList/ratings.ts": $$$11,
+    "blog/loaders/extensions/BlogpostList/reviews.ts": $$$12,
+    "blog/loaders/extensions/BlogpostListing.ts": $$$13,
+    "blog/loaders/extensions/BlogpostListing/ratings.ts": $$$14,
+    "blog/loaders/extensions/BlogpostListing/reviews.ts": $$$15,
+    "blog/loaders/extensions/BlogpostPage.ts": $$$16,
+    "blog/loaders/extensions/BlogpostPage/ratings.ts": $$$17,
+    "blog/loaders/extensions/BlogpostPage/reviews.ts": $$$18,
     "blog/loaders/GetCategories.ts": $$$8,
-    "blog/loaders/SpirePost.ts": $$$18,
+    "blog/loaders/SpirePost.ts": $$$9,
   },
   "sections": {
     "blog/sections/Seo/SeoBlogPost.tsx": $$$$$$0,

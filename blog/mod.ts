@@ -5,7 +5,11 @@ import { PreviewContainer } from "../utils/preview.tsx";
 import { type App, type FnContext } from "@deco/deco";
 import { h } from "preact";
 import SpireSyncPreviewTab from "./components/SpireSyncPreviewTab.tsx";
-import { activeSyncs, syncPostToBlocks } from "./utils/spireImport.ts";
+import {
+  activeSyncs,
+  migrateSpireBlocks,
+  syncPostToBlocks,
+} from "./utils/spireImport.ts";
 import type { BlogPost } from "./types.ts";
 
 /** Configurable by the site owner in Deco Studio settings. */
@@ -98,8 +102,8 @@ function startFileWatcher(): void {
               const text = await Deno.readTextFile(path);
               const data = JSON.parse(text);
 
-              // Only process SpirePost blocks (Spire-sourced posts)
-              if (data?.__resolveType !== "blog/loaders/SpirePost.ts") continue;
+              // Identify Spire posts by spirePostId (not __resolveType, since
+              // both native and Spire blocks now use blog/loaders/Blogpost.ts).
               const post = data?.post as BlogPost | undefined;
               if (!post?.spirePostId) continue;
 
@@ -314,7 +318,7 @@ function registerReconcileCron(): void {
  *   on startup and every 5 minutes (picks up edits even without webhooks).
  *   The live site always fetches from both sources in real-time.
  * @category Tool
- * @logo https://raw.githubusercontent.com/deco-cx/apps/main/weather/logo.png
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/blog/logo.png
  */
 export default function App(state: State): App<Manifest, State> {
   // Normalize: strip trailing slash and any trailing "/api" so users can enter
@@ -333,6 +337,10 @@ export default function App(state: State): App<Manifest, State> {
 
     // Start the file watcher that syncs Studio metadata edits → Spire.
     startFileWatcher();
+
+    // One-time migration: ensure all Spire post blocks (identified by
+    // post.spirePostId) use the current SPIRE_RESOLVE_TYPE (__resolveType).
+    migrateSpireBlocks().catch(() => {});
 
     // Detect a real slug change within the same process session.
     // lastSyncedSlug === null means "first call this session" OR "HMR reload" —
@@ -392,7 +400,7 @@ export const preview = (
       description:
         "Native Deco blog with Spire AI integration. Set a Spire Blog Slug to automatically sync all published Spire posts to Deco Studio — no manual steps required.",
       logo:
-        "https://raw.githubusercontent.com/deco-cx/apps/main/weather/logo.png",
+        "https://raw.githubusercontent.com/deco-cx/apps/main/blog/logo.png",
       images: [],
       tabs: [
         {

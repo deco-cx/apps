@@ -5,9 +5,10 @@
  * Block storage path: .deco/blocks/collections%2Fblog%2Fposts%2F{slug}.json
  *
  * Architecture:
- *   • Loaders: read from .deco/blocks/ only (pure, no external calls)
- *   • Webhook + sync: write to .deco/blocks/ so posts appear in Studio CMS
- *   • File watcher (mod.ts): detects Studio edits and syncs metadata back to Spire
+ *   • syncPostToBlocks  — writes post metadata + btoa-safe content to .deco/blocks/
+ *   • fetchSpireContent — fetches live HTML from public Spire API at render time
+ *   • migrateSpireBlocks — ensures all Spire blocks use the current __resolveType
+ *   • File watcher (mod.ts) — detects Studio edits and syncs metadata back to Spire
  */
 
 import { logger } from "@deco/deco/o11y";
@@ -17,6 +18,13 @@ import { Block, SpirePost, SpirePostSummary } from "../../spire/types.ts";
 import { sanitizeHref, sanitizeHtml } from "../../spire/utils/sanitizeHtml.ts";
 
 export const SPIRE_BASE_URL = "https://spire.blog";
+
+/**
+ * The __resolveType written into .deco/blocks/ for Spire-managed posts.
+ * SpirePost.ts renders editable fields (title/excerpt/seo) and @readOnly
+ * fields (image/authors/categories/date/slug) in Deco Studio.
+ */
+export const SPIRE_RESOLVE_TYPE = "blog/loaders/SpirePost.ts" as const;
 
 /**
  * Set of post slugs currently being written by syncPostToBlocks.
@@ -69,11 +77,9 @@ export async function syncPostToBlocks(
 
     const blogPost = spirePostToBlogPost(post);
     const collectionPath = `collections/blog/posts/${postSlug}`;
-    // SpirePost.ts loader: content/id/spirePostId are @hide, only
-    // title/excerpt/seo are editable so Studio edits can be synced back.
     const resolvable = {
       name: collectionPath,
-      __resolveType: "blog/loaders/SpirePost.ts",
+      __resolveType: SPIRE_RESOLVE_TYPE,
       post: blogPost,
     };
 
@@ -99,6 +105,36 @@ export async function syncPostToBlocks(
 }
 
 /**
+ * Ensures all Spire post blocks use SPIRE_RESOLVE_TYPE as __resolveType.
+ * Spire posts are identified by the presence of post.spirePostId (not by
+ * __resolveType, which may have changed across versions). Runs on startup.
+ */
+export async function migrateSpireBlocks(): Promise<void> {
+  try {
+    for await (const entry of Deno.readDir(BLOCKS_DIR)) {
+      if (!entry.isFile || !entry.name.includes("posts%2F") || !entry.name.endsWith(".json")) {
+        continue;
+      }
+      const path = join(BLOCKS_DIR, entry.name);
+      let data: Record<string, unknown>;
+      try {
+        data = JSON.parse(await Deno.readTextFile(path));
+      } catch {
+        continue;
+      }
+      const post = data.post as Record<string, unknown> | undefined;
+      if (!post?.spirePostId) continue; // Not a Spire post — skip
+      if (data.__resolveType === SPIRE_RESOLVE_TYPE) continue; // Already correct
+      data.__resolveType = SPIRE_RESOLVE_TYPE;
+      await Deno.writeTextFile(path, JSON.stringify(data, null, 2));
+      logger.info(`[SpireMigrate] Fixed __resolveType for "${entry.name}"`);
+    }
+  } catch {
+    // BLOCKS_DIR may not exist yet — harmless
+  }
+}
+
+/**
  * Remove a post block when it is unpublished from Spire.
  */
 export async function removePostBlock(slug: string): Promise<void> {
@@ -110,7 +146,35 @@ export async function removePostBlock(slug: string): Promise<void> {
   }
 }
 
-/** Convert a full Spire API post (with blocks) to a Deco BlogPost. */
+/**
+ * Replace non-Latin1 chars (charCode > 255) with ASCII approximations so that
+ * block JSON is safe for Deco Studio's btoa-based preview URL encoding.
+ * Only typography chars are affected (em-dash, en-dash, curly quotes, ellipsis).
+ * Standard Portuguese accented chars (a-tilde, e-acute, etc.) are Latin1 and
+ * pass through unchanged.
+ */
+function toLatinSafe(s: string): string {
+  let out = '';
+  for (let i = 0; i < s.length; i++) {
+    const code = s.charCodeAt(i);
+    if (code <= 255) { out += s[i]; continue; }
+    if (code === 0x2014 || code === 0x2013) { out += '--'; continue; }
+    if (code === 0x2018 || code === 0x2019) { out += String.fromCharCode(39); continue; }
+    if (code === 0x201C || code === 0x201D) { out += String.fromCharCode(34); continue; }
+    if (code === 0x2026) { out += '...'; continue; }
+  }
+  return out;
+}
+
+/**
+ * Convert a full Spire API post (with blocks) to a Deco BlogPost.
+ *
+ * The `content` field is stored as a btoa-safe approximation (non-Latin1
+ * typography chars like em-dash are converted to ASCII equivalents). This is
+ * used as a fallback by BlogPostPage.ts when the Spire API is unavailable
+ * (e.g. scheduled posts with a future publish date). When the API IS available,
+ * BlogPostPage.ts fetches fresh content directly via fetchSpireContent().
+ */
 export function spirePostToBlogPost(post: SpirePost): BlogPost {
   return {
     id: post.id,
@@ -129,12 +193,33 @@ export function spirePostToBlogPost(post: SpirePost): BlogPost {
     seo: {
       title: post.version.metaTitle || post.version.title,
       description: post.version.metaDescription || post.version.description,
-      // Avoid passing empty string — ImageWidget validator requires a non-empty URL.
       image: post.version.imageUrl || undefined,
     },
-    content: compileBlocksToHtml(post.version.blocks),
+    content: toLatinSafe(compileBlocksToHtml(post.version.blocks)),
     spirePostId: post.id,
   };
+}
+
+/**
+ * Fetch and compile HTML content for a Spire post from the public API.
+ * Returns null when the post is unavailable (404 means scheduled for a future
+ * date, still in draft, or temporarily unavailable). BlogPostPage.ts falls back
+ * to the btoa-safe content cached in the block file when this returns null.
+ */
+export async function fetchSpireContent(
+  blogSlug: string,
+  postSlug: string,
+  spireBase: string,
+): Promise<string | null> {
+  const res = await fetch(
+    `${spireBase}/api/blog/${encodeURIComponent(blogSlug)}/posts/${
+      encodeURIComponent(postSlug)
+    }`,
+    { signal: AbortSignal.timeout(10_000) },
+  );
+  if (!res.ok) return null; // null = unavailable (scheduled/draft), not "empty content"
+  const { post } = await res.json() as { post?: SpirePost };
+  return post ? compileBlocksToHtml(post.version.blocks) : null;
 }
 
 /** Convert a Spire post summary (listing) to a Deco BlogPost. */

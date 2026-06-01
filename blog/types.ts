@@ -20,10 +20,7 @@ export interface Category {
 }
 
 export interface BlogPost {
-  /**
-   * @hide true
-   * @readonly
-   */
+  /** @hide true */
   spirePostId?: string;
   title: string;
   excerpt: string;
@@ -102,6 +99,80 @@ export interface Seo {
   noIndexing?: boolean;
 }
 
+/**
+ * Studio form type for blog posts managed by Spire AI.
+ *
+ * Editable   (synced back to Spire via file watcher): title, excerpt, seo.
+ * Read-only  (@readOnly — visible, input disabled): image, alt, authors,
+ *            categories, date, slug.
+ * Hidden     (@hide true — not shown in form): content, spirePostId, id.
+ */
+export interface SpireBlogPost {
+  /**
+   * @title Title
+   * @description Edit here — changes are synced back to Spire automatically.
+   */
+  title: string;
+
+  /**
+   * @title Excerpt
+   * @description Edit here — changes are synced back to Spire automatically.
+   */
+  excerpt: string;
+
+  /**
+   * @title SEO
+   * @description Override SEO metadata. Changes sync back to Spire.
+   */
+  seo?: Seo;
+
+  /**
+   * @title Featured Image
+   * @description Managed by Spire AI. Edit at spire.blog to change.
+   * @readOnly
+   */
+  image?: ImageWidget;
+
+  /** @readOnly */
+  alt?: string;
+
+  /**
+   * @title Authors
+   * @description Managed by Spire AI.
+   * @readOnly
+   */
+  authors?: Author[];
+
+  /**
+   * @title Categories / Tags
+   * @description Managed by Spire AI.
+   * @readOnly
+   */
+  categories?: Category[];
+
+  /**
+   * @title Publication Date
+   * @format date
+   * @readOnly
+   */
+  date?: string;
+
+  /**
+   * @title URL Slug
+   * @readOnly
+   */
+  slug?: string;
+
+  /** @hide true */
+  content?: string;
+
+  /** @hide true */
+  spirePostId?: string;
+
+  /** @hide true */
+  id?: string;
+}
+
 export interface BlogPostPage {
   "@type": "BlogPostPage";
   post: BlogPost;
@@ -130,7 +201,7 @@ export interface ImageCarousel {
 export interface Review {
   "@type": "Review";
   id?: string;
-  /** Author of the */
+  /** The author of this review. */
   author?: Person;
   /** The date that the review was published, in ISO 8601 date format.*/
   datePublished?: string;
@@ -208,9 +279,9 @@ export interface BannerItem {
 }
 
 export interface Banner {
-  /** @description desktop otimized image */
+  /** @description desktop optimized image */
   desktop: BannerItem;
-  /** @description mobile otimized image */
+  /** @description mobile optimized image */
   mobile: BannerItem;
   /** @description Image's alt text */
   alt: string;
@@ -219,3 +290,4 @@ export interface Banner {
     href: string;
   };
 }
+

@@ -17,10 +17,12 @@ export interface Props {
   slug?: RequestURLParam;
   /**
    * @title Items per page
+   * @description Number of posts per page to display.
    */
   count?: number;
   /**
    * @title Page number
+   * @description The current page number. Defaults to 1.
    */
   page?: number;
   /**

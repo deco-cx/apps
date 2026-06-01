@@ -1,12 +1,3 @@
-/**
- * @title BlogRelatedPosts
- * @description Retrieves a list of blog related posts.
- *
- * @param props - The props for the blog related post list.
- * @param req - The request object.
- * @param ctx - The application context.
- * @returns A promise that resolves to an array of blog related posts.
- */
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import handlePosts, { slicePosts } from "../core/handlePosts.ts";
 import { getRecordsByPath } from "../core/records.ts";
@@ -48,18 +39,13 @@ export interface Props {
   excludePostSlug?: RequestURLParam | string;
 }
 
-/**
- * @title BlogRelatedPosts
- * @description Retrieves a list of blog related posts.
- *
- * @param props - The props for the blog related post list.
- * @param req - The request object.
- * @param ctx - The application context.
- * @returns A promise that resolves to an array of blog related posts.
- */
-
 export type BlogRelatedPosts = BlogPost[] | null;
 
+/**
+ * @title Related Blog Posts
+ * @description Returns a list of posts related to the current one by category.
+ *   Optionally excludes the current post slug to avoid self-reference.
+ */
 export default async function BlogRelatedPosts(
   { page, count, slug, sortBy, query, excludePostSlug }: Props,
   req: Request,

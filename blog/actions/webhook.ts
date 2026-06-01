@@ -93,7 +93,17 @@ export default async function webhook(
     const spireUrl = Deno.env.get("SPIRE_URL") ?? "https://spire.blog";
     void syncPostToBlocks(blogSlug, postSlug, spireUrl).then(
       ({ success, message }) => {
-        if (!success) logger.error(`[Webhook] Block sync failed: ${message}`);
+        if (!success) {
+          if (event === "post.saved") {
+            // post.saved fires for draft/scheduled posts not yet on the public API
+            // (e.g. future publish date). 404 here is expected — not an error.
+            logger.info(
+              `[Webhook] Block sync skipped (post not yet public): ${message}`,
+            );
+          } else {
+            logger.error(`[Webhook] Block sync failed: ${message}`);
+          }
+        }
       },
     );
   }

@@ -24,19 +24,15 @@ export const cacheKey = (
 
 /**
  * @title BlogPostItem
- * @description Fetches a single blog post by slug from native Deco block storage.
- *   Use this for featured post components and cards. Spire posts are included
- *   automatically when synced to .deco/blocks/.
+ * @description Fetches a single blog post by slug. Returns a normalized BlogPost
+ *   regardless of origin (native or Spire). Use the `spirePostId` field to
+ *   detect Spire-managed posts at runtime.
  */
 export default async function BlogPostItem(
   { slug }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<BlogPost | null> {
-  const posts = await getRecordsByPath<BlogPost>(
-    ctx,
-    COLLECTION_PATH,
-    ACCESSOR,
-  );
-  return posts.find((p) => p.slug === slug) || null;
+  const posts = await getRecordsByPath<BlogPost>(ctx, COLLECTION_PATH, ACCESSOR);
+  return posts.find((p) => p.slug === slug) ?? null;
 }
