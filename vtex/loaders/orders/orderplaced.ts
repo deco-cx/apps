@@ -29,7 +29,7 @@ export default async function loader(
       key === CHECKOUT_DATA_ACCESS_COOKIE ||
       key === VTEX_CHKO_AUTH
     ),
-  );
+  ) as Record<string, string>;
   const cookie = stringify(cookies);
 
   const isOrderGroup = !orderId.includes("-");
@@ -53,3 +53,5 @@ export default async function loader(
 
   return [order];
 }
+
+export const cache = "no-store";

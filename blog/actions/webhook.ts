@@ -39,9 +39,9 @@ export default async function webhook(
   }
 
   // 3. Tenant isolation
-  if (ctx.allowedBlogSlug && blogSlug !== ctx.allowedBlogSlug) {
+  if (ctx.spireBlogSlug && blogSlug !== ctx.spireBlogSlug) {
     logger.error(
-      `[Webhook] Rejected: "${blogSlug}" ≠ allowedBlogSlug "${ctx.allowedBlogSlug}"`,
+      `[Webhook] Rejected: "${blogSlug}" ≠ spireBlogSlug "${ctx.spireBlogSlug}"`,
     );
     return {
       success: false,

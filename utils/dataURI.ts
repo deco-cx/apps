@@ -16,7 +16,7 @@ const btoaSafe = (x: string) => {
       ),
     );
   }
-};;
+};
 
 // deno-lint-ignore no-explicit-any
 export const scriptAsDataURI = <T extends (...args: any[]) => any>(

@@ -112,7 +112,10 @@ export async function syncPostToBlocks(
 export async function migrateSpireBlocks(): Promise<void> {
   try {
     for await (const entry of Deno.readDir(BLOCKS_DIR)) {
-      if (!entry.isFile || !entry.name.includes("posts%2F") || !entry.name.endsWith(".json")) {
+      if (
+        !entry.isFile || !entry.name.includes("posts%2F") ||
+        !entry.name.endsWith(".json")
+      ) {
         continue;
       }
       const path = join(BLOCKS_DIR, entry.name);
@@ -154,14 +157,29 @@ export async function removePostBlock(slug: string): Promise<void> {
  * pass through unchanged.
  */
 function toLatinSafe(s: string): string {
-  let out = '';
+  let out = "";
   for (let i = 0; i < s.length; i++) {
     const code = s.charCodeAt(i);
-    if (code <= 255) { out += s[i]; continue; }
-    if (code === 0x2014 || code === 0x2013) { out += '--'; continue; }
-    if (code === 0x2018 || code === 0x2019) { out += String.fromCharCode(39); continue; }
-    if (code === 0x201C || code === 0x201D) { out += String.fromCharCode(34); continue; }
-    if (code === 0x2026) { out += '...'; continue; }
+    if (code <= 255) {
+      out += s[i];
+      continue;
+    }
+    if (code === 0x2014 || code === 0x2013) {
+      out += "--";
+      continue;
+    }
+    if (code === 0x2018 || code === 0x2019) {
+      out += String.fromCharCode(39);
+      continue;
+    }
+    if (code === 0x201C || code === 0x201D) {
+      out += String.fromCharCode(34);
+      continue;
+    }
+    if (code === 0x2026) {
+      out += "...";
+      continue;
+    }
   }
   return out;
 }

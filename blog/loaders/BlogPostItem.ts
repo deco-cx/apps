@@ -33,6 +33,10 @@ export default async function BlogPostItem(
   _req: Request,
   ctx: AppContext,
 ): Promise<BlogPost | null> {
-  const posts = await getRecordsByPath<BlogPost>(ctx, COLLECTION_PATH, ACCESSOR);
+  const posts = await getRecordsByPath<BlogPost>(
+    ctx,
+    COLLECTION_PATH,
+    ACCESSOR,
+  );
   return posts.find((p) => p.slug === slug) ?? null;
 }

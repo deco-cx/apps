@@ -48,3 +48,9 @@ const MatchCron = (props: CronProps) => {
 };
 
 export default MatchCron;
+
+// Cron matches a server-side time schedule — the result is identical for all
+// users at any given minute. Like the date matcher, it's safe to cache: within
+// a response's TTL, the cron answer is stable; on expiry the cache refreshes
+// and re-evaluates against the schedule.
+export const cacheable = true;

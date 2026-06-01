@@ -290,4 +290,3 @@ export interface Banner {
     href: string;
   };
 }
-

@@ -14,8 +14,8 @@ export const loader = (
   _req: Request,
   ctx: AppContext,
 ): LoaderData => ({
-  blogSlug: ctx.allowedBlogSlug,
-  isConnected: !!ctx.allowedBlogSlug,
+  blogSlug: ctx.spireBlogSlug,
+  isConnected: !!ctx.spireBlogSlug,
   spireUrl: (ctx.spireUrl ?? "https://spire.blog").replace(/\/$/, ""),
 });
 

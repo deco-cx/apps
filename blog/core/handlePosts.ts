@@ -104,7 +104,9 @@ export const sortPosts = async (
  */
 export const filterPostsByCategory = (posts: BlogPost[], slug?: string) =>
   slug
-    ? posts.filter(({ categories }) => categories?.find((c) => c.slug === slug))
+    ? posts.filter(({ categories }) =>
+      Array.isArray(categories) && categories.find((c) => c.slug === slug)
+    )
     : posts;
 
 /**
@@ -140,7 +142,9 @@ export const filterRelatedPosts = (
   slug: string[],
 ) =>
   posts.filter(
-    ({ categories }) => categories?.find((c) => slug.includes(c.slug)),
+    ({ categories }) =>
+      Array.isArray(categories) &&
+      categories.find((c) => slug.includes(c.slug)),
   );
 
 /**
