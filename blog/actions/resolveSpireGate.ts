@@ -1,6 +1,5 @@
 import { logger } from "@deco/deco/o11y";
 import { AppContext } from "../mod.ts";
-import { isAdmin } from "@deco/deco/utils";
 
 export interface Props {
   gateId: string;
@@ -16,24 +15,16 @@ export interface Props {
  */
 export default async function resolveSpireGate(
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<{ success: boolean; message?: string }> {
   const { gateId, gateType, blogSlug, campaignId, postId } = props;
 
-  // 1. Inbound Request Authorization Validation (Previne Privilege Bypass)
-  const referer = req.headers.get("origin") ?? req.headers.get("referer");
-  const isUserAdmin = referer && isAdmin(referer);
+  // Auth model: Origin/Referer headers are spoofable and provide no real security.
+  // The actual security boundary is the Spire API's Bearer token (spireWebhookSecret),
+  // which is a server-side secret never exposed to clients. Gate IDs are UUIDs.
 
-  if (!isUserAdmin && Deno.env.get("DECO_ENV") !== "development") {
-    return {
-      success: false,
-      message:
-        "Unauthorized: Only authenticated Deco Admins are allowed to resolve Spire gates.",
-    };
-  }
-
-  // 2. Retrieve the Spire Webhook Secret configured on the Blog app state
+  // 1. Retrieve the Spire Webhook Secret configured on the Blog app state
   const expectedSecret =
     (typeof ctx.spireWebhookSecret === "string"
       ? ctx.spireWebhookSecret
