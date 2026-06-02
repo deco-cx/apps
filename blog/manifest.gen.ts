@@ -13,35 +13,35 @@ import * as $$$6 from "./loaders/BlogpostListing.ts";
 import * as $$$2 from "./loaders/BlogPostPage.ts";
 import * as $$$3 from "./loaders/BlogRelatedPosts.ts";
 import * as $$$7 from "./loaders/Category.ts";
-import * as $$$10 from "./loaders/extensions/BlogpostList.ts";
-import * as $$$11 from "./loaders/extensions/BlogpostList/ratings.ts";
-import * as $$$12 from "./loaders/extensions/BlogpostList/reviews.ts";
-import * as $$$13 from "./loaders/extensions/BlogpostListing.ts";
-import * as $$$14 from "./loaders/extensions/BlogpostListing/ratings.ts";
-import * as $$$15 from "./loaders/extensions/BlogpostListing/reviews.ts";
-import * as $$$16 from "./loaders/extensions/BlogpostPage.ts";
-import * as $$$17 from "./loaders/extensions/BlogpostPage/ratings.ts";
-import * as $$$18 from "./loaders/extensions/BlogpostPage/reviews.ts";
+import * as $$$9 from "./loaders/extensions/BlogpostList.ts";
+import * as $$$10 from "./loaders/extensions/BlogpostList/ratings.ts";
+import * as $$$11 from "./loaders/extensions/BlogpostList/reviews.ts";
+import * as $$$12 from "./loaders/extensions/BlogpostListing.ts";
+import * as $$$13 from "./loaders/extensions/BlogpostListing/ratings.ts";
+import * as $$$14 from "./loaders/extensions/BlogpostListing/reviews.ts";
+import * as $$$15 from "./loaders/extensions/BlogpostPage.ts";
+import * as $$$16 from "./loaders/extensions/BlogpostPage/ratings.ts";
+import * as $$$17 from "./loaders/extensions/BlogpostPage/reviews.ts";
 import * as $$$8 from "./loaders/GetCategories.ts";
 import * as $$$$$$3 from "./sections/blocks/BlockImage.tsx";
-import * as $$$$$$4 from "./sections/blocks/Callout.tsx";
-import * as $$$$$$5 from "./sections/blocks/CardGroup.tsx";
-import * as $$$$$$6 from "./sections/blocks/Checklist.tsx";
-import * as $$$$$$7 from "./sections/blocks/Code.tsx";
-import * as $$$$$$8 from "./sections/blocks/Comparison.tsx";
-import * as $$$$$$9 from "./sections/blocks/CallToAction.tsx";
+import * as $$$$$$5 from "./sections/blocks/Callout.tsx";
+import * as $$$$$$4 from "./sections/blocks/CallToAction.tsx";
+import * as $$$$$$6 from "./sections/blocks/CardGroup.tsx";
+import * as $$$$$$7 from "./sections/blocks/Checklist.tsx";
+import * as $$$$$$8 from "./sections/blocks/Code.tsx";
+import * as $$$$$$9 from "./sections/blocks/Comparison.tsx";
 import * as $$$$$$10 from "./sections/blocks/Divider.tsx";
 import * as $$$$$$11 from "./sections/blocks/Heading.tsx";
 import * as $$$$$$12 from "./sections/blocks/List.tsx";
 import * as $$$$$$13 from "./sections/blocks/Paragraph.tsx";
-import * as $$$$$$14 from "./sections/blocks/Quote.tsx";
-import * as $$$$$$15 from "./sections/blocks/Stat.tsx";
-import * as $$$$$$16 from "./sections/blocks/StatGroup.tsx";
-import * as $$$$$$17 from "./sections/blocks/Steps.tsx";
-import * as $$$$$$18 from "./sections/blocks/Video.tsx";
-import * as $$$$$$19 from "./sections/blocks/ProductCard.tsx";
-import * as $$$$$$20 from "./sections/blocks/ProductShelf.tsx";
-import * as $$$$$$21 from "./sections/blocks/ProductHighlight.tsx";
+import * as $$$$$$14 from "./sections/blocks/ProductCard.tsx";
+import * as $$$$$$15 from "./sections/blocks/ProductHighlight.tsx";
+import * as $$$$$$16 from "./sections/blocks/ProductShelf.tsx";
+import * as $$$$$$17 from "./sections/blocks/Quote.tsx";
+import * as $$$$$$18 from "./sections/blocks/Stat.tsx";
+import * as $$$$$$19 from "./sections/blocks/StatGroup.tsx";
+import * as $$$$$$20 from "./sections/blocks/Steps.tsx";
+import * as $$$$$$21 from "./sections/blocks/Video.tsx";
 import * as $$$$$$0 from "./sections/Seo/SeoBlogPost.tsx";
 import * as $$$$$$1 from "./sections/Seo/SeoBlogPostListing.tsx";
 import * as $$$$$$2 from "./sections/Template.tsx";
@@ -56,37 +56,37 @@ const manifest = {
     "blog/loaders/BlogPostPage.ts": $$$2,
     "blog/loaders/BlogRelatedPosts.ts": $$$3,
     "blog/loaders/Category.ts": $$$7,
-    "blog/loaders/extensions/BlogpostList.ts": $$$10,
-    "blog/loaders/extensions/BlogpostList/ratings.ts": $$$11,
-    "blog/loaders/extensions/BlogpostList/reviews.ts": $$$12,
-    "blog/loaders/extensions/BlogpostListing.ts": $$$13,
-    "blog/loaders/extensions/BlogpostListing/ratings.ts": $$$14,
-    "blog/loaders/extensions/BlogpostListing/reviews.ts": $$$15,
-    "blog/loaders/extensions/BlogpostPage.ts": $$$16,
-    "blog/loaders/extensions/BlogpostPage/ratings.ts": $$$17,
-    "blog/loaders/extensions/BlogpostPage/reviews.ts": $$$18,
+    "blog/loaders/extensions/BlogpostList.ts": $$$9,
+    "blog/loaders/extensions/BlogpostList/ratings.ts": $$$10,
+    "blog/loaders/extensions/BlogpostList/reviews.ts": $$$11,
+    "blog/loaders/extensions/BlogpostListing.ts": $$$12,
+    "blog/loaders/extensions/BlogpostListing/ratings.ts": $$$13,
+    "blog/loaders/extensions/BlogpostListing/reviews.ts": $$$14,
+    "blog/loaders/extensions/BlogpostPage.ts": $$$15,
+    "blog/loaders/extensions/BlogpostPage/ratings.ts": $$$16,
+    "blog/loaders/extensions/BlogpostPage/reviews.ts": $$$17,
     "blog/loaders/GetCategories.ts": $$$8,
   },
   "sections": {
     "blog/sections/blocks/BlockImage.tsx": $$$$$$3,
-    "blog/sections/blocks/Callout.tsx": $$$$$$4,
-    "blog/sections/blocks/CardGroup.tsx": $$$$$$5,
-    "blog/sections/blocks/Checklist.tsx": $$$$$$6,
-    "blog/sections/blocks/Code.tsx": $$$$$$7,
-    "blog/sections/blocks/Comparison.tsx": $$$$$$8,
-    "blog/sections/blocks/CallToAction.tsx": $$$$$$9,
+    "blog/sections/blocks/Callout.tsx": $$$$$$5,
+    "blog/sections/blocks/CallToAction.tsx": $$$$$$4,
+    "blog/sections/blocks/CardGroup.tsx": $$$$$$6,
+    "blog/sections/blocks/Checklist.tsx": $$$$$$7,
+    "blog/sections/blocks/Code.tsx": $$$$$$8,
+    "blog/sections/blocks/Comparison.tsx": $$$$$$9,
     "blog/sections/blocks/Divider.tsx": $$$$$$10,
     "blog/sections/blocks/Heading.tsx": $$$$$$11,
     "blog/sections/blocks/List.tsx": $$$$$$12,
     "blog/sections/blocks/Paragraph.tsx": $$$$$$13,
-    "blog/sections/blocks/Quote.tsx": $$$$$$14,
-    "blog/sections/blocks/Stat.tsx": $$$$$$15,
-    "blog/sections/blocks/StatGroup.tsx": $$$$$$16,
-    "blog/sections/blocks/Steps.tsx": $$$$$$17,
-    "blog/sections/blocks/Video.tsx": $$$$$$18,
-    "blog/sections/blocks/ProductCard.tsx": $$$$$$19,
-    "blog/sections/blocks/ProductShelf.tsx": $$$$$$20,
-    "blog/sections/blocks/ProductHighlight.tsx": $$$$$$21,
+    "blog/sections/blocks/ProductCard.tsx": $$$$$$14,
+    "blog/sections/blocks/ProductHighlight.tsx": $$$$$$15,
+    "blog/sections/blocks/ProductShelf.tsx": $$$$$$16,
+    "blog/sections/blocks/Quote.tsx": $$$$$$17,
+    "blog/sections/blocks/Stat.tsx": $$$$$$18,
+    "blog/sections/blocks/StatGroup.tsx": $$$$$$19,
+    "blog/sections/blocks/Steps.tsx": $$$$$$20,
+    "blog/sections/blocks/Video.tsx": $$$$$$21,
     "blog/sections/Seo/SeoBlogPost.tsx": $$$$$$0,
     "blog/sections/Seo/SeoBlogPostListing.tsx": $$$$$$1,
     "blog/sections/Template.tsx": $$$$$$2,
