@@ -1,8 +1,16 @@
 import { type Section } from "@deco/deco/blocks";
-import { Block } from "../types.ts";
 import { Resolved } from "@deco/deco";
 
-const BASE = "spire/sections/blocks";
+/** Minimal Block type — matches the structure returned by the Spire API. */
+interface Block {
+  type?: string;
+  position?: number;
+  content?: Record<string, unknown>;
+  system_block_id?: string;
+  custom_block_id?: string;
+}
+
+const BASE = "blog/sections/blocks";
 
 function toSection(
   resolveType: string,
@@ -11,12 +19,17 @@ function toSection(
   return { __resolveType: resolveType, ...props } as unknown as Section;
 }
 
+/**
+ * Converts a Spire Block array into Deco Section[] using blog/sections/blocks components.
+ * Sections are sorted by block position before conversion.
+ * Supports an optional override map to remap block types to custom section renderers.
+ */
 export function blocksToSections(
   blocks: Block[],
   overrides: Record<string, Resolved<Section>> = {},
 ): Section[] {
   return [...blocks]
-    .sort((a, b) => a.position - b.position)
+    .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
     .map((block) => blockToSection(block, overrides))
     .filter((s): s is Section => s !== null);
 }
@@ -29,9 +42,6 @@ function blockToSection(
 
   if ("type" in block && block.type) {
     if (overrides[block.type]) {
-      // Use the store's configured section type (__resolveType) but keep
-      // props coming from the Spire API (block.content). The override exists
-      // solely to remap the renderer — not to inject static props.
       return toSection(
         overrides[block.type]?.__resolveType ?? block.type,
         block.content as Record<string, unknown>,
@@ -142,6 +152,7 @@ function blockToSection(
     }
   }
 
+  // System blocks (no explicit type) — render as paragraph if they have html/text
   if ("system_block_id" in block) {
     if (content.html) {
       return toSection(`${BASE}/Paragraph.tsx`, {
@@ -153,7 +164,6 @@ function blockToSection(
         text: content.text as string,
       });
     }
-    return null;
   }
 
   return null;

@@ -31,7 +31,7 @@ export default function Comparison({ left, right }: Props) {
     <div class="grid grid-cols-2 gap-px bg-line border border-line rounded-brand my-8 overflow-hidden">
       {/* Left column — pros */}
       <div class="bg-base p-5 sm:p-6">
-        <div class="text-xs font-semibold tracking-caps uppercase pb-4 border-b-2 border-line mb-4 text-base">
+        <div class="text-xs font-semibold tracking-caps uppercase pb-4 border-b-2 border-line mb-4">
           {leftCol.title}
         </div>
         <ul class="list-none p-0 m-0 flex flex-col gap-3">
@@ -51,7 +51,7 @@ export default function Comparison({ left, right }: Props) {
 
       {/* Right column — cons */}
       <div class="bg-alt p-5 sm:p-6">
-        <div class="text-xs font-semibold tracking-caps uppercase pb-4 border-b-2 border-line mb-4 text-base">
+        <div class="text-xs font-semibold tracking-caps uppercase pb-4 border-b-2 border-line mb-4">
           {rightCol.title}
         </div>
         <ul class="list-none p-0 m-0 flex flex-col gap-3">
