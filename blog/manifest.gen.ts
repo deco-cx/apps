@@ -2,10 +2,9 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/resolveSpireGate.ts";
-import * as $$$$$$$$$1 from "./actions/submitRating.ts";
-import * as $$$$$$$$$2 from "./actions/submitReview.ts";
-import * as $$$$$$$$$3 from "./actions/submitView.ts";
+import * as $$$$$$$$$0 from "./actions/submitRating.ts";
+import * as $$$$$$$$$1 from "./actions/submitReview.ts";
+import * as $$$$$$$$$2 from "./actions/submitView.ts";
 import * as $$$0 from "./loaders/Author.ts";
 import * as $$$4 from "./loaders/Blogpost.ts";
 import * as $$$1 from "./loaders/BlogPostItem.ts";
@@ -24,14 +23,13 @@ import * as $$$16 from "./loaders/extensions/BlogpostPage.ts";
 import * as $$$17 from "./loaders/extensions/BlogpostPage/ratings.ts";
 import * as $$$18 from "./loaders/extensions/BlogpostPage/reviews.ts";
 import * as $$$8 from "./loaders/GetCategories.ts";
-import * as $$$9 from "./loaders/SpirePost.ts";
 import * as $$$$$$3 from "./sections/blocks/BlockImage.tsx";
 import * as $$$$$$4 from "./sections/blocks/Callout.tsx";
 import * as $$$$$$5 from "./sections/blocks/CardGroup.tsx";
 import * as $$$$$$6 from "./sections/blocks/Checklist.tsx";
 import * as $$$$$$7 from "./sections/blocks/Code.tsx";
 import * as $$$$$$8 from "./sections/blocks/Comparison.tsx";
-import * as $$$$$$9 from "./sections/blocks/Cta.tsx";
+import * as $$$$$$9 from "./sections/blocks/CallToAction.tsx";
 import * as $$$$$$10 from "./sections/blocks/Divider.tsx";
 import * as $$$$$$11 from "./sections/blocks/Heading.tsx";
 import * as $$$$$$12 from "./sections/blocks/List.tsx";
@@ -41,6 +39,9 @@ import * as $$$$$$15 from "./sections/blocks/Stat.tsx";
 import * as $$$$$$16 from "./sections/blocks/StatGroup.tsx";
 import * as $$$$$$17 from "./sections/blocks/Steps.tsx";
 import * as $$$$$$18 from "./sections/blocks/Video.tsx";
+import * as $$$$$$19 from "./sections/blocks/ProductCard.tsx";
+import * as $$$$$$20 from "./sections/blocks/ProductShelf.tsx";
+import * as $$$$$$21 from "./sections/blocks/ProductHighlight.tsx";
 import * as $$$$$$0 from "./sections/Seo/SeoBlogPost.tsx";
 import * as $$$$$$1 from "./sections/Seo/SeoBlogPostListing.tsx";
 import * as $$$$$$2 from "./sections/Template.tsx";
@@ -65,7 +66,6 @@ const manifest = {
     "blog/loaders/extensions/BlogpostPage/ratings.ts": $$$17,
     "blog/loaders/extensions/BlogpostPage/reviews.ts": $$$18,
     "blog/loaders/GetCategories.ts": $$$8,
-    "blog/loaders/SpirePost.ts": $$$9,
   },
   "sections": {
     "blog/sections/blocks/BlockImage.tsx": $$$$$$3,
@@ -74,7 +74,7 @@ const manifest = {
     "blog/sections/blocks/Checklist.tsx": $$$$$$6,
     "blog/sections/blocks/Code.tsx": $$$$$$7,
     "blog/sections/blocks/Comparison.tsx": $$$$$$8,
-    "blog/sections/blocks/Cta.tsx": $$$$$$9,
+    "blog/sections/blocks/CallToAction.tsx": $$$$$$9,
     "blog/sections/blocks/Divider.tsx": $$$$$$10,
     "blog/sections/blocks/Heading.tsx": $$$$$$11,
     "blog/sections/blocks/List.tsx": $$$$$$12,
@@ -84,15 +84,17 @@ const manifest = {
     "blog/sections/blocks/StatGroup.tsx": $$$$$$16,
     "blog/sections/blocks/Steps.tsx": $$$$$$17,
     "blog/sections/blocks/Video.tsx": $$$$$$18,
+    "blog/sections/blocks/ProductCard.tsx": $$$$$$19,
+    "blog/sections/blocks/ProductShelf.tsx": $$$$$$20,
+    "blog/sections/blocks/ProductHighlight.tsx": $$$$$$21,
     "blog/sections/Seo/SeoBlogPost.tsx": $$$$$$0,
     "blog/sections/Seo/SeoBlogPostListing.tsx": $$$$$$1,
     "blog/sections/Template.tsx": $$$$$$2,
   },
   "actions": {
-    "blog/actions/resolveSpireGate.ts": $$$$$$$$$0,
-    "blog/actions/submitRating.ts": $$$$$$$$$1,
-    "blog/actions/submitReview.ts": $$$$$$$$$2,
-    "blog/actions/submitView.ts": $$$$$$$$$3,
+    "blog/actions/submitRating.ts": $$$$$$$$$0,
+    "blog/actions/submitReview.ts": $$$$$$$$$1,
+    "blog/actions/submitView.ts": $$$$$$$$$2,
   },
   "name": "blog",
   "baseUrl": import.meta.url,

@@ -142,9 +142,40 @@ function blockToSection(
         });
 
       case "cta":
-        return toSection(`${BASE}/Cta.tsx`, {
+        return toSection(`${BASE}/CallToAction.tsx`, {
           text: content.text,
-          href: content.href,
+          // Spire API sends `url`; Deco native blocks may use `href` — accept both.
+          href: (content.href ?? content.url) as string | undefined,
+        });
+
+      case "product-card":
+        return toSection(`${BASE}/ProductCard.tsx`, {
+          name: content.name ?? content.product_name,
+          price: content.price,
+          listPrice: content.listPrice ?? content.list_price,
+          imageUrl: content.imageUrl ?? content.image_url,
+          url: content.url,
+          badge: content.badge,
+          description: content.description,
+          cta: content.cta,
+        });
+
+      case "product-shelf":
+        return toSection(`${BASE}/ProductShelf.tsx`, {
+          title: content.title,
+          items: content.items,
+        });
+
+      case "product-highlight":
+        return toSection(`${BASE}/ProductHighlight.tsx`, {
+          name: content.name ?? content.product_name,
+          price: content.price,
+          listPrice: content.listPrice ?? content.list_price,
+          imageUrl: content.imageUrl ?? content.image_url,
+          url: content.url,
+          badge: content.badge,
+          description: content.description,
+          cta: content.cta,
         });
 
       default:

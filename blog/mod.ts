@@ -1,5 +1,4 @@
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { Secret } from "../website/loaders/secret.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
 import { type App, type FnContext } from "@deco/deco";
 
@@ -10,10 +9,19 @@ export type State = {
    */
   pageSlug?: string;
   /**
-   * @title Spire Webhook Secret
-   * @description Shared secret used to authenticate Spire gate resolution requests.
+   * @title Spire Blog Slug
+   * @description Slug of the Spire blog to sync (e.g. "my-company"). Must match
+   *   the spireBlogSlug configured in autonomous-blog settings.
    */
-  spireWebhookSecret?: Secret;
+  spireBlogSlug?: string;
+  /**
+   * @title Spire Webhook Secret
+   * @description Plain-text shared secret used by admin.deco.cx to validate
+   *   incoming Spire webhooks. Must match decoWebhookSecret in
+   *   autonomous-blog settings.
+   * @format secret
+   */
+  spireWebhookSecret?: string;
 };
 
 export type AppContext = FnContext<State, Manifest>;
