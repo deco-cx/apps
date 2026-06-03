@@ -2,8 +2,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MCP Connector - Airtable Access</title>
     <style>
       * {
@@ -761,7 +761,9 @@
           <div class="search-section">
             <div style="position: relative">
               <svg
-                style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none"
+                style="position: absolute; left: 12px; top: 50%; transform: translateY(
+  -50%
+); pointer-events: none"
                 width="17"
                 height="16"
                 viewBox="0 0 17 16"
@@ -780,7 +782,7 @@
                 placeholder="Search"
                 style="padding-left: 40px"
                 oninput="handleSearch()"
-              >
+              />
             </div>
           </div>
 
@@ -815,9 +817,7 @@
 
       let bases, tables;
       try {
-        bases = typeof basesData === "string"
-          ? JSON.parse(basesData)
-          : basesData;
+        bases = typeof basesData === "string" ? JSON.parse(basesData) : basesData;
         tables = typeof tablesData === "string"
           ? JSON.parse(tablesData)
           : tablesData;
@@ -898,13 +898,9 @@
             }
           }
         });
-        filteredBases = bases.filter((base) =>
-          matchingBaseIds.has(base.id)
-        );
+        filteredBases = bases.filter((base) => matchingBaseIds.has(base.id));
 
-        filteredTables = tables.filter((table) =>
-          matchingTableIds.has(table.id)
-        );
+        filteredTables = tables.filter((table) => matchingTableIds.has(table.id));
 
         renderSelectionList();
       }
@@ -919,16 +915,13 @@
         const theme = localStorage.getItem("theme") || "light";
 
         if (filteredBases.length === 0) {
-          container.innerHTML =
-            '<div class="no-results">No bases found</div>';
+          container.innerHTML = '<div class="no-results">No bases found</div>';
           headerContainer.innerHTML = "";
           return;
         }
 
         filteredTablesSet.clear();
-        filteredTables.forEach((table) =>
-          filteredTablesSet.add(table.id)
-        );
+        filteredTables.forEach((table) => filteredTablesSet.add(table.id));
 
         const searchQuery = document.getElementById("search-input")
           .value.toLowerCase();
@@ -969,9 +962,7 @@
           ) {
             filteredBases.forEach((base) => expandedBases.add(base.id));
           } else {
-            directMatchTableBaseIds.forEach((baseId) =>
-              expandedBases.add(baseId)
-            );
+            directMatchTableBaseIds.forEach((baseId) => expandedBases.add(baseId));
           }
         }
 
@@ -996,9 +987,7 @@
           }
         }
 
-        const selectAllChecked = allBasesFullySelected
-          ? "checked"
-          : "unchecked";
+        const selectAllChecked = allBasesFullySelected ? "checked" : "unchecked";
         const totalBases = selectedBases.size;
         const totalBasesCount = bases.length;
 

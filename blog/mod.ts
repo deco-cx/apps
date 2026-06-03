@@ -14,6 +14,13 @@ export type State = {
    *   the spireBlogSlug configured in autonomous-blog settings.
    */
   spireBlogSlug?: string;
+  /**
+   * @hide true
+   * @readonly
+   * Shared HMAC secret written by Spire during integration setup.
+   * Never shown in Studio — do not edit manually.
+   */
+  spireWebhookSecret?: string;
 };
 
 export type AppContext = FnContext<State, Manifest>;
