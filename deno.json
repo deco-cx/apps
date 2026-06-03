@@ -56,9 +56,13 @@
   "exclude": [
     "static",
     "README.md",
-    "**/README.md",
-    "**/ui-templates/"
+    "**/README.md"
   ],
+  "fmt": {
+    "exclude": [
+      "**/ui-templates/"
+    ]
+  },
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "preact"
