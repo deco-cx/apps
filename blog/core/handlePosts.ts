@@ -2,7 +2,6 @@ import { postViews } from "../db/schema.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost, SortBy, ViewFromDatabase } from "../types.ts";
 import { VALID_SORT_ORDERS } from "../utils/constants.ts";
-import { drizzle } from "./records.ts";
 
 /**
  * Returns an sorted BlogPost list
@@ -20,7 +19,8 @@ export const sortPosts = async (
   if (splittedSort[0] === "view") {
     //If sort is "view_asc" or "view_desc"
 
-    const records = await drizzle(ctx);
+    // deno-lint-ignore no-explicit-any
+    const records = await (ctx.invoke as any).records.loaders.drizzle();
     //Deco records not installed
     if (records.__resolveType) {
       throw new Error("Deco Records not installed!");
@@ -104,9 +104,7 @@ export const sortPosts = async (
  */
 export const filterPostsByCategory = (posts: BlogPost[], slug?: string) =>
   slug
-    ? posts.filter(({ categories }) =>
-      Array.isArray(categories) && categories.find((c) => c.slug === slug)
-    )
+    ? posts.filter(({ categories }) => categories?.find((c) => c.slug === slug))
     : posts;
 
 /**
@@ -142,9 +140,7 @@ export const filterRelatedPosts = (
   slug: string[],
 ) =>
   posts.filter(
-    ({ categories }) =>
-      Array.isArray(categories) &&
-      categories.find((c) => slug.includes(c.slug)),
+    ({ categories }) => categories?.find((c) => slug.includes(c.slug)),
   );
 
 /**

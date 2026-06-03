@@ -2,7 +2,6 @@ import { eq } from "npm:drizzle-orm@0.43.1";
 import { postViews } from "../db/schema.ts";
 import { AppContext } from "../mod.ts";
 import { ViewFromDatabase } from "../types.ts";
-import { drizzle } from "../core/records.ts";
 
 export interface Props {
   id: string;
@@ -13,7 +12,8 @@ export default async function action(
   _req: Request,
   ctx: AppContext,
 ): Promise<{ count: number }> {
-  const records = await drizzle(ctx);
+  // deno-lint-ignore no-explicit-any
+  const records = await (ctx.invoke as any).records.loaders.drizzle();
 
   const existingRecord = await records.select()
     .from(postViews)

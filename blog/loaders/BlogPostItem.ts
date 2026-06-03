@@ -7,26 +7,19 @@ const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
 
 export interface Props {
-  /**
-   * @title Post slug
-   * @description Slug of the post to retrieve.
-   */
   slug: RequestURLParam;
 }
 
-export const cache = { maxAge: 60 };
-
-export const cacheKey = (
-  props: Props,
-  _req: Request,
-  _ctx: AppContext,
-): string => `blog-item-${props.slug}`;
-
 /**
  * @title BlogPostItem
- * @description Fetches a single blog post by slug. Returns a normalized BlogPost
- *   regardless of origin (native or Spire). Use the `spirePostId` field to
- *   detect Spire-managed posts at runtime.
+ * @description Fetches a specific blog post by its slug.
+ *
+ * Fetches a specific blog post by its slug.
+ *
+ * @param props - Contains the slug of the blog post.
+ * @param _req - The request object (unused).
+ * @param ctx - The application context.
+ * @returns A promise that resolves to the blog post or undefined if not found.
  */
 export default async function BlogPostItem(
   { slug }: Props,
@@ -38,5 +31,6 @@ export default async function BlogPostItem(
     COLLECTION_PATH,
     ACCESSOR,
   );
-  return posts.find((p) => p.slug === slug) ?? null;
+
+  return posts.find((post) => post.slug === slug) || null;
 }

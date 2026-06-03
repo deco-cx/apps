@@ -1,6 +1,14 @@
+/**
+ * Retrieves a listing page of blog posts.
+ *
+ * @param props - The props for the blog post listing.
+ * @param req - The request object.
+ * @param ctx - The application context.
+ * @returns A promise that resolves to an array of blog posts.
+ */
 import { logger } from "@deco/deco/o11y";
 import { PageInfo } from "../../commerce/types.ts";
-import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost, BlogPostListingPage, SortBy } from "../types.ts";
 import handlePosts, { slicePosts } from "../core/handlePosts.ts";
@@ -11,8 +19,8 @@ const ACCESSOR = "post";
 
 export interface Props {
   /**
-   * @title Category slug
-   * @description Filter posts by category slug.
+   * @title Category Slug
+   * @description Filter by a specific category slug.
    */
   slug?: RequestURLParam;
   /**
@@ -21,45 +29,31 @@ export interface Props {
    */
   count?: number;
   /**
-   * @title Page number
+   * @title Page query parameter
    * @description The current page number. Defaults to 1.
    */
   page?: number;
   /**
-   * @title Sort
-   * @description Default: date_desc
+   * @title Page sorting parameter
+   * @description The sorting option. Default is "date_desc"
    */
   sortBy?: SortBy;
   /**
-   * @description Search term (also read from ?q= query param).
+   * @description Overrides the query term at url
    */
   query?: string;
 }
 
-export const cache = { maxAge: 60 };
-
-export const cacheKey = (
-  props: Props,
-  req: Request,
-  _ctx: AppContext,
-): string => {
-  const url = new URL(req.url);
-  const page = Number(props.page ?? url.searchParams.get("page") ?? 1);
-  const count = Number(props.count ?? url.searchParams.get("count") ?? 12);
-  const slug = String(props.slug ?? url.searchParams.get("slug") ?? "");
-  const sort = String(
-    props.sortBy ?? url.searchParams.get("sortBy") ?? "date_desc",
-  );
-  const query = String(props.query ?? url.searchParams.get("q") ?? "");
-  return `blog-listing-p${page}-c${count}-s${slug}-${sort}-q${query}`;
-};
-
 /**
- * @title BlogPostListing
- * @description Returns a paginated listing page of blog posts from native
- *   Deco block storage. Spire posts are included automatically when synced.
+ * @title BlogPostList
+ * @description Retrieves a list of blog posts.
+ *
+ * @param props - The props for the blog post list.
+ * @param req - The request object.
+ * @param ctx - The application context.
+ * @returns A promise that resolves to an array of blog posts.
  */
-export default async function BlogPostListing(
+export default async function BlogPostList(
   { page, count, slug, sortBy, query }: Props,
   req: Request,
   ctx: AppContext,
@@ -68,7 +62,8 @@ export default async function BlogPostListing(
   const params = url.searchParams;
   const postsPerPage = Number(count ?? params.get("count") ?? 12);
   const pageNumber = Number(page ?? params.get("page") ?? 1);
-  const pageSort = (sortBy ?? params.get("sortBy") ?? "date_desc") as SortBy;
+  const pageSort = sortBy ?? params.get("sortBy") as SortBy ??
+    "date_desc";
   const term = query ?? params.get("q") ?? undefined;
 
   const posts = await getRecordsByPath<BlogPost>(
@@ -78,7 +73,7 @@ export default async function BlogPostListing(
   );
 
   try {
-    const handled = await handlePosts(
+    const handledPosts = await handlePosts(
       posts,
       pageSort,
       ctx,
@@ -86,15 +81,21 @@ export default async function BlogPostListing(
       undefined,
       term,
     );
-    if (!handled) return null;
 
-    const sliced = slicePosts(handled, pageNumber, postsPerPage);
-    if (sliced.length === 0) return null;
+    if (!handledPosts) {
+      return null;
+    }
 
-    const category = sliced[0].categories?.find((c) => c.slug === slug);
+    const slicedPosts = slicePosts(handledPosts, pageNumber, postsPerPage);
+
+    if (slicedPosts.length === 0) {
+      return null;
+    }
+
+    const category = slicedPosts[0].categories?.find((c) => c.slug === slug);
     return {
-      posts: sliced,
-      pageInfo: toPageInfo(handled, postsPerPage, pageNumber, params),
+      posts: slicedPosts,
+      pageInfo: toPageInfo(handledPosts, postsPerPage, pageNumber, params),
       seo: {
         title: category?.name ?? "",
         canonical: new URL(url.pathname, url.origin).href,
@@ -112,19 +113,26 @@ const toPageInfo = (
   pageNumber: number,
   params: URLSearchParams,
 ): PageInfo => {
-  const total = posts.length;
-  const totalPages = Math.ceil(total / postsPerPage);
-  const hasNext = totalPages > pageNumber;
-  const hasPrev = pageNumber > 1;
-  const nextParams = new URLSearchParams(params);
-  const prevParams = new URLSearchParams(params);
-  if (hasNext) nextParams.set("page", String(pageNumber + 1));
-  if (hasPrev) prevParams.set("page", String(pageNumber - 1));
+  const totalPosts = posts.length;
+  const totalPages = Math.ceil(totalPosts / postsPerPage);
+  const hasNextPage = totalPages > pageNumber;
+  const hasPrevPage = pageNumber > 1;
+  const nextPage = new URLSearchParams(params);
+  const previousPage = new URLSearchParams(params);
+
+  if (hasNextPage) {
+    nextPage.set("page", (pageNumber + 1).toString());
+  }
+
+  if (hasPrevPage) {
+    previousPage.set("page", (pageNumber - 1).toString());
+  }
+
   return {
-    nextPage: hasNext ? `?${nextParams}` : undefined,
-    previousPage: hasPrev ? `?${prevParams}` : undefined,
+    nextPage: hasNextPage ? `?${nextPage}` : undefined,
+    previousPage: hasPrevPage ? `?${previousPage}` : undefined,
     currentPage: pageNumber,
-    records: total,
+    records: totalPosts,
     recordPerPage: postsPerPage,
   };
 };

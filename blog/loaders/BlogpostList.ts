@@ -1,5 +1,13 @@
+/**
+ * Retrieves a list of blog posts.
+ *
+ * @param props - The props for the blog post list.
+ * @param req - The request object.
+ * @param ctx - The application context.
+ * @returns A promise that resolves to an array of blog posts.
+ */
 import { logger } from "@deco/deco/o11y";
-import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost, SortBy } from "../types.ts";
 import handlePosts, { slicePosts } from "../core/handlePosts.ts";
@@ -15,59 +23,39 @@ export interface Props {
    */
   count?: number;
   /**
-   * @title Page number
+   * @title Page query parameter
    * @description The current page number. Defaults to 1.
    */
   page?: number;
   /**
-   * @title Category slug
-   * @description Filter posts by category slug.
+   * @title Category Slug
+   * @description Filter by a specific category slug.
    */
   slug?: RequestURLParam;
   /**
    * @title Specific post slugs
-   * @description Return only these post slugs.
+   * @description Filter by specific post slugs.
    */
   postSlugs?: string[];
   /**
-   * @title Sort
-   * @description Sorting option. Default: date_desc
+   * @title Page sorting parameter
+   * @description The sorting option. Default is "date_desc"
    */
   sortBy?: SortBy;
   /**
-   * @title Search term
-   * @description Full-text search across title, excerpt, and content.
-   *   Also read from the ?q= query parameter.
+   * @description Overrides the query term at url
    */
   query?: string;
 }
 
-export const cache = { maxAge: 60 };
-
-export const cacheKey = (
-  props: Props,
-  req: Request,
-  _ctx: AppContext,
-): string => {
-  const url = new URL(req.url);
-  const page = Number(props.page ?? url.searchParams.get("page") ?? 1);
-  const count = Number(props.count ?? url.searchParams.get("count") ?? 12);
-  const slug = String(props.slug ?? url.searchParams.get("slug") ?? "");
-  const sort = String(
-    props.sortBy ?? url.searchParams.get("sortBy") ?? "date_desc",
-  );
-  const query = String(props.query ?? url.searchParams.get("q") ?? "");
-  const slugs = JSON.stringify(props.postSlugs ?? []);
-  return `blog-list-p${page}-c${count}-s${slug}-${sort}-q${query}-${slugs}`;
-};
-
 /**
  * @title BlogPostList
- * @description Returns a list of blog posts from native Deco block storage.
- *   Spire posts are included automatically when they have been synced to
- *   .deco/blocks/ via webhook or the startup/periodic reconciliation.
- *   Always returns a normalized BlogPost[] regardless of origin — the `source`
- *   field discriminates native vs Spire at runtime.
+ * @description Retrieves a list of blog posts.
+ *
+ * @param props - The props for the blog post list.
+ * @param req - The request object.
+ * @param ctx - The application context.
+ * @returns A promise that resolves to an array of blog posts.
  */
 export default async function BlogPostList(
   { page, count, slug, sortBy, postSlugs, query }: Props,
@@ -77,8 +65,8 @@ export default async function BlogPostList(
   const url = new URL(req.url);
   const postsPerPage = Number(count ?? url.searchParams.get("count") ?? 12);
   const pageNumber = Number(page ?? url.searchParams.get("page") ?? 1);
-  const pageSort =
-    (sortBy ?? url.searchParams.get("sortBy") ?? "date_desc") as SortBy;
+  const pageSort = sortBy ?? url.searchParams.get("sortBy") as SortBy ??
+    "date_desc";
   const term = query ?? url.searchParams.get("q") ?? undefined;
 
   const posts = await getRecordsByPath<BlogPost>(
@@ -88,7 +76,7 @@ export default async function BlogPostList(
   );
 
   try {
-    const handled = await handlePosts(
+    const handledPosts = await handlePosts(
       posts,
       pageSort,
       ctx,
@@ -96,9 +84,14 @@ export default async function BlogPostList(
       postSlugs,
       term,
     );
-    if (!handled) return null;
-    const sliced = slicePosts(handled, pageNumber, postsPerPage);
-    return sliced.length > 0 ? sliced : null;
+
+    if (!handledPosts) {
+      return null;
+    }
+
+    const slicedPosts = slicePosts(handledPosts, pageNumber, postsPerPage);
+
+    return slicedPosts.length > 0 ? slicedPosts : null;
   } catch (e) {
     logger.error(e);
     return null;

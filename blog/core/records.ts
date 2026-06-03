@@ -5,48 +5,31 @@ import { and, asc, desc, eq, notInArray } from "npm:drizzle-orm@0.43.1";
 import { BlogPost, Ignore, Rating, Review } from "../types.ts";
 import { logger } from "@deco/deco/o11y";
 
-/**
- * Returns the `records` Deco app's Drizzle client.
- *
- * The `records` app is installed alongside the blog app on each site.
- * Its loaders are not in the blog manifest, so TypeScript cannot infer
- * the property from `ctx.invoke`. The cast is intentional.
- */
-export const drizzle = (ctx: AppContext) => {
-  // deno-lint-ignore no-explicit-any
-  return (ctx.invoke as any).records.loaders.drizzle();
-};
-
 export async function getRecordsByPath<T>(
   ctx: AppContext,
   path: string,
   accessor: string,
 ): Promise<T[]> {
-  // ctx.get returns the resolved value — cast to the expected shape since
-  // TypeScript cannot infer the return type from the __resolveType argument.
   const resolvables = await ctx.get({
     __resolveType: "resolvables",
   }) as unknown as Record<string, Resolvable<T>>;
   const current = Object.entries(resolvables).flatMap(([key, value]) => {
     return key.startsWith(path) ? value : [];
   });
-  return (current as Record<string, T>[])
-    .filter((item) => item != null && item[accessor] != null)
-    .map((item) => {
-      // item.name can be null when a block was partially written (e.g. .tmp file)
-      const nameStr = typeof item.name === "string" ? item.name : "";
-      const id = nameStr.split(path)[1]?.replace("/", "");
-      return {
-        ...item[accessor],
-        id,
-      };
-    });
+  return (current as Record<string, T>[]).map((item) => {
+    const id = (item.name as string).split(path)[1]?.replace("/", "");
+    return {
+      ...item[accessor],
+      id,
+    };
+  });
 }
 
 export async function getRatingsBySlug(
   { ctx, slug }: { ctx: AppContext; slug: string },
 ): Promise<Rating[]> {
-  const records = await drizzle(ctx);
+  // deno-lint-ignore no-explicit-any
+  const records = await (ctx.invoke as any).records.loaders.drizzle();
   try {
     const currentRatings = await records.select({
       id: rating.id,
@@ -121,7 +104,8 @@ export const getReviewById = async (
   if (!id) {
     return null;
   }
-  const records = await drizzle(ctx);
+  // deno-lint-ignore no-explicit-any
+  const records = await (ctx.invoke as any).records.loaders.drizzle();
   try {
     const targetReview = await records.select({
       itemReviewed: review.itemReviewed,
@@ -150,7 +134,8 @@ export async function getReviewsBySlug(
     orderBy?: "date_asc" | "date_desc";
   },
 ): Promise<Review[]> {
-  const records = await drizzle(ctx);
+  // deno-lint-ignore no-explicit-any
+  const records = await (ctx.invoke as any).records.loaders.drizzle();
 
   const whereClause = ignoreReviews?.active && ignoreReviews?.markedAs &&
       ignoreReviews?.markedAs?.length > 0

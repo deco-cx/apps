@@ -3,7 +3,7 @@ import { Person } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import { logger } from "@deco/deco/o11y";
 import { Review } from "../types.ts";
-import { drizzle, getReviewById } from "../core/records.ts";
+import { getReviewById } from "../core/records.ts";
 import { review } from "../db/schema.ts";
 
 export interface Props {
@@ -33,7 +33,8 @@ export default async function submitReview(
   ctx: AppContext,
 ): Promise<Review | null> {
   const isoDate = new Date().toISOString();
-  const records = await drizzle(ctx);
+  // deno-lint-ignore no-explicit-any
+  const records = await (ctx.invoke as any).records.loaders.drizzle();
 
   try {
     if (action != "create") {

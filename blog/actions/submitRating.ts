@@ -4,7 +4,6 @@ import { AppContext } from "../mod.ts";
 import { logger } from "@deco/deco/o11y";
 import { Rating } from "../types.ts";
 import { rating } from "../db/schema.ts";
-import { drizzle } from "../core/records.ts";
 
 export interface Props {
   itemReviewed: string;
@@ -18,7 +17,8 @@ export default async function submitRating(
   _req: Request,
   ctx: AppContext,
 ): Promise<Rating | null> {
-  const records = await drizzle(ctx);
+  // deno-lint-ignore no-explicit-any
+  const records = await (ctx.invoke as any).records.loaders.drizzle();
 
   try {
     const storedRating = await records.select({
