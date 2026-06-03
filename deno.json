@@ -56,7 +56,8 @@
   "exclude": [
     "static",
     "README.md",
-    "**/README.md"
+    "**/README.md",
+    "**/ui-templates/"
   ],
   "compilerOptions": {
     "jsx": "react-jsx",

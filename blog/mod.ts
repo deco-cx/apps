@@ -24,7 +24,7 @@ export type AppContext = FnContext<State, Manifest>;
  *   Supports native block-based posts and Spire AI-generated posts
  *   rendered as Deco sections (paragraph, heading, list, code, etc.).
  * @category Tool
- * @logo https://raw.githubusercontent.com/deco-cx/apps/main/blog/logo.png
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/weather/logo.png
  */
 export default function App(state: State): App<Manifest, State> {
   return { manifest, state };
@@ -38,7 +38,8 @@ export const preview = () => {
       owner: "deco.cx",
       description:
         "Manage your posts, categories and authors. Supports native Deco posts and Spire AI-generated posts rendered as native Deco sections.",
-      logo: "https://raw.githubusercontent.com/deco-cx/apps/main/blog/logo.png",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/weather/logo.png",
       images: [],
       tabs: [],
     },
