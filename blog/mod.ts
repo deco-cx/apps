@@ -14,14 +14,6 @@ export type State = {
    *   the spireBlogSlug configured in autonomous-blog settings.
    */
   spireBlogSlug?: string;
-  /**
-   * @title Spire Webhook Secret
-   * @description Plain-text shared secret used by admin.deco.cx to validate
-   *   incoming Spire webhooks. Must match decoWebhookSecret in
-   *   autonomous-blog settings.
-   * @format secret
-   */
-  spireWebhookSecret?: string;
 };
 
 export type AppContext = FnContext<State, Manifest>;
