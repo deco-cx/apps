@@ -8,12 +8,6 @@ export type State = {
    * @description The slug of the BlogPostPage to embed. Use :category and :slug.
    */
   pageSlug?: string;
-  /**
-   * @title Spire Blog Slug
-   * @description Slug of the Spire blog to sync (e.g. "my-company"). Must match
-   *   the spireBlogSlug configured in autonomous-blog settings.
-   */
-  spireBlogSlug?: string;
 };
 
 export type AppContext = FnContext<State, Manifest>;
