@@ -1,16 +1,25 @@
 import { sanitizeHref, sanitizeHtml } from "../../utils/sanitizeHtml.ts";
+import { getProductImage, getProductPrices } from "../../utils/productData.ts";
+import { resolveProductByReference } from "../../core/productResolver.ts";
+import { AppContext } from "../../mod.ts";
+import { Product } from "../../../commerce/types.ts";
+
+/**
+ * @title Product
+ * @description Search and select a storefront product dynamically.
+ * @format dynamic-options
+ * @options blog/loaders/options/productsByTerm.ts
+ */
+type ProductReference = string;
 
 export interface Props {
-  /** Product name */
-  name: string;
-  /** Current price (formatted string, e.g. "R$ 49,90") */
-  price?: string;
-  /** List/original price */
-  listPrice?: string;
-  /** Primary image URL */
-  imageUrl?: string;
-  /** Product page URL */
-  url?: string;
+  /**
+   * @title Product
+   * @description Product reference resolved dynamically from storefront integrations.
+   * @format dynamic-options
+   * @options blog/loaders/options/productsByTerm.ts
+   */
+  product?: ProductReference;
   /** Badge text (e.g. "New", "Sale") */
   badge?: string;
   /** Short description (HTML) */
@@ -19,14 +28,37 @@ export interface Props {
   cta?: string;
 }
 
+type RuntimeProps = Omit<Props, "product"> & {
+  product: Product | null;
+};
+
+export async function loader(props: Props, req: Request, ctx: AppContext) {
+  const product = await resolveProductByReference(props.product, req, ctx);
+  return {
+    badge: props.badge,
+    description: props.description,
+    cta: props.cta,
+    product,
+  } as RuntimeProps;
+}
+
 /**
  * @title Product Card
  * @description Displays a shoppable product card with image, name, price and CTA.
  */
 export default function ProductCard(
-  { name, price, listPrice, imageUrl, url, badge, description, cta }: Props,
+  { product, badge, description, cta }: RuntimeProps,
 ) {
-  const safeUrl = sanitizeHref(url);
+  if (!product) return null;
+
+  const name = product.name ?? "";
+  if (!name) return null;
+
+  const imageUrl = getProductImage(product);
+  const { price, listPrice } = getProductPrices(product);
+  const productDescription = description ?? product.description;
+  const safeUrl = sanitizeHref(product.url);
+
   const isExternal = /^https?:\/\//i.test(safeUrl);
 
   return (
@@ -48,10 +80,10 @@ export default function ProductCard(
       )}
       <div class="p-5 flex flex-col gap-2">
         <h3 class="text-[1.0625rem] font-semibold leading-snug m-0">{name}</h3>
-        {description && (
+        {productDescription && (
           <div
             class="text-sm text-secondary leading-normal [text-wrap:pretty] line-clamp-3"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(productDescription) }}
           />
         )}
         <div class="mt-1 flex items-baseline gap-2">

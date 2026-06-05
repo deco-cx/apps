@@ -23,6 +23,7 @@ import * as $$$15 from "./loaders/extensions/BlogpostPage.ts";
 import * as $$$16 from "./loaders/extensions/BlogpostPage/ratings.ts";
 import * as $$$17 from "./loaders/extensions/BlogpostPage/reviews.ts";
 import * as $$$8 from "./loaders/GetCategories.ts";
+import * as $$$18 from "./loaders/options/productsByTerm.ts";
 import * as $$$$$$3 from "./sections/blocks/BlockImage.tsx";
 import * as $$$$$$5 from "./sections/blocks/Callout.tsx";
 import * as $$$$$$4 from "./sections/blocks/CallToAction.tsx";
@@ -66,6 +67,7 @@ const manifest = {
     "blog/loaders/extensions/BlogpostPage/ratings.ts": $$$16,
     "blog/loaders/extensions/BlogpostPage/reviews.ts": $$$17,
     "blog/loaders/GetCategories.ts": $$$8,
+    "blog/loaders/options/productsByTerm.ts": $$$18,
   },
   "sections": {
     "blog/sections/blocks/BlockImage.tsx": $$$$$$3,

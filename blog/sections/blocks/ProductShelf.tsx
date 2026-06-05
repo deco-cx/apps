@@ -1,4 +1,16 @@
 import { sanitizeHref } from "../../utils/sanitizeHtml.ts";
+import { getProductImage, getProductPrices } from "../../utils/productData.ts";
+import { resolveProductByReference } from "../../core/productResolver.ts";
+import { AppContext } from "../../mod.ts";
+import { Product } from "../../../commerce/types.ts";
+
+/**
+ * @title Product
+ * @description Search and select a storefront product dynamically.
+ * @format dynamic-options
+ * @options blog/loaders/options/productsByTerm.ts
+ */
+type ProductReference = string;
 
 interface ShelfItem {
   name: string;
@@ -13,27 +25,47 @@ export interface Props {
   /** Section title shown above the shelf */
   title?: string;
   /**
-   * JSON-encoded ShelfItem[]
-   * Each item: { name, price?, listPrice?, imageUrl?, url?, badge? }
+   * @title Products
+   * @description Product references resolved dynamically from storefront integrations.
+   * @format dynamic-options
+   * @options blog/loaders/options/productsByTerm.ts
    */
-  items: ShelfItem[] | string;
+  products?: ProductReference[];
+}
+
+type RuntimeProps = Omit<Props, "products"> & {
+  products: Product[];
+};
+
+export async function loader(props: Props, req: Request, ctx: AppContext) {
+  const refs = Array.isArray(props.products)
+    ? props.products.filter((id) => typeof id === "string" && id.trim().length > 0)
+    : [];
+  const resolved = await Promise.all(
+    refs.map((id) => resolveProductByReference(id, req, ctx)),
+  );
+
+  return {
+    title: props.title,
+    products: resolved.filter((p): p is Product => Boolean(p)),
+  } as RuntimeProps;
 }
 
 /**
  * @title Product Shelf
  * @description Horizontally scrollable row of product cards.
  */
-export default function ProductShelf({ title, items }: Props) {
-  let products: ShelfItem[] = [];
-
-  if (Array.isArray(items)) {
-    products = items;
-  } else if (typeof items === "string") {
-    try {
-      const parsed = JSON.parse(items);
-      if (Array.isArray(parsed)) products = parsed;
-    } catch { /* ignore */ }
-  }
+export default function ProductShelf({ title, products: sourceProducts }: RuntimeProps) {
+  const products: ShelfItem[] = (sourceProducts ?? []).map((product) => {
+    const { price, listPrice } = getProductPrices(product);
+    return {
+      name: product.name ?? "",
+      price,
+      listPrice,
+      imageUrl: getProductImage(product),
+      url: product.url,
+    };
+  }).filter((item) => Boolean(item.name));
 
   if (products.length === 0) return null;
 
