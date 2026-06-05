@@ -17,6 +17,13 @@ export interface Author {
 export interface Category {
   name: string;
   slug: string;
+  /**
+   * @title Categoria Pai
+   * @description Selecione se esta categoria for uma subcategoria de outra
+   * @format dynamic-options
+   * @options apps/blog/loaders/CategoryList.ts
+   */
+  parent?: Category;
 }
 
 export interface BlogPost {
@@ -56,6 +63,13 @@ export interface BlogPost {
    * @changeable true
    */
   sections?: Section[];
+  /**
+   * @title Posts Relacionados
+   * @description Busque posts já cadastrados pelo título
+   * @format dynamic-options
+   * @options apps/blog/loaders/BlogPostList.ts
+   */
+  relatedPosts?: BlogPost[];
   /**
    * @title Carousel in post content
    * @description add a carousel in the middle of the post. Must be implemented in frontEnd
