@@ -162,3 +162,28 @@ export const getFiltersByUrl = (url: URL) => {
   });
   return filters;
 };
+
+export const parseProductSlug = (
+  slug?: string,
+): { handle: string; skuId?: number } => {
+  if (!slug) {
+    return { handle: "" };
+  }
+
+  const splitted = slug.split("-");
+  const lastSegment = splitted[splitted.length - 1];
+
+  const isSkuId = /^\d{10,16}$/.test(lastSegment);
+
+  if (isSkuId) {
+    const skuId = Number(lastSegment);
+    return {
+      handle: splitted.slice(0, -1).join("-"),
+      skuId,
+    };
+  }
+
+  return {
+    handle: slug,
+  };
+};
