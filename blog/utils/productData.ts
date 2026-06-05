@@ -25,9 +25,10 @@ export function getProductPrices(product: Product) {
   const high = product.offers?.highPrice;
 
   const price = toMoney(low, currency);
-  const listPrice = typeof high === "number" && typeof low === "number" && high > low
-    ? toMoney(high, currency)
-    : undefined;
+  const listPrice =
+    typeof high === "number" && typeof low === "number" && high > low
+      ? toMoney(high, currency)
+      : undefined;
 
   return { price, listPrice };
 }

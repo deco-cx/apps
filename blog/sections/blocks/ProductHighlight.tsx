@@ -4,7 +4,6 @@ import { resolveProductByReference } from "../../core/productResolver.ts";
 import { AppContext } from "../../mod.ts";
 import { Product } from "../../../commerce/types.ts";
 
-
 /**
  * @title Product
  * @description Search and select a storefront product dynamically.
@@ -89,7 +88,9 @@ export default function ProductHighlight(
           {productDescription && (
             <div
               class="text-[0.9375rem] text-secondary leading-relaxed [text-wrap:pretty]"
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(productDescription) }}
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHtml(productDescription),
+              }}
             />
           )}
           <div class="flex items-baseline gap-2.5 mt-1">

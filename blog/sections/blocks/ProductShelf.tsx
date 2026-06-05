@@ -39,7 +39,9 @@ type RuntimeProps = Omit<Props, "products"> & {
 
 export async function loader(props: Props, req: Request, ctx: AppContext) {
   const refs = Array.isArray(props.products)
-    ? props.products.filter((id) => typeof id === "string" && id.trim().length > 0)
+    ? props.products.filter((id) =>
+      typeof id === "string" && id.trim().length > 0
+    )
     : [];
   const resolved = await Promise.all(
     refs.map((id) => resolveProductByReference(id, req, ctx)),
@@ -55,7 +57,9 @@ export async function loader(props: Props, req: Request, ctx: AppContext) {
  * @title Product Shelf
  * @description Horizontally scrollable row of product cards.
  */
-export default function ProductShelf({ title, products: sourceProducts }: RuntimeProps) {
+export default function ProductShelf(
+  { title, products: sourceProducts }: RuntimeProps,
+) {
   const products: ShelfItem[] = (sourceProducts ?? []).map((product) => {
     const { price, listPrice } = getProductPrices(product);
     return {

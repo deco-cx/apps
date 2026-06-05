@@ -83,7 +83,9 @@ export default function ProductCard(
         {productDescription && (
           <div
             class="text-sm text-secondary leading-normal [text-wrap:pretty] line-clamp-3"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(productDescription) }}
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHtml(productDescription),
+            }}
           />
         )}
         <div class="mt-1 flex items-baseline gap-2">

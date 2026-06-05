@@ -80,42 +80,67 @@ function extractHandle(url?: string) {
   }
 }
 
-async function searchVtex(term: string, ctx: AppContext): Promise<ProductOption[]> {
+async function searchVtex(
+  term: string,
+  ctx: AppContext,
+): Promise<ProductOption[]> {
   const res = await (ctx as unknown as {
     invoke: {
       vtex: {
         loaders: {
           intelligentSearch: {
-            suggestions: (props: { query: string; count: number }) => Promise<{ products?: Product[] }>;
+            suggestions: (
+              props: { query: string; count: number },
+            ) => Promise<{ products?: Product[] }>;
           };
         };
       };
     };
-  }).invoke.vtex.loaders.intelligentSearch.suggestions({ query: term, count: 10 });
+  }).invoke.vtex.loaders.intelligentSearch.suggestions({
+    query: term,
+    count: 10,
+  });
 
   return (res?.products ?? []).map((p) => option("vtex", p));
 }
 
-async function searchShopify(term: string, req: Request, ctx: AppContext): Promise<ProductOption[]> {
+async function searchShopify(
+  term: string,
+  req: Request,
+  ctx: AppContext,
+): Promise<ProductOption[]> {
   const res = await (ctx as unknown as {
     invoke: {
       shopify: {
         loaders: {
-          ProductList: (props: { props: { query: string; count: number } }, req: Request) => Promise<Product[] | null>;
+          ProductList: (
+            props: { props: { query: string; count: number } },
+            req: Request,
+          ) => Promise<Product[] | null>;
         };
       };
     };
-  }).invoke.shopify.loaders.ProductList({ props: { query: term, count: 10 } }, req);
+  }).invoke.shopify.loaders.ProductList(
+    { props: { query: term, count: 10 } },
+    req,
+  );
 
   return (res ?? []).map((p) => option("shopify", p));
 }
 
-async function searchWake(term: string, req: Request, ctx: AppContext): Promise<ProductOption[]> {
+async function searchWake(
+  term: string,
+  req: Request,
+  ctx: AppContext,
+): Promise<ProductOption[]> {
   const res = await (ctx as unknown as {
     invoke: {
       wake: {
         loaders: {
-          suggestion: (props: { query: string; limit?: number }, req: Request) => Promise<{ products?: Product[] } | null>;
+          suggestion: (
+            props: { query: string; limit?: number },
+            req: Request,
+          ) => Promise<{ products?: Product[] } | null>;
         };
       };
     };
@@ -124,12 +149,19 @@ async function searchWake(term: string, req: Request, ctx: AppContext): Promise<
   return (res?.products ?? []).map((p) => option("wake", p));
 }
 
-async function searchWap(term: string, req: Request, ctx: AppContext): Promise<ProductOption[]> {
+async function searchWap(
+  term: string,
+  req: Request,
+  ctx: AppContext,
+): Promise<ProductOption[]> {
   const res = await (ctx as unknown as {
     invoke: {
       wap: {
         loaders: {
-          suggestions: (props: { query?: string; count?: number }, req: Request) => Promise<{ products?: Product[] } | null>;
+          suggestions: (
+            props: { query?: string; count?: number },
+            req: Request,
+          ) => Promise<{ products?: Product[] } | null>;
         };
       };
     };
@@ -138,7 +170,11 @@ async function searchWap(term: string, req: Request, ctx: AppContext): Promise<P
   return (res?.products ?? []).map((p) => option("wap", p));
 }
 
-export async function searchProductOptions(term: string, req: Request, ctx: AppContext): Promise<ProductOption[]> {
+export async function searchProductOptions(
+  term: string,
+  req: Request,
+  ctx: AppContext,
+): Promise<ProductOption[]> {
   const query = term.trim();
 
   // When the current form value is already a stored reference (e.g. vtex:sku:123),
@@ -186,7 +222,9 @@ export async function searchProductOptions(term: string, req: Request, ctx: AppC
   }];
 }
 
-function parseReference(value: string): { source: Source; kind: string; id: string } | null {
+function parseReference(
+  value: string,
+): { source: Source; kind: string; id: string } | null {
   const m = value.match(/^([a-z]+):([a-z]+):(.+)$/i);
   if (!m) return null;
   const source = m[1].toLowerCase() as Source;
@@ -196,29 +234,47 @@ function parseReference(value: string): { source: Source; kind: string; id: stri
   return { source, kind, id };
 }
 
-async function resolveVtex(id: string, req: Request, ctx: AppContext): Promise<Product | null> {
+async function resolveVtex(
+  id: string,
+  req: Request,
+  ctx: AppContext,
+): Promise<Product | null> {
   const products = await (ctx as unknown as {
     invoke: {
       vtex: {
         loaders: {
           intelligentSearch: {
-            productList: (props: { props: { ids: string[] } }, req: Request) => Promise<Product[] | null>;
+            productList: (
+              props: { props: { ids: string[] } },
+              req: Request,
+            ) => Promise<Product[] | null>;
           };
         };
       };
     };
-  }).invoke.vtex.loaders.intelligentSearch.productList({ props: { ids: [id] } }, req);
+  }).invoke.vtex.loaders.intelligentSearch.productList(
+    { props: { ids: [id] } },
+    req,
+  );
 
   return products?.[0] ?? null;
 }
 
-async function resolveShopify(id: string, kind: string, req: Request, ctx: AppContext): Promise<Product | null> {
+async function resolveShopify(
+  id: string,
+  kind: string,
+  req: Request,
+  ctx: AppContext,
+): Promise<Product | null> {
   const slug = kind === "handle" ? id : extractHandle(id) ?? id;
   const page = await (ctx as unknown as {
     invoke: {
       shopify: {
         loaders: {
-          ProductDetailsPage: (props: { slug: string }, req: Request) => Promise<{ product: Product } | null>;
+          ProductDetailsPage: (
+            props: { slug: string },
+            req: Request,
+          ) => Promise<{ product: Product } | null>;
         };
       };
     };
@@ -227,7 +283,11 @@ async function resolveShopify(id: string, kind: string, req: Request, ctx: AppCo
   return page?.product ?? null;
 }
 
-async function resolveWake(id: string, req: Request, ctx: AppContext): Promise<Product | null> {
+async function resolveWake(
+  id: string,
+  req: Request,
+  ctx: AppContext,
+): Promise<Product | null> {
   const productId = Number(id);
   if (!Number.isFinite(productId)) return null;
 
@@ -238,7 +298,14 @@ async function resolveWake(id: string, req: Request, ctx: AppContext): Promise<P
           productList: (props: {
             first: number;
             sortDirection: "ASC" | "DESC";
-            sortKey: "NAME" | "PRICE" | "DISCOUNT" | "RANDOM" | "RELEASE_DATE" | "SALES" | "STOCK";
+            sortKey:
+              | "NAME"
+              | "PRICE"
+              | "DISCOUNT"
+              | "RANDOM"
+              | "RELEASE_DATE"
+              | "SALES"
+              | "STOCK";
             filters: { productId: number[] };
           }, req: Request) => Promise<Product[] | null>;
         };
@@ -254,12 +321,19 @@ async function resolveWake(id: string, req: Request, ctx: AppContext): Promise<P
   return products?.[0] ?? null;
 }
 
-async function resolveWap(id: string, req: Request, ctx: AppContext): Promise<Product | null> {
+async function resolveWap(
+  id: string,
+  req: Request,
+  ctx: AppContext,
+): Promise<Product | null> {
   const products = await (ctx as unknown as {
     invoke: {
       wap: {
         loaders: {
-          productList: (props: { props: { busca: string; limit: number } }, req: Request) => Promise<Product[] | null>;
+          productList: (
+            props: { props: { busca: string; limit: number } },
+            req: Request,
+          ) => Promise<Product[] | null>;
         };
       };
     };
@@ -268,14 +342,20 @@ async function resolveWap(id: string, req: Request, ctx: AppContext): Promise<Pr
   return products?.[0] ?? null;
 }
 
-export async function resolveProductByReference(reference: string | undefined, req: Request, ctx: AppContext): Promise<Product | null> {
+export async function resolveProductByReference(
+  reference: string | undefined,
+  req: Request,
+  ctx: AppContext,
+): Promise<Product | null> {
   if (!reference) return null;
   const parsed = parseReference(reference);
   if (!parsed) return null;
 
   try {
     if (parsed.source === "vtex") return await resolveVtex(parsed.id, req, ctx);
-    if (parsed.source === "shopify") return await resolveShopify(parsed.id, parsed.kind, req, ctx);
+    if (parsed.source === "shopify") {
+      return await resolveShopify(parsed.id, parsed.kind, req, ctx);
+    }
     if (parsed.source === "wake") return await resolveWake(parsed.id, req, ctx);
     return await resolveWap(parsed.id, req, ctx);
   } catch {
