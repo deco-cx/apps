@@ -27,14 +27,35 @@ const includeSiteMaps = (
     : currentXML;
 };
 
+const excludeSitemapEntries = (
+  xml: string,
+  exclude?: string[],
+): string => {
+  if (!exclude?.length) return xml;
+  return xml.replace(
+    /<sitemap>\s*<loc>([^<]*)<\/loc>[\s\S]*?<\/sitemap>/gi,
+    (block, loc) => {
+      const shouldExclude = exclude.some(
+        (entry) => loc.includes(entry) || loc.endsWith(entry),
+      );
+      return shouldExclude ? "" : block;
+    },
+  );
+};
+
 export interface Props {
   include?: string[];
+  /**
+   * @title Sitemap entries to remove from the sitemap index
+   * @description URLs or path suffixes to match; any <sitemap> whose <loc> contains or ends with one of these will be removed.
+   */
+  excludeSiteMapEntry?: string[];
 }
 /**
  * @title Sitemap Proxy
  */
 export default function Sitemap(
-  { include }: Props,
+  { include, excludeSiteMapEntry }: Props,
   { publicUrl: url, usePortalSitemap, account }: AppContext,
 ) {
   return async (
@@ -62,12 +83,16 @@ export default function Sitemap(
     const reqUrl = new URL(req.url);
     const text = await response.text();
 
+    const withIncludes = includeSiteMaps(
+      text.replaceAll(publicUrl, `${reqUrl.origin}/`),
+      reqUrl.origin,
+      include,
+    );
+
+    const filtered = excludeSitemapEntries(withIncludes, excludeSiteMapEntry);
+
     return new Response(
-      includeSiteMaps(
-        text.replaceAll(publicUrl, `${reqUrl.origin}/`),
-        reqUrl.origin,
-        include,
-      ),
+      filtered,
       {
         headers: response.headers,
         status: response.status,
