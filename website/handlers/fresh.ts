@@ -232,6 +232,14 @@ export default function Fresh(
           }
         },
       );
+      // Set matched page block name for observability headers
+      if (isFreshCtx<DecoState>(ctx) && page?.metadata?.component) {
+        // deno-lint-ignore no-explicit-any
+        (ctx.state as any).matchedPageBlock = page.metadata.component
+          .replace(/^site\//, '')
+          .replace(/\.tsx$/, '');
+      }
+      
       if (asJson !== null) {
         didFinish = true;
         return Response.json(page, { headers: allowCorsFor(req) });
