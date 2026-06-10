@@ -117,6 +117,17 @@ export interface Props {
    */
   firstByteThresholdMS?: boolean;
   /**
+   * @title renderJson
+   * @description Options for the structured JSON rendering of pages (?renderJson)
+   */
+  renderJson?: {
+    /**
+     * @title Ignored Sections
+     * @description App-owned sections excluded from the renderJson response, matched by resolveType suffix (e.g. "SeoV2.tsx"). Site-owned sections should prefer `export const renderJson = false` in their own file.
+     */
+    sectionsToIgnore?: string[];
+  };
+  /**
    * @title Avoid redirecting to editor
    * @description Disable going to editor when "." or "Ctrl + Shift + E" is pressed
    */
