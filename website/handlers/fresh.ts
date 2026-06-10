@@ -118,10 +118,8 @@ export default function Fresh(
     const startedAt = Date.now();
     const asJson = url.searchParams.get("asJson");
     // Structured JSON rendering (sections serialized honoring the section's
-    // `renderJson` export). `appJson` is the legacy param name — remove once
-    // consumers switch to `renderJson`.
-    const renderJson = url.searchParams.has("renderJson") ||
-      url.searchParams.has("appJson");
+    // `renderJson` export).
+    const renderJson = url.searchParams.has("renderJson");
     // One-shot JSON responses (asJson/renderJson) never use async render.
     const isJsonOneShot = asJson !== null || renderJson;
     const delayFromProps = appContext.firstByteThresholdMS ? 1 : 0;
