@@ -544,8 +544,8 @@ export interface SearchArgs {
 
 export interface SelectedFacet {
   /**
-   * @title Use this to identify the facet
-   * @description This is an optional field that can be used to identify the facet in the CMS. Ex: "category-1 > Collection", "productClusterIds > 123".
+   * @title Facet label
+   * @description Optional label used to identify this facet in the CMS Admin. Examples: "category-1 > Collection", "productClusterIds > 123".
    */
   label?: string;
   /**
