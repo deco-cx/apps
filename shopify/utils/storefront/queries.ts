@@ -274,11 +274,7 @@ export const CreateCart = {
     $countryCode: CountryCode,
     $languageCode: LanguageCode
   ) @inContext(country: $countryCode, language: $languageCode) {
-    payload: cartCreate(
-      input: {
-        buyerIdentity: { countryCode: $countryCode }
-      }
-    ) { 
+    payload: cartCreate {
       cart { id }
       userErrors { field message }
     }
