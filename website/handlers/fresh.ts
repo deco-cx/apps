@@ -180,7 +180,11 @@ export default function Fresh(
       // configured in the website app props) + the section's own
       // `renderJson === false` export.
       const getSectionModule = renderJson ? await sectionModuleLookup() : null;
-      const sectionsToIgnore = appContext.renderJson?.sectionsToIgnore ?? [];
+      // Trim and drop blank suffixes — an empty entry would make `endsWith("")`
+      // match every section and drop the whole page.
+      const sectionsToIgnore = (appContext.renderJson?.sectionsToIgnore ?? [])
+        .map((suffix) => suffix.trim())
+        .filter((suffix) => suffix.length > 0);
       const isDroppedSection = (resolveType: string) =>
         !!getSectionModule &&
         (sectionsToIgnore.some((suffix) => resolveType.endsWith(suffix)) ||
