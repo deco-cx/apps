@@ -148,10 +148,12 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
     try {
       const isMultiProduct = Array.isArray(productId);
 
-      const [responseRating, responseReview] = await Promise.all([
+      const [responseRating, responseReviews] = await Promise.all([
         ratings({ productsIds: isMultiProduct ? productId : [productId] }),
         reviews({ productId, count, offset, order }),
-      ]) as [Ratings, Reviews | null];
+      ]) as [Ratings | undefined, Reviews[]];
+
+      const responseReview = responseReviews?.[0];
 
       const aggregateRating = isMultiProduct
         ? getWeightedRatingProduct(responseRating)
