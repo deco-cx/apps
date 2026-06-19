@@ -100,7 +100,9 @@ interface TypeTag {
   isProperty: boolean;
 }
 
-const parseTypeTagsFromUrl = (url: URL): { typeTags: TypeTag[]; cleanUrl: URL } => {
+const parseTypeTagsFromUrl = (
+  url: URL,
+): { typeTags: TypeTag[]; cleanUrl: URL } => {
   const TYPE_TAG_PATTERN = /^type_tags\[(.+)\]\[\]$/;
 
   const typeTags = [...url.searchParams.entries()]
@@ -150,7 +152,9 @@ const searchLoader = async (
   const priceFilterRegex = /de-(\d+)-a-(\d+)/;
   const filterMatch = url.href.match(priceFilterRegex) ?? [];
 
-  const categoryTagName = (props.term || url.pathname.slice(1) || "").split("/");
+  const categoryTagName = (props.term || url.pathname.slice(1) || "").split(
+    "/",
+  );
 
   const properties1 = url.searchParams.getAll("type_tags[property1][]");
   const properties2 = url.searchParams.getAll("type_tags[property2][]");
@@ -158,7 +162,9 @@ const searchLoader = async (
 
   const uniquePathNames = [
     ...new Set(
-      categoryTagName.filter((item): item is string => typeof item === "string"),
+      categoryTagName.filter((item): item is string =>
+        typeof item === "string"
+      ),
     ),
   ];
 
