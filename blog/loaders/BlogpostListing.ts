@@ -44,6 +44,12 @@ export interface Props {
    * @description Overrides the query term at url
    */
   query?: string;
+  /**
+   * @title Expanded categories
+   * @description When enabled, returns all categories and resolves the active category only from the categories collection.
+   * @default true
+   */
+  expandedCategories?: boolean;
 }
 
 /**
@@ -56,7 +62,7 @@ export interface Props {
  * @returns A promise that resolves to an array of blog posts.
  */
 export default async function BlogPostList(
-  { page, count, slug, sortBy, query }: Props,
+  { page, count, slug, sortBy, query, expandedCategories = true }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<BlogPostListingPage | null> {
@@ -95,14 +101,25 @@ export default async function BlogPostList(
     }
 
     let category: Category | null = null;
-    if (slug) {
+    let categories: Category[] | null = null;
+
+    if (expandedCategories) {
       try {
-        const categories = await getRecordsByPath<Category>(
+        categories = await loadCategories(ctx);
+        if (slug) {
+          category = categories.find((c) => c.slug === slug) ?? null;
+        }
+      } catch (e) {
+        logger.error(e);
+      }
+    } else if (slug) {
+      try {
+        const categoryRecords = await getRecordsByPath<Category>(
           ctx,
           CATEGORIES_PATH,
           CATEGORY_ACCESSOR,
         );
-        category = categories?.find((c) => c.slug === slug) ?? null;
+        category = categoryRecords?.find((c) => c.slug === slug) ?? null;
       } catch (e) {
         logger.error(e);
       }
@@ -113,6 +130,7 @@ export default async function BlogPostList(
     return {
       posts: slicedPosts,
       category,
+      categories,
       pageInfo: toPageInfo(handledPosts, postsPerPage, pageNumber, params),
       seo: {
         title: category?.name ?? "",
@@ -154,4 +172,19 @@ const toPageInfo = (
     records: totalPosts,
     recordPerPage: postsPerPage,
   };
+};
+
+const loadCategories = async (ctx: AppContext): Promise<Category[]> => {
+  const categories = await getRecordsByPath<Category>(
+    ctx,
+    CATEGORIES_PATH,
+    CATEGORY_ACCESSOR,
+  );
+
+  return (categories ?? [])
+    .filter((c) =>
+      typeof c?.name === "string" && c.name.length > 0 &&
+      typeof c?.slug === "string" && c.slug.length > 0
+    )
+    .sort((a, b) => a.name.localeCompare(b.name));
 };
