@@ -56,11 +56,20 @@ export default async function GetCategories(
     return null;
   }
 
+  const validCategories = categories.filter((c) =>
+    typeof c?.name === "string" && c.name.length > 0 &&
+    typeof c?.slug === "string" && c.slug.length > 0
+  );
+
   if (slug) {
-    return categories.filter((c) => c.slug === slug);
+    return validCategories.filter((c) => c.slug === slug);
   }
 
-  const sortedCategories = categories.sort((a, b) => {
+  if (!validCategories.length) {
+    return null;
+  }
+
+  const sortedCategories = validCategories.sort((a, b) => {
     const comparison = a.name.localeCompare(b.name);
     return sortBy.endsWith("_desc") ? comparison : -comparison;
   });
