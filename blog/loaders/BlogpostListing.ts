@@ -95,15 +95,12 @@ export default async function BlogPostList(
 
     const slicedPosts = slicePosts(handledPosts, pageNumber, postsPerPage);
 
-    if (slicedPosts.length === 0) {
-      return null;
-    }
-
     let categories: Category[] | null = null;
 
     if (expandedCategories) {
       try {
-        categories = await loadCategories(ctx);
+        const allCategories = await loadCategories(ctx);
+        categories = filterCategoriesWithPosts(allCategories, handledPosts);
       } catch (e) {
         logger.error(e);
       }
@@ -118,9 +115,14 @@ export default async function BlogPostList(
 
     const activeCategory = slug
       ? categories?.find((c) => c.slug === slug) ??
-        slicedPosts[0].categories?.find((c) => c.slug === slug) ??
+        slicedPosts[0]?.categories?.find((c) => c.slug === slug) ??
+        handledPosts[0]?.categories?.find((c) => c.slug === slug) ??
         null
       : null;
+
+    if (slicedPosts.length === 0) {
+      return null;
+    }
 
     return {
       posts: slicedPosts,
@@ -173,6 +175,19 @@ const isValidCategory = (category: Category): boolean =>
   category.name.length > 0 &&
   typeof category?.slug === "string" &&
   category.slug.length > 0;
+
+const filterCategoriesWithPosts = (
+  categories: Category[],
+  posts: BlogPost[],
+): Category[] => {
+  const slugs = new Set(
+    posts.flatMap((post) =>
+      post.categories?.map((category) => category.slug) ?? []
+    ),
+  );
+
+  return categories.filter((category) => slugs.has(category.slug));
+};
 
 const loadCategories = async (ctx: AppContext): Promise<Category[]> => {
   const categories = await getRecordsByPath<Category>(
