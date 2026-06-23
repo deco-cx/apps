@@ -10,12 +10,14 @@ import { logger } from "@deco/deco/o11y";
 import { PageInfo } from "../../commerce/types.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
-import { BlogPost, BlogPostListingPage, SortBy } from "../types.ts";
+import { BlogPost, BlogPostListingPage, Category, SortBy } from "../types.ts";
 import handlePosts, { slicePosts } from "../core/handlePosts.ts";
 import { getRecordsByPath } from "../core/records.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
+const CATEGORIES_PATH = "collections/blog/categories";
+const CATEGORY_ACCESSOR = "category";
 
 export interface Props {
   /**
@@ -92,12 +94,29 @@ export default async function BlogPostList(
       return null;
     }
 
-    const category = slicedPosts[0].categories?.find((c) => c.slug === slug);
+    let category: Category | null = null;
+    if (slug) {
+      try {
+        const categories = await getRecordsByPath<Category>(
+          ctx,
+          CATEGORIES_PATH,
+          CATEGORY_ACCESSOR,
+        );
+        category = categories?.find((c) => c.slug === slug) ?? null;
+      } catch (e) {
+        logger.error(e);
+      }
+      category ??= slicedPosts[0].categories?.find((c) => c.slug === slug) ??
+        null;
+    }
+
     return {
       posts: slicedPosts,
+      category,
       pageInfo: toPageInfo(handledPosts, postsPerPage, pageNumber, params),
       seo: {
         title: category?.name ?? "",
+        description: category?.description,
         canonical: new URL(url.pathname, url.origin).href,
       },
     };
