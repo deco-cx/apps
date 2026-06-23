@@ -14,15 +14,17 @@ export async function getRecordsByPath<T>(
     __resolveType: "resolvables",
   }) as unknown as Record<string, Resolvable<T>>;
   const current = Object.entries(resolvables).flatMap(([key, value]) => {
-    return key.startsWith(path) ? value : [];
+    return key.startsWith(path) && value != null ? value : [];
   });
-  return (current as Record<string, T>[]).map((item) => {
-    const id = (item.name as string).split(path)[1]?.replace("/", "");
-    return {
-      ...item[accessor],
-      id,
-    };
-  });
+  return (current as Record<string, T>[])
+    .filter((item) => item != null && typeof item.name === "string")
+    .map((item) => {
+      const id = (item.name as string).split(path)[1]?.replace("/", "");
+      return {
+        ...item[accessor],
+        id,
+      };
+    });
 }
 
 export async function getRatingsBySlug(
