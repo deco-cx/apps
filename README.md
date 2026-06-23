@@ -5,7 +5,6 @@
 
 <hr/>
 
-
 # Deco **Apps** Library / MCP Servers
 
 <img align="right" src="/assets/logo.svg" height="150px" alt="The Deco Framework logo: A capybara in its natural habitat">
