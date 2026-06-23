@@ -17,6 +17,13 @@ export interface Author {
 export interface Category {
   name: string;
   slug: string;
+  description?: string;
+  /**
+   * @title Sections
+   * @label hidden
+   * @changeable true
+   */
+  sections?: Section[];
 }
 
 export interface BlogPost {
