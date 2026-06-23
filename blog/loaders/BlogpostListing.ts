@@ -96,13 +96,18 @@ export default async function BlogPostList(
 
     let category: Category | null = null;
     if (slug) {
-      const categories = await getRecordsByPath<Category>(
-        ctx,
-        CATEGORIES_PATH,
-        CATEGORY_ACCESSOR,
-      );
-      category = categories?.find((c) => c.slug === slug) ??
-        slicedPosts[0].categories?.find((c) => c.slug === slug) ?? null;
+      try {
+        const categories = await getRecordsByPath<Category>(
+          ctx,
+          CATEGORIES_PATH,
+          CATEGORY_ACCESSOR,
+        );
+        category = categories?.find((c) => c.slug === slug) ?? null;
+      } catch (e) {
+        logger.error(e);
+      }
+      category ??= slicedPosts[0].categories?.find((c) => c.slug === slug) ??
+        null;
     }
 
     return {
