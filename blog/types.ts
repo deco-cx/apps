@@ -122,6 +122,8 @@ export interface BlogPostListingPage {
   posts: BlogPost[];
   /** @title Active category */
   category?: Category | null;
+  /** @title Categories */
+  categories?: Category[] | null;
   pageInfo: PageInfo;
   seo: Seo;
 }
