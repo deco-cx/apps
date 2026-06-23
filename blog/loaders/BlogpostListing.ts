@@ -47,7 +47,7 @@ export interface Props {
   /**
    * @title Expanded categories
    * @description When enabled, returns all categories from the collection.
-   * @default true
+   * @default false
    */
   expandedCategories?: boolean;
 }
@@ -62,7 +62,7 @@ export interface Props {
  * @returns A promise that resolves to an array of blog posts.
  */
 export default async function BlogPostList(
-  { page, count, slug, sortBy, query, expandedCategories = true }: Props,
+  { page, count, slug, sortBy, query, expandedCategories = false }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<BlogPostListingPage | null> {
@@ -104,6 +104,13 @@ export default async function BlogPostList(
     if (expandedCategories) {
       try {
         categories = await loadCategories(ctx);
+      } catch (e) {
+        logger.error(e);
+      }
+    } else if (slug) {
+      try {
+        const match = await loadCategoryBySlug(ctx, slug);
+        categories = match ? [match] : null;
       } catch (e) {
         logger.error(e);
       }
@@ -161,6 +168,12 @@ const toPageInfo = (
   };
 };
 
+const isValidCategory = (category: Category): boolean =>
+  typeof category?.name === "string" &&
+  category.name.length > 0 &&
+  typeof category?.slug === "string" &&
+  category.slug.length > 0;
+
 const loadCategories = async (ctx: AppContext): Promise<Category[]> => {
   const categories = await getRecordsByPath<Category>(
     ctx,
@@ -169,12 +182,22 @@ const loadCategories = async (ctx: AppContext): Promise<Category[]> => {
   );
 
   return (categories ?? [])
-    .filter(
-      (c) =>
-        typeof c?.name === "string" &&
-        c.name.length > 0 &&
-        typeof c?.slug === "string" &&
-        c.slug.length > 0,
-    )
+    .filter(isValidCategory)
     .sort((a, b) => a.name.localeCompare(b.name));
+};
+
+const loadCategoryBySlug = async (
+  ctx: AppContext,
+  slug: string,
+): Promise<Category | null> => {
+  const categories = await getRecordsByPath<Category>(
+    ctx,
+    CATEGORIES_PATH,
+    CATEGORY_ACCESSOR,
+  );
+
+  return (categories ?? []).find((c) =>
+    isValidCategory(c) && c.slug === slug
+  ) ??
+    null;
 };
