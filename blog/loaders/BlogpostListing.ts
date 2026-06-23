@@ -46,7 +46,7 @@ export interface Props {
   query?: string;
   /**
    * @title Expanded categories
-   * @description When enabled, returns all categories and resolves the active category only from the categories collection.
+   * @description When enabled, returns all categories from the collection.
    * @default true
    */
   expandedCategories?: boolean;
@@ -70,8 +70,7 @@ export default async function BlogPostList(
   const params = url.searchParams;
   const postsPerPage = Number(count ?? params.get("count") ?? 12);
   const pageNumber = Number(page ?? params.get("page") ?? 1);
-  const pageSort = sortBy ?? params.get("sortBy") as SortBy ??
-    "date_desc";
+  const pageSort = sortBy ?? (params.get("sortBy") as SortBy) ?? "date_desc";
   const term = query ?? params.get("q") ?? undefined;
 
   const posts = await getRecordsByPath<BlogPost>(
@@ -100,41 +99,29 @@ export default async function BlogPostList(
       return null;
     }
 
-    let category: Category | null = null;
     let categories: Category[] | null = null;
 
     if (expandedCategories) {
       try {
         categories = await loadCategories(ctx);
-        if (slug) {
-          category = categories.find((c) => c.slug === slug) ?? null;
-        }
       } catch (e) {
         logger.error(e);
       }
-    } else if (slug) {
-      try {
-        const categoryRecords = await getRecordsByPath<Category>(
-          ctx,
-          CATEGORIES_PATH,
-          CATEGORY_ACCESSOR,
-        );
-        category = categoryRecords?.find((c) => c.slug === slug) ?? null;
-      } catch (e) {
-        logger.error(e);
-      }
-      category ??= slicedPosts[0].categories?.find((c) => c.slug === slug) ??
-        null;
     }
+
+    const activeCategory = slug
+      ? categories?.find((c) => c.slug === slug) ??
+        slicedPosts[0].categories?.find((c) => c.slug === slug) ??
+        null
+      : null;
 
     return {
       posts: slicedPosts,
-      category,
       categories,
       pageInfo: toPageInfo(handledPosts, postsPerPage, pageNumber, params),
       seo: {
-        title: category?.name ?? "",
-        description: category?.description,
+        title: activeCategory?.name ?? "",
+        description: activeCategory?.description,
         canonical: new URL(url.pathname, url.origin).href,
       },
     };
@@ -182,9 +169,12 @@ const loadCategories = async (ctx: AppContext): Promise<Category[]> => {
   );
 
   return (categories ?? [])
-    .filter((c) =>
-      typeof c?.name === "string" && c.name.length > 0 &&
-      typeof c?.slug === "string" && c.slug.length > 0
+    .filter(
+      (c) =>
+        typeof c?.name === "string" &&
+        c.name.length > 0 &&
+        typeof c?.slug === "string" &&
+        c.slug.length > 0,
     )
     .sort((a, b) => a.name.localeCompare(b.name));
 };
