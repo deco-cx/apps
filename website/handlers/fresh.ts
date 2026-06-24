@@ -8,9 +8,14 @@ import {
   allowCorsFor,
   asResolved,
   type BaseContext,
+  computeRenderCb,
   type DecoState,
   isDeferred,
   RequestContext,
+  type ResolvedSection,
+  sectionModuleLookup,
+  type SerializeContext,
+  serializeResolvedSection,
 } from "@deco/deco";
 import type { Exception } from "npm:@opentelemetry/api@1.9.0";
 
@@ -100,6 +105,7 @@ export default function Fresh(
     | "firstByteThresholdMS"
     | "isBot"
     | "flavor"
+    | "renderJson"
   >,
 ) {
   return async (req: Request, ctx: ConnInfo) => {
@@ -111,6 +117,11 @@ export default function Fresh(
     const url = new URL(req.url);
     const startedAt = Date.now();
     const asJson = url.searchParams.get("asJson");
+    // Structured JSON rendering (sections serialized honoring the section's
+    // `renderJson` export).
+    const renderJson = url.searchParams.has("renderJson");
+    // One-shot JSON responses (asJson/renderJson) never use async render.
+    const isJsonOneShot = asJson !== null || renderJson;
     const delayFromProps = appContext.firstByteThresholdMS ? 1 : 0;
     const delay = Number(url.searchParams.get(__DECO_FBT) ?? delayFromProps);
     /** Controller to abort third party fetch (loaders) */
@@ -128,7 +139,7 @@ export default function Fresh(
      * 2. Async Rendering Feature is activated
      * 3. Is not a bot (bot requires the whole page html for boosting SEO)
      */
-    const firstByteThreshold = !asJson && delay && !appContext.isBot
+    const firstByteThreshold = !isJsonOneShot && delay && !appContext.isBot
       ? (delay === 1
         ? (() => {
           console.warn(
@@ -152,7 +163,7 @@ export default function Fresh(
       : undefined;
 
     // Propagate client aborts to loaders only when async render is enabled
-    if (!asJson && delay && !appContext.isBot) {
+    if (!isJsonOneShot && delay && !appContext.isBot) {
       abortCtrl = abortHandler(ctrl, req.signal, {
         url: `${url.pathname}${url.search}`,
         startedAt,
@@ -165,6 +176,24 @@ export default function Fresh(
       registerFinilizer(req, abortCtrl);
     }
     try {
+      // Section drop for renderJson = consumer override (app-owned sections
+      // configured in the website app props) + the section's own
+      // `renderJson === false` export.
+      const getSectionModule = renderJson ? await sectionModuleLookup() : null;
+      // sectionsToIgnore is admin config (external JSON), so it is not
+      // type-guaranteed at runtime. Keep only non-empty string suffixes: a
+      // blank entry would make `endsWith("")` match every section (dropping the
+      // whole page), and a non-string would throw on `.trim()` (500ing the request).
+      const sectionsToIgnore =
+        ((appContext.renderJson?.sectionsToIgnore ?? []) as unknown[])
+          .filter((suffix): suffix is string => typeof suffix === "string")
+          .map((suffix) => suffix.trim())
+          .filter((suffix) => suffix.length > 0);
+      const isDroppedSection = (resolveType: string) =>
+        !!getSectionModule &&
+        (sectionsToIgnore.some((suffix) => resolveType.endsWith(suffix)) ||
+          getSectionModule(resolveType)?.renderJson === false);
+
       const getPage = RequestContext.bind(
         { signal: ctrl.signal },
         async () =>
@@ -177,12 +206,39 @@ export default function Fresh(
             ? await freshConfig.page({ context: ctx }, {
               propagateOptions: true,
               hooks: {
-                onPropsResolveStart: (resolve, _props, resolver) => {
+                // Dropped sections short-circuit child resolution (their
+                // prop-loaders never run) — see deco engine/core/resolver.ts.
+                onPropsResolveStart: (
+                  resolve,
+                  _props,
+                  resolver,
+                  resolveType,
+                ) => {
+                  if (renderJson && isDroppedSection(resolveType)) {
+                    return Promise.resolve([]);
+                  }
                   let next = resolve;
                   if (resolver?.type === "matchers") { // matchers should not have a timeout.
                     next = RequestContext.bind({ signal: req.signal }, resolve);
                   }
                   return next();
+                },
+                // Skip the dropped section's own inline `mod.loader` by
+                // stubbing before the section resolver runs. Cast via
+                // `unknown` because the hook is generic over T.
+                onResolveStart: <T>(
+                  proceed: () => Promise<T>,
+                  _props: T,
+                  _resolver: unknown,
+                  resolveType: string,
+                ): Promise<T> => {
+                  if (renderJson && isDroppedSection(resolveType)) {
+                    const stub: ResolvedSection = {
+                      metadata: { component: resolveType },
+                    };
+                    return Promise.resolve(stub as unknown as T);
+                  }
+                  return proceed();
                 },
               },
             })
@@ -196,7 +252,7 @@ export default function Fresh(
             if (pathTemplate) {
               span?.setAttribute?.("deco.path_template", pathTemplate);
             }
-            if (delay && !asJson && !appContext.isBot) {
+            if (delay && !isJsonOneShot && !appContext.isBot) {
               span?.setAttribute?.(
                 "deco.async_render.first_byte_threshold_ms",
                 delay,
@@ -232,6 +288,41 @@ export default function Fresh(
           }
         },
       );
+      // renderJson takes precedence over asJson when both params are sent.
+      if (renderJson) {
+        didFinish = true;
+        const pageProps = (page as unknown as Record<string, unknown>)?.props as
+          | Record<string, unknown>
+          | undefined;
+        // appContext runtime spreads state.global (= the full request state),
+        // so vary/revision/release/deco are reachable here even though the
+        // type declares a narrower surface.
+        // deno-lint-ignore no-explicit-any
+        const appCtx = appContext as any;
+        const cb = computeRenderCb({
+          revision: appCtx?.revision ?? (await appCtx?.release?.revision?.()),
+          vary: appCtx?.vary?.build?.(),
+          href: req.url,
+          deploymentId: appCtx?.deco?.ctx?.deploymentId,
+        });
+        const serializeCtx: SerializeContext = {
+          href: req.url,
+          pathTemplate: pathTemplate ?? url.pathname,
+          cb,
+          getSectionModule: getSectionModule ?? undefined,
+        };
+        const sections = ((pageProps?.sections as Array<ResolvedSection>) ?? [])
+          .map((section) => serializeResolvedSection(section, serializeCtx))
+          // Drops renderJson === false sections (serialized to null) and the
+          // stubs left by onResolveStart for the ignored list.
+          .filter((s): s is NonNullable<typeof s> =>
+            s !== null && !isDroppedSection(s.component)
+          );
+        return Response.json(
+          { name: pageProps?.name, path: pageProps?.path, sections },
+          { headers: allowCorsFor(req) },
+        );
+      }
       if (asJson !== null) {
         didFinish = true;
         return Response.json(page, { headers: allowCorsFor(req) });
@@ -264,7 +355,7 @@ export default function Fresh(
                   pagePath: ctx.state.pathTemplate,
                 },
               });
-              if (!asJson && delay && !appContext.isBot) {
+              if (!isJsonOneShot && delay && !appContext.isBot) {
                 console.info(
                   `[fresh][async-render-response] returned initial HTML with async render` +
                     ` url=${url.pathname}${url.search}` +
