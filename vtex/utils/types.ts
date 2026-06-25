@@ -541,13 +541,10 @@ export interface SearchArgs {
   locale?: string;
   segment?: Partial<Segment>;
 }
-
+/**
+* @title {{{key}}} > {{{value}}}
+*/
 export interface SelectedFacet {
-  /**
-   * @title Facet label
-   * @description Optional label used to identify this facet in the CMS Admin. Examples: "category-1 > Collection", "productClusterIds > 123".
-   */
-  label?: string;
   /**
    * @title Key
    * @description The key of the facet (e.g. "brand", "category-1", "productClusterIds")
