@@ -1,6 +1,12 @@
 import { Context, type JSONSchema7, lazySchemaFor } from "@deco/deco";
-import { meter, ValueType } from "@deco/deco/o11y";
 import { weakcache } from "../../utils/weakcache.ts";
+import {
+  ATTR_ASSISTANT_ID,
+  ATTR_ASSISTANT_PHASE,
+  GEN_AI_SYSTEM,
+  GEN_AI_SYSTEM_OPENAI,
+  stats,
+} from "../observability.ts";
 import {
   ChatMessage,
   FunctionCallReply,
@@ -15,14 +21,6 @@ import {
 import { threadMessageToReply, Tokens } from "../loaders/messages.ts";
 import { AIAssistant, AppContext } from "../mod.ts";
 import { dereferenceJsonSchema } from "../schema.ts";
-const stats = {
-  latency: meter.createHistogram("assistant_latency", {
-    description:
-      "assistant latency (time it takes from the moment the server receives the request to the moment it sends the response)",
-    unit: "ms",
-    valueType: ValueType.DOUBLE,
-  }),
-};
 // Max length of instructions. The maximum context of the assistant is 32K chars. We use 25K for instructions to be safe.
 const MAX_INSTRUCTIONS_LENGTH = 25000;
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
@@ -224,9 +222,10 @@ export const messageProcessorFor = async (
           props,
         },
       });
-      stats.latency.record(performance.now() - start, {
-        type: "start_function_call",
-        assistant_id: run.assistant_id,
+      stats.operationDuration.record((performance.now() - start) / 1000, {
+        [GEN_AI_SYSTEM]: GEN_AI_SYSTEM_OPENAI,
+        [ATTR_ASSISTANT_PHASE]: "start_function_call",
+        [ATTR_ASSISTANT_ID]: run.assistant_id,
       });
     }, (call, props, response) => {
       functionCallReplies.push({
@@ -298,9 +297,10 @@ export const messageProcessorFor = async (
       reply(message);
     } else {
       reply(replyMessage);
-      stats.latency.record(performance.now() - start, {
-        type: "text",
-        assistant_id: run.assistant_id,
+      stats.operationDuration.record((performance.now() - start) / 1000, {
+        [GEN_AI_SYSTEM]: GEN_AI_SYSTEM_OPENAI,
+        [ATTR_ASSISTANT_PHASE]: "text",
+        [ATTR_ASSISTANT_ID]: run.assistant_id,
       });
     }
     if (functionCallReplies.length > 0) {
@@ -310,9 +310,10 @@ export const messageProcessorFor = async (
         type: "function_calls" as const,
         content: functionCallReplies,
       });
-      stats.latency.record(performance.now() - start, {
-        type: "function_calls",
-        assistant_id: run.assistant_id,
+      stats.operationDuration.record((performance.now() - start) / 1000, {
+        [GEN_AI_SYSTEM]: GEN_AI_SYSTEM_OPENAI,
+        [ATTR_ASSISTANT_PHASE]: "function_calls",
+        [ATTR_ASSISTANT_ID]: run.assistant_id,
       });
     }
   };
