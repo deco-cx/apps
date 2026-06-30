@@ -45,7 +45,10 @@ export default function Site(state: Props): App<Manifest, Required<Props>> {
     state: {
       version: state.version ?? "1.9.12",
       cdn: state.cdn ?? "https://cdn.jsdelivr.net/npm",
-      extensions: state.extensions ?? [],
+      extensions: [
+        "head-support",
+        ...(state.extensions ?? []).filter((ext) => ext !== "head-support"),
+      ],
     },
     manifest,
   };
