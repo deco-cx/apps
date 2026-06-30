@@ -16,6 +16,13 @@ export interface Props {
   /** @title Description Override */
   description?: string;
   /**
+   * @title Description Source
+   * @description Choose which field to use as the meta description when no Description Override is set.
+   * "seo" uses the SEO description from the search index (default).
+   * "product" uses the product's own description field, stripping HTML tags — useful when the SEO description is empty or you prefer the richer product copy.
+   */
+  descriptionSource?: "seo" | "product";
+  /**
    * @title Disable indexing
    * @description In testing, you can use this to prevent search engines from indexing your site
    */
@@ -38,10 +45,22 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
   const {
     title: titleProp,
     description: descriptionProp,
+    descriptionSource = "seo",
     jsonLD,
     omitVariants,
     ignoreStructuredData,
   } = props;
+
+  const productDescription = jsonLD?.product.description
+    ?.replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const resolvedDescription = descriptionProp ||
+    (descriptionSource === "product"
+      ? productDescription || jsonLD?.seo?.description
+      : jsonLD?.seo?.description || productDescription) ||
+    ctx.seo?.description || "";
 
   const title = renderTemplateString(
     titleTemplate,
@@ -49,7 +68,7 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
   );
   const description = renderTemplateString(
     descriptionTemplate,
-    descriptionProp || jsonLD?.seo?.description || ctx.seo?.description || "",
+    resolvedDescription,
   );
   const image = jsonLD?.product.image?.[0]?.url;
   const canonical = jsonLD?.seo?.canonical
