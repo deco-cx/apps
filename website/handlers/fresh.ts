@@ -97,7 +97,6 @@ export default function Fresh(
     | "monitoring"
     | "response"
     | "caching"
-    | "firstByteThresholdMS"
     | "isBot"
     | "flavor"
   >,
@@ -111,8 +110,7 @@ export default function Fresh(
     const url = new URL(req.url);
     const startedAt = Date.now();
     const asJson = url.searchParams.get("asJson");
-    const delayFromProps = appContext.firstByteThresholdMS ? 1 : 0;
-    const delay = Number(url.searchParams.get(__DECO_FBT) ?? delayFromProps);
+    const delay = Number(url.searchParams.get(__DECO_FBT) ?? 0);
     /** Controller to abort third party fetch (loaders) */
     const ctrl = new AbortController();
     const pathTemplate = isFreshCtx<DecoState>(ctx)
