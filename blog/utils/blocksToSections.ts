@@ -126,6 +126,13 @@ function blockToSection(
           rows: content.rows,
         });
 
+      case "product-shelf":
+        return toSection(`${BASE}/ProductShelf.tsx`, {
+          title: content.title,
+          // May be a productList loader ref (resolved by deco) or resolved Product[]
+          products: content.products,
+        });
+
       case "image":
         return toSection(`${BASE}/BlockImage.tsx`, {
           url: content.url,
