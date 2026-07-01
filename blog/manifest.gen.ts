@@ -34,10 +34,12 @@ import * as $$$$$$10 from "./sections/blocks/Divider.tsx";
 import * as $$$$$$11 from "./sections/blocks/Heading.tsx";
 import * as $$$$$$12 from "./sections/blocks/List.tsx";
 import * as $$$$$$13 from "./sections/blocks/Paragraph.tsx";
+import * as $$$$$$19 from "./sections/blocks/ProductShelf.tsx";
 import * as $$$$$$14 from "./sections/blocks/Quote.tsx";
 import * as $$$$$$15 from "./sections/blocks/Stat.tsx";
 import * as $$$$$$16 from "./sections/blocks/StatGroup.tsx";
 import * as $$$$$$17 from "./sections/blocks/Steps.tsx";
+import * as $$$$$$20 from "./sections/blocks/Table.tsx";
 import * as $$$$$$18 from "./sections/blocks/Video.tsx";
 import * as $$$$$$0 from "./sections/Seo/SeoBlogPost.tsx";
 import * as $$$$$$1 from "./sections/Seo/SeoBlogPostListing.tsx";
@@ -76,10 +78,12 @@ const manifest = {
     "blog/sections/blocks/Heading.tsx": $$$$$$11,
     "blog/sections/blocks/List.tsx": $$$$$$12,
     "blog/sections/blocks/Paragraph.tsx": $$$$$$13,
+    "blog/sections/blocks/ProductShelf.tsx": $$$$$$19,
     "blog/sections/blocks/Quote.tsx": $$$$$$14,
     "blog/sections/blocks/Stat.tsx": $$$$$$15,
     "blog/sections/blocks/StatGroup.tsx": $$$$$$16,
     "blog/sections/blocks/Steps.tsx": $$$$$$17,
+    "blog/sections/blocks/Table.tsx": $$$$$$20,
     "blog/sections/blocks/Video.tsx": $$$$$$18,
     "blog/sections/Seo/SeoBlogPost.tsx": $$$$$$0,
     "blog/sections/Seo/SeoBlogPostListing.tsx": $$$$$$1,
