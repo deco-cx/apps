@@ -27,6 +27,8 @@ export interface Category {
 }
 
 export interface BlogPost {
+  /** @hide true */
+  spirePostId?: string;
   title: string;
   excerpt: string;
   /**
@@ -136,7 +138,7 @@ export interface ImageCarousel {
 export interface Review {
   "@type": "Review";
   id?: string;
-  /** Author of the */
+  /** The author of this review. */
   author?: Person;
   /** The date that the review was published, in ISO 8601 date format.*/
   datePublished?: string;
@@ -214,9 +216,9 @@ export interface BannerItem {
 }
 
 export interface Banner {
-  /** @description desktop otimized image */
+  /** @description desktop optimized image */
   desktop: BannerItem;
-  /** @description mobile otimized image */
+  /** @description mobile optimized image */
   mobile: BannerItem;
   /** @description Image's alt text */
   alt: string;
