@@ -38,6 +38,12 @@ const API_PATHS = [
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
 const VNDA_HOST_HEADER = "X-Shop-Host";
+const VNDA_ALLOWED_COOKIES = [
+  "vnda_cart_id",
+  "cart_id",
+  "ahoy_visit",
+  "ahoy_visitor",
+];
 export interface Props {
   /** @description ex: /p/fale-conosco */
   pagesToProxy?: string[];
@@ -100,6 +106,7 @@ function loader(
           : internalDomain,
         host: url.hostname,
         customHeaders,
+        allowedCookies: VNDA_ALLOWED_COOKIES,
       },
     },
   }));
@@ -123,6 +130,7 @@ function loader(
         url: `https://api.vnda.com.br/`,
         host: url.hostname,
         customHeaders,
+        allowedCookies: VNDA_ALLOWED_COOKIES,
       },
     },
   }));
