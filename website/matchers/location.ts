@@ -13,6 +13,9 @@ export interface Map {
    */
   coordinates?: MapWidget;
 }
+/**
+ * @format location
+ */
 export interface Location {
   /**
    * @title City
