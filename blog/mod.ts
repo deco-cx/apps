@@ -7,7 +7,7 @@ export type State = {
    * @description The slug of the Categories of the blogposts. Use :category
    * @example /blog/:category
    */
-  categorySlug?: string
+  categorySlug?: string;
   /**
    * @title Page Slug
    * @description The slug of the BlogPostPage to embed. Use :category and :slug.
