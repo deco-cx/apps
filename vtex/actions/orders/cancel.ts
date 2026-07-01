@@ -17,7 +17,7 @@ async function action(
 ): Promise<unknown> {
   const { orderId, reason } = props;
   const { vcsDeprecated } = ctx;
-  const { cookie } = parseCookie(req.headers, ctx.account);
+  const { cookie } = parseCookie(req.headers);
 
   const response = await vcsDeprecated
     ["POST /api/checkout/pub/orders/:orderId/user-cancel-request"](
