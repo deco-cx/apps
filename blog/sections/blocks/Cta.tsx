@@ -1,9 +1,7 @@
 import { sanitizeHref } from "../../utils/sanitizeHtml.ts";
 
 export interface Props {
-  /** Button label text */
   text: string;
-  /** Destination URL (accepts both `href` and `url` fields from Spire) */
   href?: string;
 }
 
@@ -11,7 +9,7 @@ export interface Props {
  * @title Call to Action
  * @description A full-width button linking to an internal or external URL.
  */
-export default function CallToAction({ text, href }: Props) {
+export default function Cta({ text, href }: Props) {
   const safeHref = sanitizeHref(href);
   const isExternal = /^https?:\/\//i.test(safeHref);
   return (

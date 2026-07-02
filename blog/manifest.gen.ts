@@ -26,7 +26,7 @@ import * as $$$8 from "./loaders/GetCategories.ts";
 import * as $$$18 from "./loaders/options/productsByTerm.ts";
 import * as $$$$$$3 from "./sections/blocks/BlockImage.tsx";
 import * as $$$$$$5 from "./sections/blocks/Callout.tsx";
-import * as $$$$$$4 from "./sections/blocks/CallToAction.tsx";
+import * as $$$$$$4 from "./sections/blocks/Cta.tsx";
 import * as $$$$$$6 from "./sections/blocks/CardGroup.tsx";
 import * as $$$$$$7 from "./sections/blocks/Checklist.tsx";
 import * as $$$$$$8 from "./sections/blocks/Code.tsx";
@@ -72,7 +72,7 @@ const manifest = {
   "sections": {
     "blog/sections/blocks/BlockImage.tsx": $$$$$$3,
     "blog/sections/blocks/Callout.tsx": $$$$$$5,
-    "blog/sections/blocks/CallToAction.tsx": $$$$$$4,
+    "blog/sections/blocks/Cta.tsx": $$$$$$4,
     "blog/sections/blocks/CardGroup.tsx": $$$$$$6,
     "blog/sections/blocks/Checklist.tsx": $$$$$$7,
     "blog/sections/blocks/Code.tsx": $$$$$$8,

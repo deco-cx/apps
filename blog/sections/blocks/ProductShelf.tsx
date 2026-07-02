@@ -1,8 +1,8 @@
-import { sanitizeHref } from "../../utils/sanitizeHtml.ts";
-import { getProductImage, getProductPrices } from "../../utils/productData.ts";
-import { resolveProductByReference } from "../../core/productResolver.ts";
+import Image from "../../../website/components/Image.tsx";
+import { getProductDisplay } from "../../utils/productData.ts";
+import { resolveProductsByReference } from "../../utils/productResolver.ts";
 import { AppContext } from "../../mod.ts";
-import { Product } from "../../../commerce/types.ts";
+import type { Product } from "../../../commerce/types.ts";
 
 /**
  * @title Product
@@ -11,15 +11,6 @@ import { Product } from "../../../commerce/types.ts";
  * @options blog/loaders/options/productsByTerm.ts
  */
 type ProductReference = string;
-
-interface ShelfItem {
-  name: string;
-  price?: string;
-  listPrice?: string;
-  imageUrl?: string;
-  url?: string;
-  badge?: string;
-}
 
 export interface Props {
   /** Section title shown above the shelf */
@@ -43,13 +34,10 @@ export async function loader(props: Props, req: Request, ctx: AppContext) {
       typeof id === "string" && id.trim().length > 0
     )
     : [];
-  const resolved = await Promise.all(
-    refs.map((id) => resolveProductByReference(id, req, ctx)),
-  );
-
+  const products = await resolveProductsByReference(refs, req, ctx);
   return {
     title: props.title,
-    products: resolved.filter((p): p is Product => Boolean(p)),
+    products,
   } as RuntimeProps;
 }
 
@@ -58,20 +46,9 @@ export async function loader(props: Props, req: Request, ctx: AppContext) {
  * @description Horizontally scrollable row of product cards.
  */
 export default function ProductShelf(
-  { title, products: sourceProducts }: RuntimeProps,
+  { title, products }: RuntimeProps,
 ) {
-  const products: ShelfItem[] = (sourceProducts ?? []).map((product) => {
-    const { price, listPrice } = getProductPrices(product);
-    return {
-      name: product.name ?? "",
-      price,
-      listPrice,
-      imageUrl: getProductImage(product),
-      url: product.url,
-    };
-  }).filter((item) => Boolean(item.name));
-
-  if (products.length === 0) return null;
+  if (!products?.length) return null;
 
   return (
     <div class="not-prose my-10">
@@ -79,42 +56,49 @@ export default function ProductShelf(
         <h3 class="text-base font-semibold tracking-tight mb-4 m-0">{title}</h3>
       )}
       <div class="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-thin scrollbar-track-transparent scrollbar-thumb-line">
-        {products.map((item, i) => {
-          const safeUrl = sanitizeHref(item.url);
-          const isExternal = /^https?:\/\//i.test(safeUrl);
+        {products.map((product, index) => {
+          const {
+            name,
+            imageUrl,
+            width,
+            height,
+            price,
+            listPrice,
+            safeUrl,
+            isExternal,
+          } = getProductDisplay(product);
+          if (!name) return null;
+
           return (
             <div
-              key={i}
+              key={`${product.productID ?? product.sku ?? index}`}
               class="flex-none w-44 snap-start border border-line rounded-brand overflow-hidden bg-base"
             >
-              {item.imageUrl && (
-                <div class="relative overflow-hidden bg-alt aspect-square">
-                  <img
-                    src={item.imageUrl}
-                    alt={item.name}
-                    loading="lazy"
-                    class="w-full h-full object-cover block"
-                  />
-                  {item.badge && (
-                    <span class="absolute top-2 left-2 text-[0.65rem] font-semibold px-1.5 py-0.5 rounded-full bg-accent text-inverted leading-none">
-                      {item.badge}
-                    </span>
-                  )}
-                </div>
-              )}
+              <div class="relative overflow-hidden bg-alt aspect-square">
+                <Image
+                  src={imageUrl}
+                  alt={name}
+                  width={Math.min(width, 352)}
+                  height={Math.min(height, 352)}
+                  fit="cover"
+                  loading="lazy"
+                  fetchPriority="low"
+                  class="w-full h-full object-cover block"
+                />
+              </div>
               <div class="p-3 flex flex-col gap-1">
                 <span class="text-sm font-semibold leading-snug line-clamp-2">
-                  {item.name}
+                  {name}
                 </span>
                 <div class="flex items-baseline gap-1 flex-wrap">
-                  {item.price && (
+                  {price && (
                     <span class="text-sm font-bold text-accent tabular-nums">
-                      {item.price}
+                      {price}
                     </span>
                   )}
-                  {item.listPrice && item.listPrice !== item.price && (
+                  {listPrice && listPrice !== price && (
                     <span class="text-xs text-muted line-through tabular-nums">
-                      {item.listPrice}
+                      {listPrice}
                     </span>
                   )}
                 </div>
@@ -133,6 +117,28 @@ export default function ProductShelf(
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+export function LoadingFallback() {
+  return (
+    <div class="not-prose my-10 animate-pulse">
+      <div class="h-5 bg-alt rounded w-40 mb-4" />
+      <div class="flex gap-4 overflow-x-auto pb-2">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            class="flex-none w-44 border border-line rounded-brand overflow-hidden bg-base"
+          >
+            <div class="aspect-square bg-alt" />
+            <div class="p-3 flex flex-col gap-2">
+              <div class="h-4 bg-alt rounded" />
+              <div class="h-3 bg-alt rounded w-2/3" />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

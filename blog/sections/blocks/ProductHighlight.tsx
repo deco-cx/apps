@@ -1,8 +1,9 @@
-import { sanitizeHref, sanitizeHtml } from "../../utils/sanitizeHtml.ts";
-import { getProductImage, getProductPrices } from "../../utils/productData.ts";
-import { resolveProductByReference } from "../../core/productResolver.ts";
+import Image from "../../../website/components/Image.tsx";
+import { getProductDisplay } from "../../utils/productData.ts";
+import { resolveProductByReference } from "../../utils/productResolver.ts";
+import { sanitizeHtml } from "../../utils/sanitizeHtml.ts";
 import { AppContext } from "../../mod.ts";
-import { Product } from "../../../commerce/types.ts";
+import type { Product } from "../../../commerce/types.ts";
 
 /**
  * @title Product
@@ -51,39 +52,41 @@ export default function ProductHighlight(
 ) {
   if (!product) return null;
 
-  const name = product.name ?? "";
+  const {
+    name,
+    imageUrl,
+    width,
+    height,
+    price,
+    listPrice,
+    safeUrl,
+    isExternal,
+  } = getProductDisplay(product);
   if (!name) return null;
 
-  const imageUrl = getProductImage(product);
-  const { price, listPrice } = getProductPrices(product);
   const productDescription = description ?? product.description;
-  const safeUrl = sanitizeHref(product.url);
-
-  const isExternal = /^https?:\/\//i.test(safeUrl);
 
   return (
     <div class="not-prose my-10 border border-line rounded-brand overflow-hidden bg-base">
       <div class="flex flex-col sm:flex-row">
-        {imageUrl && (
-          <div class="relative sm:w-2/5 overflow-hidden bg-alt aspect-video sm:aspect-auto">
-            <img
-              src={imageUrl}
-              alt={name}
-              loading="lazy"
-              class="w-full h-full object-cover block"
-            />
-            {badge && (
-              <span class="absolute top-4 left-4 text-xs font-semibold px-2.5 py-1 rounded-full bg-accent text-inverted leading-none">
-                {badge}
-              </span>
-            )}
-          </div>
-        )}
-        <div
-          class={`p-7 flex flex-col gap-3 justify-center ${
-            imageUrl ? "sm:w-3/5" : "w-full"
-          }`}
-        >
+        <div class="relative sm:w-2/5 overflow-hidden bg-alt aspect-video sm:aspect-auto sm:min-h-[280px]">
+          <Image
+            src={imageUrl}
+            alt={name}
+            width={width}
+            height={height}
+            fit="cover"
+            loading="lazy"
+            fetchPriority="low"
+            class="w-full h-full object-cover block"
+          />
+          {badge && (
+            <span class="absolute top-4 left-4 text-xs font-semibold px-2.5 py-1 rounded-full bg-accent text-inverted leading-none">
+              {badge}
+            </span>
+          )}
+        </div>
+        <div class="p-7 flex flex-col gap-3 justify-center sm:w-3/5">
           <h3 class="text-xl font-bold leading-snug m-0">{name}</h3>
           {productDescription && (
             <div
@@ -116,6 +119,23 @@ export default function ProductHighlight(
               {cta ?? "Comprar"}
             </a>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function LoadingFallback() {
+  return (
+    <div class="not-prose my-10 border border-line rounded-brand bg-base animate-pulse">
+      <div class="flex flex-col sm:flex-row">
+        <div class="sm:w-2/5 aspect-video sm:aspect-auto bg-alt" />
+        <div class="p-7 sm:w-3/5 flex flex-col gap-3">
+          <div class="h-7 bg-alt rounded w-3/4" />
+          <div class="h-4 bg-alt rounded" />
+          <div class="h-4 bg-alt rounded w-5/6" />
+          <div class="h-8 bg-alt rounded w-1/3 mt-2" />
+          <div class="h-10 bg-alt rounded-full w-40 mt-2" />
         </div>
       </div>
     </div>

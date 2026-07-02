@@ -1,8 +1,9 @@
-import { sanitizeHref, sanitizeHtml } from "../../utils/sanitizeHtml.ts";
-import { getProductImage, getProductPrices } from "../../utils/productData.ts";
-import { resolveProductByReference } from "../../core/productResolver.ts";
+import Image from "../../../website/components/Image.tsx";
+import { getProductDisplay } from "../../utils/productData.ts";
+import { resolveProductByReference } from "../../utils/productResolver.ts";
+import { sanitizeHtml } from "../../utils/sanitizeHtml.ts";
 import { AppContext } from "../../mod.ts";
-import { Product } from "../../../commerce/types.ts";
+import type { Product } from "../../../commerce/types.ts";
 
 /**
  * @title Product
@@ -51,33 +52,39 @@ export default function ProductCard(
 ) {
   if (!product) return null;
 
-  const name = product.name ?? "";
+  const {
+    name,
+    imageUrl,
+    width,
+    height,
+    price,
+    listPrice,
+    safeUrl,
+    isExternal,
+  } = getProductDisplay(product);
   if (!name) return null;
 
-  const imageUrl = getProductImage(product);
-  const { price, listPrice } = getProductPrices(product);
   const productDescription = description ?? product.description;
-  const safeUrl = sanitizeHref(product.url);
-
-  const isExternal = /^https?:\/\//i.test(safeUrl);
 
   return (
     <div class="not-prose my-8 border border-line rounded-brand overflow-hidden bg-base max-w-xs mx-auto">
-      {imageUrl && (
-        <div class="relative overflow-hidden bg-alt aspect-square">
-          <img
-            src={imageUrl}
-            alt={name}
-            loading="lazy"
-            class="w-full h-full object-cover block"
-          />
-          {badge && (
-            <span class="absolute top-3 left-3 text-xs font-semibold px-2 py-1 rounded-full bg-accent text-inverted leading-none">
-              {badge}
-            </span>
-          )}
-        </div>
-      )}
+      <div class="relative overflow-hidden bg-alt aspect-square">
+        <Image
+          src={imageUrl}
+          alt={name}
+          width={width}
+          height={height}
+          fit="cover"
+          loading="lazy"
+          fetchPriority="low"
+          class="w-full h-full object-cover block"
+        />
+        {badge && (
+          <span class="absolute top-3 left-3 text-xs font-semibold px-2 py-1 rounded-full bg-accent text-inverted leading-none">
+            {badge}
+          </span>
+        )}
+      </div>
       <div class="p-5 flex flex-col gap-2">
         <h3 class="text-[1.0625rem] font-semibold leading-snug m-0">{name}</h3>
         {productDescription && (
@@ -112,6 +119,18 @@ export default function ProductCard(
           </a>
         )}
       </div>
+    </div>
+  );
+}
+
+export function LoadingFallback() {
+  return (
+    <div class="not-prose my-8 border border-line rounded-brand bg-base max-w-xs mx-auto p-5 animate-pulse">
+      <div class="aspect-square bg-alt mb-4 rounded-brand" />
+      <div class="h-5 bg-alt mb-2 rounded" />
+      <div class="h-4 bg-alt mb-2 rounded" />
+      <div class="h-4 bg-alt w-2/3 mb-4 rounded" />
+      <div class="h-9 bg-alt w-1/2 rounded-full" />
     </div>
   );
 }

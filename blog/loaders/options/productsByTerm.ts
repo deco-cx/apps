@@ -1,5 +1,5 @@
 import { allowCorsFor } from "@deco/deco";
-import { searchProductOptions } from "../../core/productResolver.ts";
+import { searchProductOptions } from "../../utils/productResolver.ts";
 import { AppContext } from "../../mod.ts";
 
 export interface Props {

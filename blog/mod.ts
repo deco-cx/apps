@@ -1,7 +1,6 @@
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
 import { type App, type FnContext } from "@deco/deco";
-
 export type State = {
   /**
    * @title Page Slug
@@ -9,29 +8,23 @@ export type State = {
    */
   pageSlug?: string;
 };
-
 export type AppContext = FnContext<State, Manifest>;
-
 /**
  * @title Deco Blog
- * @description Manage your blog posts, categories and authors.
- *   Supports native block-based posts and Spire AI-generated posts
- *   rendered as Deco sections (paragraph, heading, list, code, etc.).
+ * @description Manage your posts.
  * @category Tool
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/weather/logo.png
  */
 export default function App(state: State): App<Manifest, State> {
   return { manifest, state };
 }
-
 export const preview = () => {
   return {
     Component: PreviewContainer,
     props: {
       name: "Deco Blog",
       owner: "deco.cx",
-      description:
-        "Manage your posts, categories and authors. Supports native Deco posts and Spire AI-generated posts rendered as native Deco sections.",
+      description: "Manage your posts, categories and authors.",
       logo:
         "https://raw.githubusercontent.com/deco-cx/apps/main/weather/logo.png",
       images: [],
