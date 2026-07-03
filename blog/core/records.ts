@@ -5,6 +5,11 @@ import { and, asc, desc, eq, notInArray } from "npm:drizzle-orm@0.43.1";
 import { BlogPost, Ignore, Rating, Review } from "../types.ts";
 import { logger } from "@deco/deco/o11y";
 
+export const drizzle = (ctx: AppContext) => {
+  // deno-lint-ignore no-explicit-any
+  return (ctx.invoke as any).records.loaders.drizzle();
+};
+
 export async function getRecordsByPath<T>(
   ctx: AppContext,
   path: string,
@@ -16,20 +21,22 @@ export async function getRecordsByPath<T>(
   const current = Object.entries(resolvables).flatMap(([key, value]) => {
     return key.startsWith(path) ? value : [];
   });
-  return (current as Record<string, T>[]).map((item) => {
-    const id = (item.name as string).split(path)[1]?.replace("/", "");
-    return {
-      ...item[accessor],
-      id,
-    };
-  });
+  return (current as Record<string, T>[])
+    .filter((item) => item != null && item[accessor] != null)
+    .map((item) => {
+      const nameStr = typeof item.name === "string" ? item.name : "";
+      const id = nameStr.split(path)[1]?.replace("/", "");
+      return {
+        ...item[accessor],
+        id,
+      };
+    });
 }
 
 export async function getRatingsBySlug(
   { ctx, slug }: { ctx: AppContext; slug: string },
 ): Promise<Rating[]> {
-  // deno-lint-ignore no-explicit-any
-  const records = await (ctx.invoke as any).records.loaders.drizzle();
+  const records = await drizzle(ctx);
   try {
     const currentRatings = await records.select({
       id: rating.id,
@@ -104,8 +111,7 @@ export const getReviewById = async (
   if (!id) {
     return null;
   }
-  // deno-lint-ignore no-explicit-any
-  const records = await (ctx.invoke as any).records.loaders.drizzle();
+  const records = await drizzle(ctx);
   try {
     const targetReview = await records.select({
       itemReviewed: review.itemReviewed,
@@ -134,8 +140,7 @@ export async function getReviewsBySlug(
     orderBy?: "date_asc" | "date_desc";
   },
 ): Promise<Review[]> {
-  // deno-lint-ignore no-explicit-any
-  const records = await (ctx.invoke as any).records.loaders.drizzle();
+  const records = await drizzle(ctx);
 
   const whereClause = ignoreReviews?.active && ignoreReviews?.markedAs &&
       ignoreReviews?.markedAs?.length > 0

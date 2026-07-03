@@ -1,5 +1,10 @@
 import Image from "../../../website/components/Image.tsx";
 import { getProductDisplay } from "../../utils/productData.ts";
+import {
+  getLegacyProductDisplay,
+  hasLegacyProductFields,
+  type LegacyProductFields,
+} from "../../utils/legacyProductBlock.ts";
 import { resolveProductByReference } from "../../utils/productResolver.ts";
 import { sanitizeHtml } from "../../utils/sanitizeHtml.ts";
 import { AppContext } from "../../mod.ts";
@@ -13,7 +18,7 @@ import type { Product } from "../../../commerce/types.ts";
  */
 type ProductReference = string;
 
-export interface Props {
+export interface Props extends LegacyProductFields {
   /**
    * @title Product
    * @description Product reference resolved dynamically from storefront integrations.
@@ -31,15 +36,23 @@ export interface Props {
 
 type RuntimeProps = Omit<Props, "product"> & {
   product: Product | null;
+  legacyDisplay: ReturnType<typeof getLegacyProductDisplay>;
 };
 
 export async function loader(props: Props, req: Request, ctx: AppContext) {
-  const product = await resolveProductByReference(props.product, req, ctx);
+  const product = props.product?.trim()
+    ? await resolveProductByReference(props.product, req, ctx)
+    : null;
+  const legacyDisplay = !product && hasLegacyProductFields(props)
+    ? getLegacyProductDisplay(props)
+    : null;
+
   return {
     badge: props.badge,
     description: props.description,
     cta: props.cta,
     product,
+    legacyDisplay,
   } as RuntimeProps;
 }
 
@@ -48,9 +61,10 @@ export async function loader(props: Props, req: Request, ctx: AppContext) {
  * @description Displays a shoppable product card with image, name, price and CTA.
  */
 export default function ProductCard(
-  { product, badge, description, cta }: RuntimeProps,
+  { product, legacyDisplay, badge, description, cta }: RuntimeProps,
 ) {
-  if (!product) return null;
+  const display = product ? getProductDisplay(product) : legacyDisplay;
+  if (!display?.name) return null;
 
   const {
     name,
@@ -61,30 +75,31 @@ export default function ProductCard(
     listPrice,
     safeUrl,
     isExternal,
-  } = getProductDisplay(product);
-  if (!name) return null;
-
-  const productDescription = description ?? product.description;
+  } = display;
+  const productDescription = description ??
+    (product ? product.description : undefined);
 
   return (
     <div class="not-prose my-8 border border-line rounded-brand overflow-hidden bg-base max-w-xs mx-auto">
-      <div class="relative overflow-hidden bg-alt aspect-square">
-        <Image
-          src={imageUrl}
-          alt={name}
-          width={width}
-          height={height}
-          fit="cover"
-          loading="lazy"
-          fetchPriority="low"
-          class="w-full h-full object-cover block"
-        />
-        {badge && (
-          <span class="absolute top-3 left-3 text-xs font-semibold px-2 py-1 rounded-full bg-accent text-inverted leading-none">
-            {badge}
-          </span>
-        )}
-      </div>
+      {imageUrl && (
+        <div class="relative overflow-hidden bg-alt aspect-square">
+          <Image
+            src={imageUrl}
+            alt={name}
+            width={width}
+            height={height}
+            fit="cover"
+            loading="lazy"
+            fetchPriority="low"
+            class="w-full h-full object-cover block"
+          />
+          {badge && (
+            <span class="absolute top-3 left-3 text-xs font-semibold px-2 py-1 rounded-full bg-accent text-inverted leading-none">
+              {badge}
+            </span>
+          )}
+        </div>
+      )}
       <div class="p-5 flex flex-col gap-2">
         <h3 class="text-[1.0625rem] font-semibold leading-snug m-0">{name}</h3>
         {productDescription && (

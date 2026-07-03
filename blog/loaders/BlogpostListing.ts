@@ -1,10 +1,10 @@
 /**
- * Retrieves a listing page of blog posts.
+ * Retrieves a paginated listing page of blog posts.
  *
  * @param props - The props for the blog post listing.
  * @param req - The request object.
  * @param ctx - The application context.
- * @returns A promise that resolves to an array of blog posts.
+ * @returns A promise that resolves to a `BlogPostListingPage` object or `null`.
  */
 import { logger } from "@deco/deco/o11y";
 import { PageInfo } from "../../commerce/types.ts";
@@ -45,13 +45,13 @@ export interface Props {
 }
 
 /**
- * @title BlogPostList
- * @description Retrieves a list of blog posts.
+ * @title BlogPostListing
+ * @description Retrieves a paginated listing page of blog posts.
  *
- * @param props - The props for the blog post list.
+ * @param props - The props for the blog post listing.
  * @param req - The request object.
  * @param ctx - The application context.
- * @returns A promise that resolves to an array of blog posts.
+ * @returns A promise that resolves to a `BlogPostListingPage` object or `null`.
  */
 export default async function BlogPostList(
   { page, count, slug, sortBy, query }: Props,

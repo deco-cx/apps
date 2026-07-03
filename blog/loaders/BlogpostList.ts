@@ -48,6 +48,25 @@ export interface Props {
   query?: string;
 }
 
+export const cache = { maxAge: 60 };
+
+export const cacheKey = (
+  props: Props,
+  req: Request,
+  _ctx: AppContext,
+): string => {
+  const url = new URL(req.url);
+  const page = Number(props.page ?? url.searchParams.get("page") ?? 1);
+  const count = Number(props.count ?? url.searchParams.get("count") ?? 12);
+  const slug = String(props.slug ?? url.searchParams.get("slug") ?? "");
+  const sort = String(
+    props.sortBy ?? url.searchParams.get("sortBy") ?? "date_desc",
+  );
+  const query = String(props.query ?? url.searchParams.get("q") ?? "");
+  const slugs = JSON.stringify(props.postSlugs ?? []);
+  return `blog-list-p${page}-c${count}-s${slug}-${sort}-q${query}-${slugs}`;
+};
+
 /**
  * @title BlogPostList
  * @description Retrieves a list of blog posts.

@@ -84,7 +84,11 @@ type InvokeSurface = {
   };
 };
 
-const platformByRequest = new WeakMap<Request, ProductPlatform | null>();
+const platformBySite = new Map<string, ProductPlatform | null>();
+
+function siteKey(req: Request): string {
+  return new URL(req.url).origin;
+}
 
 function invoke(ctx: unknown): InvokeSurface {
   return (ctx as { invoke: InvokeSurface }).invoke;
@@ -176,11 +180,12 @@ async function getPlatform(
   ctx: unknown,
   req: Request,
 ): Promise<ProductPlatform | null> {
-  if (platformByRequest.has(req)) {
-    return platformByRequest.get(req) ?? null;
+  const key = siteKey(req);
+  if (platformBySite.has(key)) {
+    return platformBySite.get(key) ?? null;
   }
   const platform = await detectPlatform(ctx, req);
-  platformByRequest.set(req, platform);
+  platformBySite.set(key, platform);
   return platform;
 }
 
