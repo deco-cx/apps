@@ -5,10 +5,6 @@ export interface Props {
   href?: string;
 }
 
-/**
- * @title Call to Action
- * @description A full-width button linking to an internal or external URL.
- */
 export default function Cta({ text, href }: Props) {
   const safeHref = sanitizeHref(href);
   const isExternal = /^https?:\/\//i.test(safeHref);

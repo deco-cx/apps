@@ -25,12 +25,12 @@ import * as $$$17 from "./loaders/extensions/BlogpostPage/reviews.ts";
 import * as $$$8 from "./loaders/GetCategories.ts";
 import * as $$$18 from "./loaders/options/productsByTerm.ts";
 import * as $$$$$$3 from "./sections/blocks/BlockImage.tsx";
-import * as $$$$$$5 from "./sections/blocks/Callout.tsx";
-import * as $$$$$$4 from "./sections/blocks/Cta.tsx";
-import * as $$$$$$6 from "./sections/blocks/CardGroup.tsx";
-import * as $$$$$$7 from "./sections/blocks/Checklist.tsx";
-import * as $$$$$$8 from "./sections/blocks/Code.tsx";
-import * as $$$$$$9 from "./sections/blocks/Comparison.tsx";
+import * as $$$$$$4 from "./sections/blocks/Callout.tsx";
+import * as $$$$$$5 from "./sections/blocks/CardGroup.tsx";
+import * as $$$$$$6 from "./sections/blocks/Checklist.tsx";
+import * as $$$$$$7 from "./sections/blocks/Code.tsx";
+import * as $$$$$$8 from "./sections/blocks/Comparison.tsx";
+import * as $$$$$$9 from "./sections/blocks/Cta.tsx";
 import * as $$$$$$10 from "./sections/blocks/Divider.tsx";
 import * as $$$$$$11 from "./sections/blocks/Heading.tsx";
 import * as $$$$$$12 from "./sections/blocks/List.tsx";
@@ -71,12 +71,12 @@ const manifest = {
   },
   "sections": {
     "blog/sections/blocks/BlockImage.tsx": $$$$$$3,
-    "blog/sections/blocks/Callout.tsx": $$$$$$5,
-    "blog/sections/blocks/Cta.tsx": $$$$$$4,
-    "blog/sections/blocks/CardGroup.tsx": $$$$$$6,
-    "blog/sections/blocks/Checklist.tsx": $$$$$$7,
-    "blog/sections/blocks/Code.tsx": $$$$$$8,
-    "blog/sections/blocks/Comparison.tsx": $$$$$$9,
+    "blog/sections/blocks/Callout.tsx": $$$$$$4,
+    "blog/sections/blocks/CardGroup.tsx": $$$$$$5,
+    "blog/sections/blocks/Checklist.tsx": $$$$$$6,
+    "blog/sections/blocks/Code.tsx": $$$$$$7,
+    "blog/sections/blocks/Comparison.tsx": $$$$$$8,
+    "blog/sections/blocks/Cta.tsx": $$$$$$9,
     "blog/sections/blocks/Divider.tsx": $$$$$$10,
     "blog/sections/blocks/Heading.tsx": $$$$$$11,
     "blog/sections/blocks/List.tsx": $$$$$$12,
