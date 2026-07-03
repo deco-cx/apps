@@ -1,4 +1,4 @@
-import { sanitizeHtml } from "../../utils/sanitizeHtml.ts";
+import { sanitizeHtmlStrict } from "../../utils/sanitizeHtmlStrict.ts";
 
 export interface Props {
   /** JSON-encoded string[] — optional header row */
@@ -51,7 +51,7 @@ export default function Table({ headers, rows }: Props) {
                 <th
                   key={i}
                   class="px-4 py-3 text-xs font-semibold tracking-caps uppercase border-b-2 border-line"
-                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(cell) }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtmlStrict(cell) }}
                 />
               ))}
             </tr>
@@ -64,7 +64,7 @@ export default function Table({ headers, rows }: Props) {
                 <td
                   key={c}
                   class={cellClass}
-                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(cell) }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtmlStrict(cell) }}
                 />
               ))}
             </tr>
