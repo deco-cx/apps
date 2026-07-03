@@ -78,7 +78,7 @@ function hasDangerousScheme(value: string): boolean {
   return DANGEROUS_SCHEME_RE.test(normalized);
 }
 
-export function sanitizeHtmlStrict(raw: string | null | undefined): string {
+export function hardSanitize(raw: string | null | undefined): string {
   if (!raw) return "";
 
   let html = raw;
