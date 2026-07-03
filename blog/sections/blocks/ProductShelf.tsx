@@ -34,6 +34,10 @@ export async function loader(props: Props, req: Request, ctx: AppContext) {
       typeof id === "string" && id.trim().length > 0
     )
     : [];
+  if (refs.length === 0) {
+    return { title: props.title, products: [] } as RuntimeProps;
+  }
+
   const products = await resolveProductsByReference(refs, req, ctx);
   return {
     title: props.title,
