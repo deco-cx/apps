@@ -56,7 +56,8 @@
   "exclude": [
     "static",
     "README.md",
-    "**/README.md"
+    "**/README.md",
+    ".context"
   ],
   "compilerOptions": {
     "jsx": "react-jsx",
