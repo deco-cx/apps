@@ -75,6 +75,7 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     canonical,
     noIndexing,
     jsonLDs,
+    type: "product" as const,
   };
 }
 
