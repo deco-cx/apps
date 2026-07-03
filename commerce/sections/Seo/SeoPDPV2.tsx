@@ -1,5 +1,6 @@
 import Seo from "../../../website/components/Seo.tsx";
 import {
+  OGType,
   renderTemplateString,
   SEOSection,
 } from "../../../website/components/Seo.tsx";
@@ -25,6 +26,11 @@ export interface Props {
    * @description By default, Structured Data is sent to everyone. Use this to prevent Structured Data from being sent to your customers, it will still be sent to crawlers and bots. Be aware that some integrations may not work if Structured Data is not sent.
    */
   ignoreStructuredData?: boolean;
+  /**
+   * @title OG Type
+   * @default product
+   */
+  type?: OGType;
 }
 
 /** @title Product details */
@@ -41,6 +47,7 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     jsonLD,
     omitVariants,
     ignoreStructuredData,
+    type: typeProp,
   } = props;
 
   const title = renderTemplateString(
@@ -75,7 +82,7 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     canonical,
     noIndexing,
     jsonLDs,
-    type: "product" as const,
+    type: typeProp ?? "product",
   };
 }
 
