@@ -38,7 +38,8 @@ import * as $$$$$$14 from "./sections/blocks/Quote.tsx";
 import * as $$$$$$15 from "./sections/blocks/Stat.tsx";
 import * as $$$$$$16 from "./sections/blocks/StatGroup.tsx";
 import * as $$$$$$17 from "./sections/blocks/Steps.tsx";
-import * as $$$$$$18 from "./sections/blocks/Video.tsx";
+import * as $$$$$$18 from "./sections/blocks/Table.tsx";
+import * as $$$$$$19 from "./sections/blocks/Video.tsx";
 import * as $$$$$$0 from "./sections/Seo/SeoBlogPost.tsx";
 import * as $$$$$$1 from "./sections/Seo/SeoBlogPostListing.tsx";
 import * as $$$$$$2 from "./sections/Template.tsx";
@@ -80,7 +81,8 @@ const manifest = {
     "blog/sections/blocks/Stat.tsx": $$$$$$15,
     "blog/sections/blocks/StatGroup.tsx": $$$$$$16,
     "blog/sections/blocks/Steps.tsx": $$$$$$17,
-    "blog/sections/blocks/Video.tsx": $$$$$$18,
+    "blog/sections/blocks/Table.tsx": $$$$$$18,
+    "blog/sections/blocks/Video.tsx": $$$$$$19,
     "blog/sections/Seo/SeoBlogPost.tsx": $$$$$$0,
     "blog/sections/Seo/SeoBlogPostListing.tsx": $$$$$$1,
     "blog/sections/Template.tsx": $$$$$$2,

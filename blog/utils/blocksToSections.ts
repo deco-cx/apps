@@ -120,6 +120,12 @@ function blockToSection(
           right: content.right,
         });
 
+      case "table":
+        return toSection(`${BASE}/Table.tsx`, {
+          headers: content.headers,
+          rows: content.rows,
+        });
+
       case "image":
         return toSection(`${BASE}/BlockImage.tsx`, {
           url: content.url,
