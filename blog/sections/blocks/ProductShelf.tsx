@@ -1,6 +1,6 @@
 import Image from "../../../website/components/Image.tsx";
 import { getProductDisplay } from "../../utils/productData.ts";
-import { resolveProductsByReference } from "../../utils/productResolver.ts";
+import { coerceProducts } from "../../utils/coerceProductInput.ts";
 import { AppContext } from "../../mod.ts";
 import type { Product } from "../../../commerce/types.ts";
 
@@ -17,7 +17,7 @@ export interface Props {
   title?: string;
   /**
    * @title Products
-   * @description Product references resolved dynamically from storefront integrations.
+   * @description Product references as `platform:kind:id` strings (e.g. `vtex:product:123`). Loader-ref shapes work at runtime but strings are preferred.
    * @format dynamic-options
    * @options blog/loaders/options/productsByTerm.ts
    */
@@ -29,16 +29,7 @@ type RuntimeProps = Omit<Props, "products"> & {
 };
 
 export async function loader(props: Props, req: Request, ctx: AppContext) {
-  const refs = Array.isArray(props.products)
-    ? props.products.filter((id) =>
-      typeof id === "string" && id.trim().length > 0
-    )
-    : [];
-  if (refs.length === 0) {
-    return { title: props.title, products: [] } as RuntimeProps;
-  }
-
-  const products = await resolveProductsByReference(refs, req, ctx);
+  const products = await coerceProducts(props.products, req, ctx);
   return {
     title: props.title,
     products,
