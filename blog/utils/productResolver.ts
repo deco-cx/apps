@@ -94,6 +94,16 @@ function invoke(ctx: unknown): InvokeSurface {
   return (ctx as { invoke: InvokeSurface }).invoke;
 }
 
+function hasInvokePlatform(
+  inv: InvokeSurface,
+  platform: ProductPlatform,
+): boolean {
+  if (platform === "vtex") return !!inv.vtex;
+  if (platform === "shopify") return !!inv.shopify;
+  if (platform === "wake") return !!inv.wake;
+  return !!inv.wap;
+}
+
 function extractHandle(url?: string) {
   if (!url) return undefined;
   try {
@@ -141,26 +151,34 @@ async function probePlatform(
 ): Promise<boolean> {
   try {
     const inv = invoke(ctx);
+    if (!hasInvokePlatform(inv, platform)) return false;
+
     if (platform === "vtex") {
-      await inv.vtex!.loaders.intelligentSearch.suggestions({
+      const res = await inv.vtex!.loaders.intelligentSearch.suggestions({
         query: "a",
         count: 1,
       });
-      return true;
+      return (res?.products?.length ?? 0) > 0;
     }
     if (platform === "shopify") {
-      await inv.shopify!.loaders.ProductList(
-        { props: { query: "a", count: 1 } },
+      const res = await inv.shopify!.loaders.ProductList(
+        { props: { query: "*", count: 1 } },
         req,
       );
-      return true;
+      return Array.isArray(res);
     }
     if (platform === "wake") {
-      await inv.wake!.loaders.suggestion({ query: "a", limit: 1 }, req);
-      return true;
+      const res = await inv.wake!.loaders.suggestion(
+        { query: "a", limit: 1 },
+        req,
+      );
+      return (res?.products?.length ?? 0) > 0;
     }
-    await inv.wap!.loaders.suggestions({ query: "a", count: 1 }, req);
-    return true;
+    const res = await inv.wap!.loaders.suggestions(
+      { query: "a", count: 1 },
+      req,
+    );
+    return (res?.products?.length ?? 0) > 0;
   } catch {
     return false;
   }
