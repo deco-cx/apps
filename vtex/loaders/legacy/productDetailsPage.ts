@@ -45,7 +45,7 @@ async function loader(
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
-  const haveToUseSlug = slug && !slug.startsWith(":");
+  const haveToUseSlug = slug && !slug.startsWith(":slug");
   let defaultPaths;
   if (!haveToUseSlug) {
     defaultPaths = await PDPDefaultPath({ count: 1 }, req, ctx);
