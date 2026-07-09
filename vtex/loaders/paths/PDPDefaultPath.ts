@@ -1,6 +1,6 @@
 import { DefaultPathProps } from "../../../website/pages/Page.tsx";
 import { AppContext } from "../../mod.ts";
-import productList from "../legacy/productList.ts";
+import productList from "../intelligentSearch/productList.ts";
 
 export interface Props {
   count: number;
@@ -20,9 +20,10 @@ const loader = async (
   const response = await productList(
     {
       props: {
-        term: "",
+        query: "",
         count,
-        sort: "OrderByTopSaleDESC",
+        sort: "orders:desc",
+        hideUnavailableItems: true,
       },
     },
     req,
