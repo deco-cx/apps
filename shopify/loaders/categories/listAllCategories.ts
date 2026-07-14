@@ -97,7 +97,6 @@ export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request): string => {
   const url = new URL(req.url);
-  url.searchParams.sort();
 
   const propsParams = new URLSearchParams();
   for (const [key, value] of Object.entries(props)) {
@@ -107,7 +106,7 @@ export const cacheKey = (props: Props, req: Request): string => {
   }
 
   propsParams.sort();
-  return `${url.href}::${propsParams.toString()}`;
+  return `${url.origin}::${propsParams.toString()}`;
 };
 
 export default loader;
