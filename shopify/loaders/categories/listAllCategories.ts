@@ -47,14 +47,14 @@ export interface Props {
   sortKey?: CollectionSortKeys;
 }
 
-export interface Categories {
+export interface Category {
   id: string;
   name: string;
   url: string;
-  image: string;
+  image?: string;
 }
 
-export interface ListAllCategories extends Array<Categories> {}
+export interface ListAllCategories extends Array<Category> {}
 
 /**
  * @title Shopify Integration
@@ -67,13 +67,17 @@ const loader = async (
 ): Promise<ListAllCategories> => {
   const { storefront } = ctx;
   const { after, before, first, last, query, reverse, sortKey } = props;
-  const count = first ?? 250;
+  const variables = { after, before, first, last, query, reverse, sortKey };
+
+  if (!first && !last && !variables.first) {
+    variables.first = 250;
+  }
 
   const data = await storefront.query<
     QueryRoot,
     QueryRootCollectionsArgs
   >({
-    variables: { first: count, after, before, last, query, reverse, sortKey },
+    variables,
     ...ListAllCategories,
   });
 
@@ -91,10 +95,19 @@ const loader = async (
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (_props: Props, req: Request): string => {
+export const cacheKey = (props: Props, req: Request): string => {
   const url = new URL(req.url);
   url.searchParams.sort();
-  return url.href;
+
+  const propsParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(props)) {
+    if (value !== undefined) {
+      propsParams.set(key, String(value));
+    }
+  }
+
+  propsParams.sort();
+  return `${url.href}::${propsParams.toString()}`;
 };
 
 export default loader;
