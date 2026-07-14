@@ -17,6 +17,13 @@ export interface Author {
 export interface Category {
   name: string;
   slug: string;
+  description?: string;
+  /**
+   * @title Sections
+   * @label hidden
+   * @changeable true
+   */
+  sections?: Section[];
 }
 
 export interface BlogPost {
@@ -139,6 +146,10 @@ export type SortBy =
 
 export interface BlogPostListingPage {
   posts: BlogPost[];
+  /** @title Active category */
+  category?: Category | null;
+  /** @title Categories */
+  categories?: Category[] | null;
   pageInfo: PageInfo;
   seo: Seo;
 }

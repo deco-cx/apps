@@ -24,6 +24,23 @@ export const removeCFHeaders = (headers: Headers) => {
     }
   });
 };
+export const filterCookies = (headers: Headers, allowed: string[]) => {
+  const cookie = headers.get("cookie");
+  if (!cookie) return;
+  const filtered = cookie
+    .split(";")
+    .map((c) => c.trim())
+    .filter((c) => {
+      const name = c.split("=")[0]?.trim();
+      return name && allowed.includes(name);
+    })
+    .join("; ");
+  if (filtered) {
+    headers.set("cookie", filtered);
+  } else {
+    headers.delete("cookie");
+  }
+};
 /**
  * @title {{{key}}} - {{{value}}}
  */
@@ -86,6 +103,10 @@ export interface Props {
   removeDirtyCookies?: boolean;
   excludeHeaders?: string[];
   pathsThatRequireSameReferer?: string[];
+  /**
+   * @description Only forward cookies whose names match this list. When set, all other cookies are stripped from the proxied request.
+   */
+  allowedCookies?: string[];
 }
 /**
  * @title Proxy
@@ -104,6 +125,7 @@ export default function Proxy({
   replaces,
   removeDirtyCookies = false,
   pathsThatRequireSameReferer = [],
+  allowedCookies,
 }: Props): Handler {
   return async (req, _ctx) => {
     const url = new URL(req.url);
@@ -126,6 +148,9 @@ export default function Proxy({
     removeCFHeaders(headers); // cf-headers are not ASCII-compliant
     if (removeDirtyCookies) {
       removeDirtyCookiesFn(headers);
+    }
+    if (allowedCookies && allowedCookies.length > 0) {
+      filterCookies(headers, allowedCookies);
     }
     if (isFreshCtx<DecoSiteState>(_ctx)) {
       _ctx?.state?.monitoring?.logger?.log?.("proxy sent headers", headers);

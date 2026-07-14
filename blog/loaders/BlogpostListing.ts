@@ -10,12 +10,14 @@ import { logger } from "@deco/deco/o11y";
 import { PageInfo } from "../../commerce/types.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
-import { BlogPost, BlogPostListingPage, SortBy } from "../types.ts";
+import { BlogPost, BlogPostListingPage, Category, SortBy } from "../types.ts";
 import handlePosts, { slicePosts } from "../core/handlePosts.ts";
 import { getRecordsByPath } from "../core/records.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
+const CATEGORIES_PATH = "collections/blog/categories";
+const CATEGORY_ACCESSOR = "category";
 
 export interface Props {
   /**
@@ -62,8 +64,7 @@ export default async function BlogPostList(
   const params = url.searchParams;
   const postsPerPage = Number(count ?? params.get("count") ?? 12);
   const pageNumber = Number(page ?? params.get("page") ?? 1);
-  const pageSort = sortBy ?? params.get("sortBy") as SortBy ??
-    "date_desc";
+  const pageSort = sortBy ?? (params.get("sortBy") as SortBy) ?? "date_desc";
   const term = query ?? params.get("q") ?? undefined;
 
   const posts = await getRecordsByPath<BlogPost>(
@@ -92,12 +93,35 @@ export default async function BlogPostList(
       return null;
     }
 
-    const category = slicedPosts[0].categories?.find((c) => c.slug === slug);
+    let categories: Category[] | null = null;
+    try {
+      categories = await loadCategories(ctx);
+    } catch (e) {
+      logger.error(e);
+    }
+
+    let category: Category | null = null;
+    if (slug) {
+      category = categories?.find((c) => c.slug === slug) ?? null;
+      if (!category) {
+        try {
+          category = await loadCategoryBySlug(ctx, slug);
+        } catch (e) {
+          logger.error(e);
+        }
+      }
+      category ??= slicedPosts[0]?.categories?.find((c) => c.slug === slug) ??
+        null;
+    }
+
     return {
       posts: slicedPosts,
+      category,
+      categories,
       pageInfo: toPageInfo(handledPosts, postsPerPage, pageNumber, params),
       seo: {
         title: category?.name ?? "",
+        description: category?.description,
         canonical: new URL(url.pathname, url.origin).href,
       },
     };
@@ -135,4 +159,36 @@ const toPageInfo = (
     records: totalPosts,
     recordPerPage: postsPerPage,
   };
+};
+
+const loadCategories = async (ctx: AppContext): Promise<Category[]> => {
+  const categories = await getRecordsByPath<Category>(
+    ctx,
+    CATEGORIES_PATH,
+    CATEGORY_ACCESSOR,
+  );
+
+  return (categories ?? [])
+    .filter((c) =>
+      typeof c?.name === "string" && c.name.length > 0 &&
+      typeof c?.slug === "string" && c.slug.length > 0
+    )
+    .sort((a, b) => a.name.localeCompare(b.name));
+};
+
+const loadCategoryBySlug = async (
+  ctx: AppContext,
+  slug: string,
+): Promise<Category | null> => {
+  const categories = await getRecordsByPath<Category>(
+    ctx,
+    CATEGORIES_PATH,
+    CATEGORY_ACCESSOR,
+  );
+
+  return (categories ?? []).find((c) =>
+    typeof c?.name === "string" && c.name.length > 0 &&
+    typeof c?.slug === "string" && c.slug.length > 0 &&
+    c.slug === slug
+  ) ?? null;
 };

@@ -541,7 +541,9 @@ export interface SearchArgs {
   locale?: string;
   segment?: Partial<Segment>;
 }
-
+/**
+ * @title {{{key}}} > {{{value}}}
+ */
 export interface SelectedFacet {
   /**
    * @title Key

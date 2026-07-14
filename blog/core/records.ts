@@ -21,15 +21,17 @@ export async function getRecordsByPath<T>(
     __resolveType: "resolvables",
   }) as unknown as Record<string, Resolvable<T>>;
   const current = Object.entries(resolvables).flatMap(([key, value]) => {
-    return key.startsWith(path) ? value : [];
+    return key.startsWith(path) && value != null ? value : [];
   });
-  const records = (current as Record<string, T>[]).map((item) => {
-    const id = (item.name as string).split(path)[1]?.replace("/", "");
-    return {
-      ...item[accessor],
-      id,
-    };
-  });
+  const records = (current as Record<string, T>[])
+    .filter((item) => item != null && typeof item.name === "string")
+    .map((item) => {
+      const id = (item.name as string).split(path)[1]?.replace("/", "");
+      return {
+        ...item[accessor],
+        id,
+      };
+    });
   // Hide non-published posts from the live site. A post with no `status`
   // (legacy) or `status: "published"` still shows — see `isPublishedStatus`.
   // Record kinds without a status (categories/authors) are always kept.

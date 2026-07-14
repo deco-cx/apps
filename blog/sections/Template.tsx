@@ -7,8 +7,10 @@ export interface Props {
   post: BlogPost | null;
 }
 
+const iframeStyle = "width:100%;height:100%;border:none;height:100vh;";
+
 export default function Template(
-  { post, pageSlug }: ReturnType<typeof loader>,
+  { post, pageSlug, categorySlug }: ReturnType<typeof loader>,
 ) {
   if (!post) return null;
 
@@ -20,19 +22,32 @@ export default function Template(
     image,
     alt,
     sections,
+    slug,
+    categories,
   } = post;
 
+  const postCategorySlug = categories?.[0]?.slug ?? "";
+
   if (pageSlug) {
-    const { slug, categories } = post;
-    const categorySlug = categories?.[0]?.slug ?? "";
     const resolvedUrl = pageSlug
-      .replace(":category", categorySlug)
+      .replace(":category", postCategorySlug)
       .replace(":slug", slug);
 
     return (
       <iframe
         src={resolvedUrl}
-        style="width:100%;height:100%;border:none;height:100vh;"
+        style={iframeStyle}
+      />
+    );
+  }
+
+  if (categorySlug) {
+    const resolvedUrl = categorySlug.replace(":category", postCategorySlug);
+
+    return (
+      <iframe
+        src={resolvedUrl}
+        style={iframeStyle}
       />
     );
   }
@@ -73,5 +88,6 @@ export const loader = (props: Props, _req: Request, ctx: AppContext) => {
   return {
     ...props,
     pageSlug: ctx.pageSlug,
+    categorySlug: ctx.categorySlug,
   };
 };

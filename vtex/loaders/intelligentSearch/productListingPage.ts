@@ -311,49 +311,19 @@ const loader = async (
     ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   const params = withDefaultParams({ ...searchArgs, page, locale });
-
-  // Multiple items search format: ?query=product:98765;98743 or ?query=sku:123;456
-  // The facets path must be empty because the API returns exactly the specified IDs
-  const query = searchArgs.query ?? "";
-  const isMultipleItemsSearch = query.startsWith("product:") ||
-    query.startsWith("sku:");
-  const facetsPath = isMultipleItemsSearch ? "" : toPath(selected);
-  const fFacetsPath = isMultipleItemsSearch ? "" : toPath(fselected);
-
-  // For multi-ID searches, paginate client-side: slice the IDs by page/count
-  // and send only that slice to VTEX in a single request
-  let multiIdsTotalCount = 0;
-  const searchParams = (() => {
-    if (!isMultipleItemsSearch) {
-      return params;
-    }
-
-    const [prefix, idsStr] = query.split(":");
-    const allIds = idsStr.split(";");
-    multiIdsTotalCount = allIds.length;
-    const start = page * searchArgs.count;
-    const pageIds = allIds.slice(start, start + searchArgs.count);
-
-    return {
-      ...params,
-      query: `${prefix}:${pageIds.join(";")}`,
-      page: 1,
-    };
-  })();
-
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
     vcsDeprecated
       ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
-        ...searchParams,
-        facets: facetsPath,
+        ...params,
+        facets: toPath(selected),
       }, {
         ...STALE,
         headers: segment ? withSegmentCookie(segment) : undefined,
       }).then((res) => res.json()),
     vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
-      ...searchParams,
-      facets: fFacetsPath,
+      ...params,
+      facets: toPath(fselected),
     }, { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined })
       .then((res) => res.json()),
   ]);
@@ -429,13 +399,7 @@ const loader = async (
     .filter((f) => !f.hidden)
     .map(toFilter(selectedFacets, paramsToPersist));
   const itemListElement = pageTypesToBreadcrumbList(pageTypes, baseUrl);
-  // For multi-ID searches, pagination is handled client-side
-  const totalRecords = isMultipleItemsSearch
-    ? multiIdsTotalCount
-    : recordsFiltered;
-  const hasNextPage = isMultipleItemsSearch
-    ? (page + 1) * searchArgs.count < multiIdsTotalCount
-    : Boolean(pagination.next.proxyUrl);
+  const hasNextPage = Boolean(pagination.next.proxyUrl);
   const hasPreviousPage = page > 0;
   const nextPage = new URLSearchParams(url.searchParams);
   const previousPage = new URLSearchParams(url.searchParams);
@@ -459,7 +423,7 @@ const loader = async (
       nextPage: hasNextPage ? `?${nextPage}` : undefined,
       previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
       currentPage,
-      records: totalRecords,
+      records: recordsFiltered,
       recordPerPage: pagination.perPage,
       pageTypes: allPageTypes.map(parsePageType),
     },
