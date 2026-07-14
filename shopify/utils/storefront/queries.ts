@@ -53,6 +53,7 @@ fragment Collection on Collection {
   }
   title
   updatedAt
+  onlineStoreUrl
 }`;
 
 const Product = gql`
