@@ -2,13 +2,20 @@ import { rating, review } from "../db/schema.ts";
 import { AppContext } from "../mod.ts";
 import { type Resolvable } from "@deco/deco";
 import { and, asc, desc, eq, notInArray } from "npm:drizzle-orm@0.43.1";
-import { BlogPost, Ignore, Rating, Review } from "../types.ts";
+import {
+  BlogPost,
+  Ignore,
+  isPublishedStatus,
+  Rating,
+  Review,
+} from "../types.ts";
 import { logger } from "@deco/deco/o11y";
 
 export async function getRecordsByPath<T>(
   ctx: AppContext,
   path: string,
   accessor: string,
+  { includeUnpublished = false }: { includeUnpublished?: boolean } = {},
 ): Promise<T[]> {
   const resolvables = await ctx.get({
     __resolveType: "resolvables",
@@ -16,13 +23,21 @@ export async function getRecordsByPath<T>(
   const current = Object.entries(resolvables).flatMap(([key, value]) => {
     return key.startsWith(path) ? value : [];
   });
-  return (current as Record<string, T>[]).map((item) => {
+  const records = (current as Record<string, T>[]).map((item) => {
     const id = (item.name as string).split(path)[1]?.replace("/", "");
     return {
       ...item[accessor],
       id,
     };
   });
+  // Hide non-published posts from the live site. A post with no `status`
+  // (legacy) or `status: "published"` still shows — see `isPublishedStatus`.
+  // Record kinds without a status (categories/authors) are always kept.
+  // `includeUnpublished` bypasses this for editor preview.
+  if (includeUnpublished) return records as T[];
+  return records.filter((record) =>
+    isPublishedStatus((record as { status?: string }).status)
+  ) as T[];
 }
 
 export async function getRatingsBySlug(
