@@ -1,5 +1,4 @@
 import { AppContext } from "../../../shopify/mod.ts";
-import type { Category } from "../../../commerce/types.ts";
 import {
   Collection,
   QueryRoot,
@@ -48,6 +47,15 @@ export interface Props {
   sortKey?: CollectionSortKeys;
 }
 
+export interface Categories {
+  id: string;
+  name: string;
+  url: string;
+  image: string;
+}
+
+export interface ListAllCategories extends Array<Categories> {}
+
 /**
  * @title Shopify Integration
  * @description List All Categories
@@ -56,7 +64,7 @@ const loader = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<Category[]> => {
+): Promise<ListAllCategories> => {
   const { storefront } = ctx;
   const { after, before, first, last, query, reverse, sortKey } = props;
   const count = first ?? 250;
