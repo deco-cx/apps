@@ -87,8 +87,7 @@ const loader = async (
   return collections.map((collection) => ({
     id: collection.handle,
     name: collection.title,
-    url: collection.onlineStoreUrl ??
-      `${baseUrl}/collections/${collection.handle}`,
+    url: `${baseUrl}/collections/${collection.handle}`,
     image: collection.image?.url,
   }));
 };
