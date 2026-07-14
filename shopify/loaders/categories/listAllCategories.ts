@@ -79,16 +79,25 @@ const loader = async (
   >({
     variables,
     ...ListAllCategories,
-  });
+  }) as QueryRoot;
 
   const collections = (data?.collections?.nodes ?? []) as Collection[];
   const baseUrl = new URL(req.url).origin;
+
+  const { hasNextPage, hasPreviousPage, endCursor, startCursor } =
+    data?.collections?.pageInfo ?? {};
 
   return collections.map((collection) => ({
     id: collection.handle,
     name: collection.title,
     url: `${baseUrl}/collections/${collection.handle}`,
     image: collection.image?.url,
+    pageInfo: {
+      hasNextPage,
+      hasPreviousPage,
+      endCursor,
+      startCursor,
+    },
   }));
 };
 
