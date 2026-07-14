@@ -621,3 +621,32 @@ export const SignInWithEmailAndPassword = {
     }
   `,
 };
+
+export const ListAllCategories = {
+  fragments: [Collection],
+  query: gql`
+    query ListAllCategories(
+      $after: String,
+      $before: String,
+      $first: Int,
+      $last: Int,
+      $query: String,
+      $reverse: Boolean,
+      $sortKey: CollectionSortKeys,
+    ) {
+      collections(
+        first: $first,
+        after: $after,
+        before: $before,
+        last: $last,
+        query: $query,
+        reverse: $reverse,
+        sortKey: $sortKey
+      ) {
+        nodes {
+          ...Collection
+        }
+      }
+    }
+  `,
+};
