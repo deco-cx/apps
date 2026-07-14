@@ -647,6 +647,12 @@ export const ListAllCategories = {
         nodes {
           ...Collection
         }
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          endCursor
+          startCursor
+        }
       }
     }
   `,

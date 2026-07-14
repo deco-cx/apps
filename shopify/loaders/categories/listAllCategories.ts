@@ -69,7 +69,7 @@ const loader = async (
   const { after, before, first, last, query, reverse, sortKey } = props;
   const variables = { after, before, first, last, query, reverse, sortKey };
 
-  if (!first && !last && !variables.first) {
+  if (first === undefined && last === undefined) {
     variables.first = 250;
   }
 
