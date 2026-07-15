@@ -444,8 +444,12 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     return null;
   }
 
+  // By default, don't cache PLPs with `filter.*` params: bots crawling
+  // arbitrary filter combinations would explode the number of distinct cache
+  // keys. Opt in via advancedConfigs.cacheFilteredPLP when the filter surface
+  // is bounded — filter.* params are already whitelisted into the key below.
   if (
-    url.search.includes("filter.")
+    !ctx.advancedConfigs?.cacheFilteredPLP && url.search.includes("filter.")
   ) {
     return null;
   }
