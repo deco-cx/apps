@@ -7,7 +7,6 @@ import {
 } from "./utils/intelligentSearch.ts";
 import {
   getSegmentFromBag,
-  hasUTM,
   isCacheableSegment,
   setSegmentBag,
 } from "./utils/segment.ts";
@@ -35,13 +34,7 @@ export const middleware = (
       cookies[`${VTEX_ID_CLIENT_COOKIE}_${ctx.account}`],
   );
 
-  // UTM can drive VTEX promotions and change price, so a UTM-carrying request
-  // is only cacheable when the store opts into removeUTMFromCacheKey (the same
-  // flag the product loaders use to strip UTM from their cache key). Channel is
-  // left cacheable (CDN varies by VTEXSC), matching isCacheableSegment.
-  const utmBlocksCache = !ctx.advancedConfigs?.removeUTMFromCacheKey &&
-    hasUTM(ctx);
-  const cacheable = isCacheableSegment(ctx) && !utmBlocksCache && !isLoggedIn;
+  const cacheable = isCacheableSegment(ctx) && !isLoggedIn;
 
   if (cacheable) {
     ctx.bag.set(PAGE_CACHE_ALLOWED_KEY, true);

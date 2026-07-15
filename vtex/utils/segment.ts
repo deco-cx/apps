@@ -70,16 +70,6 @@ export const isCacheableSegment = (ctx: AppContext) => {
   return !campaigns && !priceTables && !regionId;
 };
 
-/** Whether the segment carries any UTM/UTMI marketing param. */
-export const hasUTM = (ctx: AppContext): boolean => {
-  const p = getSegmentFromBag(ctx)?.payload;
-  if (!p) return false;
-  return Boolean(
-    p.utm_campaign || p.utm_source || p.utm_medium ||
-      p.utmi_campaign || p.utmi_page || p.utmi_part,
-  );
-};
-
 const setSegmentInBag = (ctx: AppContext, data: WrappedSegment) =>
   ctx?.bag?.set(SEGMENT, data);
 
