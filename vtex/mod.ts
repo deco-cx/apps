@@ -92,6 +92,16 @@ export interface Props {
      * @description Remove UTM from cache key to prevent cache fragmentation.
      */
     removeUTMFromCacheKey?: boolean;
+    /**
+     * @title Cache PLPs with `filter.*` params
+     * @description By default, PLP URLs carrying `filter.*` query params are NOT
+     * cached, to avoid bots crawling arbitrary filter combinations and
+     * exploding the number of distinct cache keys. Enable this only if your
+     * filter surface is bounded and you want filtered PLPs to be cacheable.
+     * Each filter combination still produces a distinct cache key.
+     * @default false
+     */
+    cacheFilteredPLP?: boolean;
   };
 
   /**
