@@ -260,9 +260,11 @@ export const setSegmentBag = (
     });
   }
 
-  // Only set vtex_segment when the channel is non-default so that default-SC
-  // responses remain cacheable by the CDN without a Set-Cookie header.
-  if (vtex_segment !== token && !isAnonymous(ctx)) {
+  // Only set vtex_segment on non-cacheable responses so cacheable ones (incl.
+  // UTM-only and non-default sales channel) stay Set-Cookie-free and CDN-
+  // cacheable. Mirrors the middleware's cacheability check (isCacheableSegment)
+  // so the cookie gate and the Cache-Control decision never disagree.
+  if (vtex_segment !== token && !isCacheableSegment(ctx)) {
     setCookie(ctx.response.headers, {
       value: token,
       name: SEGMENT_COOKIE_NAME,
