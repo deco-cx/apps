@@ -260,11 +260,19 @@ export const setSegmentBag = (
     });
   }
 
-  // Only set vtex_segment on non-cacheable responses so cacheable ones (incl.
-  // UTM-only and non-default sales channel) stay Set-Cookie-free and CDN-
-  // cacheable. Mirrors the middleware's cacheability check (isCacheableSegment)
-  // so the cookie gate and the Cache-Control decision never disagree.
-  if (vtex_segment !== token && !isCacheableSegment(ctx)) {
+  // The vtex_segment cookie disqualifies CDN caching (Cloudflare skips
+  // Set-Cookie responses). Gate its emission on whether the response is
+  // cacheable. UTM can drive VTEX promotions and change price, so treating
+  // UTM-only requests as cacheable is only safe when the store opts in via
+  // removeUTMFromCacheKey (the same flag the loaders use to strip UTM from
+  // their cache key). With the flag on we use isCacheableSegment (ignores
+  // UTM); otherwise we keep isAnonymous, which keeps UTM-carrying requests
+  // non-cacheable and cookie-bearing.
+  const nonCacheable = ctx.advancedConfigs?.removeUTMFromCacheKey
+    ? !isCacheableSegment(ctx)
+    : !isAnonymous(ctx);
+
+  if (vtex_segment !== token && nonCacheable) {
     setCookie(ctx.response.headers, {
       value: token,
       name: SEGMENT_COOKIE_NAME,
