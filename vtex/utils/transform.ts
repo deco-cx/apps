@@ -435,7 +435,10 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
   }) ?? [DEFAULT_IMAGE];
 
   const finalVideos = nonEmptyVideos?.map((video) => {
-    const url = video;
+    const url = video.replace(
+      /^https:\/\/(?:assets\.decocache\.com|data\.decoassets\.com)\//,
+      "https://decoims.com/",
+    );
     const alternateName = "Product video";
     const name = "Product video";
     const encodingFormat = "video";
