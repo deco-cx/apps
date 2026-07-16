@@ -45,11 +45,13 @@ export function loader(props: Props, req: Request, ctx: AppContext) {
 
   const image = jsonLD?.post?.seo?.image || jsonLD?.seo?.image ||
     jsonLD?.post?.image;
-  const canonical = jsonLD?.seo?.canonical ? jsonLD?.seo?.canonical : undefined;
+  const { canonicalBaseUrl, publisher } = ctx;
+  const canonical = jsonLD?.seo?.canonical
+    ? withCanonicalBase(jsonLD.seo.canonical, canonicalBaseUrl)
+    : undefined;
   const noIndexing = !jsonLD || jsonLD.seo?.noIndexing;
 
-  const { canonicalBaseUrl, publisher } = ctx;
-  const pageUrl = withCanonicalBase(canonical ?? req.url, canonicalBaseUrl);
+  const pageUrl = canonical ?? withCanonicalBase(req.url, canonicalBaseUrl);
   const jsonLDs = jsonLD?.post
     ? [
       toBlogPosting(jsonLD.post, pageUrl, publisher),

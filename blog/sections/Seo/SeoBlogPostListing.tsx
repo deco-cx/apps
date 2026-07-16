@@ -44,11 +44,13 @@ export function loader(props: Props, req: Request, ctx: AppContext) {
     descriptionProp || jsonLD?.seo?.description || "",
   );
 
-  const canonical = jsonLD?.seo?.canonical ? jsonLD?.seo?.canonical : undefined;
+  const { canonicalBaseUrl, publisher } = ctx;
+  const canonical = jsonLD?.seo?.canonical
+    ? withCanonicalBase(jsonLD.seo.canonical, canonicalBaseUrl)
+    : undefined;
   const noIndexing = !jsonLD || jsonLD.seo?.noIndexing;
 
-  const { canonicalBaseUrl, publisher } = ctx;
-  const url = withCanonicalBase(canonical ?? req.url, canonicalBaseUrl);
+  const url = canonical ?? withCanonicalBase(req.url, canonicalBaseUrl);
   const jsonLDs = jsonLD
     ? [
       {
