@@ -1,13 +1,19 @@
 import { Author, BlogPost, Category, Publisher } from "../types.ts";
 
-const toPerson = (author: Author) => ({
-  "@type": "Person" as const,
-  name: author.name,
-  ...(author.jobTitle ? { jobTitle: author.jobTitle } : {}),
-  ...(author.company
-    ? { worksFor: { "@type": "Organization" as const, name: author.company } }
-    : {}),
-});
+const toAuthor = (author: Author) => {
+  const type = author.type ?? "Person";
+  return {
+    "@type": type,
+    name: author.name,
+    // jobTitle and worksFor are Person-only properties
+    ...(type === "Person" && author.jobTitle
+      ? { jobTitle: author.jobTitle }
+      : {}),
+    ...(type === "Person" && author.company
+      ? { worksFor: { "@type": "Organization" as const, name: author.company } }
+      : {}),
+  };
+};
 
 export const toOrganization = (publisher: Publisher) => ({
   "@type": "Organization" as const,
@@ -63,7 +69,7 @@ export const toBlogPosting = (
     ...(image ? { image: [image] } : {}),
     ...(post.date ? { datePublished: post.date } : {}),
     ...(post.dateModified ? { dateModified: post.dateModified } : {}),
-    ...(post.authors?.length ? { author: post.authors.map(toPerson) } : {}),
+    ...(post.authors?.length ? { author: post.authors.map(toAuthor) } : {}),
     ...(publisher?.name ? { publisher: toOrganization(publisher) } : {}),
     ...(categories?.length ? { articleSection: categories } : {}),
     ...(post.readTime ? { timeRequired: `PT${post.readTime}M` } : {}),
