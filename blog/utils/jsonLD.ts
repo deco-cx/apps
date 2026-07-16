@@ -24,12 +24,16 @@ export const toOrganization = (publisher: Publisher) => ({
     : {}),
 });
 
-/** Replaces the origin of an absolute URL, keeping only its pathname. */
+/**
+ * Replaces the origin of a URL, keeping path, query and hash. Relative URLs
+ * are resolved against the canonical base.
+ */
 export const withCanonicalBase = (url: string, canonicalBaseUrl?: string) => {
   if (!canonicalBaseUrl) {
     return url;
   }
-  return new URL(new URL(url).pathname, canonicalBaseUrl).href;
+  const { pathname, search, hash } = new URL(url, canonicalBaseUrl);
+  return new URL(pathname + search + hash, canonicalBaseUrl).href;
 };
 
 /**
@@ -72,7 +76,9 @@ export const toBlogPosting = (
     ...(post.authors?.length ? { author: post.authors.map(toAuthor) } : {}),
     ...(publisher?.name ? { publisher: toOrganization(publisher) } : {}),
     ...(categories?.length ? { articleSection: categories } : {}),
-    ...(post.readTime ? { timeRequired: `PT${post.readTime}M` } : {}),
+    ...(post.readTime && post.readTime > 0 && Number.isFinite(post.readTime)
+      ? { timeRequired: `PT${post.readTime}M` }
+      : {}),
     ...(url
       ? { url, mainEntityOfPage: { "@type": "WebPage" as const, "@id": url } }
       : {}),

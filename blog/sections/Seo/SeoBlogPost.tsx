@@ -46,8 +46,12 @@ export function loader(props: Props, req: Request, ctx: AppContext) {
   const image = jsonLD?.post?.seo?.image || jsonLD?.seo?.image ||
     jsonLD?.post?.image;
   const { canonicalBaseUrl, publisher } = ctx;
+  // Configured canonicals may be relative; resolve against the request URL
   const canonical = jsonLD?.seo?.canonical
-    ? withCanonicalBase(jsonLD.seo.canonical, canonicalBaseUrl)
+    ? withCanonicalBase(
+      new URL(jsonLD.seo.canonical, req.url).href,
+      canonicalBaseUrl,
+    )
     : undefined;
   const noIndexing = !jsonLD || jsonLD.seo?.noIndexing;
 
