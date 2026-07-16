@@ -51,6 +51,12 @@ export interface BlogPost {
    * @format date
    */
   date: string;
+  /**
+   * @title Modified date
+   * @format date
+   * @description Date of the last relevant content update. Emitted as dateModified in the JSON-LD.
+   */
+  dateModified?: string;
   slug: string;
   /**
    * @title Post Content
@@ -102,6 +108,14 @@ export interface Seo {
   image?: ImageWidget;
   canonical?: string;
   noIndexing?: boolean;
+}
+
+/** @titleBy name */
+export interface Publisher {
+  name: string;
+  /** @title Logo */
+  logo?: ImageWidget;
+  url?: string;
 }
 
 export interface BlogPostPage {

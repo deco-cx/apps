@@ -5,7 +5,11 @@ import {
 } from "../../../website/components/Seo.tsx";
 import { BlogPostPage } from "../../types.ts";
 import { AppContext } from "../../mod.ts";
-import { toBlogPosting } from "../../utils/jsonLD.ts";
+import {
+  toBlogPosting,
+  toBreadcrumbList,
+  withCanonicalBase,
+} from "../../utils/jsonLD.ts";
 
 export interface Props {
   /** @title Data Source */
@@ -44,8 +48,16 @@ export function loader(props: Props, req: Request, ctx: AppContext) {
   const canonical = jsonLD?.seo?.canonical ? jsonLD?.seo?.canonical : undefined;
   const noIndexing = !jsonLD || jsonLD.seo?.noIndexing;
 
+  const { canonicalBaseUrl, publisher } = ctx;
+  const pageUrl = withCanonicalBase(canonical ?? req.url, canonicalBaseUrl);
   const jsonLDs = jsonLD?.post
-    ? [toBlogPosting(jsonLD.post, canonical ?? req.url)]
+    ? [
+      toBlogPosting(jsonLD.post, pageUrl, publisher),
+      toBreadcrumbList(pageUrl, {
+        currentName: jsonLD.post.title,
+        categories: jsonLD.post.categories,
+      }),
+    ]
     : [];
 
   return {
