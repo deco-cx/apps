@@ -5,6 +5,7 @@ import {
 } from "../../../website/components/Seo.tsx";
 import { BlogPostListingPage } from "../../types.ts";
 import { AppContext } from "../../mod.ts";
+import { toBlogPosting } from "../../utils/jsonLD.ts";
 
 export interface Props {
   /** @title Data Source */
@@ -15,8 +16,8 @@ export interface Props {
   description?: string;
 }
 
-/** @title Blog Post details */
-export function loader(props: Props, _req: Request, ctx: AppContext) {
+/** @title Blog Post listing */
+export function loader(props: Props, req: Request, ctx: AppContext) {
   const rawSeo = (ctx as unknown as { seo: Record<string, unknown> }).seo ?? {};
   const titleTemplate = typeof rawSeo.titleTemplate === "string"
     ? rawSeo.titleTemplate
@@ -41,11 +42,17 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
   const canonical = jsonLD?.seo?.canonical ? jsonLD?.seo?.canonical : undefined;
   const noIndexing = !jsonLD || jsonLD.seo?.noIndexing;
 
-  // Some HTML can break the meta tag
-  const jsonLDWithoutContent = {
-    ...jsonLD,
-    post: { ...jsonLD?.posts, content: undefined },
-  };
+  const url = canonical ?? req.url;
+  const jsonLDs = jsonLD
+    ? [{
+      "@type": "Blog" as const,
+      ...(title ? { name: title } : {}),
+      ...(description ? { description } : {}),
+      url,
+      mainEntityOfPage: { "@type": "WebPage" as const, "@id": url },
+      blogPost: jsonLD.posts?.map((post) => toBlogPosting(post)) ?? [],
+    }]
+    : [];
 
   return {
     ...seoSiteProps,
@@ -53,7 +60,7 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
     description,
     canonical,
     noIndexing,
-    jsonLDs: [jsonLDWithoutContent],
+    jsonLDs,
   };
 }
 
