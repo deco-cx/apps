@@ -9,6 +9,12 @@ import { type Section } from "@deco/deco/blocks";
 export interface Author {
   name: string;
   email: string;
+  /**
+   * @title Type
+   * @description Whether the author is a person or an organization. Emitted as the author @type in the JSON-LD. Defaults to Person.
+   * @default Person
+   */
+  type?: "Person" | "Organization";
   avatar?: ImageWidget;
   jobTitle?: string;
   company?: string;
@@ -51,6 +57,12 @@ export interface BlogPost {
    * @format date
    */
   date: string;
+  /**
+   * @title Modified date
+   * @format date
+   * @description Date of the last relevant content update. Emitted as dateModified in the JSON-LD.
+   */
+  dateModified?: string;
   slug: string;
   /**
    * @title Post Content
@@ -102,6 +114,14 @@ export interface Seo {
   image?: ImageWidget;
   canonical?: string;
   noIndexing?: boolean;
+}
+
+/** @titleBy name */
+export interface Publisher {
+  name: string;
+  /** @title Logo */
+  logo?: ImageWidget;
+  url?: string;
 }
 
 export interface BlogPostPage {

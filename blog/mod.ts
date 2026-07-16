@@ -1,6 +1,7 @@
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
 import { type App, type FnContext } from "@deco/deco";
+import type { Publisher } from "./types.ts";
 export type State = {
   /**
    * @title Category Slug
@@ -14,6 +15,17 @@ export type State = {
    * @example /blog/:category/:slug
    */
   pageSlug?: string;
+  /**
+   * @title Canonical Base URL
+   * @description Overrides the origin of the url/mainEntityOfPage emitted in the JSON-LD by the SEO sections, which otherwise use the request host.
+   * @example https://www.mysite.com
+   */
+  canonicalBaseUrl?: string;
+  /**
+   * @title Publisher
+   * @description Emitted as the publisher of the blog posts in the JSON-LD.
+   */
+  publisher?: Publisher;
 };
 export type AppContext = FnContext<State, Manifest>;
 /**

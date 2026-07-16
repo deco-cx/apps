@@ -5,6 +5,11 @@ import {
 } from "../../../website/components/Seo.tsx";
 import { BlogPostPage } from "../../types.ts";
 import { AppContext } from "../../mod.ts";
+import {
+  toBlogPosting,
+  toBreadcrumbList,
+  withCanonicalBase,
+} from "../../utils/jsonLD.ts";
 
 export interface Props {
   /** @title Data Source */
@@ -16,7 +21,7 @@ export interface Props {
 }
 
 /** @title Blog Post details */
-export function loader(props: Props, _req: Request, ctx: AppContext) {
+export function loader(props: Props, req: Request, ctx: AppContext) {
   const rawSeo = (ctx as unknown as { seo: Record<string, unknown> }).seo ?? {};
   const titleTemplate = typeof rawSeo.titleTemplate === "string"
     ? rawSeo.titleTemplate
@@ -40,14 +45,26 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
 
   const image = jsonLD?.post?.seo?.image || jsonLD?.seo?.image ||
     jsonLD?.post?.image;
-  const canonical = jsonLD?.seo?.canonical ? jsonLD?.seo?.canonical : undefined;
+  const { canonicalBaseUrl, publisher } = ctx;
+  // Configured canonicals may be relative; resolve against the request URL
+  const canonical = jsonLD?.seo?.canonical
+    ? withCanonicalBase(
+      new URL(jsonLD.seo.canonical, req.url).href,
+      canonicalBaseUrl,
+    )
+    : undefined;
   const noIndexing = !jsonLD || jsonLD.seo?.noIndexing;
 
-  // Some HTML can break the meta tag
-  const jsonLDWithoutContent = {
-    ...jsonLD,
-    post: { ...jsonLD?.post, content: undefined },
-  };
+  const pageUrl = canonical ?? withCanonicalBase(req.url, canonicalBaseUrl);
+  const jsonLDs = jsonLD?.post
+    ? [
+      toBlogPosting(jsonLD.post, pageUrl, publisher),
+      toBreadcrumbList(pageUrl, {
+        currentName: jsonLD.post.title,
+        categories: jsonLD.post.categories,
+      }),
+    ]
+    : [];
 
   return {
     ...seoSiteProps,
@@ -56,7 +73,7 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
     image,
     canonical,
     noIndexing,
-    jsonLDs: [jsonLDWithoutContent],
+    jsonLDs,
   };
 }
 

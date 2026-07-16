@@ -140,7 +140,12 @@ function Component({
               "@context": "https://schema.org",
               // @ts-expect-error Trust me, I'm an engineer
               ...json,
-            }),
+            })
+              // "<" would allow a "</script>" in the data to break out of the
+              // tag; the unicode escapes stay equivalent when parsed as JSON
+              .replace(/</g, "\\u003c")
+              .replace(/\u2028/g, "\\u2028")
+              .replace(/\u2029/g, "\\u2029"),
           }}
         />
       ))}
