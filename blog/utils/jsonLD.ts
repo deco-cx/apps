@@ -25,15 +25,22 @@ export const toOrganization = (publisher: Publisher) => ({
 });
 
 /**
- * Replaces the origin of a URL, keeping path, query and hash. Relative URLs
- * are resolved against the canonical base.
+ * Normalizes a page URL for SEO use (canonical and JSON-LD): strips the query
+ * string and hash, keeping only origin + pathname, and replaces the origin
+ * with the canonical base's when one is configured. Relative URLs are
+ * resolved against the canonical base; without a base, relative URLs are
+ * returned unchanged.
  */
 export const withCanonicalBase = (url: string, canonicalBaseUrl?: string) => {
   if (!canonicalBaseUrl) {
-    return url;
+    if (!URL.canParse(url)) {
+      return url;
+    }
+    const { origin, pathname } = new URL(url);
+    return origin + pathname;
   }
-  const { pathname, search, hash } = new URL(url, canonicalBaseUrl);
-  return new URL(pathname + search + hash, canonicalBaseUrl).href;
+  const { pathname } = new URL(url, canonicalBaseUrl);
+  return new URL(pathname, canonicalBaseUrl).href;
 };
 
 /**
