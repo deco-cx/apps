@@ -161,7 +161,7 @@ export interface Props {
 }
 const searchArgsOf = (props: Props, url: URL, ctx: AppContext) => {
   const hideUnavailableItems = props.hideUnavailableItems ??
-    ctx.hideUnavailableItems;
+    ctx.advancedConfigs?.hideUnavailableItems;
   const simulationBehavior =
     url.searchParams.get("simulationBehavior") as SimulationBehavior ||
     props.simulationBehavior || "default";
@@ -468,7 +468,8 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     ["fuzzy", props.fuzzy ?? url.searchParams.get("fuzzy") ?? ""],
     [
       "hideUnavailableItems",
-      (props.hideUnavailableItems ?? ctx.hideUnavailableItems)?.toString() ??
+      (props.hideUnavailableItems ?? ctx.advancedConfigs?.hideUnavailableItems)
+        ?.toString() ??
         "",
     ],
     ["pageOffset", (props.pageOffset ?? 1).toString()],

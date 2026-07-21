@@ -149,7 +149,7 @@ const isProductIDList = (p: any): p is ProductIDProps =>
 
 const fromProps = ({ props }: Props, ctx: AppContext) => {
   const hideUnavailableItems = (p: CommonProps) =>
-    p.hideUnavailableItems ?? ctx.hideUnavailableItems;
+    p.hideUnavailableItems ?? ctx.advancedConfigs?.hideUnavailableItems;
 
   if (isFacetsList(props)) {
     return {
@@ -273,7 +273,8 @@ const getSearchParams = (
       ["selectedFacets", props.facets],
       [
         "hideUnavailableItems",
-        (props.hideUnavailableItems ?? ctx.hideUnavailableItems ?? false)
+        (props.hideUnavailableItems ??
+          ctx.advancedConfigs?.hideUnavailableItems ?? false)
           .toString(),
       ],
       ["simulationBehavior", props.simulationBehavior || "default"],
@@ -288,7 +289,8 @@ const getSearchParams = (
       ["fuzzy", mapLabelledFuzzyToFuzzy(props.fuzzy) ?? ""],
       [
         "hideUnavailableItems",
-        (props.hideUnavailableItems ?? ctx.hideUnavailableItems ?? false)
+        (props.hideUnavailableItems ??
+          ctx.advancedConfigs?.hideUnavailableItems ?? false)
           .toString(),
       ],
       ["simulationBehavior", props.simulationBehavior || "default"],
@@ -302,7 +304,8 @@ const getSearchParams = (
       ["collection", props.collection],
       [
         "hideUnavailableItems",
-        (props.hideUnavailableItems ?? ctx.hideUnavailableItems ?? false)
+        (props.hideUnavailableItems ??
+          ctx.advancedConfigs?.hideUnavailableItems ?? false)
           .toString(),
       ],
       ["simulationBehavior", props.simulationBehavior || "default"],

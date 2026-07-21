@@ -79,11 +79,6 @@ export interface Props {
   defaultSegment?: SegmentCulture;
   usePortalSitemap?: boolean;
   /**
-   * @title Hide Unavailable Items
-   * @description Default behavior for hiding out of stock items across search, shelves and listing loaders. Individual loaders can still override this. When unset, defaults to false.
-   */
-  hideUnavailableItems?: boolean;
-  /**
    * @description Use VTEX as backend platform
    * @default vtex
    * @hide true
@@ -92,6 +87,11 @@ export interface Props {
 
   advancedConfigs?: {
     doNotFetchVariantsForRelatedProducts?: boolean;
+    /**
+     * @title Hide Unavailable Items
+     * @description Default behavior for hiding out of stock items across search, shelves and listing loaders. Individual loaders can still override this. When unset, defaults to false.
+     */
+    hideUnavailableItems?: boolean;
     /**
      * @title Remove UTM from cache key
      * @description Remove UTM from cache key to prevent cache fragmentation.

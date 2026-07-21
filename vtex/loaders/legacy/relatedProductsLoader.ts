@@ -52,7 +52,7 @@ async function loader(
     count,
   } = props;
   const hideUnavailableItems = props.hideUnavailableItems ??
-    ctx.hideUnavailableItems;
+    ctx.advancedConfigs?.hideUnavailableItems;
   const segment = getSegmentFromBag(ctx);
   const params = toSegmentParams(segment);
 
@@ -180,7 +180,8 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     ["count", (props.count ?? 0).toString()],
     [
       "hideUnavailableItems",
-      (props.hideUnavailableItems ?? ctx.hideUnavailableItems ?? false)
+      (props.hideUnavailableItems ??
+        ctx.advancedConfigs?.hideUnavailableItems ?? false)
         .toString(),
     ],
     ["segment", segment ?? ""],
