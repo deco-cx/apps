@@ -50,6 +50,7 @@ import * as $$$$$$$14 from "./matchers/site.ts";
 import * as $$$$$$$15 from "./matchers/userAgent.ts";
 import * as $$$$$0 from "./pages/Page.tsx";
 import * as $$$$$$0 from "./sections/Analytics/Analytics.tsx";
+import * as $$$$$$6 from "./sections/Cache/AllowPageCache.tsx";
 import * as $$$$$$1 from "./sections/Rendering/Deferred.tsx";
 import * as $$$$$$2 from "./sections/Rendering/Lazy.tsx";
 import * as $$$$$$3 from "./sections/Rendering/SingleDeferred.tsx";
@@ -89,6 +90,7 @@ const manifest = {
   },
   "sections": {
     "website/sections/Analytics/Analytics.tsx": $$$$$$0,
+    "website/sections/Cache/AllowPageCache.tsx": $$$$$$6,
     "website/sections/Rendering/Deferred.tsx": $$$$$$1,
     "website/sections/Rendering/Lazy.tsx": $$$$$$2,
     "website/sections/Rendering/SingleDeferred.tsx": $$$$$$3,
