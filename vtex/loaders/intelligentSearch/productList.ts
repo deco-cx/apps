@@ -147,14 +147,17 @@ const isQueryList = (p: any): p is QueryProps =>
 const isProductIDList = (p: any): p is ProductIDProps =>
   Array.isArray(p.ids) && p.ids.length > 0;
 
-const fromProps = ({ props }: Props) => {
+const fromProps = ({ props }: Props, ctx: AppContext) => {
+  const hideUnavailableItems = (p: CommonProps) =>
+    p.hideUnavailableItems ?? ctx.hideUnavailableItems;
+
   if (isFacetsList(props)) {
     return {
       query: props.query,
       count: props.count || 12,
       sort: props.sort || "",
       selectedFacets: [{ key: "", value: props.facets }],
-      hideUnavailableItems: props.hideUnavailableItems,
+      hideUnavailableItems: hideUnavailableItems(props),
       simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
@@ -165,7 +168,7 @@ const fromProps = ({ props }: Props) => {
       count: props.ids.length || 12,
       sort: "",
       selectedFacets: [],
-      hideUnavailableItems: props.hideUnavailableItems,
+      hideUnavailableItems: hideUnavailableItems(props),
       simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
@@ -177,7 +180,7 @@ const fromProps = ({ props }: Props) => {
       sort: props.sort || "",
       fuzzy: mapLabelledFuzzyToFuzzy(props.fuzzy),
       selectedFacets: [],
-      hideUnavailableItems: props.hideUnavailableItems,
+      hideUnavailableItems: hideUnavailableItems(props),
       simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
@@ -188,7 +191,7 @@ const fromProps = ({ props }: Props) => {
       count: props.count || 12,
       sort: props.sort || "",
       selectedFacets: [{ key: "productClusterIds", value: props.collection }],
-      hideUnavailableItems: props.hideUnavailableItems,
+      hideUnavailableItems: hideUnavailableItems(props),
       simulationBehavior: props.simulationBehavior || "default",
     } as const;
   }
@@ -221,7 +224,7 @@ const loader = async (
   const locale = segment?.payload?.cultureInfo ??
     ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
-  const { selectedFacets, ...args } = fromProps({ props });
+  const { selectedFacets, ...args } = fromProps({ props }, ctx);
   const params = withDefaultParams({ ...args, locale });
   const facets = withDefaultFacets(selectedFacets, ctx);
 
@@ -260,6 +263,7 @@ type Entry = [string, string];
 const getSearchParams = (
   props: Props["props"],
   searchParams: URLSearchParams,
+  ctx: AppContext,
 ): Entry[] => {
   if (isFacetsList(props)) {
     return [
@@ -269,7 +273,8 @@ const getSearchParams = (
       ["selectedFacets", props.facets],
       [
         "hideUnavailableItems",
-        (props.hideUnavailableItems ?? false).toString(),
+        (props.hideUnavailableItems ?? ctx.hideUnavailableItems ?? false)
+          .toString(),
       ],
       ["simulationBehavior", props.simulationBehavior || "default"],
     ];
@@ -283,7 +288,8 @@ const getSearchParams = (
       ["fuzzy", mapLabelledFuzzyToFuzzy(props.fuzzy) ?? ""],
       [
         "hideUnavailableItems",
-        (props.hideUnavailableItems ?? false).toString(),
+        (props.hideUnavailableItems ?? ctx.hideUnavailableItems ?? false)
+          .toString(),
       ],
       ["simulationBehavior", props.simulationBehavior || "default"],
     ];
@@ -296,7 +302,8 @@ const getSearchParams = (
       ["collection", props.collection],
       [
         "hideUnavailableItems",
-        (props.hideUnavailableItems ?? false).toString(),
+        (props.hideUnavailableItems ?? ctx.hideUnavailableItems ?? false)
+          .toString(),
       ],
       ["simulationBehavior", props.simulationBehavior || "default"],
     ];
@@ -337,7 +344,7 @@ export const cacheKey = (
     ? getSegmentCacheKeyWithoutUTM(ctx)
     : getSegmentFromBag(ctx)?.token;
   const params = new URLSearchParams([
-    ...getSearchParams(props, url.searchParams),
+    ...getSearchParams(props, url.searchParams, ctx),
     ["segment", segmentCacheKey],
   ]);
 

@@ -48,10 +48,11 @@ async function loader(
 ): Promise<Product[] | null> {
   const { vcsDeprecated } = ctx;
   const {
-    hideUnavailableItems,
     crossSelling = "similars",
     count,
   } = props;
+  const hideUnavailableItems = props.hideUnavailableItems ??
+    ctx.hideUnavailableItems;
   const segment = getSegmentFromBag(ctx);
   const params = toSegmentParams(segment);
 
@@ -177,7 +178,11 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     ["id", props.id ?? ""],
     ["crossSelling", props.crossSelling],
     ["count", (props.count ?? 0).toString()],
-    ["hideUnavailableItems", (props.hideUnavailableItems ?? false).toString()],
+    [
+      "hideUnavailableItems",
+      (props.hideUnavailableItems ?? ctx.hideUnavailableItems ?? false)
+        .toString(),
+    ],
     ["segment", segment ?? ""],
   ]);
 
