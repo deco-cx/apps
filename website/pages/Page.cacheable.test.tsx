@@ -11,7 +11,7 @@ const fakeCtx = () =>
     errorPage: undefined,
     resolverId: "root",
     // deno-lint-ignore no-explicit-any
-    get: async () => ({}) as any,
+    get: () => Promise.resolve({}) as any,
     avoidRedirectingToEditor: undefined,
     defaultImageQuality: undefined,
     // deno-lint-ignore no-explicit-any
