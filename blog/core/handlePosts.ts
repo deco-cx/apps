@@ -169,12 +169,25 @@ export const slicePosts = (
   return posts.slice(startIndex, endIndex);
 };
 
+/**
+ * A record without a slug has no route, so it can never be rendered: listing it
+ * only produces cards linking to the listing itself. Dropped here, before
+ * slicePosts, so `count` still yields `count` renderable posts.
+ */
+export const filterRoutablePosts = (posts: BlogPost[]) =>
+  // Records come straight from the CMS, so `slug` is only a string by
+  // convention: the typeof guard keeps a malformed one from throwing here and
+  // taking the whole listing down with it.
+  posts.filter(({ slug }) => typeof slug === "string" && slug.trim());
+
 const filterPosts = (
-  posts: BlogPost[],
+  allPosts: BlogPost[],
   slug?: string | string[],
   postSlugs?: string[],
   term?: string,
 ): BlogPost[] => {
+  const posts = filterRoutablePosts(allPosts);
+
   if (typeof slug === "string") {
     const firstFilter = postSlugs && postSlugs.length > 0
       ? filterPostsBySlugs(posts, postSlugs)
