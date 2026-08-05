@@ -4,6 +4,16 @@ import { BlogPost, SortBy, ViewFromDatabase } from "../types.ts";
 import { VALID_SORT_ORDERS } from "../utils/constants.ts";
 
 /**
+ * `BlogPost.date` may be a bare `YYYY-MM-DD` or a full ISO 8601 timestamp.
+ * A bare date is read as UTC midnight so ordering doesn't depend on the
+ * machine timezone. Unparseable values fall back to 0 instead of leaking NaN
+ * into the comparator (a NaN result is treated as 0, so the post never moves).
+ */
+const dateToTime = (date: string) =>
+  new Date(/^\d{4}-\d{2}-\d{2}$/.test(date) ? `${date}T00:00:00Z` : date)
+    .getTime() || 0;
+
+/**
  * Returns an sorted BlogPost list
  *
  * @param posts Posts to be sorted
@@ -87,8 +97,7 @@ export const sortPosts = async (
       return -1; // If post b doesn't have sort method, put it after post a
     }
     const comparison = sortMethod === "date"
-      ? new Date(`${b.date}T00:00:00`).getTime() -
-        new Date(`${a.date}T00:00:00`).getTime()
+      ? dateToTime(b.date) - dateToTime(a.date)
       : a[sortMethod]?.toString().localeCompare(
         b[sortMethod]?.toString() ?? "",
       ) ?? 0;
@@ -210,6 +219,7 @@ export default async function handlePosts(
   if (!filteredPosts || filteredPosts.length === 0) {
     return null;
   }
+  const sorted = await sortPosts(filteredPosts, sortBy, ctx);
 
-  return await sortPosts(filteredPosts, sortBy, ctx);
+  return sorted;
 }
