@@ -111,9 +111,8 @@ For help: https://wakecommerce.readme.io/docs/storefront-api-criacao-e-autentica
   const storefront = createGraphqlClient({
     endpoint: new URL(
       "/graphql",
-      checkoutUrl ?? `https://${account}.checkout.fbits.store`,
-    )
-      .href,
+      checkoutUrl ?? "https://storefront-api.fbits.net",
+    ).href,
     headers: new Headers({ "TCS-Access-Token": `${stringStorefrontToken}` }),
     fetcher: fetchSafe,
   });
