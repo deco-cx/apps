@@ -81,6 +81,11 @@ const buildProxyRoutes = (
 
       return ({
         pathTemplate,
+        // These are VTEX system paths — checkout, account, login, /api, /_v.
+        // Without the priority bump a catch-all `/*` route from an A/B test
+        // audience outranks them (1000 + rank("/*") = 1003 beats rank
+        // ("/checkout") = 6) and swallows the whole platform surface.
+        highPriority: true,
         handler: {
           value: handlerValue,
         },
