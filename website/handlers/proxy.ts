@@ -145,7 +145,19 @@ export default function Proxy({
     if (isFreshCtx<DecoSiteState>(_ctx)) {
       _ctx?.state?.monitoring?.logger?.log?.("proxy received headers", headers);
     }
+    // cf-connecting-ip carries the real client IP, and removeCFHeaders is about
+    // to drop it. Forward it as x-forwarded-for/x-real-ip so the proxied origin
+    // still sees who the visitor is (geo, rate limiting, analytics, fraud).
+    const clientIp = headers.get("cf-connecting-ip");
     removeCFHeaders(headers); // cf-headers are not ASCII-compliant
+    if (clientIp) {
+      const forwardedFor = headers.get("x-forwarded-for");
+      headers.set(
+        "x-forwarded-for",
+        forwardedFor ? `${clientIp}, ${forwardedFor}` : clientIp,
+      );
+      headers.set("x-real-ip", clientIp);
+    }
     if (removeDirtyCookies) {
       removeDirtyCookiesFn(headers);
     }
