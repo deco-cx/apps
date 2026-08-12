@@ -1,6 +1,7 @@
 import { ImageWidget } from "../admin/widgets.ts";
 import { PageInfo, Person, Thing } from "../commerce/types.ts";
 import { type Section } from "@deco/deco/blocks";
+import { JSX } from "preact";
 
 /**
  * @titleBy name
@@ -74,7 +75,7 @@ export interface BlogPost {
    * @label hidden
    * @changeable true
    */
-  sections?: Section[];
+  sections?: PostSection[];
   /**
    * @title Carousel in post content
    * @description add a carousel in the middle of the post. Must be implemented in frontEnd
@@ -152,6 +153,8 @@ export interface ImageCarousel {
   banners?: Banner[];
   description?: string;
 }
+
+export type PostSection = JSX.Element
 
 export interface Review {
   "@type": "Review";
