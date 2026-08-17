@@ -59,7 +59,26 @@ const sortOptions = [
   { value: "name:asc", label: "name:asc" },
   { value: "release:desc", label: "release:desc" },
   { value: "discount:desc", label: "discount:desc" },
+  { value: "random", label: "random" },
 ];
+
+function seededRandom(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    return (s >>> 0) / 0xffffffff;
+  };
+}
+
+function shuffle<T>(arr: T[], seed: number): T[] {
+  const result = [...arr];
+  const rand = seededRandom(seed);
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
 const LEGACY_TO_IS: Record<string, Sort> = {
   OrderByPriceDESC: "price:desc",
   OrderByPriceASC: "price:asc",
@@ -312,7 +331,13 @@ const loader = async (
   const locale = segment?.payload?.cultureInfo ??
     ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
-  const params = withDefaultParams({ ...searchArgs, page, locale });
+  const isRandom = searchArgs.sort === "random";
+  const params = withDefaultParams({
+    ...searchArgs,
+    sort: isRandom ? "" as Sort : searchArgs.sort,
+    page,
+    locale,
+  });
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
     vcsDeprecated
@@ -400,6 +425,13 @@ const loader = async (
   const filters = facets
     .filter((f) => !f.hidden)
     .map(toFilter(selectedFacets, paramsToPersist));
+
+  const today = new Date();
+  const dailySeed = today.getFullYear() * 10000 +
+    (today.getMonth() + 1) * 100 +
+    today.getDate();
+  const finalProducts = isRandom ? shuffle(products, dailySeed) : products;
+
   const itemListElement = pageTypesToBreadcrumbList(pageTypes, baseUrl);
   const hasNextPage = Boolean(pagination.next.proxyUrl);
   const hasPreviousPage = page > 0;
@@ -420,7 +452,7 @@ const loader = async (
       numberOfItems: itemListElement.length,
     },
     filters,
-    products,
+    products: finalProducts,
     pageInfo: {
       nextPage: hasNextPage ? `?${nextPage}` : undefined,
       previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
