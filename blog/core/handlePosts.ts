@@ -1,6 +1,11 @@
 import { postViews } from "../db/schema.ts";
 import { AppContext } from "../mod.ts";
-import { BlogPost, SortBy, ViewFromDatabase } from "../types.ts";
+import {
+  BlogPost,
+  isPublishedStatus,
+  SortBy,
+  ViewFromDatabase,
+} from "../types.ts";
 import { VALID_SORT_ORDERS } from "../utils/constants.ts";
 
 /** An ISO 8601 date or date-time carrying no timezone designator. */
@@ -183,29 +188,19 @@ export const slicePosts = (
 };
 
 /**
- * Only the exact literal `"draft"` means draft.
- *
- * `status` was added long after the first posts were written, so every existing
- * record is missing it: resolving absent to draft would empty every blog in
- * production the moment a site bumps this app. An unrecognized string a site set
- * for its own purposes is left published for the same reason — this check hides
- * posts, so it errs towards showing them.
- */
-export const isDraftPost = ({ status }: BlogPost) => status === "draft";
-
-/**
  * A record without a slug has no route, so it can never be rendered: listing it
- * only produces cards linking to the listing itself. Drafts are unreachable for
- * a different reason — they aren't published yet — but the outcome is the same,
- * so both are dropped here, before slicePosts, so `count` still yields `count`
- * renderable posts.
+ * only produces cards linking to the listing itself. Unpublished posts are
+ * unreachable for a different reason — the CMS doesn't consider them ready —
+ * but the outcome is the same, so both are dropped here, before slicePosts, so
+ * `count` still yields `count` renderable posts.
  */
 export const filterRoutablePosts = (posts: BlogPost[]) =>
   // Records come straight from the CMS, so `slug` is only a string by
   // convention: the typeof guard keeps a malformed one from throwing here and
   // taking the whole listing down with it.
   posts.filter((post) =>
-    typeof post.slug === "string" && post.slug.trim() && !isDraftPost(post)
+    typeof post.slug === "string" && post.slug.trim() &&
+    isPublishedStatus(post.status)
   );
 
 const filterPosts = (

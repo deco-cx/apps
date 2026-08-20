@@ -1,7 +1,6 @@
 import { AppContext } from "../mod.ts";
-import { BlogPost } from "../types.ts";
+import { BlogPost, isPublishedStatus } from "../types.ts";
 import { getRecordsByPath } from "../core/records.ts";
-import { isDraftPost } from "../core/handlePosts.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
@@ -39,10 +38,10 @@ export default async function BlogPostItem(
     return null;
   }
 
-  // A draft is still served — that page *is* the CMS preview — it just must
-  // never be indexed while unpublished. Everything else the post declared under
-  // `seo` is kept as-is.
-  return isDraftPost(post)
-    ? { ...post, seo: { ...post.seo, noIndexing: true } }
-    : post;
+  // An unpublished post is still served — that page *is* the CMS preview — it
+  // just must never be indexed. Everything else the post declared under `seo`
+  // is kept as-is.
+  return isPublishedStatus(post.status)
+    ? post
+    : { ...post, seo: { ...post.seo, noIndexing: true } };
 }

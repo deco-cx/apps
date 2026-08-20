@@ -66,9 +66,9 @@ export interface BlogPost {
   slug: string;
   /**
    * @title Status
-   * @description Draft posts are hidden from listings and never indexed, but their page still renders so the CMS can preview them. Posts without a status are treated as published.
+   * @description Publication status. Anything other than `published` is kept out of listings and never indexed. Posts with no status are treated as published.
    */
-  status?: "draft" | "published";
+  status?: PostStatus;
   /**
    * @title Post Content
    * @format rich-text
@@ -107,6 +107,37 @@ export interface BlogPost {
   interactionStatistic?: InteractionCounter;
   id?: string;
 }
+
+/**
+ * Publication status of a post. `published` (or an absent value, for legacy
+ * posts) renders on the live site; every other value keeps the post out of
+ * listings and out of the index.
+ *
+ * `generating` and `awaiting_review` are written by the autonomous-blog agent
+ * while a post is still being produced, which is why the check below is an
+ * allowlist: a status this app does not recognize is a post the CMS does not
+ * consider ready, so it must not leak into a listing.
+ */
+export type PostStatus =
+  | "draft"
+  | "published"
+  | "archived"
+  | "generating"
+  | "awaiting_review";
+
+/**
+ * A post is live when it has no status at all or is explicitly `published`.
+ *
+ * The absent case is load-bearing: `status` was added long after the first
+ * posts were written, so every existing record is missing it. Requiring an
+ * explicit `published` would empty every blog in production the moment a site
+ * bumps this app.
+ *
+ * Takes a plain `string` so it can also be applied to a raw CMS record, where
+ * the value is only a `PostStatus` by convention.
+ */
+export const isPublishedStatus = (status?: string): boolean =>
+  !status || status === "published";
 
 export interface ExtraProps {
   key: string;

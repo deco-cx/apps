@@ -96,3 +96,24 @@ Deno.test("BlogPostPage leaves a published post indexable", async () => {
 
   assertEquals(page?.seo?.noIndexing, false);
 });
+
+Deno.test("every non-published status is served but unindexable", async () => {
+  for (
+    const status of [
+      "draft",
+      "archived",
+      "generating",
+      "awaiting_review",
+    ] as const
+  ) {
+    const ctx = ctxWith({ ...draft, status });
+
+    const item = await BlogPostItem({ slug: "wip" }, req, ctx);
+    assertEquals(item?.slug, "wip", status);
+    assertEquals(item?.seo?.noIndexing, true, status);
+
+    const page = await BlogPostPageLoader({ slug: "wip" }, req, ctx);
+    assertEquals(page?.post.slug, "wip", status);
+    assertEquals(page?.seo?.noIndexing, true, status);
+  }
+});
