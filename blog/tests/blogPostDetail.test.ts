@@ -1,6 +1,6 @@
 import { assertEquals } from "@std/assert";
-import BlogPostItem from "./BlogPostItem.ts";
-import BlogPostPageLoader from "./BlogPostPage.ts";
+import BlogPostItem from "../loaders/BlogPostItem.ts";
+import BlogPostPageLoader from "../loaders/BlogPostPage.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost } from "../types.ts";
 

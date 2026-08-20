@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { filterRoutablePosts, isDraftPost } from "./handlePosts.ts";
+import { filterRoutablePosts, isDraftPost } from "../core/handlePosts.ts";
 import { BlogPost } from "../types.ts";
 
 const post = (slug: string, status?: string): BlogPost => ({
