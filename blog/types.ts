@@ -100,8 +100,34 @@ export interface BlogPost {
   contentRating?: Rating[];
   /** @hide true */
   interactionStatistic?: InteractionCounter;
+  /**
+   * @title Status
+   * @description Publication status. Anything other than `published` is hidden
+   * from the live site. Legacy posts with no status are treated as published.
+   */
+  status?: PostStatus;
   id?: string;
 }
+
+/**
+ * Publication status of a post. `published` (or an absent value, for legacy
+ * posts) renders on the live site; every other value keeps the post out of
+ * listings, single-post pages, related posts and category aggregations.
+ */
+export type PostStatus =
+  | "draft"
+  | "published"
+  | "archived"
+  | "generating"
+  | "awaiting_review";
+
+/**
+ * A post is visible on the live site when it has no status at all (legacy
+ * posts predate this field) or is explicitly `published`. Any other value
+ * hides it. Centralizing the rule here keeps every loader consistent.
+ */
+export const isPublishedStatus = (status?: string): boolean =>
+  !status || status === "published";
 
 export interface ExtraProps {
   key: string;
