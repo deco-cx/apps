@@ -65,6 +65,11 @@ export interface BlogPost {
   dateModified?: string;
   slug: string;
   /**
+   * @title Status
+   * @description Draft posts are hidden from listings and never indexed, but their page still renders so the CMS can preview them. Posts without a status are treated as published.
+   */
+  status?: "draft" | "published";
+  /**
    * @title Post Content
    * @format rich-text
    */

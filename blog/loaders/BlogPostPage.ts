@@ -1,6 +1,7 @@
 import { AppContext } from "../mod.ts";
 import { BlogPost, BlogPostPage } from "../types.ts";
 import { getRecordsByPath } from "../core/records.ts";
+import { isDraftPost } from "../core/handlePosts.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
@@ -47,7 +48,9 @@ export default async function BlogPostPageLoader(
       description: post?.seo?.description || post?.excerpt,
       canonical: post?.seo?.canonical || url.href,
       image: post?.seo?.image || post?.image,
-      noIndexing: post?.seo?.noIndexing || false,
+      // A draft still renders — that page *is* the CMS preview — it just must
+      // never be indexed while unpublished.
+      noIndexing: isDraftPost(post) || post?.seo?.noIndexing || false,
     },
   };
 }
