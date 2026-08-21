@@ -1,5 +1,5 @@
 import { AppContext } from "../mod.ts";
-import { BlogPost, isPublishedStatus } from "../types.ts";
+import { BlogPost, isLivePost } from "../types.ts";
 import { getRecordsByPath } from "../core/records.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 
@@ -38,10 +38,12 @@ export default async function BlogPostItem(
     return null;
   }
 
-  // An unpublished post is still served — that page *is* the CMS preview — it
-  // just must never be indexed. Everything else the post declared under `seo`
-  // is kept as-is.
-  return isPublishedStatus(post.status)
+  // A post that isn't live yet — unpublished, or scheduled for an instant still
+  // ahead — is still served, because that page *is* the CMS preview. It just
+  // must never be indexed. Everything else the post declared under `seo` is
+  // kept as-is, and a scheduled post becomes indexable on its own once its
+  // instant passes.
+  return isLivePost(post)
     ? post
     : { ...post, seo: { ...post.seo, noIndexing: true } };
 }

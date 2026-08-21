@@ -97,6 +97,60 @@ Deno.test("BlogPostPage leaves a published post indexable", async () => {
   assertEquals(page?.seo?.noIndexing, false);
 });
 
+const DAY = 86_400_000;
+
+const fromNow = (offsetMs: number) =>
+  new Date(Date.now() + offsetMs).toISOString();
+
+const scheduled = (offsetMs: number): Partial<BlogPost> => ({
+  ...draft,
+  status: "scheduled",
+  scheduledDatetime: fromNow(offsetMs),
+});
+
+Deno.test("a not-yet-due scheduled post is served, marked noIndexing", async () => {
+  // Same contract as a draft: the URL works so the CMS can preview it, but it
+  // must not be indexed before its go-live.
+  const ctx = ctxWith(scheduled(DAY));
+
+  const item = await BlogPostItem({ slug: "wip" }, req, ctx);
+  assertEquals(item?.slug, "wip");
+  assertEquals(item?.seo?.noIndexing, true);
+
+  const page = await BlogPostPageLoader({ slug: "wip" }, req, ctx);
+  assertEquals(page?.post.slug, "wip");
+  assertEquals(page?.seo?.noIndexing, true);
+});
+
+Deno.test("a due scheduled post becomes indexable with no rewrite", async () => {
+  // The record is identical to the one above apart from its instant — crossing
+  // it is the entire publication event.
+  const ctx = ctxWith(scheduled(-DAY));
+
+  const item = await BlogPostItem({ slug: "wip" }, req, ctx);
+  assertEquals(item?.seo?.noIndexing, undefined);
+
+  const page = await BlogPostPageLoader({ slug: "wip" }, req, ctx);
+  assertEquals(page?.seo?.noIndexing, false);
+});
+
+Deno.test("a scheduled post with a broken instant stays unindexable", async () => {
+  const ctx = ctxWith({
+    ...draft,
+    status: "scheduled",
+    scheduledDatetime: "not a date",
+  });
+
+  assertEquals(
+    (await BlogPostItem({ slug: "wip" }, req, ctx))?.seo?.noIndexing,
+    true,
+  );
+  assertEquals(
+    (await BlogPostPageLoader({ slug: "wip" }, req, ctx))?.seo?.noIndexing,
+    true,
+  );
+});
+
 Deno.test("every non-published status is served but unindexable", async () => {
   for (
     const status of [

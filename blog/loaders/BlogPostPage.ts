@@ -1,5 +1,5 @@
 import { AppContext } from "../mod.ts";
-import { BlogPost, BlogPostPage, isPublishedStatus } from "../types.ts";
+import { BlogPost, BlogPostPage, isLivePost } from "../types.ts";
 import { getRecordsByPath } from "../core/records.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 
@@ -47,9 +47,11 @@ export default async function BlogPostPageLoader(
       description: post?.seo?.description || post?.excerpt,
       canonical: post?.seo?.canonical || url.href,
       image: post?.seo?.image || post?.image,
-      // An unpublished post still renders — that page *is* the CMS preview —
-      // it just must never be indexed, even if the URL leaks.
-      noIndexing: post?.seo?.noIndexing || !isPublishedStatus(post.status),
+      // A post that isn't live yet — unpublished, or scheduled for an instant
+      // still ahead — renders anyway, because that page *is* the CMS preview.
+      // It just must never be indexed, even if the URL leaks. A scheduled post
+      // becomes indexable on its own once its instant passes.
+      noIndexing: post?.seo?.noIndexing || !isLivePost(post),
     },
   };
 }
