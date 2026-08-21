@@ -89,13 +89,59 @@ Deno.test("a scheduled post with no instant is hidden", () => {
 });
 
 Deno.test("a scheduled post with an unparseable instant is hidden", () => {
-  // The parse collapses to 0, which compares as 1970 — i.e. as *already live*.
-  // Rejecting it is what keeps a typo from publishing a post early.
-  // Not exhaustive by design: `Date` is a lenient parser, so some junk ("0"
-  // becomes the year 2000) does resolve to a real instant and is honoured.
-  for (const garbage of ["not a date", "tomorrow", "2026-13-45"]) {
+  for (const garbage of ["not a date", "tomorrow", "2026-13-45", "2026"]) {
     assertEquals(listed([post("junk", "scheduled", garbage)]), [], garbage);
   }
+});
+
+Deno.test("a loose date string is rejected rather than parsed", () => {
+  // `Date` accepts all of these, and parses them in *server-local* time — so
+  // honouring them would publish the same record at a different instant on
+  // every machine, defeating the UTC pinning. `"0"` is the worst of them: it
+  // resolves to the year 2000, i.e. to "already live".
+  for (const loose of ["0", "Sep 1 2026", "2026/09/01", "01-09-2026"]) {
+    assertEquals(listed([post("loose", "scheduled", loose)]), [], loose);
+  }
+});
+
+Deno.test("a calendar overflow is rejected, not rolled forward", () => {
+  // `Date` slides "Feb 31st" to March 3rd, which would put the post live days
+  // off the date someone typed. A schedule we can't read exactly is one we
+  // must not act on.
+  for (const overflow of ["2026-02-31", "2026-02-30T10:00", "2026-04-31"]) {
+    assertEquals(listed([post("typo", "scheduled", overflow)]), [], overflow);
+  }
+  // The same day in a leap year is real, so it must still be honoured.
+  assertEquals(listed([post("leap", "scheduled", "2024-02-29")]), ["leap"]);
+});
+
+Deno.test("an out-of-range time or offset is rejected", () => {
+  for (
+    const bad of [
+      "2026-09-01T25:00",
+      "2026-09-01T10:61",
+      "2020-01-01T00:00+99:00",
+    ]
+  ) {
+    assertEquals(listed([post("bad", "scheduled", bad)]), [], bad);
+  }
+});
+
+Deno.test("the Unix epoch is a real instant, not a parse failure", () => {
+  // Nobody schedules 1970 on purpose, but the distinction is what proves the
+  // rejection path keys off an unreadable value rather than off a falsy
+  // timestamp — the bug class that publishes a typo'd post immediately.
+  assertEquals(
+    listed([post("epoch", "scheduled", "1970-01-01T00:00:00Z")]),
+    ["epoch"],
+  );
+});
+
+Deno.test("a bare date is honoured as midnight UTC", () => {
+  // Unambiguous ISO, unlike the loose forms above: rejecting it would strand a
+  // post forever over a missing time.
+  assertEquals(listed([post("dated", "scheduled", "2020-01-01")]), ["dated"]);
+  assertEquals(listed([post("future", "scheduled", "2999-01-01")]), []);
 });
 
 Deno.test("scheduledDatetime is inert unless the status is scheduled", () => {

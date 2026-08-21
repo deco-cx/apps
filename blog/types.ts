@@ -1,7 +1,7 @@
 import { ImageWidget } from "../admin/widgets.ts";
 import { PageInfo, Person, Thing } from "../commerce/types.ts";
 import { type Section } from "@deco/deco/blocks";
-import { dateToTime } from "./utils/date.ts";
+import { scheduledTime } from "./utils/date.ts";
 
 /**
  * @titleBy name
@@ -173,14 +173,13 @@ export const isLivePost = (
     return false;
   }
   const goLive = post.scheduledDatetime
-    ? dateToTime(post.scheduledDatetime)
-    : 0;
-  // `dateToTime` collapses garbage to 0, which would otherwise read as "went
-  // live in 1970" and publish the post — so a missing or unparseable instant is
-  // rejected here rather than compared. This is the fail-closed guarantee, not
-  // a redundant falsy check. It also rejects the exact Unix epoch, which is
-  // indistinguishable from a parse failure and is not a schedule anyone means.
-  return goLive !== 0 && goLive <= now;
+    ? scheduledTime(post.scheduledDatetime)
+    : null;
+  // A missing or unreadable instant is rejected rather than compared: this is
+  // the fail-closed guarantee, not a redundant null check. `scheduledTime`
+  // returns null (not 0) for a bad value precisely so that a real instant which
+  // happens to be the epoch is still honoured here.
+  return goLive !== null && goLive <= now;
 };
 
 export interface ExtraProps {
