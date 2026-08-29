@@ -79,7 +79,6 @@ export interface Category {
   updated_at: Date;
 }
 export type NuvemShopSort =
-  | "user"
   | "price-ascending"
   | "price-descending"
   | "alpha-ascending"

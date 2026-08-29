@@ -1,6 +1,6 @@
 import type { ProductListingPage } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
-import { ProductBaseNuvemShop } from "../utils/types.ts";
+import { NuvemShopSort, ProductBaseNuvemShop } from "../utils/types.ts";
 import { toProduct } from "../utils/transform.ts";
 
 export interface Props {
@@ -15,6 +15,7 @@ export interface Props {
   limit: number;
   // Sort in NuvemShort do not work when using q in query params
   // sort?: NuvemShopSort;
+  sort?: NuvemShopSort;
 
   /**
    * @hide true
@@ -59,7 +60,7 @@ async function loader(
       per_page,
       price_max: maxPrice,
       price_min: minPrice,
-      sort_by: "price-ascending",
+      sort_by: props.sort || "price-descending",
     });
     result = await response.json();
   } catch (error) {
