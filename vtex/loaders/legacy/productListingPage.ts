@@ -371,6 +371,7 @@ const loader = async (
     ? getFlatCategories(vtexFacets.CategoriesTrees)
     : {};
 
+
   const filters = Object.entries({
     Departments: vtexFacets.Departments,
     Categories: getCategoryFacets(
@@ -391,7 +392,7 @@ const loader = async (
         term,
         filtersBehavior,
         props.ignoreCaseSelected,
-        name === "Categories",
+        false,
       )
     )
     .flat()
