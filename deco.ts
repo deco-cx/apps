@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("stape"),
     app("data-for-seo"),
     app("discord-user"),
     app("discord-bot"),
