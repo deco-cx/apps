@@ -164,6 +164,40 @@ export interface VTEXCommerceStable {
     };
   };
   "GET /api/catalog_system/pub/category/tree/:level": { response: Category[] };
+  // Legacy Intelligent Search endpoints. Kept alongside the v1 routes so the
+  // `intelligentSearchV1` app flag can fall back to them.
+  "GET /api/io/_v/api/intelligent-search/search_suggestions": {
+    response: Suggestion;
+    searchParams: { locale: string; query: string };
+  };
+  "GET /api/io/_v/api/intelligent-search/top_searches": {
+    response: Suggestion;
+    searchParams: { locale: string };
+  };
+  "GET /api/io/_v/api/intelligent-search/product_search/*facets": {
+    response: ProductSearchResult;
+    searchParams: {
+      page: number;
+      count: number;
+      query?: string;
+      sort?: string;
+      fuzzy?: string;
+      locale?: string;
+      hideUnavailableItems: boolean;
+    };
+  };
+  "GET /api/io/_v/api/intelligent-search/facets/*facets": {
+    response: FacetSearchResult;
+    searchParams: {
+      page: number;
+      count: number;
+      query?: string;
+      sort?: string;
+      fuzzy?: string;
+      locale?: string;
+      hideUnavailableItems: boolean;
+    };
+  };
   "GET /api/intelligent-search/v1/search-suggestions": {
     response: Suggestion;
     searchParams: { locale: string; query: string };

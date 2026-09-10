@@ -1,8 +1,8 @@
 import type { Product } from "../../../commerce/types.ts";
-import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import {
   isFilterParam,
+  searchProducts,
   toPath,
   withDefaultFacets,
   withDefaultParams,
@@ -10,7 +10,6 @@ import {
 import {
   getSegmentCacheKeyWithoutUTM,
   getSegmentFromBag,
-  withSegmentParams,
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { sortProducts, toProduct } from "../../utils/transform.ts";
@@ -218,7 +217,6 @@ const loader = async (
 ): Promise<Product[] | null> => {
   const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
-  const { vcsDeprecated } = ctx;
   const { url } = req;
   const segment = getSegmentFromBag(ctx);
   const locale = segment?.payload?.cultureInfo ??
@@ -228,13 +226,12 @@ const loader = async (
   const params = withDefaultParams({ ...args, locale });
   const facets = withDefaultFacets(selectedFacets, ctx);
 
-  const { products: vtexProducts } = await vcsDeprecated
-    ["GET /api/intelligent-search/v1/product-search/*facets"]({
-      ...params,
-      ...withSegmentParams(segment),
-      facets: toPath(facets),
-    }, STALE)
-    .then((res) => res.json());
+  const { products: vtexProducts } = await searchProducts(
+    ctx,
+    segment,
+    params,
+    toPath(facets),
+  );
 
   const options = {
     baseUrl: url,

@@ -3,7 +3,7 @@ import {
   getSegmentCacheKeyWithoutUTM,
   getSegmentFromBag,
 } from "../../utils/segment.ts";
-import { STALE } from "../../../utils/fetch.ts";
+import { topSearches } from "../../utils/intelligentSearch.ts";
 import { Suggestion } from "../../../commerce/types.ts";
 
 /**
@@ -19,11 +19,7 @@ export default async function (
   const locale = segment?.payload?.cultureInfo ??
     ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
-  return await ctx.vcsDeprecated
-    ["GET /api/intelligent-search/v1/top-searches"]({
-      locale,
-    }, STALE)
-    .then((res) => res.json());
+  return await topSearches(ctx, segment, { locale });
 }
 
 export const cache = {

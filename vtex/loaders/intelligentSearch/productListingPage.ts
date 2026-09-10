@@ -1,10 +1,11 @@
 import type { ProductListingPage } from "../../../commerce/types.ts";
 import { parseRange } from "../../../commerce/utils/filters.ts";
-import { STALE } from "../../../utils/fetch.ts";
 import sendEvent from "../../actions/analytics/sendEvent.ts";
 import { AppContext } from "../../mod.ts";
 import {
   isFilterParam,
+  searchFacets,
+  searchProducts,
   toPath,
   withDefaultFacets,
   withDefaultParams,
@@ -17,7 +18,6 @@ import {
 import {
   getSegmentCacheKeyWithoutUTM,
   getSegmentFromBag,
-  withSegmentParams,
 } from "../../utils/segment.ts";
 import { pageTypesFromUrl } from "../../utils/intelligentSearch.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
@@ -276,7 +276,6 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
-  const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const url = new URL(props.pageHref || baseUrl);
   const segment = getSegmentFromBag(ctx);
@@ -313,21 +312,10 @@ const loader = async (
     ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   const params = withDefaultParams({ ...searchArgs, page, locale });
-  const segmentParams = withSegmentParams(segment);
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
-    vcsDeprecated
-      ["GET /api/intelligent-search/v1/product-search/*facets"]({
-        ...params,
-        ...segmentParams,
-        facets: toPath(selected),
-      }, STALE).then((res) => res.json()),
-    vcsDeprecated["GET /api/intelligent-search/v1/facets/*facets"]({
-      ...params,
-      ...segmentParams,
-      facets: toPath(fselected),
-    }, STALE)
-      .then((res) => res.json()),
+    searchProducts(ctx, segment, params, toPath(selected)),
+    searchFacets(ctx, segment, params, toPath(fselected)),
   ]);
 
   const currentPageTypes = !props.useCollectionName

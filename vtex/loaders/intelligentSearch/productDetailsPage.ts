@@ -3,6 +3,8 @@ import { STALE } from "../../../utils/fetch.ts";
 import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import {
+  isIntelligentSearchV1,
+  searchProducts,
   toPath,
   withDefaultFacets,
   withDefaultParams,
@@ -18,6 +20,7 @@ import { HttpError } from "../../../utils/http.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type {
   AdvancedLoaderConfig,
+  PageType,
   Product as VTEXProduct,
   SimulationBehavior,
 } from "../../utils/types.ts";
@@ -46,6 +49,18 @@ export interface Props {
    */
   simulationBehavior?: SimulationBehavior;
 }
+
+/**
+ * When there's no ?skuId querystring, we need to figure out the product id
+ * from the pathname. For this, we use the pageType api (legacy IS flow only).
+ */
+const getProductID = (page: PageType) => {
+  if (page.pageType !== "Product") {
+    return null;
+  }
+
+  return page.id!;
+};
 
 /**
  * @title Product Details Page - Intelligent Search
@@ -82,37 +97,69 @@ const loader = async (
   const url = new URL(baseUrl);
   const skuId = url.searchParams.get("skuId");
 
-  // The v1 Intelligent Search exposes a dedicated single-product endpoint.
-  // Look it up by SKU when a skuId is present in the URL, otherwise by slug —
-  // no need to resolve the productId from the pageType API anymore.
-  const [field, value] = skuId
-    ? (["sku", skuId] as const)
-    : (["slug", lowercaseSlug] as const);
+  let product: VTEXProduct | null = null;
 
-  // Without a skuId or a slug there is nothing to look up, 404
-  if (!value) {
-    return null;
-  }
+  if (isIntelligentSearchV1(ctx)) {
+    // v1 exposes a dedicated single-product endpoint. Look it up by SKU when a
+    // skuId is present in the URL, otherwise by slug — no need to resolve the
+    // productId from the pageType API.
+    const [field, value] = skuId
+      ? (["sku", skuId] as const)
+      : (["slug", lowercaseSlug] as const);
 
-  const product = await vcsDeprecated
-    ["GET /api/intelligent-search/v1/products"]({
-      field,
-      value,
+    // Without a skuId or a slug there is nothing to look up, 404
+    if (!value) {
+      return null;
+    }
+
+    product = await vcsDeprecated
+      ["GET /api/intelligent-search/v1/products"]({
+        field,
+        value,
+        locale,
+        simulationBehavior: props.simulationBehavior ?? "default",
+        ...withSegmentParams(segment),
+        // sc is required by this endpoint to resolve pricing/availability.
+        sc: segment?.payload?.channel ?? ctx.salesChannel ?? "1",
+      }, STALE)
+      .then((res) => res.json())
+      .catch((error) => {
+        // A missing product resolves to a 404 on the v1 products endpoint;
+        // translate it into a not-found page instead of surfacing the error.
+        if (error instanceof HttpError && error.status === 404) {
+          return null;
+        }
+        throw error;
+      });
+  } else {
+    // Legacy pipeline: resolve the productId from the pageType, then take the
+    // first product returned by product_search.
+    const productId = !skuId && getProductID(await pageTypePromise);
+    const query = skuId
+      ? `sku:${skuId}`
+      : productId
+      ? `product:${productId}`
+      : null;
+
+    // In case we dont have the skuId or the productId, 404
+    if (!query) {
+      return null;
+    }
+
+    const params = withDefaultParams({
+      query,
+      count: 1,
       locale,
       simulationBehavior: props.simulationBehavior ?? "default",
-      ...withSegmentParams(segment),
-      // sc is required by this endpoint to resolve pricing/availability.
-      sc: segment?.payload?.channel ?? ctx.salesChannel ?? "1",
-    }, STALE)
-    .then((res) => res.json())
-    .catch((error) => {
-      // A missing product resolves to a 404 on the v1 products endpoint;
-      // translate it into a not-found page instead of surfacing the error.
-      if (error instanceof HttpError && error.status === 404) {
-        return null;
-      }
-      throw error;
     });
+    const { products: [firstProduct] } = await searchProducts(
+      ctx,
+      segment,
+      params,
+      toPath(withDefaultFacets([], ctx)),
+    );
+    product = firstProduct;
+  }
 
   // Product not found, return the 404 status code
   if (!product) {
@@ -131,13 +178,12 @@ const loader = async (
       simulationBehavior: props.simulationBehavior ?? "default",
     });
 
-    const result = await vcsDeprecated
-      ["GET /api/intelligent-search/v1/product-search/*facets"]({
-        ...params,
-        ...withSegmentParams(segment),
-        facets: toPath(withDefaultFacets([], ctx)),
-      }, STALE)
-      .then((res) => res.json());
+    const result = await searchProducts(
+      ctx,
+      segment,
+      params,
+      toPath(withDefaultFacets([], ctx)),
+    );
 
     kitItems = result.products;
   }
