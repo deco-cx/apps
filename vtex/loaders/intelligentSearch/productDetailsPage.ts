@@ -11,13 +11,13 @@ import { pageTypesToSeo } from "../../utils/legacy.ts";
 import {
   getSegmentCacheKeyWithoutUTM,
   getSegmentFromBag,
-  withSegmentCookie,
+  withSegmentParams,
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
+import { HttpError } from "../../../utils/http.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type {
   AdvancedLoaderConfig,
-  PageType,
   Product as VTEXProduct,
   SimulationBehavior,
 } from "../../utils/types.ts";
@@ -46,18 +46,6 @@ export interface Props {
    */
   simulationBehavior?: SimulationBehavior;
 }
-
-/**
- * When there's no ?skuId querystring, we need to figure out the product id
- * from the pathname. For this, we use the pageType api
- */
-const getProductID = (page: PageType) => {
-  if (page.pageType !== "Product") {
-    return null;
-  }
-
-  return page.id!;
-};
 
 /**
  * @title Product Details Page - Intelligent Search
@@ -93,36 +81,38 @@ const loader = async (
 
   const url = new URL(baseUrl);
   const skuId = url.searchParams.get("skuId");
-  const productId = !skuId && getProductID(await pageTypePromise);
 
-  /**
-   * Fetch the exact skuId. If no one was provided, try fetching the product
-   * and return the first sku
-   */
-  const query = skuId
-    ? `sku:${skuId}`
-    : productId
-    ? `product:${productId}`
-    : null;
+  // The v1 Intelligent Search exposes a dedicated single-product endpoint.
+  // Look it up by SKU when a skuId is present in the URL, otherwise by slug —
+  // no need to resolve the productId from the pageType API anymore.
+  const [field, value] = skuId
+    ? (["sku", skuId] as const)
+    : (["slug", lowercaseSlug] as const);
 
-  // In case we dont have the skuId or the productId, 404
-  if (!query) {
+  // Without a skuId or a slug there is nothing to look up, 404
+  if (!value) {
     return null;
   }
 
-  const facets = withDefaultFacets([], ctx);
-  const params = withDefaultParams({
-    query,
-    count: 1,
-    locale,
-    simulationBehavior: props.simulationBehavior ?? "default",
-  });
-  const { products: [product] } = await vcsDeprecated
-    ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
-      ...params,
-      facets: toPath(facets),
-    }, { ...STALE, headers: withSegmentCookie(segment) })
-    .then((res) => res.json());
+  const product = await vcsDeprecated
+    ["GET /api/intelligent-search/v1/products"]({
+      field,
+      value,
+      locale,
+      simulationBehavior: props.simulationBehavior ?? "default",
+      ...withSegmentParams(segment),
+      // sc is required by this endpoint to resolve pricing/availability.
+      sc: segment?.payload?.channel ?? ctx.salesChannel ?? "1",
+    }, STALE)
+    .then((res) => res.json())
+    .catch((error) => {
+      // A missing product resolves to a 404 on the v1 products endpoint;
+      // translate it into a not-found page instead of surfacing the error.
+      if (error instanceof HttpError && error.status === 404) {
+        return null;
+      }
+      throw error;
+    });
 
   // Product not found, return the 404 status code
   if (!product) {
@@ -133,6 +123,8 @@ const loader = async (
 
   let kitItems: VTEXProduct[] = [];
   if (sku.isKit && sku.kitItems) {
+    // Kit components are a multi-SKU lookup, which the single-product endpoint
+    // does not support, so it stays on the product_search pipeline.
     const params = withDefaultParams({
       query: `sku:${sku.kitItems.join(";")}`,
       count: sku.kitItems.length,
@@ -140,10 +132,11 @@ const loader = async (
     });
 
     const result = await vcsDeprecated
-      ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+      ["GET /api/intelligent-search/v1/product-search/*facets"]({
         ...params,
-        facets: toPath(facets),
-      }, { ...STALE, headers: withSegmentCookie(segment) })
+        ...withSegmentParams(segment),
+        facets: toPath(withDefaultFacets([], ctx)),
+      }, STALE)
       .then((res) => res.json());
 
     kitItems = result.products;

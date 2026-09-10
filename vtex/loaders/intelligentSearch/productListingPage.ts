@@ -17,7 +17,7 @@ import {
 import {
   getSegmentCacheKeyWithoutUTM,
   getSegmentFromBag,
-  withSegmentCookie,
+  withSegmentParams,
 } from "../../utils/segment.ts";
 import { pageTypesFromUrl } from "../../utils/intelligentSearch.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
@@ -313,20 +313,20 @@ const loader = async (
     ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   const params = withDefaultParams({ ...searchArgs, page, locale });
+  const segmentParams = withSegmentParams(segment);
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
     vcsDeprecated
-      ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+      ["GET /api/intelligent-search/v1/product-search/*facets"]({
         ...params,
+        ...segmentParams,
         facets: toPath(selected),
-      }, {
-        ...STALE,
-        headers: segment ? withSegmentCookie(segment) : undefined,
-      }).then((res) => res.json()),
-    vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
+      }, STALE).then((res) => res.json()),
+    vcsDeprecated["GET /api/intelligent-search/v1/facets/*facets"]({
       ...params,
+      ...segmentParams,
       facets: toPath(fselected),
-    }, { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined })
+    }, STALE)
       .then((res) => res.json()),
   ]);
 

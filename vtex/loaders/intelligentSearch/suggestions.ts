@@ -9,7 +9,7 @@ import {
 import {
   getSegmentCacheKeyWithoutUTM,
   getSegmentFromBag,
-  withSegmentCookie,
+  withSegmentParams,
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
@@ -52,19 +52,15 @@ const loaders = async (
     ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   const suggestions = () =>
-    vcsDeprecated["GET /api/io/_v/api/intelligent-search/search_suggestions"]({
+    vcsDeprecated["GET /api/intelligent-search/v1/search-suggestions"]({
       locale,
       query: query ?? "",
-    }, {
-      // Not adding suggestions to cache since queries are very spread out
-      // deco: { cache: "stale-while-revalidate" },
-      headers: withSegmentCookie(segment),
     }).then((res) => res.json());
 
   const topSearches = () =>
-    vcsDeprecated["GET /api/io/_v/api/intelligent-search/top_searches"]({
+    vcsDeprecated["GET /api/intelligent-search/v1/top-searches"]({
       locale,
-    }, { ...STALE, headers: withSegmentCookie(segment) })
+    }, STALE)
       .then((res) => res.json());
 
   const productSearch = () => {
@@ -72,10 +68,11 @@ const loaders = async (
     const params = withDefaultParams({ query, count: count ?? 4, locale });
 
     return vcsDeprecated
-      ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+      ["GET /api/intelligent-search/v1/product-search/*facets"]({
         ...params,
+        ...withSegmentParams(segment),
         facets: toPath(facets),
-      }, { ...STALE, headers: withSegmentCookie(segment) })
+      }, STALE)
       .then((res) => res.json());
   };
 

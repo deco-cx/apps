@@ -10,7 +10,7 @@ import {
 import {
   getSegmentCacheKeyWithoutUTM,
   getSegmentFromBag,
-  withSegmentCookie,
+  withSegmentParams,
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { sortProducts, toProduct } from "../../utils/transform.ts";
@@ -229,10 +229,11 @@ const loader = async (
   const facets = withDefaultFacets(selectedFacets, ctx);
 
   const { products: vtexProducts } = await vcsDeprecated
-    ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+    ["GET /api/intelligent-search/v1/product-search/*facets"]({
       ...params,
+      ...withSegmentParams(segment),
       facets: toPath(facets),
-    }, { ...STALE, headers: withSegmentCookie(segment) })
+    }, STALE)
     .then((res) => res.json());
 
   const options = {
