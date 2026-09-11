@@ -1,7 +1,8 @@
+import { RichText } from "../../../admin/widgets.ts";
 import { sanitizeHtml } from "../../utils/sanitizeHtml.ts";
 
 export interface Props {
-  items: string;
+  items: RichText;
   style?: "ordered" | "unordered";
 }
 
