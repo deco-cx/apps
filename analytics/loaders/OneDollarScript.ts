@@ -54,8 +54,18 @@ const snippet = () => {
   const flags: Record<string, string | boolean> = {};
   _flags.forEach((flag) => flags[flag.name] = flag.value);
   const trackPageview = () => globalThis.window.stonks?.view?.(flags);
-  // First load
-  trackPageview();
+  // The tracker script is async, so `stonks` may not be defined yet when this
+  // runs. Fire the first pageview as soon as the tracker is ready (or right
+  // now if it already loaded) so the landing pageview is never dropped.
+  if (globalThis.window.stonks) {
+    trackPageview();
+  } else {
+    document.getElementById("tracker")?.addEventListener(
+      "load",
+      trackPageview,
+      { once: true },
+    );
+  }
   // Attach pushState and popState listeners
   const originalPushState = history.pushState;
   if (originalPushState) {
