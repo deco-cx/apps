@@ -77,6 +77,7 @@ const loader = (props: Props): Script => {
     const preconnectLink =
       `<link rel="preconnect" href="${collector}" crossorigin="anonymous" />`;
     const trackerScript = `<script
+        async
         id="tracker"
         data-autocollect="false"
         data-hash-routing="true"

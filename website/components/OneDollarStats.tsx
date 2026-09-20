@@ -100,7 +100,7 @@ function Component({ collectorAddress, staticScriptUrl }: Props) {
         crossOrigin="anonymous"
       />
       <script
-        defer
+        async
         id="tracker"
         data-autocollect="false"
         data-hash-routing="true"
