@@ -213,6 +213,15 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     return optimizeVTEX(opts);
   }
 
+  // Domains not authorized in the decoims.com CDN allowlist return 403.
+  // Serve these URLs directly until the domain is added to the CDN config.
+  const UNALLOWED_CDN_DOMAINS = [
+    "https://static.tradesquash.com",
+  ];
+  if (UNALLOWED_CDN_DOMAINS.some((d) => originalSrc.startsWith(d))) {
+    return originalSrc;
+  }
+
   if (bypassDecoImageOptimization()) {
     return originalSrc;
   }
