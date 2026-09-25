@@ -59,8 +59,32 @@ const snippet = (live: Live) => {
       globalThis.window.location.href = `${href}`;
     }
   };
+  const TRUSTED_ORIGINS = [
+    "https://deco.cx",
+    "https://admin.deco.cx",
+    "https://play.deco.cx",
+    "https://admin-cx.deco.page",
+    "https://deco.chat",
+    "https://admin.decocms.com",
+    "https://decocms.com",
+    "https://studio.decocms.com",
+  ];
+  const isTrustedOrigin = (origin: string) =>
+    TRUSTED_ORIGINS.indexOf(origin) !== -1 ||
+    (origin.startsWith("https://") && origin.endsWith(".deco.cx")) ||
+    origin === globalThis.window.location.origin;
+
   const onMessage = (event: MessageEvent<EditorEvent>) => {
+    if (!isTrustedOrigin(event.origin)) {
+      return;
+    }
     const { data } = event;
+    if (
+      typeof data !== "object" || data === null ||
+      typeof (data as { type?: unknown }).type !== "string"
+    ) {
+      return;
+    }
     switch (data.type) {
       case "editor::inject": {
         return eval(data.args.script);
