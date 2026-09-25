@@ -35,7 +35,7 @@ async function loader(
   ctx: AppContext,
 ): Promise<Payment[]> {
   const { io } = ctx;
-  const { cookie, payload } = parseCookie(req.headers, ctx.account);
+  const { cookie, payload } = parseCookie(req.headers);
 
   if (!payload?.sub || !payload?.userId) {
     throw new Error("User cookie is invalid");

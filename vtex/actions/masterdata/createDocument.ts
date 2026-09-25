@@ -22,7 +22,7 @@ const action = async (
 ): Promise<CreateNewDocument> => {
   const { vcs, vcsDeprecated } = ctx;
   const { data, acronym, isPrivateEntity, schema } = props;
-  const { cookie } = parseCookie(req.headers, ctx.account);
+  const { cookie } = parseCookie(req.headers);
 
   const requestOptions = {
     body: data,

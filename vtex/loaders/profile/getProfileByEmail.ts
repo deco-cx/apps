@@ -16,7 +16,7 @@ export async function loader(
   ctx: AppContext,
 ) {
   const { vcs } = ctx;
-  const { cookie } = parseCookie(req.headers, ctx.account);
+  const { cookie } = parseCookie(req.headers);
 
   const response = await vcs["GET /api/checkout/pub/profiles"]({
     email,

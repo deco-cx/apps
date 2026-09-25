@@ -12,7 +12,7 @@ export default async function action(
   ctx: AppContext,
 ) {
   const cookies = getCookies(req.headers);
-  const { payload } = parseCookie(req.headers, ctx.account);
+  const { payload } = parseCookie(req.headers);
 
   for (const cookieName in cookies) {
     if (cookieName.startsWith("VtexIdclientAutCookie")) {

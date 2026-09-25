@@ -1,6 +1,6 @@
 import { AppContext } from "../../mod.ts";
 import { proxySetCookie } from "../../utils/cookies.ts";
-import { parseCookie } from "../../utils/orderForm.ts";
+import { parseCookieWithoutAuth } from "../../utils/orderForm.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
 import type { OrderForm } from "../../utils/types.ts";
 import { forceHttpsOnAssets } from "../../utils/transform.ts";
@@ -33,8 +33,7 @@ const action = async (
     orderItems,
     allowedOutdatedData = ["paymentData"],
   } = props;
-  const { orderFormId } = parseCookie(req.headers);
-  const cookie = req.headers.get("cookie") ?? "";
+  const { orderFormId, cookie } = parseCookieWithoutAuth(req.headers);
   const segment = getSegmentFromBag(ctx);
 
   try {

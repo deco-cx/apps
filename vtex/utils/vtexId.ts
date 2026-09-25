@@ -15,6 +15,7 @@ interface CookiePayload {
 
 export const parseAuthCookie = (headers: Headers) => {
   const cookies = getCookies(headers);
+
   const token = cookies[VTEX_ID_CLIENT_COOKIE] ||
     Object.entries(cookies).find(([k]) =>
       k.startsWith(`${VTEX_ID_CLIENT_COOKIE}_`)
@@ -26,24 +27,23 @@ export const parseAuthCookie = (headers: Headers) => {
   return decoded?.[1] as CookiePayload | undefined ?? null;
 };
 
-export const parseCookie = (headers: Headers, account: string) => {
+export const parseCookie = (headers: Headers) => {
   const cookies = getCookies(headers);
-  const cookie = cookies[VTEX_ID_CLIENT_COOKIE] ||
-    cookies[`${VTEX_ID_CLIENT_COOKIE}_${account}`];
-  const decoded = cookie ? decode(cookie) : null;
 
+  const authCookieName = Object.keys(cookies)
+    .toSorted((a, z) => a.length - z.length)
+    .find((cookieName) => cookieName.startsWith("VtexIdclientAutCookie"));
+
+  if (!authCookieName) {
+    return { cookie: "", payload: undefined };
+  }
+
+  const cookie = cookies[authCookieName];
+  const decoded = cookie ? decode(cookie) : null;
   const payload = decoded?.[1] as CookiePayload | undefined;
 
   return {
-    cookie: stringify({
-      ...(cookies[VTEX_ID_CLIENT_COOKIE] &&
-        { [VTEX_ID_CLIENT_COOKIE]: cookies[VTEX_ID_CLIENT_COOKIE] }),
-      ...(cookies[`${VTEX_ID_CLIENT_COOKIE}_${account}`] &&
-        {
-          [`${VTEX_ID_CLIENT_COOKIE}_${account}`]:
-            cookies[`${VTEX_ID_CLIENT_COOKIE}_${account}`],
-        }),
-    }),
+    cookie: stringify({ [authCookieName]: cookie }),
     payload,
   };
 };
