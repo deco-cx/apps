@@ -1,7 +1,17 @@
-import { BlogPost } from "../types.ts";
+import { logger } from "@deco/deco/o11y";
+import { BlogPost, Category } from "../types.ts";
 import { CSS } from "../static/css.ts";
 import { renderSection } from "../../website/pages/Page.tsx";
 import { AppContext } from "../mod.ts";
+import { getRecordsByPath } from "../core/records.ts";
+import {
+  ancestorsOf,
+  categoryPathname,
+  indexCategories,
+} from "../core/categoryTree.ts";
+
+const CATEGORIES_PATH = "collections/blog/categories";
+const CATEGORY_ACCESSOR = "category";
 
 export interface Props {
   post: BlogPost | null;
@@ -10,7 +20,9 @@ export interface Props {
 const iframeStyle = "width:100%;height:100%;border:none;height:100vh;";
 
 export default function Template(
-  { post, pageSlug, categorySlug }: ReturnType<typeof loader>,
+  { post, pageSlug, categorySlug, postCategorySlug }: Awaited<
+    ReturnType<typeof loader>
+  >,
 ) {
   if (!post) return null;
 
@@ -23,14 +35,11 @@ export default function Template(
     alt,
     sections,
     slug,
-    categories,
   } = post;
-
-  const postCategorySlug = categories?.[0]?.slug ?? "";
 
   if (pageSlug) {
     const resolvedUrl = pageSlug
-      .replace(":category", postCategorySlug)
+      .replace(/:category\*?/, postCategorySlug)
       .replace(":slug", slug);
 
     return (
@@ -42,7 +51,7 @@ export default function Template(
   }
 
   if (categorySlug) {
-    const resolvedUrl = categorySlug.replace(":category", postCategorySlug);
+    const resolvedUrl = categorySlug.replace(/:category\*?/, postCategorySlug);
 
     return (
       <iframe
@@ -84,10 +93,34 @@ export default function Template(
   );
 }
 
-export const loader = (props: Props, _req: Request, ctx: AppContext) => {
+export const loader = async (props: Props, _req: Request, ctx: AppContext) => {
+  // The preview iframe has to hit the real URL, and a subcategory's URL carries
+  // its whole ancestor path.
+  const primarySlug = props.post?.categories?.[0]?.slug;
+  let postCategorySlug = typeof primarySlug === "string" ? primarySlug : "";
+
+  if (postCategorySlug) {
+    // A broken categories collection must not take the preview down with it —
+    // the flat slug still renders something useful.
+    try {
+      const categories = await getRecordsByPath<Category>(
+        ctx,
+        CATEGORIES_PATH,
+        CATEGORY_ACCESSOR,
+      );
+      const chain = ancestorsOf(postCategorySlug, indexCategories(categories));
+      if (chain?.length) {
+        postCategorySlug = categoryPathname(chain);
+      }
+    } catch (e) {
+      logger.error(e);
+    }
+  }
+
   return {
     ...props,
     pageSlug: ctx.pageSlug,
     categorySlug: ctx.categorySlug,
+    postCategorySlug,
   };
 };

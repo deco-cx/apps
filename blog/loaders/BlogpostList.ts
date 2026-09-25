@@ -12,9 +12,13 @@ import { AppContext } from "../mod.ts";
 import { BlogPost, SortBy } from "../types.ts";
 import handlePosts, { slicePosts } from "../core/handlePosts.ts";
 import { getRecordsByPath } from "../core/records.ts";
+import { descendantSlugs } from "../core/categoryTree.ts";
+import { Category } from "../types.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
+const CATEGORIES_PATH = "collections/blog/categories";
+const CATEGORY_ACCESSOR = "category";
 
 export interface Props {
   /**
@@ -29,7 +33,9 @@ export interface Props {
   page?: number;
   /**
    * @title Category Slug
-   * @description Filter by a specific category slug.
+   * @description Filter by a category slug. May be a full path
+   * ("parent/child"); posts of every subcategory below the last segment are
+   * included.
    */
   slug?: RequestURLParam;
   /**
@@ -76,11 +82,29 @@ export default async function BlogPostList(
   );
 
   try {
+    // A parent category also lists its descendants' posts, so the slug expands
+    // into the whole subtree below it.
+    const leafSlug = (slug ?? "").split("/").filter(Boolean).pop();
+    let categorySlugs: string | string[] | undefined = leafSlug;
+
+    if (leafSlug && !postSlugs?.length) {
+      try {
+        const categories = await getRecordsByPath<Category>(
+          ctx,
+          CATEGORIES_PATH,
+          CATEGORY_ACCESSOR,
+        );
+        categorySlugs = descendantSlugs(leafSlug, categories);
+      } catch (e) {
+        logger.error(e);
+      }
+    }
+
     const handledPosts = await handlePosts(
       posts,
       pageSort,
       ctx,
-      slug,
+      categorySlugs,
       postSlugs,
       term,
     );
