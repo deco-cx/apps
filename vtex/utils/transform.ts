@@ -1135,7 +1135,7 @@ export const sortProducts = (
     productMap[product[prop] || product["sku"]] = product;
   });
 
-  return orderOfIdsOrSkus.map((id) => productMap[id]);
+  return orderOfIdsOrSkus.map((id) => productMap[id]).filter(Boolean);
 };
 
 export const parsePageType = (p: PageTypeVTEX): PageType => {
