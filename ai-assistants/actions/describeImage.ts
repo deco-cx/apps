@@ -1,23 +1,17 @@
 import { AssistantIds } from "../types.ts";
 import { AppContext } from "../mod.ts";
-import { logger, meter, ValueType } from "@deco/deco/o11y";
+import { logger } from "@deco/deco/o11y";
 import { shortcircuit } from "@deco/deco";
-
-const stats = {
-  promptTokens: meter.createHistogram("assistant_image_prompt_tokens", {
-    description: "Tokens used in Sales Assistant Describe Image Input - OpenAI",
-    valueType: ValueType.INT,
-  }),
-  completionTokens: meter.createHistogram("assistant_image_completion_tokens", {
-    description:
-      "Tokens used in Sales Assistant Describe Image Output - OpenAI",
-    valueType: ValueType.INT,
-  }),
-  describeImageError: meter.createCounter("assistant_describe_image_error", {
-    unit: "1",
-    valueType: ValueType.INT,
-  }),
-};
+import {
+  ATTR_ASSISTANT_ID,
+  ATTR_ASSISTANT_OPERATION,
+  GEN_AI_SYSTEM,
+  GEN_AI_SYSTEM_OPENAI,
+  GEN_AI_TOKEN_TYPE,
+  GEN_AI_TOKEN_TYPE_INPUT,
+  GEN_AI_TOKEN_TYPE_OUTPUT,
+  stats,
+} from "../observability.ts";
 export interface DescribeImageProps {
   uploadURL: string;
   userPrompt: string;
@@ -71,11 +65,15 @@ export default async function describeImage(
       response: JSON.stringify(response),
       props: describeImageProps,
     });
-    stats.promptTokens.record(response.usage?.prompt_tokens ?? 0, {
-      assistant_id: assistantId,
+    stats.tokenUsage.record(response.usage?.prompt_tokens ?? 0, {
+      [GEN_AI_SYSTEM]: GEN_AI_SYSTEM_OPENAI,
+      [GEN_AI_TOKEN_TYPE]: GEN_AI_TOKEN_TYPE_INPUT,
+      [ATTR_ASSISTANT_ID]: assistantId,
     });
-    stats.completionTokens.record(response.usage?.completion_tokens ?? 0, {
-      assistant_id: assistantId,
+    stats.tokenUsage.record(response.usage?.completion_tokens ?? 0, {
+      [GEN_AI_SYSTEM]: GEN_AI_SYSTEM_OPENAI,
+      [GEN_AI_TOKEN_TYPE]: GEN_AI_TOKEN_TYPE_OUTPUT,
+      [ATTR_ASSISTANT_ID]: assistantId,
     });
     return response;
   } catch (error) {
@@ -84,8 +82,9 @@ export default async function describeImage(
       status: number;
       headers: Headers;
     };
-    stats.describeImageError.add(1, {
-      assistantId,
+    stats.errors.add(1, {
+      [ATTR_ASSISTANT_OPERATION]: "describe_image",
+      [ATTR_ASSISTANT_ID]: assistantId,
     });
     shortcircuit(
       new Response(JSON.stringify({ error: errorObj.error.message }), {
