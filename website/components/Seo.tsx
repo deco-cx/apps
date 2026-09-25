@@ -7,7 +7,7 @@ export const renderTemplateString = (template: string, value: string) =>
   template.replace("%s", value);
 
 export type SEOSection = JSX.Element;
-export type OGType = "website" | "article";
+export type OGType = "website" | "article" | "product";
 
 export interface Props {
   title?: string;
