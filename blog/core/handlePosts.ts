@@ -100,12 +100,21 @@ export const sortPosts = async (
  * Returns an filtered BlogPost list
  *
  * @param posts Posts to be handled
- * @param slug Category Slug to be filter
+ * @param slug Category slug, or a list of slugs a post may belong to any of.
+ *   A list is how a parent category pulls in its descendants' posts.
  */
-export const filterPostsByCategory = (posts: BlogPost[], slug?: string) =>
-  slug
-    ? posts.filter(({ categories }) => categories?.find((c) => c.slug === slug))
-    : posts;
+export const filterPostsByCategory = (
+  posts: BlogPost[],
+  slug?: string | string[],
+) => {
+  if (!slug || (Array.isArray(slug) && slug.length === 0)) {
+    return posts;
+  }
+  const slugs = new Set(Array.isArray(slug) ? slug : [slug]);
+  return posts.filter(({ categories }) =>
+    categories?.some((c) => slugs.has(c?.slug))
+  );
+};
 
 /**
  * Returns an filtered BlogPost list by specific slugs
@@ -138,10 +147,7 @@ export const filterPostsByTerm = (posts: BlogPost[], term: string) =>
 export const filterRelatedPosts = (
   posts: BlogPost[],
   slug: string[],
-) =>
-  posts.filter(
-    ({ categories }) => categories?.find((c) => slug.includes(c.slug)),
-  );
+) => filterPostsByCategory(posts, slug);
 
 /**
  * Returns an filtered and sorted BlogPost list
@@ -187,21 +193,11 @@ const filterPosts = (
 ): BlogPost[] => {
   const posts = filterRoutablePosts(allPosts);
 
-  if (typeof slug === "string") {
-    const firstFilter = postSlugs && postSlugs.length > 0
-      ? filterPostsBySlugs(posts, postSlugs)
-      : filterPostsByCategory(posts, slug);
+  const byCategory = postSlugs && postSlugs.length > 0
+    ? filterPostsBySlugs(posts, postSlugs)
+    : filterPostsByCategory(posts, slug);
 
-    const filteredByTerm = term
-      ? filterPostsByTerm(firstFilter, term)
-      : firstFilter;
-    return filteredByTerm;
-  }
-  if (Array.isArray(slug)) {
-    return filterRelatedPosts(posts, slug);
-  }
-
-  return term ? filterPostsByTerm(posts, term) : posts;
+  return term ? filterPostsByTerm(byCategory, term) : byCategory;
 };
 
 /**

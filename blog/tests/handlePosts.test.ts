@@ -1,5 +1,8 @@
 import { assertEquals } from "@std/assert";
-import { filterRoutablePosts } from "../core/handlePosts.ts";
+import {
+  filterPostsByCategory,
+  filterRoutablePosts,
+} from "../core/handlePosts.ts";
 import { BlogPost, isPublishedStatus } from "../types.ts";
 
 const post = (
@@ -162,4 +165,32 @@ Deno.test("an offset-less instant is read as UTC, not as server local time", () 
   const twoHoursAgo = fromNow(-2 * 60 * 60 * 1000).replace("Z", "");
 
   assertEquals(listed([post("due", "scheduled", twoHoursAgo)]), ["due"]);
+});
+
+/**
+ * A parent category lists its descendants' posts by expanding its slug into the
+ * whole subtree, so the category filter has to match on any slug of a list.
+ */
+const inCategory = (slug: string): BlogPost => ({
+  title: slug,
+  excerpt: "",
+  date: "2026-01-01",
+  slug: `post-${slug}`,
+  categories: [{ name: slug, slug }],
+});
+
+Deno.test("a list of category slugs matches a post in any of them", () => {
+  const posts = [inCategory("root"), inCategory("child"), inCategory("other")];
+
+  assertEquals(
+    filterPostsByCategory(posts, ["root", "child"]).map(({ slug }) => slug),
+    ["post-root", "post-child"],
+  );
+  assertEquals(
+    filterPostsByCategory(posts, "child").map(({ slug }) => slug),
+    ["post-child"],
+  );
+  // No slug at all means no category filter, same as before.
+  assertEquals(filterPostsByCategory(posts, []).length, 3);
+  assertEquals(filterPostsByCategory(posts).length, 3);
 });

@@ -13,6 +13,12 @@ import { AppContext } from "../mod.ts";
 import { BlogPost, BlogPostListingPage, Category, SortBy } from "../types.ts";
 import handlePosts, { slicePosts } from "../core/handlePosts.ts";
 import { getRecordsByPath } from "../core/records.ts";
+import {
+  ancestorsOf,
+  descendantSlugs,
+  indexCategories,
+  withCategoryPath,
+} from "../core/categoryTree.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
@@ -22,7 +28,9 @@ const CATEGORY_ACCESSOR = "category";
 export interface Props {
   /**
    * @title Category Slug
-   * @description Filter by a specific category slug.
+   * @description Filter by a category slug. May be a full path ("parent/child")
+   * when the listing route is a catch-all; posts of every subcategory below the
+   * last segment are included.
    */
   slug?: RequestURLParam;
   /**
@@ -74,11 +82,32 @@ export default async function BlogPostList(
   );
 
   try {
+    let categories: Category[] | null = null;
+    try {
+      categories = await loadCategories(ctx);
+    } catch (e) {
+      logger.error(e);
+    }
+
+    // The slug prop carries the whole category path ("pai/filho") when the
+    // site routes the listing as a catch-all; only the leaf identifies the
+    // category, the segments before it are its ancestors.
+    const requestedSegments = (slug ?? "").split("/").filter(Boolean);
+    const leafSlug = requestedSegments[requestedSegments.length - 1];
+
+    const index = indexCategories(categories);
+    const chain = leafSlug ? ancestorsOf(leafSlug, index) : null;
+
+    // A parent lists its own posts plus every descendant's.
+    const categorySlugs = leafSlug
+      ? descendantSlugs(leafSlug, categories)
+      : undefined;
+
     const handledPosts = await handlePosts(
       posts,
       pageSort,
       ctx,
-      slug,
+      categorySlugs,
       undefined,
       term,
     );
@@ -93,36 +122,32 @@ export default async function BlogPostList(
       return null;
     }
 
-    let categories: Category[] | null = null;
-    try {
-      categories = await loadCategories(ctx);
-    } catch (e) {
-      logger.error(e);
+    let category: Category | null = null;
+    if (leafSlug) {
+      // The category may not be a record yet — fall back to the copy embedded
+      // in a post, as before.
+      category = chain?.[chain.length - 1] ??
+        slicedPosts[0]?.categories?.find((c) => c?.slug === leafSlug) ?? null;
     }
 
-    let category: Category | null = null;
-    if (slug) {
-      category = categories?.find((c) => c.slug === slug) ?? null;
-      if (!category) {
-        try {
-          category = await loadCategoryBySlug(ctx, slug);
-        } catch (e) {
-          logger.error(e);
-        }
-      }
-      category ??= slicedPosts[0]?.categories?.find((c) => c.slug === slug) ??
-        null;
-    }
+    const categoryPath = chain ?? (category ? [category] : null);
 
     return {
       posts: slicedPosts,
       category,
       categories,
+      categoryPath,
       pageInfo: toPageInfo(handledPosts, postsPerPage, pageNumber, params),
       seo: {
         title: category?.name ?? "",
         description: category?.description,
-        canonical: new URL(url.pathname, url.origin).href,
+        // Reached through a stale or wrong path, the page still renders and
+        // points at the one canonical URL instead of 404ing.
+        canonical: categoryPath?.length
+          ? withCategoryPath(url, categoryPath, {
+            strip: requestedSegments.length,
+          })
+          : new URL(url.pathname, url.origin).href,
       },
     };
   } catch (e) {
@@ -174,21 +199,4 @@ const loadCategories = async (ctx: AppContext): Promise<Category[]> => {
       typeof c?.slug === "string" && c.slug.length > 0
     )
     .sort((a, b) => a.name.localeCompare(b.name));
-};
-
-const loadCategoryBySlug = async (
-  ctx: AppContext,
-  slug: string,
-): Promise<Category | null> => {
-  const categories = await getRecordsByPath<Category>(
-    ctx,
-    CATEGORIES_PATH,
-    CATEGORY_ACCESSOR,
-  );
-
-  return (categories ?? []).find((c) =>
-    typeof c?.name === "string" && c.name.length > 0 &&
-    typeof c?.slug === "string" && c.slug.length > 0 &&
-    c.slug === slug
-  ) ?? null;
 };

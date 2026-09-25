@@ -26,6 +26,11 @@ export interface Category {
   slug: string;
   description?: string;
   /**
+   * @title Parent category
+   * @description Slug of the parent category. Leave empty for a root category.
+   */
+  parentSlug?: string;
+  /**
    * @title Sections
    * @label hidden
    * @changeable true
@@ -206,6 +211,11 @@ export interface Publisher {
 export interface BlogPostPage {
   "@type": "BlogPostPage";
   post: BlogPost;
+  /**
+   * @title Category path
+   * @description Ancestor chain of the post's primary category, root first.
+   */
+  categories?: Category[] | null;
   seo?: Seo | null;
 }
 
@@ -223,6 +233,11 @@ export interface BlogPostListingPage {
   category?: Category | null;
   /** @title Categories */
   categories?: Category[] | null;
+  /**
+   * @title Category path
+   * @description Ancestor chain of the active category, root first.
+   */
+  categoryPath?: Category[] | null;
   pageInfo: PageInfo;
   seo: Seo;
 }
