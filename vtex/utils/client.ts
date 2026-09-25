@@ -16,14 +16,41 @@ import {
   OrderFormOrder,
   PageType,
   PortalSuggestion,
+  Product,
   ProductSearchResult,
   SelectableGifts,
+  SimulationBehavior,
   SimulationItem,
   SimulationOrderForm,
   SPEvent,
   StartAuthentication,
   Suggestion,
 } from "./types.ts";
+
+/**
+ * Context parameters for the Intelligent Search API v1.
+ *
+ * Unlike the legacy API, v1 no longer reads the `vtex_segment` cookie: locale,
+ * sales channel, region and marketing context must be sent explicitly as query
+ * parameters.
+ *
+ * @see https://developers.vtex.com/updates/release-notes/2026-07-08-new-intelligent-search-api-v1
+ */
+export interface IntelligentSearchContext {
+  /** @description BCP 47 language code, e.g. pt-BR */
+  locale?: string;
+  /** @description Sales channel (trade policy) ID */
+  sc?: string;
+  /** @description Region ID for regionalized results */
+  regionId?: string;
+  /** @description Three-letter country code (ISO 3166 ALPHA-3), e.g. BRA */
+  country?: string;
+  utmSource?: string;
+  utmCampaign?: string;
+  utmiCampaign?: string;
+  campaigns?: string;
+  priceTables?: string;
+}
 
 export interface VTEXCommerceStable {
   "GET /api/vtexid/pub/authentication/start": {
@@ -137,6 +164,8 @@ export interface VTEXCommerceStable {
     };
   };
   "GET /api/catalog_system/pub/category/tree/:level": { response: Category[] };
+  // Legacy Intelligent Search endpoints. Kept alongside the v1 routes so the
+  // `intelligentSearchV1` app flag can fall back to them.
   "GET /api/io/_v/api/intelligent-search/search_suggestions": {
     response: Suggestion;
     searchParams: { locale: string; query: string };
@@ -168,6 +197,55 @@ export interface VTEXCommerceStable {
       locale?: string;
       hideUnavailableItems: boolean;
     };
+  };
+  "GET /api/intelligent-search/v1/search-suggestions": {
+    response: Suggestion;
+    searchParams: { locale: string; query: string };
+  };
+  "GET /api/intelligent-search/v1/top-searches": {
+    response: Suggestion;
+    searchParams: { locale: string };
+  };
+  "GET /api/intelligent-search/v1/product-search/*facets": {
+    response: ProductSearchResult;
+    searchParams:
+      & {
+        page: number;
+        count: number;
+        query?: string;
+        sort?: string;
+        fuzzy?: string;
+        hideUnavailableItems: boolean;
+      }
+      & IntelligentSearchContext;
+  };
+  "GET /api/intelligent-search/v1/facets/*facets": {
+    response: FacetSearchResult;
+    searchParams:
+      & {
+        page: number;
+        count: number;
+        query?: string;
+        sort?: string;
+        fuzzy?: string;
+        hideUnavailableItems: boolean;
+      }
+      & IntelligentSearchContext;
+  };
+  // Dedicated single-product lookup introduced by the Intelligent Search API v1,
+  // replacing the `product_search` + `product:`/`sku:` pipeline for PDPs.
+  "GET /api/intelligent-search/v1/products": {
+    response: Product;
+    searchParams:
+      & {
+        /** @description Identifier value to look up, interpreted per `field`. */
+        value: string;
+        /** @description Which identifier `value` represents. Defaults to `id`. */
+        field?: "id" | "slug" | "ean" | "sku" | "reference";
+        hideUnavailableItems?: boolean;
+        simulationBehavior?: SimulationBehavior;
+      }
+      & IntelligentSearchContext;
   };
 
   "GET /api/checkout/changeToAnonymousUser/:orderFormId": {
