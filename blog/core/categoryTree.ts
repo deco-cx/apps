@@ -41,9 +41,14 @@ const parentOf = (
 
 /**
  * The ancestor chain of `slug`, root first and the category itself last —
- * exactly the breadcrumb sequence. Returns null when the slug is unknown.
- * A dangling `parentSlug`, a self-reference, a cycle or an over-deep chain all
- * stop the walk and yield the truncated chain instead of throwing.
+ * exactly the breadcrumb sequence.
+ *
+ * Returns null whenever the chain cannot be trusted: the slug is unknown, the
+ * walk ran into a cycle, or it went past MAX_CATEGORY_DEPTH. A truncated chain
+ * is worse than none — it would name a breadcrumb and a canonical URL missing
+ * their topmost segments — so callers fall back to the flat behaviour instead.
+ * A dangling `parentSlug` or a self-reference is not an error: the walk just
+ * ends there, treating the category as a root.
  */
 export const ancestorsOf = (
   slug: string,
@@ -58,9 +63,10 @@ export const ancestorsOf = (
   const seen = new Set<string>();
   let current: Category | undefined = start;
 
-  while (
-    current && !seen.has(current.slug) && chain.length < MAX_CATEGORY_DEPTH
-  ) {
+  while (current) {
+    if (seen.has(current.slug) || chain.length >= MAX_CATEGORY_DEPTH) {
+      return null;
+    }
     seen.add(current.slug);
     chain.push(current);
     current = parentOf(current, index);
@@ -128,9 +134,16 @@ export const categoryPathname = (chain: Category[]): string =>
   chain.map((c) => c.slug).join("/");
 
 interface PathOptions {
-  /** How many trailing segments of the request are the category path. */
-  strip?: number;
-  /** Known category slugs, used to find the category segments when `strip` is unknown. */
+  /**
+   * The category segments the router handed the loader. They must be the tail
+   * of the pathname, otherwise the slug was configured by hand and the URL
+   * carries no category to rewrite.
+   */
+  requested?: string[];
+  /**
+   * Known category slugs, for routes that don't hand the category over — the
+   * category segments are the trailing ones that name a real category.
+   */
   knownSlugs?: Set<string>;
   /** Segment that stays at the end of the path — a post slug. */
   trailing?: string;
@@ -142,31 +155,47 @@ interface PathOptions {
  * reaches a child through a stale or wrong path still renders; this is what
  * points its canonical at the one true URL so Google consolidates instead of
  * seeing duplicates.
+ *
+ * Returns null when the URL has no category portion to replace — a route
+ * without a category segment, or a slug that didn't come from the route. The
+ * caller keeps the request URL rather than inventing a path that 404s.
  */
 export const withCategoryPath = (
   url: string | URL,
   chain: Category[],
-  { strip, knownSlugs, trailing }: PathOptions = {},
-): string => {
-  const parsed = new URL(url);
+  { requested, knownSlugs, trailing }: PathOptions = {},
+): string | null => {
   if (chain.length === 0) {
-    return new URL(parsed.pathname, parsed.origin).href;
+    return null;
   }
 
+  const parsed = new URL(url);
   let segments = parsed.pathname.split("/").filter(Boolean);
 
-  if (trailing && segments[segments.length - 1] === trailing) {
+  if (trailing) {
+    if (segments[segments.length - 1] !== trailing) {
+      return null;
+    }
     segments = segments.slice(0, -1);
   }
 
-  if (typeof strip === "number") {
-    segments = strip > 0
-      ? segments.slice(0, Math.max(segments.length - strip, 0))
-      : segments;
+  if (requested) {
+    const size = requested.length;
+    const tail = segments.slice(Math.max(segments.length - size, 0));
+    if (size === 0 || tail.join("/") !== requested.join("/")) {
+      return null;
+    }
+    segments = segments.slice(0, segments.length - size);
   } else if (knownSlugs) {
+    const before = segments.length;
     while (segments.length && knownSlugs.has(segments[segments.length - 1])) {
       segments = segments.slice(0, -1);
     }
+    if (segments.length === before) {
+      return null;
+    }
+  } else {
+    return null;
   }
 
   const pathname = "/" + [

@@ -66,23 +66,24 @@ export default async function BlogPostPageLoader(
     ? ancestorsOf(primarySlug, indexCategories(categories))
     : null;
 
-  const categoryPath = chain ??
-    (post.categories?.[0] ? [post.categories[0]] : null);
+  // Only a chain that came out of the records is trustworthy enough to name a
+  // canonical URL; withCategoryPath itself returns null when the route has no
+  // category segment to replace, so a /blog/:slug site keeps its own URL.
+  const canonical = chain
+    ? withCategoryPath(url, chain, {
+      knownSlugs: new Set(categories.map((c) => c?.slug)),
+      trailing: post.slug,
+    })
+    : null;
 
   return {
     "@type": "BlogPostPage",
     post,
-    categories: categoryPath,
+    categories: chain ?? (post.categories?.[0] ? [post.categories[0]] : null),
     seo: {
       title: post?.seo?.title || post?.title,
       description: post?.seo?.description || post?.excerpt,
-      canonical: post?.seo?.canonical ||
-        (categoryPath?.length
-          ? withCategoryPath(url, categoryPath, {
-            knownSlugs: new Set(categories.map((c) => c?.slug)),
-            trailing: post.slug,
-          })
-          : url.href),
+      canonical: post?.seo?.canonical || canonical || url.href,
       image: post?.seo?.image || post?.image,
       // A post that isn't live yet — unpublished, or scheduled for an instant
       // still ahead — renders anyway, because that page *is* the CMS preview.

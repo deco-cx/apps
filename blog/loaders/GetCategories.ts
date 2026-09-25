@@ -71,16 +71,15 @@ export default async function GetCategories(
     return validCategories.filter((c) => c.slug === slug);
   }
 
-  if (parentSlug) {
-    const children = childrenOf(parentSlug, validCategories);
-    return count ? children.slice(0, count) : children;
-  }
-
   if (!validCategories.length) {
     return null;
   }
 
-  const sortedCategories = validCategories.sort((a, b) => {
+  const scoped = parentSlug
+    ? childrenOf(parentSlug, validCategories)
+    : validCategories;
+
+  const sortedCategories = scoped.sort((a, b) => {
     const comparison = a.name.localeCompare(b.name);
     return sortBy.endsWith("_desc") ? comparison : -comparison;
   });

@@ -1,3 +1,4 @@
+import { logger } from "@deco/deco/o11y";
 import { BlogPost, Category } from "../types.ts";
 import { CSS } from "../static/css.ts";
 import { renderSection } from "../../website/pages/Page.tsx";
@@ -99,14 +100,20 @@ export const loader = async (props: Props, _req: Request, ctx: AppContext) => {
   let postCategorySlug = typeof primarySlug === "string" ? primarySlug : "";
 
   if (postCategorySlug) {
-    const categories = await getRecordsByPath<Category>(
-      ctx,
-      CATEGORIES_PATH,
-      CATEGORY_ACCESSOR,
-    );
-    const chain = ancestorsOf(postCategorySlug, indexCategories(categories));
-    if (chain?.length) {
-      postCategorySlug = categoryPathname(chain);
+    // A broken categories collection must not take the preview down with it —
+    // the flat slug still renders something useful.
+    try {
+      const categories = await getRecordsByPath<Category>(
+        ctx,
+        CATEGORIES_PATH,
+        CATEGORY_ACCESSOR,
+      );
+      const chain = ancestorsOf(postCategorySlug, indexCategories(categories));
+      if (chain?.length) {
+        postCategorySlug = categoryPathname(chain);
+      }
+    } catch (e) {
+      logger.error(e);
     }
   }
 

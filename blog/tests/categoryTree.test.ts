@@ -35,14 +35,12 @@ Deno.test("ancestorsOf returns null for an unknown slug", () => {
   assertEquals(ancestorsOf("ghost", indexCategories([cat("root")])), null);
 });
 
-Deno.test("a cycle truncates the chain instead of looping", () => {
+Deno.test("a cycle yields no chain instead of looping", () => {
   const categories = [cat("a", "b"), cat("b", "a")];
-  // Walking up from `a` reaches `b`, whose parent is `a` again — the visited
-  // set stops there rather than recursing forever.
-  assertEquals(slugsOf(ancestorsOf("a", indexCategories(categories))), [
-    "b",
-    "a",
-  ]);
+  // Walking up from `a` reaches `b`, whose parent is `a` again. The visited set
+  // stops the walk; the chain is reported as unusable rather than truncated,
+  // because a truncated one would name a canonical URL missing its top.
+  assertEquals(ancestorsOf("a", indexCategories(categories)), null);
 });
 
 Deno.test("a self-referencing category is treated as a root", () => {
@@ -58,17 +56,26 @@ Deno.test("a dangling parentSlug stops the walk", () => {
   ]);
 });
 
-Deno.test("an over-deep chain is cut at MAX_CATEGORY_DEPTH", () => {
-  const categories = Array.from(
-    { length: 15 },
-    (_, i) => cat(`c${i}`, i === 0 ? undefined : `c${i - 1}`),
-  );
-  const chain = ancestorsOf("c14", indexCategories(categories));
+Deno.test("a chain deeper than MAX_CATEGORY_DEPTH is rejected", () => {
+  const chainOf = (length: number) =>
+    Array.from(
+      { length },
+      (_, i) => cat(`c${i}`, i === 0 ? undefined : `c${i - 1}`),
+    );
 
-  assertEquals(chain?.length, MAX_CATEGORY_DEPTH);
-  // The cut happens at the far end of the walk, so the category itself is
-  // always the last item — the breadcrumb never loses the page it describes.
-  assertEquals(chain?.[chain.length - 1].slug, "c14");
+  const deepest = chainOf(MAX_CATEGORY_DEPTH);
+  assertEquals(
+    ancestorsOf(`c${MAX_CATEGORY_DEPTH - 1}`, indexCategories(deepest))?.length,
+    MAX_CATEGORY_DEPTH,
+  );
+
+  // One level past the ceiling: reporting the truncated chain would hand the
+  // canonical URL a path missing its topmost segments, so it reports nothing.
+  const tooDeep = chainOf(MAX_CATEGORY_DEPTH + 1);
+  assertEquals(
+    ancestorsOf(`c${MAX_CATEGORY_DEPTH}`, indexCategories(tooDeep)),
+    null,
+  );
 });
 
 Deno.test("duplicated slugs resolve to the first record", () => {
@@ -121,13 +128,36 @@ Deno.test("withCategoryPath rewrites the requested path with the real chain", ()
   // A request that reached the child through a flat path still gets the one
   // canonical URL, so Google consolidates instead of seeing duplicates.
   assertEquals(
-    withCategoryPath("https://x.com/blog/leaf?page=2", chain, { strip: 1 }),
+    withCategoryPath("https://x.com/blog/leaf?page=2", chain, {
+      requested: ["leaf"],
+    }),
     "https://x.com/blog/root/leaf",
   );
   assertEquals(
-    withCategoryPath("https://x.com/blog/wrong/leaf", chain, { strip: 2 }),
+    withCategoryPath("https://x.com/blog/wrong/leaf", chain, {
+      requested: ["wrong", "leaf"],
+    }),
     "https://x.com/blog/root/leaf",
   );
+});
+
+Deno.test("withCategoryPath declines when the slug isn't in the path", () => {
+  const chain = [cat("root"), cat("leaf", "root")];
+
+  // A listing hardcoded to a category on a plain /blog route: the pathname has
+  // no category segment, so rewriting it would strip the route prefix and
+  // point the canonical at a page that doesn't exist.
+  assertEquals(
+    withCategoryPath("https://x.com/blog", chain, { requested: ["leaf"] }),
+    null,
+  );
+  assertEquals(
+    withCategoryPath("https://x.com/blog/other", chain, {
+      requested: ["leaf"],
+    }),
+    null,
+  );
+  assertEquals(withCategoryPath("https://x.com/blog/leaf", chain, {}), null);
 });
 
 Deno.test("withCategoryPath keeps a trailing post slug", () => {
@@ -141,18 +171,31 @@ Deno.test("withCategoryPath keeps a trailing post slug", () => {
     }),
     "https://x.com/blog/root/leaf/my-post",
   );
+  // A post route with no category segment keeps its own URL: injecting the
+  // chain would canonicalize to a path the site never serves.
   assertEquals(
     withCategoryPath("https://x.com/blog/my-post", chain, {
       knownSlugs,
       trailing: "my-post",
     }),
-    "https://x.com/blog/root/leaf/my-post",
+    null,
+  );
+  // The categories collection failed to load, so nothing is a known slug —
+  // same outcome, rather than doubling the segment already in the path.
+  assertEquals(
+    withCategoryPath("https://x.com/blog/leaf/my-post", chain, {
+      knownSlugs: new Set<string>(),
+      trailing: "my-post",
+    }),
+    null,
   );
 });
 
-Deno.test("withCategoryPath with an empty chain leaves the path alone", () => {
+Deno.test("withCategoryPath with an empty chain rewrites nothing", () => {
   assertEquals(
-    withCategoryPath("https://x.com/blog/leaf?page=2", []),
-    "https://x.com/blog/leaf",
+    withCategoryPath("https://x.com/blog/leaf?page=2", [], {
+      requested: ["leaf"],
+    }),
+    null,
   );
 });

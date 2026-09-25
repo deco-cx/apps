@@ -126,28 +126,28 @@ export default async function BlogPostList(
     if (leafSlug) {
       // The category may not be a record yet — fall back to the copy embedded
       // in a post, as before.
-      category = chain?.[chain.length - 1] ??
+      category = index.get(leafSlug) ??
         slicedPosts[0]?.categories?.find((c) => c?.slug === leafSlug) ?? null;
     }
 
-    const categoryPath = chain ?? (category ? [category] : null);
+    // Only a chain that came out of the records is trustworthy enough to name
+    // a canonical URL; a missing or broken one keeps the flat behaviour.
+    const canonical = chain
+      ? withCategoryPath(url, chain, { requested: requestedSegments })
+      : null;
 
     return {
       posts: slicedPosts,
       category,
       categories,
-      categoryPath,
+      categoryPath: chain ?? (category ? [category] : null),
       pageInfo: toPageInfo(handledPosts, postsPerPage, pageNumber, params),
       seo: {
         title: category?.name ?? "",
         description: category?.description,
         // Reached through a stale or wrong path, the page still renders and
         // points at the one canonical URL instead of 404ing.
-        canonical: categoryPath?.length
-          ? withCategoryPath(url, categoryPath, {
-            strip: requestedSegments.length,
-          })
-          : new URL(url.pathname, url.origin).href,
+        canonical: canonical ?? new URL(url.pathname, url.origin).href,
       },
     };
   } catch (e) {
