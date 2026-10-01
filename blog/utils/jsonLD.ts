@@ -5,6 +5,9 @@ const toAuthor = (author: Author) => {
   return {
     "@type": type,
     name: author.name,
+    // url and image are valid on both Person and Organization
+    ...(author.url ? { url: author.url } : {}),
+    ...(author.avatar ? { image: author.avatar } : {}),
     // jobTitle and worksFor are Person-only properties
     ...(type === "Person" && author.jobTitle
       ? { jobTitle: author.jobTitle }
