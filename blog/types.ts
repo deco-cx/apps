@@ -19,6 +19,7 @@ export interface Author {
   avatar?: ImageWidget;
   jobTitle?: string;
   company?: string;
+  url?: string;
 }
 
 export interface Category {
