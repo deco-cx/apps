@@ -32,6 +32,7 @@ export default function Template(
     excerpt = "Excerpt",
     date,
     image,
+    mobileImage,
     alt,
     sections,
     slug,
@@ -78,11 +79,16 @@ export default function Template(
             : ""}
         </p>
         {image && (
-          <img
-            class="w-full rounded-2xl bg-cover"
-            src={image}
-            alt={alt ?? title}
-          />
+          <picture>
+            {mobileImage && (
+              <source media="(max-width: 767px)" srcSet={mobileImage} />
+            )}
+            <img
+              class="w-full rounded-2xl bg-cover"
+              src={image}
+              alt={alt ?? title}
+            />
+          </picture>
         )}
         <div dangerouslySetInnerHTML={{ __html: content as string }} />
         <div class="content-sections">

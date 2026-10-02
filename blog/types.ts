@@ -51,6 +51,11 @@ export interface BlogPost {
    */
   alt?: string;
   /**
+   * @title Mobile image
+   * @description Optional mobile-optimized version of the main image. Served below 768px. Falls back to the main image when empty.
+   */
+  mobileImage?: ImageWidget;
+  /**
    * @widget blog
    * @collection authors
    */
