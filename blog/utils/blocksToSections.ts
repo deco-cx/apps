@@ -129,6 +129,7 @@ function blockToSection(
       case "image":
         return toSection(`${BASE}/BlockImage.tsx`, {
           url: content.url,
+          mobileUrl: content.mobileUrl,
           alt: content.alt,
           caption: content.caption,
           size: content.size,
