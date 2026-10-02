@@ -100,6 +100,8 @@ interface ProductOptions {
   /** Price coded currency, e.g.: USD, BRL */
   priceCurrency: string;
   imagesByKey?: Map<string, string>;
+  /** Product-level category/cluster properties, computed once and shared by its variants */
+  productAdditionalProperty?: PropertyValue[];
   /** Original attributes to be included in the transformed product */
   includeOriginalAttributes?: string[];
 }
@@ -380,14 +382,6 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
         return map;
       }, new Map<string, string>());
 
-  const groupAdditionalProperty = isLegacyProduct(product)
-    ? legacyToProductGroupAdditionalProperties(product)
-    : toProductGroupAdditionalProperties(product);
-  const originalAttributesAdditionalProperties =
-    toOriginalAttributesAdditionalProperties(
-      options.includeOriginalAttributes,
-      product,
-    );
   const specificationsAdditionalProperty = isLegacySku(sku)
     ? toAdditionalPropertiesLegacy(sku)
     : toAdditionalProperties(sku);
@@ -399,9 +393,14 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     isLegacyProduct(product) ? toOfferLegacy : toOffer,
   );
 
-  const variantOptions = imagesByKey !== options.imagesByKey
-    ? { ...options, imagesByKey }
-    : options;
+  // Same for every SKU of the product: computed once at level 0 and handed to
+  // the variants instead of being rebuilt per SKU.
+  const productAdditionalProperty = (level > 0 &&
+    options.productAdditionalProperty) || [
+    ...(toAdditionalPropertyCategories(product) ?? []),
+    ...(toAdditionalPropertyClusters(product) ?? []),
+  ];
+  const variantOptions = { ...options, imagesByKey, productAdditionalProperty };
   const isVariantOf = level < 1
     ? ({
       "@type": "ProductGroup",
@@ -412,8 +411,13 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       url: getProductGroupURL(baseUrl, product).href,
       name: product.productName,
       additionalProperty: [
-        ...groupAdditionalProperty,
-        ...originalAttributesAdditionalProperties,
+        ...(isLegacyProduct(product)
+          ? legacyToProductGroupAdditionalProperties(product)
+          : toProductGroupAdditionalProperties(product)),
+        ...toOriginalAttributesAdditionalProperties(
+          options.includeOriginalAttributes,
+          product,
+        ),
       ],
       model: productReference,
     } satisfies ProductGroup)
@@ -453,18 +457,10 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     DEFAULT_CATEGORY_SEPARATOR,
   );
 
-  const categoryAdditionalProperties = toAdditionalPropertyCategories(product);
-  const clusterAdditionalProperties = toAdditionalPropertyClusters(product);
-
   const additionalProperty: PropertyValue[] = [
     ...specificationsAdditionalProperty,
+    ...productAdditionalProperty,
   ];
-  if (categoryAdditionalProperties) {
-    additionalProperty.push(...categoryAdditionalProperties);
-  }
-  if (clusterAdditionalProperties) {
-    additionalProperty.push(...clusterAdditionalProperties);
-  }
   if (referenceIdAdditionalProperty) {
     additionalProperty.push(...referenceIdAdditionalProperty);
   }
