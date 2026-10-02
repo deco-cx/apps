@@ -5,10 +5,12 @@ export interface Props {
   alt?: string;
   caption?: string;
   size?: "full" | "normal";
+  /** @description Loads eagerly with high fetch priority. Use for above-the-fold images. */
+  highPriority?: boolean;
 }
 
 export default function BlockImage(
-  { url, mobileUrl, alt, caption, size }: Props,
+  { url, mobileUrl, alt, caption, size, highPriority = false }: Props,
 ) {
   const wrapperClass = size === "full" ? "my-8 -mx-[var(--gutter)]" : "my-8";
 
@@ -25,7 +27,9 @@ export default function BlockImage(
           <img
             src={url}
             alt={alt ?? ""}
-            loading="lazy"
+            {...(highPriority
+              ? { loading: "eager" as const, fetchpriority: "high" }
+              : { loading: "lazy" as const, decoding: "async" as const })}
             class="w-full h-auto block"
           />
         </picture>
