@@ -12,3 +12,5 @@ const loader = (_props: unknown, _req: Request, ctx: AppContext): Config => ({
 });
 
 export default loader;
+
+export const defaultVisibility = "private";
