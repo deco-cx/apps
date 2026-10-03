@@ -1,3 +1,5 @@
+import { logger } from "@deco/deco/o11y";
+import { cleanResponse } from "../../../utils/http.ts";
 import type { AppContext } from "../../mod.ts";
 import { CartOperation } from "../../utils/types/basket.ts";
 
@@ -25,7 +27,24 @@ const action = async (
     },
   );
 
-  const data = await response.json();
+  const data = await cleanResponse<CartOperation>(response);
+
+  if (typeof data !== "object") {
+    logger.error(`Failed to parse response from linx as JSON: ${data}`);
+    return {
+      Errors: [],
+      IsValid: false,
+      RefreshBasket: false,
+      ResponseCallBack: {
+        Code: "0",
+        Parameters: [],
+        Value: "",
+      },
+      SuccessMessage: null,
+      Url: null,
+      Warnings: [],
+    };
+  }
 
   return data;
 };
