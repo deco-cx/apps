@@ -1092,6 +1092,8 @@ export const toReview = (
         reviewRating: {
           "@type": "AggregateRating",
           ratingValue: productReviews[reviewIndex]?.rating || 0,
+          reviewCount: ratingsCount,
+          ratingCount: ratingsCount,
         },
       })),
     };
