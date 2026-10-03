@@ -11,6 +11,7 @@ import {
   type ComponentFunc,
   type ComponentMetadata,
   type Page,
+  PAGE_CACHE_ALLOWED_KEY,
   type Section,
 } from "@deco/deco/blocks";
 import { logger } from "@deco/deco/o11y";
@@ -67,6 +68,15 @@ export interface Props {
   /** @hide true */
   seo?: Section<SEOSection>;
   sections: Sections;
+  /**
+   * @title Allow CDN caching
+   * @description Opt this page into CDN page caching. Only enable for public,
+   * non-personalized pages: the response is still forced to `no-store` if a
+   * loader sets a cookie, vetoes caching (cache "no-store" / null cache key),
+   * or a non-cacheable matcher/flag is active. Leave off for anything that
+   * renders per-user content without one of those signals.
+   */
+  cacheable?: boolean;
   /** @hide true */
   unindexedDomain?: boolean;
 }
@@ -182,10 +192,16 @@ function Page(
 }
 
 export const loader = async (
-  { sections, ...restProps }: Props,
+  { sections, cacheable, ...restProps }: Props,
   req: Request,
   ctx: AppContext,
 ) => {
+  // Opt the page into CDN caching. Same mechanism the VTEX middleware uses;
+  // the runtime still applies the no-store guards (set-cookie, vary, flags).
+  if (cacheable) {
+    ctx.bag?.set(PAGE_CACHE_ALLOWED_KEY, true);
+  }
+
   const url = new URL(req.url);
   const devMode = url.searchParams.has("__d");
   const unindexedDomain = noIndexedDomains.some((domain) =>
