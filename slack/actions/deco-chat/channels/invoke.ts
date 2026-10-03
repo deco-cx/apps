@@ -24,7 +24,7 @@ export default async function invoke(
 
   const [joinChannel, channel, thread] = props.event.channel_type === "im"
     ? [botIdentifier, props.event.channel, props.event.user]
-    : [props.event.channel, props.event.channel, props.event.channel];
+    : [props.event.channel, props.event.channel, props.event.ts];
   const linkProps =
     await ctx.appStorage.getItem<JoinChannelProps & { installId: string }>(
       ctx.cb.forTeam(props.event.team, joinChannel),
