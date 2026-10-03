@@ -26,7 +26,7 @@ const action = async (
 ): Promise<unknown | IdHrefDocumentID> => {
   const { vcs } = ctx;
   const { id, data, acronym, createIfNotExists, schema } = props;
-  const { cookie } = parseCookie(req.headers, ctx.account);
+  const { cookie } = parseCookie(req.headers);
 
   const requestOptions = {
     body: createIfNotExists ? { ...data, id } : data,

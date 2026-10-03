@@ -202,6 +202,7 @@ export default function Proxy({
           // Prepare scripts to insert
           let scriptsInsert = "";
           for (const script of (includeScriptsToHead?.includes ?? [])) {
+            if (!script || !script.src) continue;
             scriptsInsert += typeof script.src === "string"
               ? script.src
               : script.src(req);
@@ -224,6 +225,7 @@ export default function Proxy({
           // Prepare scripts to insert
           let scriptsInsert = "";
           for (const script of (includeScriptsToBody?.includes ?? [])) {
+            if (!script || !script.src) continue;
             scriptsInsert += typeof script.src === "string"
               ? script.src
               : script.src(req);

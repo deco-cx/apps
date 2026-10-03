@@ -52,7 +52,7 @@ export default async function loader(
 ): Promise<Document[]> {
   const { vcs } = ctx;
   const { acronym, fields, where, sort, skip = 0, take = 10, schema } = props;
-  const { cookie } = parseCookie(req.headers, ctx.account);
+  const { cookie } = parseCookie(req.headers);
   const limits = resourceRange(skip, take);
 
   const documents = await vcs["GET /api/dataentities/:acronym/search"]({

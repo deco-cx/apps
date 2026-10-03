@@ -1,6 +1,6 @@
 import { AppContext } from "../../mod.ts";
 import { proxySetCookie } from "../../utils/cookies.ts";
-import { parseCookie } from "../../utils/orderForm.ts";
+import { parseCookieWithoutAuth } from "../../utils/orderForm.ts";
 import { forceHttpsOnAssets } from "../../utils/transform.ts";
 import { OrderForm } from "../../utils/types.ts";
 import { DEFAULT_EXPECTED_SECTIONS } from "./updateItemAttachment.ts";
@@ -24,8 +24,7 @@ const action = async (
     props;
   const { vcsDeprecated } = ctx;
 
-  const { orderFormId } = parseCookie(req.headers);
-  const cookie = req.headers.get("cookie") ?? "";
+  const { orderFormId, cookie } = parseCookieWithoutAuth(req.headers);
 
   try {
     const response = await vcsDeprecated

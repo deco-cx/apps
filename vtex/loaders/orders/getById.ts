@@ -15,7 +15,7 @@ export default async function loader(
   ctx: AppContext,
 ) {
   const { vcsDeprecated } = ctx;
-  const { cookie } = parseCookie(req.headers, ctx.account);
+  const { cookie } = parseCookie(req.headers);
 
   const order = await vcsDeprecated["GET /api/oms/user/orders/:orderId"](
     {
