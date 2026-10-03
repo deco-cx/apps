@@ -20,6 +20,14 @@ export interface Props {
 }
 
 /**
+ * The weather match is derived from the visitor's geo (Cf-Iplatitude /
+ * Cf-Iplongitude) and never from per-user identity, so it is safe to bake
+ * into cached HTML shared across visitors. Without this, any page using this
+ * matcher falls through to `Cache-Control: no-store` (see blocks/matcher.ts).
+ */
+export const cacheable = true;
+
+/**
  * @title Weather
  * @description Target users based on specific temperature
  * @icon cloud-storm
