@@ -188,8 +188,14 @@ export const loader = async (
 ) => {
   const url = new URL(req.url);
   const devMode = url.searchParams.has("__d");
+  // Behind a proxy (e.g. a CDN-level A/B worker fetching `<site>.deco.site`),
+  // the public hostname arrives in `x-forwarded-host`, not in the request URL.
+  // Chained proxies join values with ", ": the first one is the client-facing host.
+  const forwardedHost = req.headers.get("x-forwarded-host")?.split(",")[0]
+    .trim().toLowerCase();
+  const host = forwardedHost || url.host;
   const unindexedDomain = noIndexedDomains.some((domain) =>
-    url.origin.includes(domain)
+    host.includes(domain)
   );
   const global = ctx.global || [];
   const resolvedGlobals = await Promise.all(
