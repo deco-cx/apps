@@ -34,6 +34,50 @@ export function blocksToSections(
     .filter((s): s is Section => s !== null);
 }
 
+/**
+ * The Spire FAQ block carries each answer as HTML/text, while the FAQ section
+ * takes a Section[] body — so every answer becomes a single Paragraph section.
+ * Accepts the items as an array or as a JSON-encoded string.
+ */
+function toFaqItems(raw: unknown): { title: string; body: Section[] }[] {
+  let items: Record<string, unknown>[] = [];
+
+  if (Array.isArray(raw)) {
+    items = raw;
+  } else if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) items = parsed;
+    } catch { /* ignore */ }
+  }
+
+  // A question with no usable title is not renderable, and a non-string field
+  // would blow up the sanitizer downstream — drop both instead.
+  return items.flatMap((item) => {
+    const title = asString(item?.title);
+    if (!title) return [];
+
+    const html = asString(item?.html) ?? asString(item?.body);
+    const text = asString(item?.text);
+    const answer = html ?? text;
+
+    return [{
+      title,
+      // An answer-less question renders as an empty accordion body rather than
+      // an empty <p> carrying paragraph typography.
+      body: answer
+        // Spire answers are rich HTML and routinely carry block-level markup,
+        // which a <p> cannot hold.
+        ? [toSection(`${BASE}/Paragraph.tsx`, { html, text, block: true })]
+        : [],
+    }];
+  });
+}
+
+function asString(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
 function blockToSection(
   block: Block,
   overrides: Record<string, Resolved<Section>>,
@@ -152,6 +196,12 @@ function blockToSection(
         return toSection(`${BASE}/Cta.tsx`, {
           text: content.text,
           href: content.href,
+        });
+
+      case "faq":
+        return toSection(`${BASE}/FAQ.tsx`, {
+          faqId: content.faqId,
+          items: toFaqItems(content.items),
         });
 
       default:
