@@ -195,7 +195,6 @@ function blockToSection(
 
       case "faq":
         return toSection(`${BASE}/FAQ.tsx`, {
-          title: content.title,
           faqId: content.faqId,
           items: toFaqItems(content.items),
         });
