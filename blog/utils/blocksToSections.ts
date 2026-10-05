@@ -39,7 +39,7 @@ export function blocksToSections(
  * takes a Section[] body — so every answer becomes a single Paragraph section.
  * Accepts the items as an array or as a JSON-encoded string.
  */
-function toFaqItems(raw: unknown): { title: unknown; body: Section[] }[] {
+function toFaqItems(raw: unknown): { title: string; body: Section[] }[] {
   let items: Record<string, unknown>[] = [];
 
   if (Array.isArray(raw)) {
@@ -51,15 +51,26 @@ function toFaqItems(raw: unknown): { title: unknown; body: Section[] }[] {
     } catch { /* ignore */ }
   }
 
-  return items.map((item) => ({
-    title: item?.title,
-    body: [
-      toSection(`${BASE}/Paragraph.tsx`, {
-        html: item?.html ?? item?.body,
-        text: item?.text,
-      }),
-    ],
-  }));
+  // A question with no usable title is not renderable, and a non-string field
+  // would blow up the sanitizer downstream — drop both instead.
+  return items.flatMap((item) => {
+    const title = asString(item?.title);
+    if (!title) return [];
+
+    return [{
+      title,
+      body: [
+        toSection(`${BASE}/Paragraph.tsx`, {
+          html: asString(item?.html) ?? asString(item?.body),
+          text: asString(item?.text),
+        }),
+      ],
+    }];
+  });
+}
+
+function asString(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
 }
 
 function blockToSection(
