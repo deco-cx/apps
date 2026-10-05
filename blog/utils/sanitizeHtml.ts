@@ -13,8 +13,10 @@ const DANGEROUS_PROTOCOLS = "javascript|data|vbscript";
 // A start tag, so attribute rewriting never touches text nodes.
 const TAG_RE = /<[a-z][^>]*>/gi;
 // Captures a url-bearing attribute and its value (double/single-quoted or bare).
+// The name must be whole: `\b` would also match inside `data-href`, whose value
+// a browser never navigates to.
 const URL_ATTR_RE = new RegExp(
-  `\\b(${URL_ATTRS})\\s*=\\s*("[^"]*"|'[^']*'|[^\\s>]+)`,
+  `(?<![\\w-])(${URL_ATTRS})\\s*=\\s*("[^"]*"|'[^']*'|[^\\s>]+)`,
   "gi",
 );
 // A dangerous scheme must be a real scheme: name immediately followed by ":".
