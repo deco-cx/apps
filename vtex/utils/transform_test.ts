@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { assertEquals, assertStrictEquals } from "@std/assert";
 import { toProduct } from "./transform.ts";
 import type { LegacyProduct } from "./types.ts";
 
@@ -38,8 +38,11 @@ Deno.test("toProduct: every variant carries the product's category and cluster p
     );
 
   assertEquals(productLevel(out)?.length, 4); // 2 categories + 2 clusters
+  assertEquals(out.isVariantOf!.hasVariant.length, product.items.length);
   for (const variant of out.isVariantOf!.hasVariant) {
     assertEquals(productLevel(variant), productLevel(out));
+    // shared, not rebuilt per SKU
+    assertStrictEquals(productLevel(variant)![0], productLevel(out)![0]);
     assertEquals((variant as { isVariantOf?: unknown }).isVariantOf, undefined);
   }
   assertEquals(
