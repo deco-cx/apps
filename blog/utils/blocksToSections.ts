@@ -34,6 +34,34 @@ export function blocksToSections(
     .filter((s): s is Section => s !== null);
 }
 
+/**
+ * The Spire FAQ block carries each answer as HTML/text, while the FAQ section
+ * takes a Section[] body — so every answer becomes a single Paragraph section.
+ * Accepts the items as an array or as a JSON-encoded string.
+ */
+function toFaqItems(raw: unknown): { title: unknown; body: Section[] }[] {
+  let items: Record<string, unknown>[] = [];
+
+  if (Array.isArray(raw)) {
+    items = raw;
+  } else if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) items = parsed;
+    } catch { /* ignore */ }
+  }
+
+  return items.map((item) => ({
+    title: item?.title,
+    body: [
+      toSection(`${BASE}/Paragraph.tsx`, {
+        html: item?.html ?? item?.body,
+        text: item?.text,
+      }),
+    ],
+  }));
+}
+
 function blockToSection(
   block: Block,
   overrides: Record<string, Resolved<Section>>,
@@ -152,6 +180,13 @@ function blockToSection(
         return toSection(`${BASE}/Cta.tsx`, {
           text: content.text,
           href: content.href,
+        });
+
+      case "faq":
+        return toSection(`${BASE}/FAQ.tsx`, {
+          title: content.title,
+          faqId: content.faqId,
+          items: toFaqItems(content.items),
         });
 
       default:
