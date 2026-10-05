@@ -50,6 +50,18 @@ const neutralized = [
     `<use xlink:href="javascript:alert(1)" />`,
     `<use xlink:href="#" />`,
   ],
+  [
+    // A ">" inside an earlier attribute must not end the tag scan, or every
+    // attribute after it escapes sanitization.
+    "scheme behind a quoted >",
+    `<a title=">" href="javascript:alert(1)">x</a>`,
+    `<a title=">" href="#">x</a>`,
+  ],
+  [
+    "scheme behind a single-quoted >",
+    `<a title='>' href='javascript:alert(1)'>x</a>`,
+    `<a title='>' href='#'>x</a>`,
+  ],
 ];
 
 for (const [name, sanitize] of sanitizers) {
@@ -95,6 +107,26 @@ for (const [name, sanitize] of sanitizers) {
       sanitize(`<p>write href=javascript:alert(1) to break it</p>`),
       `<p>write href=javascript:alert(1) to break it</p>`,
     );
+  });
+
+  Deno.test(`${name} keeps a quoted ">" out of the tag boundary`, () => {
+    const html = `<a title=">" href="https://deco.cx">x</a>`;
+    assertEquals(sanitize(html), html);
+  });
+
+  Deno.test(`${name} still neutralizes an unterminated attribute value`, () => {
+    // Malformed markup a browser may yet close further down the document. The
+    // tag is mangled, but the executable href does not survive.
+    const out = sanitize(`<a href="javascript:alert(1)>x</a> <p class="y">z`);
+    assertEquals(out.includes("javascript:"), false);
+  });
+
+  Deno.test(`${name} runs in linear time on pathological input`, () => {
+    // An unterminated quote followed by a long run used to backtrack forever.
+    const started = performance.now();
+    sanitize(`<a "` + "x".repeat(200_000));
+    sanitize("<a " + 'x="y" '.repeat(50_000) + ">");
+    assertEquals(performance.now() - started < 1_000, true);
   });
 
   Deno.test(`${name} returns "" for empty and non-string input`, () => {
