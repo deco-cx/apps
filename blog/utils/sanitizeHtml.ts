@@ -10,6 +10,8 @@
 const URL_ATTRS = "href|src|action|formaction|xlink:href";
 const DANGEROUS_PROTOCOLS = "javascript|data|vbscript";
 
+// A start tag, so attribute rewriting never touches text nodes.
+const TAG_RE = /<[a-z][^>]*>/gi;
 // Captures a url-bearing attribute and its value (double/single-quoted or bare).
 const URL_ATTR_RE = new RegExp(
   `\\b(${URL_ATTRS})\\s*=\\s*("[^"]*"|'[^']*'|[^\\s>]+)`,
@@ -50,19 +52,26 @@ export function hasDangerousScheme(value: string): boolean {
 }
 
 /**
- * Points every url-bearing attribute carrying a dangerous scheme at "#". A
- * single pass handles quoted and unquoted values identically — an unquoted
+ * Points every url-bearing attribute carrying a dangerous scheme at "#". Quoted
+ * and unquoted values are handled identically — an unquoted
  * `href=javascript:alert(1)` is just as executable as a quoted one — while
  * harmless values like "data-*" or "javascriptX" are left intact.
+ *
+ * Only start tags are scanned, so prose and code samples that merely *mention*
+ * `href=javascript:` (escaped as `&lt;a href=javascript:…&gt;`) are not rewritten.
  */
 export function neutralizeUrlSchemes(html: string): string {
-  return html.replace(URL_ATTR_RE, (match, attr, value) => {
-    const quote = value[0] === '"' || value[0] === "'" ? value[0] : "";
-    const inner = quote ? value.slice(1, -1) : value;
-    if (!hasDangerousScheme(inner)) return match;
-    const q = quote || '"';
-    return `${attr}=${q}#${q}`;
-  });
+  return html.replace(
+    TAG_RE,
+    (tag) =>
+      tag.replace(URL_ATTR_RE, (match, attr, value) => {
+        const quote = value[0] === '"' || value[0] === "'" ? value[0] : "";
+        const inner = quote ? value.slice(1, -1) : value;
+        if (!hasDangerousScheme(inner)) return match;
+        const q = quote || '"';
+        return `${attr}=${q}#${q}`;
+      }),
+  );
 }
 
 export function sanitizeHtml(raw: string | null | undefined): string {

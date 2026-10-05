@@ -57,14 +57,19 @@ function toFaqItems(raw: unknown): { title: string; body: Section[] }[] {
     const title = asString(item?.title);
     if (!title) return [];
 
+    const html = asString(item?.html) ?? asString(item?.body);
+    const text = asString(item?.text);
+    const answer = html ?? text;
+
     return [{
       title,
-      body: [
-        toSection(`${BASE}/Paragraph.tsx`, {
-          html: asString(item?.html) ?? asString(item?.body),
-          text: asString(item?.text),
-        }),
-      ],
+      // An answer-less question renders as an empty accordion body rather than
+      // an empty <p> carrying paragraph typography.
+      body: answer
+        // Spire answers are rich HTML and routinely carry block-level markup,
+        // which a <p> cannot hold.
+        ? [toSection(`${BASE}/Paragraph.tsx`, { html, text, block: true })]
+        : [],
     }];
   });
 }
