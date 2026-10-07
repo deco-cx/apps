@@ -47,6 +47,7 @@ export const fetchSafe = async (
   if (isManual && isRedirect) {
     return response;
   }
+  console.error(input)
   throw new HttpError(response.status, `${await response.text()}`);
 };
 export const fetchAPI = async <T>(
