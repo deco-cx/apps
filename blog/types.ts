@@ -20,6 +20,8 @@ export interface Author {
   jobTitle?: string;
   company?: string;
   url?: string;
+  test?: string;
+  testImage?: ImageWidget;
 }
 
 export interface Category {
@@ -37,6 +39,7 @@ export interface Category {
    * @changeable true
    */
   sections?: Section[];
+  test?: string;
 }
 
 export interface BlogPost {
@@ -124,6 +127,7 @@ export interface BlogPost {
   /** @hide true */
   interactionStatistic?: InteractionCounter;
   id?: string;
+  test?: string;
 }
 
 /**
