@@ -99,11 +99,6 @@ export interface BlogPost {
    */
   sections?: Section[];
   /**
-   * @title Carousel in post content
-   * @description add a carousel in the middle of the post. Must be implemented in frontEnd
-   */
-  imageCarousel?: ImageCarousel;
-  /**
    * @title SEO
    */
   seo?: Seo;
@@ -246,11 +241,6 @@ export interface BlogPostListingPage {
   categoryPath?: Category[] | null;
   pageInfo: PageInfo;
   seo: Seo;
-}
-
-export interface ImageCarousel {
-  banners?: Banner[];
-  description?: string;
 }
 
 export interface Review {
