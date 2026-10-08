@@ -46,6 +46,7 @@ export default function App(props: Props): App<Manifest, State> {
     headers: new Headers({
       "Authorization": `Bearer ${stringApiKey}`,
       "Content-Type": "application/json",
+      "X-Pplx-Integration": "deco",
     }),
     fetcher: fetchSafe,
   });
