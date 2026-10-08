@@ -27,6 +27,22 @@ export const dateToTime = (date: string) =>
   ).getTime() || 0;
 
 /**
+ * Normalizes a CMS-authored date into a full ISO 8601 date-time with a
+ * timezone, for JSON-LD's `datePublished`/`dateModified`, or returns
+ * `undefined` if the value can't be read as a date.
+ *
+ * `BlogPost.date` is usually a bare `YYYY-MM-DD` (the admin's date picker),
+ * which Google's Rich Results Test rejects as an invalid datetime missing its
+ * timezone. It is pinned to UTC through `dateToTime`, so the emitted instant
+ * matches the one posts are sorted by; unparseable values are dropped rather
+ * than emitted as invalid structured data.
+ */
+export const toISODateTime = (date: string) => {
+  const time = dateToTime(date);
+  return time ? new Date(time).toISOString() : undefined;
+};
+
+/**
  * An ISO 8601 date, optionally with a time and an offset. Anchored, grouped and
  * deliberately narrow: `Date` accepts far more than this, and the extras are the
  * problem — see `scheduledTime`.
