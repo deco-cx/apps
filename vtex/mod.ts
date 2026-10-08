@@ -85,6 +85,16 @@ export interface Props {
    */
   platform: "vtex";
 
+  /**
+   * @title Use Intelligent Search API v1
+   * @description Opt in to VTEX's new Intelligent Search API v1 for search, PLP,
+   * PDP, facets and suggestions. v1 no longer reads the segment cookie (context
+   * is sent as explicit query params) and uses the dedicated `/products`
+   * endpoint for PDPs. When off, the legacy Intelligent Search API is used.
+   * @default false
+   */
+  intelligentSearchV1?: boolean;
+
   advancedConfigs?: {
     doNotFetchVariantsForRelatedProducts?: boolean;
     /**
