@@ -94,3 +94,28 @@ export const scheduledTime = (value: string): number | null => {
   // `+99:00` matches the pattern but is not a real instant.
   return Number.isNaN(parsed) ? null : parsed;
 };
+
+const BARE_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Normalizes a CMS-authored date into a full ISO 8601 date-time with a
+ * timezone, for JSON-LD's `datePublished`/`dateModified`, or returns
+ * `undefined` if the value isn't a real ISO date.
+ *
+ * `BlogPost.date` is usually a bare `YYYY-MM-DD` (the admin's date picker),
+ * which Google's Rich Results Test rejects as an invalid datetime missing its
+ * timezone. A bare date carries no time of day, so it is placed at 08:00 UTC
+ * rather than midnight: that instant falls on the same calendar day from
+ * UTC-08:00 to UTC+14:00, so search results don't show a post a day early in
+ * the Americas.
+ *
+ * Parsing goes through `scheduledTime` rather than `dateToTime` for the same
+ * reasons it exists: an impossible date such as `2024-02-31` is dropped instead
+ * of rolling over into March, non-ISO strings aren't read in server-local time,
+ * and the Unix epoch isn't mistaken for a failure. Anything rejected is omitted
+ * rather than emitted as invalid structured data.
+ */
+export const toISODateTime = (date: string) => {
+  const time = scheduledTime(BARE_DATE.test(date) ? `${date}T08:00:00` : date);
+  return time === null ? undefined : new Date(time).toISOString();
+};
