@@ -11,8 +11,15 @@ const post = (overrides: Partial<BlogPost> = {}): BlogPost => ({
   ...overrides,
 });
 
-Deno.test("toISODateTime expands a bare date to midnight UTC", () => {
-  assertEquals(toISODateTime("2025-06-01"), "2025-06-01T00:00:00.000Z");
+Deno.test("toISODateTime places a bare date at 08:00 UTC", () => {
+  assertEquals(toISODateTime("2025-06-01"), "2025-06-01T08:00:00.000Z");
+});
+
+Deno.test("toISODateTime pins an offset-less date-time to UTC", () => {
+  assertEquals(
+    toISODateTime("2025-06-01T00:00:00"),
+    "2025-06-01T00:00:00.000Z",
+  );
 });
 
 Deno.test("toISODateTime keeps the instant of an offset date-time", () => {
@@ -30,7 +37,7 @@ Deno.test("toISODateTime returns undefined for an unparseable value", () => {
 Deno.test("toBlogPosting emits dates with a timezone", () => {
   const node = toBlogPosting(post({ dateModified: "2024-07-01T10:30:00" }));
 
-  assertEquals(node.datePublished, "2024-06-01T00:00:00.000Z");
+  assertEquals(node.datePublished, "2024-06-01T08:00:00.000Z");
   assertEquals(node.dateModified, "2024-07-01T10:30:00.000Z");
 });
 

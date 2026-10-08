@@ -26,6 +26,8 @@ export const dateToTime = (date: string) =>
       : date,
   ).getTime() || 0;
 
+const BARE_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
 /**
  * Normalizes a CMS-authored date into a full ISO 8601 date-time with a
  * timezone, for JSON-LD's `datePublished`/`dateModified`, or returns
@@ -33,12 +35,15 @@ export const dateToTime = (date: string) =>
  *
  * `BlogPost.date` is usually a bare `YYYY-MM-DD` (the admin's date picker),
  * which Google's Rich Results Test rejects as an invalid datetime missing its
- * timezone. It is pinned to UTC through `dateToTime`, so the emitted instant
- * matches the one posts are sorted by; unparseable values are dropped rather
- * than emitted as invalid structured data.
+ * timezone. A bare date carries no time of day, so it is placed at 08:00 UTC
+ * rather than midnight: that instant falls on the same calendar day from
+ * UTC-08:00 to UTC+14:00, so search results don't show a post a day early in
+ * the Americas. Everything else goes through `dateToTime` (offset-less
+ * date-times pinned to UTC); unparseable values are dropped rather than
+ * emitted as invalid structured data.
  */
 export const toISODateTime = (date: string) => {
-  const time = dateToTime(date);
+  const time = dateToTime(BARE_DATE.test(date) ? `${date}T08:00:00` : date);
   return time ? new Date(time).toISOString() : undefined;
 };
 
