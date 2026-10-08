@@ -50,6 +50,17 @@ Deno.test("toISODateTime rejects non-ISO strings", () => {
   assertEquals(toISODateTime("June 1, 2025"), undefined);
 });
 
+Deno.test("toBlogPosting normalizes full timestamps and bare dates alike", () => {
+  assertEquals(
+    toBlogPosting(post({ date: "2025-10-31T15:10:01Z" })).datePublished,
+    "2025-10-31T15:10:01.000Z",
+  );
+  assertEquals(
+    toBlogPosting(post({ date: "2026-08-14" })).datePublished,
+    "2026-08-14T08:00:00.000Z",
+  );
+});
+
 Deno.test("toBlogPosting emits dates with a timezone", () => {
   const node = toBlogPosting(post({ dateModified: "2024-07-01T10:30:00" }));
 
