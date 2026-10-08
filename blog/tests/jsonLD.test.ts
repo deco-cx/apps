@@ -29,9 +29,25 @@ Deno.test("toISODateTime keeps the instant of an offset date-time", () => {
   );
 });
 
+Deno.test("toISODateTime keeps the Unix epoch", () => {
+  assertEquals(
+    toISODateTime("1970-01-01T00:00:00Z"),
+    "1970-01-01T00:00:00.000Z",
+  );
+});
+
 Deno.test("toISODateTime returns undefined for an unparseable value", () => {
   assertEquals(toISODateTime(""), undefined);
   assertEquals(toISODateTime("not a date"), undefined);
+});
+
+Deno.test("toISODateTime rejects an impossible calendar date", () => {
+  assertEquals(toISODateTime("2024-02-31"), undefined);
+  assertEquals(toISODateTime("2024-02-31T10:00:00Z"), undefined);
+});
+
+Deno.test("toISODateTime rejects non-ISO strings", () => {
+  assertEquals(toISODateTime("June 1, 2025"), undefined);
 });
 
 Deno.test("toBlogPosting emits dates with a timezone", () => {
