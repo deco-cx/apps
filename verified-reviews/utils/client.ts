@@ -8,6 +8,7 @@ import {
   toReview,
 } from "./transform.ts";
 import { context } from "@deco/deco";
+import { logger } from "@deco/deco/o11y";
 export type ClientVerifiedReviews = ReturnType<typeof createClient>;
 export interface PaginationOptions {
   count?: number;
@@ -44,6 +45,8 @@ const MessageError = {
     "🔴⭐ Error on call Full Review of Verified Review - probably unidentified product",
 };
 const baseUrl = "https://awsapis3.netreviews.eu/product";
+// A string body defaults to text/plain, which the API answers with a 502.
+const jsonHeaders = { "content-type": "application/json" };
 export const createClient = (params: ConfigVerifiedReviews | undefined) => {
   if (!params) {
     return;
@@ -62,12 +65,13 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
     try {
       const data = await fetchAPI<Ratings>(`${baseUrl}`, {
         method: "POST",
+        headers: jsonHeaders,
         body: JSON.stringify(payload),
       });
       return Object.keys(data).length ? data : undefined;
     } catch (error) {
       if (context.isDeploy) {
-        console.error(MessageError.rating, error);
+        logger.error(`${MessageError.rating} - ${error}`);
       } else {
         throw new Error(`${MessageError.rating} - ${error}`);
       }
@@ -87,12 +91,13 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
     try {
       const data = await fetchAPI<Ratings>(`${baseUrl}`, {
         method: "POST",
+        headers: jsonHeaders,
         body: JSON.stringify(payload),
       });
       return Object.keys(data).length ? data : undefined;
     } catch (error) {
       if (context.isDeploy) {
-        console.error(MessageError.ratings, error);
+        logger.error(`${MessageError.ratings} - ${error}`);
       } else {
         console.log(`${MessageError.ratings} - ${error}`);
         return undefined;
@@ -130,6 +135,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
 
     return fetchAPI<Reviews[]>(`${baseUrl}`, {
       method: "POST",
+      headers: jsonHeaders,
       body: JSON.stringify(payload),
     });
   };
@@ -171,7 +177,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       };
     } catch (error) {
       if (context.isDeploy) {
-        console.error(MessageError.ratings, error);
+        logger.error(`${MessageError.fullReview} - ${error}`);
       } else {
         throw new Error(`${MessageError.fullReview} - ${error}`);
       }
@@ -192,7 +198,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       return (response ? response : []);
     } catch (error) {
       if (context.isDeploy) {
-        console.error(MessageError.ratings, error);
+        logger.error(`${MessageError.ratings} - ${error}`);
       } else {
         throw new Error(`${MessageError.ratings} - ${error}`);
       }
