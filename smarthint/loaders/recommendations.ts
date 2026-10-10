@@ -35,7 +35,7 @@ export interface Props {
   channel?: string;
 }
 
-function getProductParam(pagetype: ComplexPageType, productsParam: string[]) {
+export function getProductParam(pagetype: ComplexPageType, productsParam: string[]) {
   if (productsParam.length) {
     return productsParam.map((productId) => `productid:${productId}`).join("&");
   }
