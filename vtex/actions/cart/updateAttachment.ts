@@ -1,6 +1,6 @@
 import { AppContext } from "../../mod.ts";
 import { proxySetCookie } from "../../utils/cookies.ts";
-import { parseCookie } from "../../utils/orderForm.ts";
+import { parseCookieWithoutAuth } from "../../utils/orderForm.ts";
 import type { OrderForm } from "../../utils/types.ts";
 import { DEFAULT_EXPECTED_SECTIONS } from "./updateItemAttachment.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
@@ -27,13 +27,11 @@ const action = async (
     body,
     expectedOrderFormSections = DEFAULT_EXPECTED_SECTIONS,
   } = props;
-  const { orderFormId } = parseCookie(req.headers);
+  const { orderFormId, cookie } = parseCookieWithoutAuth(req.headers);
 
   if (!orderFormId || orderFormId === "") {
     throw new Error("Order form ID is required");
   }
-
-  const cookie = req.headers.get("cookie") ?? "";
   const segment = getSegmentFromBag(ctx);
 
   const response = await vcsDeprecated

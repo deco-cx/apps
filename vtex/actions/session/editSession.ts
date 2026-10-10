@@ -17,7 +17,7 @@ async function action(
   ctx: AppContext,
 ): Promise<CreateEditSessionResponse> {
   const { vcs } = ctx;
-  const { cookie } = parseCookie(req.headers, ctx.account);
+  const { cookie } = parseCookie(req.headers);
 
   const response = await vcs["PATCH /api/sessions"]({}, {
     body: {

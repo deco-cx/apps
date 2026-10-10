@@ -1,6 +1,6 @@
 import { AppContext } from "../../mod.ts";
 import { proxySetCookie } from "../../utils/cookies.ts";
-import { parseCookie } from "../../utils/orderForm.ts";
+import { parseCookieWithoutAuth } from "../../utils/orderForm.ts";
 import type { OrderForm } from "../../utils/types.ts";
 
 /**
@@ -13,8 +13,7 @@ const action = async (
   ctx: AppContext,
 ): Promise<OrderForm> => {
   const { vcsDeprecated } = ctx;
-  const { orderFormId } = parseCookie(req.headers);
-  const cookie = req.headers.get("cookie") ?? "";
+  const { orderFormId, cookie } = parseCookieWithoutAuth(req.headers);
 
   const response = await vcsDeprecated[
     "POST /api/checkout/pub/orderForm/:orderFormId/messages/clear"
