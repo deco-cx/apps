@@ -17,6 +17,20 @@ const HOP_BY_HOP = [
 const noTrailingSlashes = (str: string) =>
   str.at(-1) === "/" ? str.slice(0, -1) : str;
 const sanitize = (str: string) => str.startsWith("/") ? str : `/${str}`;
+/**
+ * Canonical form of an IP for comparison only — never for forwarding.
+ * x-forwarded-for entries may be bracketed and carry a port ([::1]:443,
+ * 1.2.3.4:56789) and IPv6 hex casing varies between hops; cf-connecting-ip
+ * is always a bare address.
+ */
+const normalizeIp = (value: string): string => {
+  const ip = value.trim().toLowerCase();
+  const bracketed = ip.match(/^\[(.+)\](?::\d+)?$/);
+  if (bracketed) return bracketed[1];
+  const ipv4WithPort = ip.match(/^([\d.]+):\d+$/);
+  if (ipv4WithPort) return ipv4WithPort[1];
+  return ip;
+};
 export const removeCFHeaders = (headers: Headers) => {
   headers.forEach((_value, key) => {
     if (key.startsWith("cf-")) {
@@ -145,7 +159,28 @@ export default function Proxy({
     if (isFreshCtx<DecoSiteState>(_ctx)) {
       _ctx?.state?.monitoring?.logger?.log?.("proxy received headers", headers);
     }
+    // cf-connecting-ip carries the real client IP and removeCFHeaders is about
+    // to drop it, leaving the proxied origin without x-real-ip. x-forwarded-for
+    // usually already arrives with the client IP first, so only fill the gaps.
+    //
+    // Trust boundary: these headers are only as trustworthy as the ingress in
+    // front of this handler. x-forwarded-for is already forwarded untouched, so
+    // an origin reachable outside the CDN could always be fed a forged first
+    // entry — deriving x-real-ip from cf-connecting-ip does not widen that.
+    // Authenticating the edge belongs at the ingress, not here.
+    const clientIp = headers.get("cf-connecting-ip");
     removeCFHeaders(headers); // cf-headers are not ASCII-compliant
+    if (clientIp) {
+      const forwardedFor = headers.get("x-forwarded-for");
+      if (!forwardedFor) {
+        headers.set("x-forwarded-for", clientIp);
+      } else if (
+        normalizeIp(forwardedFor.split(",")[0]) !== normalizeIp(clientIp)
+      ) {
+        headers.set("x-forwarded-for", `${clientIp}, ${forwardedFor}`);
+      }
+      headers.set("x-real-ip", clientIp);
+    }
     if (removeDirtyCookies) {
       removeDirtyCookiesFn(headers);
     }
