@@ -1,0 +1,45 @@
+name: Propagate version to dependent sites
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+" # stable versions only, ignores next.*
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      sites: ${{ steps.search.outputs.sites }}
+    steps:
+      - name: Search for repos using deco-cx/apps
+        id: search
+        env:
+          GH_TOKEN: ${{ secrets.SITES_PAT }}
+        run: |
+          # --paginate follows Link headers across all pages (100 results each)
+          # --jq filters per page; jq -sc merges all pages and deduplicates
+          sites=$(gh api --paginate \
+            "search/code?q=cdn.jsdelivr.net/gh/deco-cx/apps+filename:deno.json+org:deco-sites&per_page=100" \
+            --jq '[.items[] | select(.path == "deno.json") | {owner: .repository.owner.login, repo: .repository.name}]' \
+            | jq -sc 'add | unique_by(.repo) // []')
+          echo "sites=${sites}" >> "$GITHUB_OUTPUT"
+
+  propagate:
+    needs: discover
+    if: needs.discover.outputs.sites != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        site: ${{ fromJson(needs.discover.outputs.sites) }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Propagate ${{ github.ref_name }} to ${{ matrix.site.owner }}/${{ matrix.site.repo }}
+        env:
+          GH_TOKEN: ${{ secrets.SITES_PAT }}
+          NEW_VERSION: ${{ github.ref_name }}
+          SITE_OWNER: ${{ matrix.site.owner }}
+          SITE_REPO: ${{ matrix.site.repo }}
+        run: bash .github/scripts/propagate.sh
