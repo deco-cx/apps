@@ -445,12 +445,30 @@ const loader = async (
 
 export const cache = "stale-while-revalidate";
 
+/**
+ * Bots crawl endless legacy facet combinations (specificationFilter_*, priceFrom,
+ * ft text segments, deep paths). Each is a one-off URL, so caching them only
+ * evicts hot entries. Cache just the bounded shapes humans and our own links
+ * hit: up to 2 category/brand segments that line up with the path, e.g.
+ * `/brand?map=b` and `/category/brand?map=c,b`.
+ */
+const isCacheableMap = (map: string, term: string) => {
+  const parts = map.split(",");
+  const segments = term.split("/").filter(Boolean);
+  return parts.length <= 2 && parts.length === segments.length &&
+    parts.every((part) => part === "c" || part === "b");
+};
+
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(props.pageHref || req.url);
 
   const searchTerm = url.searchParams.get("ft") || url.searchParams.get("q");
   const cachedSearchTerms = ctx.cachedSearchTerms ?? [];
   if (searchTerm && !cachedSearchTerms.includes(searchTerm.toLowerCase())) {
+    return null;
+  }
+  const map = props.map ?? url.searchParams.get("map");
+  if (map && !isCacheableMap(map, props.term ?? url.pathname)) {
     return null;
   }
   const fq = [

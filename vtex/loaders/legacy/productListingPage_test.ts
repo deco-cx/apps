@@ -18,6 +18,17 @@ Deno.test("cacheKey: legacy map URLs are cacheable and keyed on map", () => {
   assertNotEquals(category, null);
   assertNotEquals(brand, category);
   assertEquals(new URL(brand!).searchParams.get("map"), "b");
+  assertNotEquals(key("/lingerie/pepper-blend?map=c,b"), null);
+});
+
+Deno.test("cacheKey: unbounded legacy facet combinations stay uncached", () => {
+  // deep paths, spec filters, price ranges and ft text segments are bot crawl space
+  assertEquals(key("/a/b/c?map=c,c,c"), null);
+  assertEquals(key("/lingerie/azul?map=c,specificationFilter_16"), null);
+  assertEquals(key("/lingerie/de-0-a-50?map=c,priceFrom"), null);
+  assertEquals(key("/lingerie/anything?map=c,ft"), null);
+  // map that doesn't line up with the path
+  assertEquals(key("/lingerie?map=c,b"), null);
 });
 
 Deno.test("cacheKey: fmap and PS are part of the key", () => {
