@@ -445,16 +445,30 @@ const loader = async (
 
 export const cache = "stale-while-revalidate";
 
+/**
+ * Bots crawl endless legacy facet combinations (specificationFilter_*, priceFrom,
+ * ft text segments, deep paths). Each is a one-off URL, so caching them only
+ * evicts hot entries. Cache just the bounded shapes humans and our own links
+ * hit: up to 2 category/brand segments that line up with the path, e.g.
+ * `/brand?map=b` and `/category/brand?map=c,b`.
+ */
+const isCacheableMap = (map: string, term: string) => {
+  const parts = map.split(",");
+  const segments = term.split("/").filter(Boolean);
+  return parts.length <= 2 && parts.length === segments.length &&
+    parts.every((part) => part === "c" || part === "b");
+};
+
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(props.pageHref || req.url);
 
   const searchTerm = url.searchParams.get("ft") || url.searchParams.get("q");
-  const hasMap = url.search.includes("map=");
   const cachedSearchTerms = ctx.cachedSearchTerms ?? [];
-  if (
-    hasMap ||
-    (searchTerm && !cachedSearchTerms.includes(searchTerm.toLowerCase()))
-  ) {
+  if (searchTerm && !cachedSearchTerms.includes(searchTerm.toLowerCase())) {
+    return null;
+  }
+  const map = props.map ?? url.searchParams.get("map");
+  if (map && !isCacheableMap(map, props.term ?? url.pathname)) {
     return null;
   }
   const fq = [
@@ -495,6 +509,14 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     if (!isFilterParam(key)) return;
     params.append(key, value);
   });
+
+  // The loader also reads these straight from the URL: `fmap` drives the facets
+  // query and `PS` the page size. Only added when present, so keys for URLs
+  // without them are unchanged.
+  for (const key of ["fmap", "PS"]) {
+    const value = url.searchParams.get(key);
+    if (value !== null) params.set(key, value);
+  }
 
   params.sort();
 
