@@ -449,12 +449,8 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(props.pageHref || req.url);
 
   const searchTerm = url.searchParams.get("ft") || url.searchParams.get("q");
-  const hasMap = url.search.includes("map=");
   const cachedSearchTerms = ctx.cachedSearchTerms ?? [];
-  if (
-    hasMap ||
-    (searchTerm && !cachedSearchTerms.includes(searchTerm.toLowerCase()))
-  ) {
+  if (searchTerm && !cachedSearchTerms.includes(searchTerm.toLowerCase())) {
     return null;
   }
   const fq = [
@@ -495,6 +491,14 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     if (!isFilterParam(key)) return;
     params.append(key, value);
   });
+
+  // The loader also reads these straight from the URL: `fmap` drives the facets
+  // query and `PS` the page size. Only added when present, so keys for URLs
+  // without them are unchanged.
+  for (const key of ["fmap", "PS"]) {
+    const value = url.searchParams.get(key);
+    if (value !== null) params.set(key, value);
+  }
 
   params.sort();
 
