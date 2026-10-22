@@ -112,20 +112,20 @@ const optmizeShopify = (opts: OptimizationOptions) => {
 };
 
 const optimizeVTEX = (opts: OptimizationOptions) => {
-  const { originalSrc, width, height } = opts;
+  const { originalSrc, width } = opts;
 
   const src = new URL(originalSrc);
 
   const [slash, arquivos, ids, rawId, ...rest] = src.pathname.split("/");
-  const [trueId, _w, _h] = rawId.split("-");
+  const [trueId] = rawId.split("-");
 
   src.pathname = [
-    slash,
-    arquivos,
-    ids,
-    `${trueId}-${width}-${height}`,
-    ...rest,
-  ].join("/");
+    slash, 
+    arquivos, 
+    ids, 
+    `${trueId}-${width}-0`,
+    ...rest]
+    .join("/");
 
   return src.href;
 };
