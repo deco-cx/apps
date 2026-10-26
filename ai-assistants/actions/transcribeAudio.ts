@@ -1,22 +1,12 @@
 import base64ToBlob from "../utils/blobConversion.ts";
 import { AssistantIds } from "../types.ts";
 import { AppContext } from "../mod.ts";
-import { logger, meter, ValueType } from "@deco/deco/o11y";
-const stats = {
-  audioSize: meter.createHistogram("assistant_transcribe_audio_size", {
-    description:
-      "Audio size used in Sales Assistant Transcribe Image Input - OpenAI",
-    unit: "s",
-    valueType: ValueType.DOUBLE,
-  }),
-  transcribeAudioError: meter.createCounter(
-    "assistant_transcribe_audio_error",
-    {
-      unit: "1",
-      valueType: ValueType.INT,
-    },
-  ),
-};
+import { logger } from "@deco/deco/o11y";
+import {
+  ATTR_ASSISTANT_ID,
+  ATTR_ASSISTANT_OPERATION,
+  stats,
+} from "../observability.ts";
 export interface TranscribeAudioProps {
   file: string | ArrayBuffer | null;
   assistantIds?: AssistantIds;
@@ -31,8 +21,9 @@ export default async function transcribeAudio(
   const assistantId = transcribeAudioProps.assistantIds?.assistantId;
   const threadId = transcribeAudioProps.assistantIds?.threadId;
   if (!transcribeAudioProps.file) {
-    stats.transcribeAudioError.add(1, {
-      assistantId,
+    stats.errors.add(1, {
+      [ATTR_ASSISTANT_OPERATION]: "transcribe_audio",
+      [ATTR_ASSISTANT_ID]: assistantId,
     });
     throw new Error("Audio file is empty");
   }
@@ -42,8 +33,8 @@ export default async function transcribeAudio(
     transcribeAudioProps.assistantIds,
   );
   const file = new File([blobData], "input.wav", { type: "audio/wav" });
-  stats.audioSize.record(transcribeAudioProps.audioDuration, {
-    assistant_id: assistantId,
+  stats.audioDuration.record(transcribeAudioProps.audioDuration, {
+    [ATTR_ASSISTANT_ID]: assistantId,
   });
   const response = await ctx.openAI.audio.transcriptions.create({
     model: "whisper-1",
