@@ -99,6 +99,12 @@ export interface BlogPost {
    */
   sections?: Section[];
   /**
+   * @deprecated Will be removed in a future release.
+   * @title Carousel in post content
+   * @description add a carousel in the middle of the post. Must be implemented in frontEnd
+   */
+  imageCarousel?: ImageCarousel;
+  /**
    * @title SEO
    */
   seo?: Seo;
@@ -241,6 +247,12 @@ export interface BlogPostListingPage {
   categoryPath?: Category[] | null;
   pageInfo: PageInfo;
   seo: Seo;
+}
+
+/** @deprecated Will be removed in a future release. */
+export interface ImageCarousel {
+  banners?: Banner[];
+  description?: string;
 }
 
 export interface Review {
