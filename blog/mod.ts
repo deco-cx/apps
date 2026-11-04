@@ -28,6 +28,11 @@ export type State = {
    * @description Emitted as the publisher of the blog posts in the JSON-LD.
    */
   publisher?: Publisher;
+  /**
+   * @title Custom Section Paths
+   * @description Folders of sections from other apps that posts and categories can use, e.g. acme-ui/sections/Blog. The blog blocks and the site's sections/Blog/Post are always available.
+   */
+  customSectionPaths?: string[];
 };
 export type AppContext = FnContext<State, Manifest>;
 /**
