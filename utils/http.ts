@@ -97,19 +97,10 @@ export interface HttpClientOptions {
 }
 
 /**
- * Encode path segment for URLs while preserving forward slashes
- * Encodes special characters but leaves / intact for API compatibility
- */
-function encodePathSegment(value: string): string {
-  // Split by /, encode each segment, then rejoin
-  return value
-    .split("/")
-    .map((segment) => encodeURIComponent(segment))
-    .join("/");
-}
-
-/**
- * Normalize and validate path parameters to prevent path traversal attacks
+ * Validate path parameters to prevent path traversal attacks.
+ * Validates against a fully-decoded copy of the value but returns the
+ * original input verbatim so the caller's encoding level is preserved
+ * (e.g. a caller-encoded "%2520" stays "%2520" rather than collapsing to "%20").
  */
 function normalizePathParam(
   value: string | number,
@@ -117,58 +108,46 @@ function normalizePathParam(
 ): string {
   const str = String(value);
 
-  // Step 1: Decode any URL encoding to catch encoded attacks
   let decoded = str;
   try {
-    // Decode multiple times to catch double-encoding
+    // Decode repeatedly so we can detect attacks hidden behind double-encoding.
     let prev = "";
     while (prev !== decoded) {
       prev = decoded;
       decoded = decodeURIComponent(decoded);
     }
   } catch {
-    // If decode fails, keep the last successful decoded value
-    // Do not reset to original string as that would bypass security checks
+    // Partial decode is acceptable for validation purposes.
   }
 
-  // Step 2: Check for path traversal in decoded value
   if (decoded.includes("../") || decoded.includes("..\\")) {
     throw new Error(
       `Path traversal detected in parameter '${paramName}'`,
     );
   }
 
-  // Step 3: Block absolute paths
   if (decoded.startsWith("/") || decoded.startsWith("\\")) {
     throw new Error(
       `Absolute paths not allowed in parameter '${paramName}'`,
     );
   }
 
-  // Step 4: Normalize path separators and clean up
-  const normalized = decoded
-    .replace(/\\/g, "/") // Convert backslashes to forward slashes
-    .replace(/\/+/g, "/") // Collapse multiple slashes
-    .replace(/^\/|\/$/g, ""); // Remove leading/trailing slashes
-
-  // Step 5: Final validation - ensure no ".." or "." segments remain
-  const segments = normalized.split("/");
+  const segments = decoded.replace(/\\/g, "/").split("/");
   for (const segment of segments) {
-    if (segment === ".." || segment === ".") {
+    if (segment === "..") {
       throw new Error(
         `Invalid path segment in parameter '${paramName}'`,
       );
     }
   }
 
-  // Step 6: Block null bytes
-  if (normalized.includes("\0")) {
+  if (str.includes("\0") || decoded.includes("\0")) {
     throw new Error(
       `Null byte detected in parameter '${paramName}'`,
     );
   }
 
-  return normalized;
+  return str;
 }
 
 /**
@@ -267,27 +246,20 @@ export const createHttpClient = <T>(
               throw new TypeError(`HttpClient: Missing ${name} at ${path}`);
             }
 
-            // Normalize and validate path parameters to prevent path traversal
+            // Validate path parameters to prevent path traversal.
+            // We intentionally pass the value through verbatim — re-encoding
+            // here would break callers that already pre-encoded special
+            // characters (e.g. "%2520" must reach the server as "%2520",
+            // not collapse to "%20" or "%2525").
             if (param !== undefined) {
               try {
-                // Handle array params (for wildcard routes like /*)
                 if (Array.isArray(param)) {
-                  return param.map((item) => {
-                    const itemStr = String(item);
-                    const normalized = normalizePathParam(itemStr, name);
-                    // Encode special chars but preserve forward slashes for API compatibility
-                    return encodePathSegment(normalized);
-                  });
+                  return param.map((item) =>
+                    normalizePathParam(String(item), name)
+                  );
                 }
-
-                // Handle single value params
-                const paramStr = String(param);
-                const normalized = normalizePathParam(paramStr, name);
-                // Encode special chars but preserve forward slashes for API compatibility
-                return encodePathSegment(normalized);
+                return normalizePathParam(String(param), name);
               } catch (_error) {
-                // Translate validation errors into generic HTTP 400 errors
-                // without exposing the original input value or error details
                 throw new HttpError(
                   400,
                   `Invalid parameter '${name}'`,
