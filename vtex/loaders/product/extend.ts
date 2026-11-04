@@ -112,6 +112,13 @@ const variantsExt = async (
   }));
 };
 
+/**
+ * Reviews are decoration: a failed call already degrades to "no rating".
+ * Without a timeout, a single stalled reviews-and-ratings call holds the
+ * whole page render (observed ~55s stalls on myvtex.com).
+ */
+const REVIEWS_TIMEOUT_MS = 3_000;
+
 const reviewsExt = async (
   products: Product[],
   ctx: AppContext,
@@ -124,14 +131,16 @@ const reviewsExt = async (
       to: "10",
       order_by: "",
       status: true,
-    }).then((res) => res.json())
+    }, { signal: AbortSignal.timeout(REVIEWS_TIMEOUT_MS) })
+      .then((res) => res.json())
       .catch(() => ({}))
   );
 
   const ratingPromises = products.map((product) =>
     ctx.my["GET /reviews-and-ratings/api/rating/:inProductGroupWithId"]({
       inProductGroupWithId: product.inProductGroupWithID ?? "",
-    }).then((res) => res.json())
+    }, { signal: AbortSignal.timeout(REVIEWS_TIMEOUT_MS) })
+      .then((res) => res.json())
       .catch(() => ({}))
   );
 
