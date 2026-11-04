@@ -16,7 +16,7 @@ export interface Props {
 /**
  * @title Birthday
  * @description Target users based on their birth date
- * @icon calendar-event
+ * @icon gift
  */
 const MatchBirthday = async (
   props: Props,
