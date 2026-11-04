@@ -30,7 +30,7 @@ export type State = {
   publisher?: Publisher;
   /**
    * @title Custom Section Paths
-   * @description Folders of sections from other apps that posts and categories can use, e.g. acme-ui/sections/Blog. The blog blocks and the site's sections/Blog/Post are always available.
+   * @description Folders of sections from other apps that posts and categories can use, written as the start of the section's path, e.g. acme-ui/sections/Blog. A section named like a blog block (Paragraph, Heading...) is edited as that block, so it must take the same props.
    */
   customSectionPaths?: string[];
 };
