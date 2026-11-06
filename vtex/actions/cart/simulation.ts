@@ -13,6 +13,7 @@ export interface Props {
   postalCode: string;
   country: string;
   RnbBehavior?: 0 | 1;
+  sc?: string;
 }
 
 /**
@@ -27,7 +28,7 @@ const action = async (
 ): Promise<SimulationOrderForm> => {
   const cookie = req.headers.get("cookie") ?? "";
   const { vcsDeprecated } = ctx;
-  const { items, postalCode, country, RnbBehavior = 1 } = props;
+  const { items, postalCode, country, RnbBehavior = 1, sc } = props;
   const segment = getSegmentFromBag(ctx);
 
   const response = await vcsDeprecated[
@@ -35,7 +36,11 @@ const action = async (
   ](
     {
       RnbBehavior,
-      sc: segment?.payload.channel,
+      sc:
+        sc ? sc :
+        (ctx.allowMixedSegments
+          ? segment?.payload.channel
+          : ctx.salesChannel),
     },
     {
       body: { items, country, postalCode },

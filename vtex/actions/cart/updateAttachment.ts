@@ -10,6 +10,7 @@ export interface Props {
   expectedOrderFormSections?: string[];
   // deno-lint-ignore no-explicit-any
   body: any;
+  sc?: string;
 }
 
 /**
@@ -26,6 +27,7 @@ const action = async (
     attachment,
     body,
     expectedOrderFormSections = DEFAULT_EXPECTED_SECTIONS,
+    sc,
   } = props;
   const { orderFormId } = parseCookie(req.headers);
 
@@ -36,19 +38,27 @@ const action = async (
   const cookie = req.headers.get("cookie") ?? "";
   const segment = getSegmentFromBag(ctx);
 
-  const response = await vcsDeprecated
-    ["POST /api/checkout/pub/orderForm/:orderFormId/attachments/:attachment"]({
+  const response = await vcsDeprecated[
+    "POST /api/checkout/pub/orderForm/:orderFormId/attachments/:attachment"
+  ](
+    {
       orderFormId,
       attachment,
-      sc: segment?.payload.channel,
-    }, {
+      sc:
+        sc ? sc :
+        (ctx.allowMixedSegments
+        ? segment?.payload.channel
+          : ctx.salesChannel),
+    },
+    {
       body: { expectedOrderFormSections, ...body },
       headers: {
         accept: "application/json",
         "content-type": "application/json",
         cookie,
       },
-    });
+    },
+  );
 
   proxySetCookie(response.headers, ctx.response.headers, req.url);
 
