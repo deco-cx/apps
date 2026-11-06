@@ -8,6 +8,7 @@ import {
   withCategoryPath,
 } from "../core/categoryTree.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import { isDraftPreview } from "../utils/draftPreview.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
@@ -23,7 +24,7 @@ export interface Props {
  * @description Fetches a specific blog post page by its slug.
  *
  * @param props - Contains the slug of the blog post.
- * @param _req - The request object (unused).
+ * @param req - The request object; `?draft=true` previews a non-live post.
  * @param ctx - The application context.
  * @returns A promise that resolves to the blog post or undefined if not found.
  */
@@ -44,6 +45,13 @@ export default async function BlogPostPageLoader(
   const post = posts.find((post) => post?.slug === slug);
 
   if (!post) {
+    return null;
+  }
+
+  // A post that isn't live yet — unpublished, or scheduled for an instant still
+  // ahead — only renders in a `?draft=true` preview. Without it the page
+  // answers as if the post didn't exist.
+  if (!isLivePost(post) && !isDraftPreview(url)) {
     return null;
   }
 
@@ -85,10 +93,9 @@ export default async function BlogPostPageLoader(
       description: post?.seo?.description || post?.excerpt,
       canonical: post?.seo?.canonical || canonical || url.href,
       image: post?.seo?.image || post?.image,
-      // A post that isn't live yet — unpublished, or scheduled for an instant
-      // still ahead — renders anyway, because that page *is* the CMS preview.
-      // It just must never be indexed, even if the URL leaks. A scheduled post
-      // becomes indexable on its own once its instant passes.
+      // A non-live post reaching this point is a draft preview: it must never
+      // be indexed, even if the URL leaks. A scheduled post becomes indexable
+      // on its own once its instant passes.
       noIndexing: post?.seo?.noIndexing || !isLivePost(post),
     },
   };

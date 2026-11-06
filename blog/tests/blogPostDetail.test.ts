@@ -31,9 +31,10 @@ const draft: Partial<BlogPost> = {
 };
 
 const req = new Request("https://example.com/blog/wip");
+const preview = new Request("https://example.com/blog/wip?draft=true");
 
-Deno.test("BlogPostItem still serves a draft, marked noIndexing", async () => {
-  const post = await BlogPostItem({ slug: "wip" }, req, ctxWith(draft));
+Deno.test("BlogPostItem serves a draft in preview, marked noIndexing", async () => {
+  const post = await BlogPostItem({ slug: "wip" }, preview, ctxWith(draft));
 
   assertEquals(post?.slug, "wip");
   assertEquals(post?.seo?.noIndexing, true);
@@ -42,7 +43,7 @@ Deno.test("BlogPostItem still serves a draft, marked noIndexing", async () => {
 Deno.test("BlogPostItem keeps the draft's other seo fields", async () => {
   const post = await BlogPostItem(
     { slug: "wip" },
-    req,
+    preview,
     ctxWith({
       ...draft,
       seo: { title: "Custom title", canonical: "https://example.com/canon" },
@@ -65,8 +66,12 @@ Deno.test("BlogPostItem leaves a published post untouched", async () => {
   assertEquals(post?.seo?.noIndexing, undefined);
 });
 
-Deno.test("BlogPostPage still serves a draft, marked noIndexing", async () => {
-  const page = await BlogPostPageLoader({ slug: "wip" }, req, ctxWith(draft));
+Deno.test("BlogPostPage serves a draft in preview, marked noIndexing", async () => {
+  const page = await BlogPostPageLoader(
+    { slug: "wip" },
+    preview,
+    ctxWith(draft),
+  );
 
   assertEquals(page?.post.slug, "wip");
   assertEquals(page?.seo?.noIndexing, true);
@@ -75,7 +80,7 @@ Deno.test("BlogPostPage still serves a draft, marked noIndexing", async () => {
 Deno.test("BlogPostPage keeps the draft's other seo fields", async () => {
   const page = await BlogPostPageLoader(
     { slug: "wip" },
-    req,
+    preview,
     ctxWith({
       ...draft,
       seo: { title: "Custom title", canonical: "https://example.com/canon" },
@@ -97,6 +102,22 @@ Deno.test("BlogPostPage leaves a published post indexable", async () => {
   assertEquals(page?.seo?.noIndexing, false);
 });
 
+Deno.test("a draft is not found without ?draft=true", async () => {
+  const ctx = ctxWith(draft);
+
+  for (
+    const query of ["", "?draft=1", "?draft=false", "?draft", "?__draft=true"]
+  ) {
+    const r = new Request(`https://example.com/blog/wip${query}`);
+    assertEquals(await BlogPostItem({ slug: "wip" }, r, ctx), null, query);
+    assertEquals(
+      await BlogPostPageLoader({ slug: "wip" }, r, ctx),
+      null,
+      query,
+    );
+  }
+});
+
 const DAY = 86_400_000;
 
 const fromNow = (offsetMs: number) =>
@@ -108,16 +129,19 @@ const scheduled = (offsetMs: number): Partial<BlogPost> => ({
   scheduledDatetime: fromNow(offsetMs),
 });
 
-Deno.test("a not-yet-due scheduled post is served, marked noIndexing", async () => {
-  // Same contract as a draft: the URL works so the CMS can preview it, but it
+Deno.test("a not-yet-due scheduled post only renders in preview, unindexed", async () => {
+  // Same contract as a draft: the page renders in a `?draft=true` preview, but
   // must not be indexed before its go-live.
   const ctx = ctxWith(scheduled(DAY));
 
-  const item = await BlogPostItem({ slug: "wip" }, req, ctx);
+  assertEquals(await BlogPostItem({ slug: "wip" }, req, ctx), null);
+  assertEquals(await BlogPostPageLoader({ slug: "wip" }, req, ctx), null);
+
+  const item = await BlogPostItem({ slug: "wip" }, preview, ctx);
   assertEquals(item?.slug, "wip");
   assertEquals(item?.seo?.noIndexing, true);
 
-  const page = await BlogPostPageLoader({ slug: "wip" }, req, ctx);
+  const page = await BlogPostPageLoader({ slug: "wip" }, preview, ctx);
   assertEquals(page?.post.slug, "wip");
   assertEquals(page?.seo?.noIndexing, true);
 });
@@ -141,17 +165,19 @@ Deno.test("a scheduled post with a broken instant stays unindexable", async () =
     scheduledDatetime: "not a date",
   });
 
+  assertEquals(await BlogPostItem({ slug: "wip" }, req, ctx), null);
+  assertEquals(await BlogPostPageLoader({ slug: "wip" }, req, ctx), null);
   assertEquals(
-    (await BlogPostItem({ slug: "wip" }, req, ctx))?.seo?.noIndexing,
+    (await BlogPostItem({ slug: "wip" }, preview, ctx))?.seo?.noIndexing,
     true,
   );
   assertEquals(
-    (await BlogPostPageLoader({ slug: "wip" }, req, ctx))?.seo?.noIndexing,
+    (await BlogPostPageLoader({ slug: "wip" }, preview, ctx))?.seo?.noIndexing,
     true,
   );
 });
 
-Deno.test("every non-published status is served but unindexable", async () => {
+Deno.test("every non-published status only renders in preview, unindexed", async () => {
   for (
     const status of [
       "draft",
@@ -162,11 +188,18 @@ Deno.test("every non-published status is served but unindexable", async () => {
   ) {
     const ctx = ctxWith({ ...draft, status });
 
-    const item = await BlogPostItem({ slug: "wip" }, req, ctx);
+    assertEquals(await BlogPostItem({ slug: "wip" }, req, ctx), null, status);
+    assertEquals(
+      await BlogPostPageLoader({ slug: "wip" }, req, ctx),
+      null,
+      status,
+    );
+
+    const item = await BlogPostItem({ slug: "wip" }, preview, ctx);
     assertEquals(item?.slug, "wip", status);
     assertEquals(item?.seo?.noIndexing, true, status);
 
-    const page = await BlogPostPageLoader({ slug: "wip" }, req, ctx);
+    const page = await BlogPostPageLoader({ slug: "wip" }, preview, ctx);
     assertEquals(page?.post.slug, "wip", status);
     assertEquals(page?.seo?.noIndexing, true, status);
   }
