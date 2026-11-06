@@ -78,7 +78,7 @@ export interface BlogPost {
   slug: string;
   /**
    * @title Status
-   * @description Publication status. Anything other than `published` is kept out of listings and never indexed, and its page only renders with `?draft=true` in the URL. Posts with no status are treated as published.
+   * @description Publication status. A post is live with no status, as `published`, or as `scheduled` once its scheduled date has passed. Any other post (a draft, a `scheduled` post before its date, or any other status) is kept out of listings and never indexed, and its page only renders with `?draft=true` in the URL.
    */
   status?: PostStatus;
   /**
@@ -130,9 +130,9 @@ export interface BlogPost {
 /**
  * Publication status of a post. `published` (or an absent value, for legacy
  * posts) renders on the live site; `scheduled` renders once its
- * `scheduledDatetime` has passed; every other value keeps the post out of
- * listings and out of the index, and its own page only renders in a
- * `?draft=true` preview.
+ * `scheduledDatetime` has passed. Until then, and for every other value, the
+ * post is kept out of listings and out of the index, and its own page only
+ * renders in a `?draft=true` preview.
  *
  * `generating` and `awaiting_review` are written by the autonomous-blog agent
  * while a post is still being produced, which is why the checks below are
