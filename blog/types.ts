@@ -78,7 +78,7 @@ export interface BlogPost {
   slug: string;
   /**
    * @title Status
-   * @description Publication status. Anything other than `published` is kept out of listings and never indexed. Posts with no status are treated as published.
+   * @description Publication status. Anything other than `published` is kept out of listings and never indexed. Posts with no status are treated as published. Open a listing with `?draft=true` to preview every post, whatever its status.
    */
   status?: PostStatus;
   /**
