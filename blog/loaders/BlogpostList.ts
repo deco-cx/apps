@@ -14,7 +14,6 @@ import handlePosts, { slicePosts } from "../core/handlePosts.ts";
 import { getRecordsByPath } from "../core/records.ts";
 import { descendantSlugs } from "../core/categoryTree.ts";
 import { Category } from "../types.ts";
-import { isDraftPreview } from "../utils/draftPreview.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
@@ -108,8 +107,6 @@ export default async function BlogPostList(
       categorySlugs,
       postSlugs,
       term,
-      undefined,
-      isDraftPreview(url),
     );
 
     if (!handledPosts) {

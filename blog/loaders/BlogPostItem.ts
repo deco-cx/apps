@@ -2,6 +2,7 @@ import { AppContext } from "../mod.ts";
 import { BlogPost, isLivePost } from "../types.ts";
 import { getRecordsByPath } from "../core/records.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import { isDraftPreview } from "../utils/draftPreview.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
@@ -17,13 +18,13 @@ export interface Props {
  * Fetches a specific blog post by its slug.
  *
  * @param props - Contains the slug of the blog post.
- * @param _req - The request object (unused).
+ * @param req - The request object; `?draft=true` previews a non-live post.
  * @param ctx - The application context.
  * @returns A promise that resolves to the blog post or undefined if not found.
  */
 export default async function BlogPostItem(
   { slug }: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<BlogPost | null> {
   const posts = await getRecordsByPath<BlogPost>(
@@ -38,12 +39,17 @@ export default async function BlogPostItem(
     return null;
   }
 
+  if (isLivePost(post)) {
+    return post;
+  }
+
   // A post that isn't live yet — unpublished, or scheduled for an instant still
-  // ahead — is still served, because that page *is* the CMS preview. It just
-  // must never be indexed. Everything else the post declared under `seo` is
-  // kept as-is, and a scheduled post becomes indexable on its own once its
-  // instant passes.
-  return isLivePost(post)
-    ? post
-    : { ...post, seo: { ...post.seo, noIndexing: true } };
+  // ahead — is only served in a `?draft=true` preview, and then must never be
+  // indexed. Everything else the post declared under `seo` is kept as-is, and a
+  // scheduled post becomes indexable on its own once its instant passes.
+  if (!isDraftPreview(new URL(req.url))) {
+    return null;
+  }
+
+  return { ...post, seo: { ...post.seo, noIndexing: true } };
 }

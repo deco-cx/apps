@@ -19,7 +19,6 @@ import {
   indexCategories,
   withCategoryPath,
 } from "../core/categoryTree.ts";
-import { isDraftPreview } from "../utils/draftPreview.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
@@ -75,7 +74,6 @@ export default async function BlogPostList(
   const pageNumber = Number(page ?? params.get("page") ?? 1);
   const pageSort = sortBy ?? (params.get("sortBy") as SortBy) ?? "date_desc";
   const term = query ?? params.get("q") ?? undefined;
-  const includeDrafts = isDraftPreview(url);
 
   const posts = await getRecordsByPath<BlogPost>(
     ctx,
@@ -112,8 +110,6 @@ export default async function BlogPostList(
       categorySlugs,
       undefined,
       term,
-      undefined,
-      includeDrafts,
     );
 
     if (!handledPosts) {
@@ -152,8 +148,6 @@ export default async function BlogPostList(
         // Reached through a stale or wrong path, the page still renders and
         // points at the one canonical URL instead of 404ing.
         canonical: canonical ?? new URL(url.pathname, url.origin).href,
-        // A preview lists posts that aren't live, so it must never be indexed.
-        ...(includeDrafts ? { noIndexing: true } : {}),
       },
     };
   } catch (e) {

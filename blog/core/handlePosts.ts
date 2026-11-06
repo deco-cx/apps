@@ -176,18 +176,13 @@ export const slicePosts = (
  *
  * A scheduled post crossing its instant flips this filter on the next request
  * that misses cache; nothing re-deploys and no record is rewritten.
- *
- * `includeDrafts` (a `?draft=true` preview) skips the liveness check, so every
- * post shows whatever its status. A post without a slug is still dropped: it
- * has no route in a preview either.
  */
-export const filterRoutablePosts = (posts: BlogPost[], includeDrafts = false) =>
+export const filterRoutablePosts = (posts: BlogPost[]) =>
   // Records come straight from the CMS, so `slug` is only a string by
   // convention: the typeof guard keeps a malformed one from throwing here and
   // taking the whole listing down with it.
   posts.filter((post) =>
-    typeof post.slug === "string" && post.slug.trim() &&
-    (includeDrafts || isLivePost(post))
+    typeof post.slug === "string" && post.slug.trim() && isLivePost(post)
   );
 
 const filterPosts = (
@@ -195,9 +190,8 @@ const filterPosts = (
   slug?: string | string[],
   postSlugs?: string[],
   term?: string,
-  includeDrafts = false,
 ): BlogPost[] => {
-  const posts = filterRoutablePosts(allPosts, includeDrafts);
+  const posts = filterRoutablePosts(allPosts);
 
   const byCategory = postSlugs && postSlugs.length > 0
     ? filterPostsBySlugs(posts, postSlugs)
@@ -216,7 +210,6 @@ const filterPosts = (
  * @param postSlugs Specific slugs to be filtered
  * @param term Term to be filtered
  * @param excludePostSlug Slug to be excluded
- * @param includeDrafts Keep posts that aren't live (a `?draft=true` preview)
  */
 export default async function handlePosts(
   posts: BlogPost[],
@@ -226,15 +219,8 @@ export default async function handlePosts(
   postSlugs?: string[],
   term?: string,
   excludePostSlug?: string,
-  includeDrafts = false,
 ) {
-  const filteredPosts = filterPosts(
-    posts,
-    slug,
-    postSlugs,
-    term,
-    includeDrafts,
-  ).filter(
+  const filteredPosts = filterPosts(posts, slug, postSlugs, term).filter(
     ({ slug: postSlug }) => postSlug !== excludePostSlug,
   );
 

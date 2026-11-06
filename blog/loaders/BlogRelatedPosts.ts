@@ -12,7 +12,6 @@ import handlePosts, { slicePosts } from "../core/handlePosts.ts";
 import { getRecordsByPath } from "../core/records.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost, SortBy } from "../types.ts";
-import { isDraftPreview } from "../utils/draftPreview.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
@@ -87,7 +86,6 @@ export default async function BlogRelatedPosts(
     undefined,
     term,
     excludePostSlug,
-    isDraftPreview(url),
   );
 
   if (!handledPosts) {
