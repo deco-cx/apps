@@ -1,7 +1,12 @@
 import { extname, isAbsolute, join, relative, SEP } from "std/path/mod.ts";
 import { Route } from "../flags/audience.ts";
 import type { AppContext } from "../mod.ts";
-import { fetchPublicUrl, readTextWithLimit } from "../utils/publicUrl.ts";
+import {
+  allowlist,
+  type AllowUrl,
+  fetchPublicUrl,
+  readTextWithLimit,
+} from "../utils/publicUrl.ts";
 
 const MAX_CACHED_FILES = 50;
 const MAX_REMOTE_FILE_BYTES = 20 * 1024 * 1024;
@@ -60,8 +65,11 @@ const readLocalCsv = (from: string) => {
 const isRemote = (from: string) => /^https?:\/\//i.test(from);
 
 // Plain http is refused, so a remote file is not fetched in clear text.
-const fetchRemoteCsv = async (from: string) => {
-  const response = await fetchPublicUrl(from, {}, { httpsOnly: true });
+const fetchRemoteCsv = async (from: string, allowUrl?: AllowUrl) => {
+  const response = await fetchPublicUrl(from, {}, {
+    httpsOnly: true,
+    allowUrl,
+  });
   if (!response.ok) {
     await response.body?.cancel();
     throw new Error(`Redirects file responded ${response.status}`);
@@ -74,11 +82,12 @@ const fetchRemoteCsv = async (from: string) => {
 const getRedirectFromFile = async (
   from: string,
   forcePermanentRedirects?: boolean,
+  allowUrl?: AllowUrl,
 ): Promise<Route[] | null> => {
   let redirectsRaw: string | null = null;
   try {
     redirectsRaw = isRemote(from)
-      ? await fetchRemoteCsv(from)
+      ? await fetchRemoteCsv(from, allowUrl)
       : await readLocalCsv(from);
   } catch (e) {
     console.error(`Could not read redirects file ${from}:`, e);
@@ -127,11 +136,6 @@ export const removeTrailingSlash = (path: string) =>
 
 const routesMap = new Map<string, Promise<Route[] | null>>();
 
-// Same rule as the image and asset proxies: an empty allowlist allows any
-// public https source.
-const isAllowedSource = (from: string, patterns?: URLPattern[]) =>
-  !patterns?.length || patterns.some((pattern) => pattern.test(from));
-
 export default async function redirect(
   {
     redirects,
@@ -156,9 +160,11 @@ export default async function redirect(
     },
   }));
 
-  // Checked before the cache, so a source removed from the allowlist stops
-  // being served without a restart.
-  if (isRemote(from) && !isAllowedSource(from, ctx?.whitelistPatterns)) {
+  // Same allowlist as the image and asset proxies. Checked before the cache,
+  // so a source removed from the allowlist stops being served without a
+  // restart.
+  const allowUrl = allowlist(ctx?.whitelistPatterns);
+  if (isRemote(from) && allowUrl && !allowUrl(from)) {
     console.error(`Redirects file is not in the URL allowlist: ${from}`);
     return routes;
   }
@@ -170,7 +176,7 @@ export default async function redirect(
       routesMap.delete(routesMap.keys().next().value!);
     }
     pending = from
-      ? getRedirectFromFile(from, forcePermanentRedirects)
+      ? getRedirectFromFile(from, forcePermanentRedirects, allowUrl)
       : Promise.resolve([]);
     routesMap.set(from, pending);
   }

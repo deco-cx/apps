@@ -6,7 +6,11 @@ import {
 } from "../../utils/fetch.ts";
 import { HttpError } from "../../utils/http.ts";
 import { AppContext } from "../mod.ts";
-import { fetchPublicUrl, parsePublicUrl } from "../utils/publicUrl.ts";
+import {
+  allowlist,
+  fetchPublicUrl,
+  parsePublicUrl,
+} from "../utils/publicUrl.ts";
 
 const httpErrorResponse = (error: unknown) => {
   if (!(error instanceof HttpError)) throw error;
@@ -39,11 +43,8 @@ const loader = async (
     return httpErrorResponse(error);
   }
 
-  if (
-    ctx.whitelistPatterns &&
-    ctx.whitelistPatterns.length > 0 &&
-    !ctx.whitelistPatterns.some((pattern) => pattern.test(url))
-  ) {
+  const allowUrl = allowlist(ctx.whitelistPatterns);
+  if (allowUrl && !allowUrl(url)) {
     return new Response("Proxy disabled for this source", { status: 403 });
   }
 
@@ -66,7 +67,7 @@ const loader = async (
     original = await fetchPublicUrl(
       url,
       { ...STALE, headers: forwardedHeaders },
-      { fetcher: fetchWithRetry },
+      { fetcher: fetchWithRetry, allowUrl },
     );
   } catch (error) {
     return httpErrorResponse(error);
