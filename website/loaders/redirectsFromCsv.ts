@@ -1,5 +1,6 @@
 import { extname, isAbsolute, join, relative, SEP } from "std/path/mod.ts";
 import { Route } from "../flags/audience.ts";
+import type { AppContext } from "../mod.ts";
 import { fetchPublicUrl, readTextWithLimit } from "../utils/publicUrl.ts";
 
 const MAX_CACHED_FILES = 50;
@@ -126,11 +127,42 @@ export const removeTrailingSlash = (path: string) =>
 
 const routesMap = new Map<string, Promise<Route[] | null>>();
 
-export default async function redirect({
-  redirects,
-  from = "",
-  forcePermanentRedirects,
-}: Redirects): Promise<Route[]> {
+// Same rule as the image and asset proxies: an empty allowlist allows any
+// public https source.
+const isAllowedSource = (from: string, patterns?: URLPattern[]) =>
+  !patterns?.length || patterns.some((pattern) => pattern.test(from));
+
+export default async function redirect(
+  {
+    redirects,
+    from = "",
+    forcePermanentRedirects,
+  }: Redirects,
+  _req?: Request,
+  ctx?: AppContext,
+): Promise<Route[]> {
+  const routes: Route[] = (redirects || []).map((
+    { from, to, type, discardQueryParameters },
+  ) => ({
+    pathTemplate: from,
+    isHref: true,
+    handler: {
+      value: {
+        __resolveType: "website/handlers/redirect.ts",
+        to,
+        type,
+        discardQueryParameters,
+      },
+    },
+  }));
+
+  // Checked before the cache, so a source removed from the allowlist stops
+  // being served without a restart.
+  if (isRemote(from) && !isAllowedSource(from, ctx?.whitelistPatterns)) {
+    console.error(`Redirects file is not in the URL allowlist: ${from}`);
+    return routes;
+  }
+
   let pending = routesMap.get(from);
 
   if (!pending) {
@@ -147,21 +179,6 @@ export default async function redirect({
   if (redirectsFromFiles === null && routesMap.get(from) === pending) {
     routesMap.delete(from);
   }
-
-  const routes: Route[] = (redirects || []).map((
-    { from, to, type, discardQueryParameters },
-  ) => ({
-    pathTemplate: from,
-    isHref: true,
-    handler: {
-      value: {
-        __resolveType: "website/handlers/redirect.ts",
-        to,
-        type,
-        discardQueryParameters,
-      },
-    },
-  }));
 
   return [...(redirectsFromFiles ?? []), ...routes];
 }

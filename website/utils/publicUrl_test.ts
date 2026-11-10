@@ -352,6 +352,61 @@ Deno.test("redirectsFromCsv reads a local file whose name starts with http", asy
   }
 });
 
+Deno.test("redirectsFromCsv only fetches remote files in the URL allowlist", async () => {
+  const { requested, restore } = stubFetch();
+  // An IP literal skips the DNS lookup. The retry test below caches its own
+  // URL, so this one uses a different address in the same documentation range.
+  const allowed = "https://203.0.113.30/redirects.csv";
+  const ctx = {
+    whitelistPatterns: [new URLPattern("https://203.0.113.30/*")],
+  } as AppContext;
+  const redirects = [{ from: "/inline", to: "/target" }];
+  const paths = (routes: { pathTemplate: string }[]) =>
+    routes.map((route) => route.pathTemplate);
+  try {
+    assertEquals(
+      paths(
+        await redirectsFromCsv(
+          { from: "https://203.0.113.20/redirects.csv", redirects },
+          new Request("https://site.com/"),
+          ctx,
+        ),
+      ),
+      ["/inline"],
+    );
+    assertEquals(requested, []);
+
+    assertEquals(
+      paths(
+        await redirectsFromCsv(
+          { from: allowed, redirects },
+          new Request("https://site.com/"),
+          ctx,
+        ),
+      ),
+      ["/from", "/inline"],
+    );
+    assertEquals(requested, [allowed]);
+
+    // A cached file stops being served once its source leaves the allowlist.
+    const narrowed = {
+      whitelistPatterns: [new URLPattern("https://example.com/*")],
+    } as AppContext;
+    assertEquals(
+      paths(
+        await redirectsFromCsv(
+          { from: allowed, redirects },
+          new Request("https://site.com/"),
+          narrowed,
+        ),
+      ),
+      ["/inline"],
+    );
+  } finally {
+    restore();
+  }
+});
+
 Deno.test("redirectsFromCsv retries a remote file that failed", async () => {
   const originalFetch = globalThis.fetch;
   const responses = [
