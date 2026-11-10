@@ -1,6 +1,12 @@
 import { extname, isAbsolute, join, relative, SEP } from "std/path/mod.ts";
 import { Route } from "../flags/audience.ts";
-import { fetchPublicUrl, readTextWithLimit } from "../utils/publicUrl.ts";
+import type { AppContext } from "../mod.ts";
+import {
+  allowlist,
+  type AllowUrl,
+  fetchPublicUrl,
+  readTextWithLimit,
+} from "../utils/publicUrl.ts";
 
 const MAX_CACHED_FILES = 50;
 const MAX_REMOTE_FILE_BYTES = 20 * 1024 * 1024;
@@ -50,17 +56,23 @@ const readLocalCsv = (from: string) => {
     isAbsolute(fromRoot) ||
     extname(path).toLowerCase() !== ".csv"
   ) {
-    throw new Error(`Redirects file must be a .csv inside the site: ${from}`);
+    throw new Error("Redirects file must be a .csv inside the site");
   }
 
   return Deno.readTextFile(path);
 };
 
-const fetchRemoteCsv = async (from: string) => {
-  const response = await fetchPublicUrl(from);
+const isRemote = (from: string) => /^https?:\/\//i.test(from);
+
+// Plain http is refused, so a remote file is not fetched in clear text.
+const fetchRemoteCsv = async (from: string, allowUrl?: AllowUrl) => {
+  const response = await fetchPublicUrl(from, {}, {
+    httpsOnly: true,
+    allowUrl,
+  });
   if (!response.ok) {
     await response.body?.cancel();
-    throw new Error(`Redirects file responded ${response.status}: ${from}`);
+    throw new Error(`Redirects file responded ${response.status}`);
   }
   return readTextWithLimit(response, MAX_REMOTE_FILE_BYTES);
 };
@@ -70,14 +82,15 @@ const fetchRemoteCsv = async (from: string) => {
 const getRedirectFromFile = async (
   from: string,
   forcePermanentRedirects?: boolean,
+  allowUrl?: AllowUrl,
 ): Promise<Route[] | null> => {
   let redirectsRaw: string | null = null;
   try {
-    redirectsRaw = from.startsWith("http")
-      ? await fetchRemoteCsv(from)
+    redirectsRaw = isRemote(from)
+      ? await fetchRemoteCsv(from, allowUrl)
       : await readLocalCsv(from);
   } catch (e) {
-    console.error(e);
+    console.error(`Could not read redirects file ${from}:`, e);
     return null;
   }
 
@@ -123,28 +136,15 @@ export const removeTrailingSlash = (path: string) =>
 
 const routesMap = new Map<string, Promise<Route[] | null>>();
 
-export default async function redirect({
-  redirects,
-  from = "",
-  forcePermanentRedirects,
-}: Redirects): Promise<Route[]> {
-  let pending = routesMap.get(from);
-
-  if (!pending) {
-    if (routesMap.size >= MAX_CACHED_FILES) {
-      routesMap.delete(routesMap.keys().next().value!);
-    }
-    pending = from
-      ? getRedirectFromFile(from, forcePermanentRedirects)
-      : Promise.resolve([]);
-    routesMap.set(from, pending);
-  }
-
-  const redirectsFromFiles = await pending;
-  if (redirectsFromFiles === null && routesMap.get(from) === pending) {
-    routesMap.delete(from);
-  }
-
+export default async function redirect(
+  {
+    redirects,
+    from = "",
+    forcePermanentRedirects,
+  }: Redirects,
+  _req?: Request,
+  ctx?: AppContext,
+): Promise<Route[]> {
   const routes: Route[] = (redirects || []).map((
     { from, to, type, discardQueryParameters },
   ) => ({
@@ -159,6 +159,32 @@ export default async function redirect({
       },
     },
   }));
+
+  // Same allowlist as the image and asset proxies. Checked before the cache,
+  // so a source removed from the allowlist stops being served without a
+  // restart.
+  const allowUrl = allowlist(ctx?.whitelistPatterns);
+  if (isRemote(from) && allowUrl && !allowUrl(from)) {
+    console.error(`Redirects file is not in the URL allowlist: ${from}`);
+    return routes;
+  }
+
+  let pending = routesMap.get(from);
+
+  if (!pending) {
+    if (routesMap.size >= MAX_CACHED_FILES) {
+      routesMap.delete(routesMap.keys().next().value!);
+    }
+    pending = from
+      ? getRedirectFromFile(from, forcePermanentRedirects, allowUrl)
+      : Promise.resolve([]);
+    routesMap.set(from, pending);
+  }
+
+  const redirectsFromFiles = await pending;
+  if (redirectsFromFiles === null && routesMap.get(from) === pending) {
+    routesMap.delete(from);
+  }
 
   return [...(redirectsFromFiles ?? []), ...routes];
 }

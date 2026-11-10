@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects, assertThrows } from "@std/assert";
 import { HttpError } from "../../utils/http.ts";
 import {
+  allowlist,
   fetchPublicUrl,
   parsePublicUrl,
   readTextWithLimit,
@@ -100,6 +101,56 @@ Deno.test("fetchPublicUrl validates every redirect target", async () => {
     "https://example.com/a.png",
     "https://cdn.example.com/b.png",
   ]);
+});
+
+Deno.test("httpsOnly rejects plain http, including on redirects", async () => {
+  assertThrows(
+    () => parsePublicUrl("http://example.com/a.csv", { httpsOnly: true }),
+    HttpError,
+    "URL must be an absolute https URL",
+  );
+  assertEquals(
+    parsePublicUrl("https://example.com/a.csv", { httpsOnly: true }).href,
+    "https://example.com/a.csv",
+  );
+
+  const { requested, fetcher } = redirectingFetcher({
+    "https://example.com/a.csv": "http://example.com/a.csv",
+  });
+  await assertRejects(
+    () =>
+      fetchPublicUrl("https://example.com/a.csv", {}, {
+        fetcher,
+        resolveDns: publicDns,
+        httpsOnly: true,
+      }),
+    HttpError,
+    "URL must be an absolute https URL",
+  );
+  assertEquals(requested, ["https://example.com/a.csv"]);
+});
+
+Deno.test("allowUrl applies to the first URL and every redirect", async () => {
+  assertEquals(allowlist([]), undefined);
+  assertEquals(allowlist(undefined), undefined);
+
+  const allowUrl = allowlist([new URLPattern("https://example.com/*")]);
+  const { requested, fetcher } = redirectingFetcher({
+    "https://example.com/a.png": "https://cdn.example.com/b.png",
+  });
+  const options = { fetcher, resolveDns: publicDns, allowUrl };
+
+  await assertRejects(
+    () => fetchPublicUrl("https://example.com/a.png", {}, options),
+    HttpError,
+    "URL is not in the allowlist",
+  );
+  await assertRejects(
+    () => fetchPublicUrl("https://other.example.com/a.png", {}, options),
+    HttpError,
+    "URL is not in the allowlist",
+  );
+  assertEquals(requested, ["https://example.com/a.png"]);
 });
 
 Deno.test("fetchPublicUrl follows public redirects up to a limit", async () => {
@@ -288,15 +339,160 @@ Deno.test("redirectsFromCsv only reads .csv files inside the site", async () => 
   }
 });
 
-Deno.test("redirectsFromCsv refuses internal URLs", async () => {
+Deno.test("redirectsFromCsv refuses internal and plain http URLs", async () => {
   const { requested, restore } = stubFetch();
+  const originalError = console.error;
+  const logged: string[] = [];
+  console.error = (...args: unknown[]) => logged.push(String(args[0]));
+  try {
+    for (
+      const from of [
+        "https://169.254.169.254/redirects.csv",
+        // 203.0.113.0/24 is a public documentation range.
+        "http://203.0.113.10/redirects.csv",
+        "HTTP://203.0.113.10/redirects.csv",
+      ]
+    ) {
+      assertEquals(await redirectsFromCsv({ from, redirects: [] }), [], from);
+      // The log names the source, so a site with several files knows which
+      // one to fix.
+      assertEquals(logged.pop()?.includes(from), true, from);
+    }
+    assertEquals(requested, []);
+  } finally {
+    console.error = originalError;
+    restore();
+  }
+});
+
+Deno.test("redirectsFromCsv reads a local file whose name starts with http", async () => {
+  const csv = await Deno.makeTempFile({
+    dir: Deno.cwd(),
+    prefix: "http-",
+    suffix: ".csv",
+  });
+  await Deno.writeTextFile(csv, "from,to\n/old,/new\n");
   try {
     const routes = await redirectsFromCsv({
-      from: "http://169.254.169.254/redirects.csv",
+      from: csv.slice(Deno.cwd().length + 1),
       redirects: [],
     });
-    assertEquals(routes, []);
+    assertEquals(routes.map((route) => route.pathTemplate), ["/old"]);
+  } finally {
+    await Deno.remove(csv);
+  }
+});
+
+Deno.test("redirectsFromCsv only fetches remote files in the URL allowlist", async () => {
+  const { requested, restore } = stubFetch();
+  // An IP literal skips the DNS lookup. The retry test below caches its own
+  // URL, so this one uses a different address in the same documentation range.
+  const allowed = "https://203.0.113.30/redirects.csv";
+  const ctx = {
+    whitelistPatterns: [new URLPattern("https://203.0.113.30/*")],
+  } as AppContext;
+  const redirects = [{ from: "/inline", to: "/target" }];
+  const paths = (routes: { pathTemplate: string }[]) =>
+    routes.map((route) => route.pathTemplate);
+  try {
+    assertEquals(
+      paths(
+        await redirectsFromCsv(
+          { from: "https://203.0.113.20/redirects.csv", redirects },
+          new Request("https://site.com/"),
+          ctx,
+        ),
+      ),
+      ["/inline"],
+    );
     assertEquals(requested, []);
+
+    assertEquals(
+      paths(
+        await redirectsFromCsv(
+          { from: allowed, redirects },
+          new Request("https://site.com/"),
+          ctx,
+        ),
+      ),
+      ["/from", "/inline"],
+    );
+    assertEquals(requested, [allowed]);
+
+    // A cached file stops being served once its source leaves the allowlist.
+    const narrowed = {
+      whitelistPatterns: [new URLPattern("https://example.com/*")],
+    } as AppContext;
+    assertEquals(
+      paths(
+        await redirectsFromCsv(
+          { from: allowed, redirects },
+          new Request("https://site.com/"),
+          narrowed,
+        ),
+      ),
+      ["/inline"],
+    );
+  } finally {
+    restore();
+  }
+});
+
+// IP literals skip the DNS lookup; 203.0.113.0/24 is a documentation range.
+const ALLOWED_ORIGIN = "https://203.0.113.40";
+const OUTSIDE_ORIGIN = "https://203.0.113.50";
+
+/** Every request to the allowed origin redirects outside the allowlist. */
+const stubRedirectOutsideAllowlist = () => {
+  const originalFetch = globalThis.fetch;
+  const requested: string[] = [];
+  globalThis.fetch = (input: string | URL | Request) => {
+    const url = input instanceof Request ? input.url : String(input);
+    requested.push(url);
+    return Promise.resolve(
+      url.startsWith(ALLOWED_ORIGIN)
+        ? new Response(null, {
+          status: 302,
+          headers: { location: `${OUTSIDE_ORIGIN}/file` },
+        })
+        : new Response("from,to\n/outside,/target\n"),
+    );
+  };
+  return { requested, restore: () => (globalThis.fetch = originalFetch) };
+};
+
+const allowlistCtx = {
+  whitelistPatterns: [new URLPattern(`${ALLOWED_ORIGIN}/*`)],
+} as AppContext;
+
+// asset.ts fetches through Deco's fetch, which keeps the original fetch, so it
+// cannot be stubbed here; the allowUrl test above covers its redirect check.
+Deno.test("image and CSV loaders refuse a redirect that leaves the URL allowlist", async () => {
+  const { requested, restore } = stubRedirectOutsideAllowlist();
+  try {
+    const image = await imageLoader(
+      { src: `${ALLOWED_ORIGIN}/image.png`, width: 10, height: 10 },
+      new Request(
+        "https://site.com/live/invoke/website/loaders/image.ts?allowlist-redirect",
+      ),
+      allowlistCtx,
+    );
+    assertEquals(image.status, 403);
+
+    const routes = await redirectsFromCsv(
+      {
+        from: `${ALLOWED_ORIGIN}/redirects.csv`,
+        redirects: [{ from: "/inline", to: "/target" }],
+      },
+      new Request("https://site.com/"),
+      allowlistCtx,
+    );
+    assertEquals(routes.map((route) => route.pathTemplate), ["/inline"]);
+
+    assertEquals(
+      requested.some((url) => url.startsWith(OUTSIDE_ORIGIN)),
+      false,
+    );
   } finally {
     restore();
   }
