@@ -50,6 +50,12 @@ const isPrivateIPv6 = (hostname: string) => {
   ); // fe80::/10 link local
 };
 
+const isPrivateAddress = (hostname: string) =>
+  isPrivateIPv4(hostname) || isPrivateIPv6(hostname);
+
+const isIpLiteral = (hostname: string) =>
+  hostname.startsWith("[") || /^\d+\.\d+\.\d+\.\d+$/.test(hostname);
+
 /**
  * Parses a URL taken from request input and rejects anything that is not a
  * public http(s) URL, so loaders that fetch it cannot read local files
@@ -74,8 +80,7 @@ export const parsePublicUrl = (src: string | URL): URL => {
     hostname === "localhost" ||
     (!hostname.includes(".") && !hostname.startsWith("[")) ||
     INTERNAL_HOSTNAME_SUFFIXES.some((suffix) => hostname.endsWith(suffix)) ||
-    isPrivateIPv4(hostname) ||
-    isPrivateIPv6(hostname)
+    isPrivateAddress(hostname)
   ) {
     throw new HttpError(403, "URL host is not allowed");
   }
@@ -83,23 +88,71 @@ export const parsePublicUrl = (src: string | URL): URL => {
   return url;
 };
 
+export type ResolveDns = (
+  hostname: string,
+  recordType: "A" | "AAAA",
+) => Promise<string[]>;
+
+// Resolver output goes through the URL parser so it gets the same normalized
+// form (bracketed, hex IPv4-mapped) that the range checks expect.
+const normalizeAddress = (address: string) =>
+  new URL(`http://${address.includes(":") ? `[${address}]` : address}/`)
+    .hostname;
+
+/**
+ * A public name can still point at an internal address, so check what the
+ * host resolves to. The connection resolves again, so this does not stop DNS
+ * rebinding.
+ */
+const assertPublicResolution = async (url: URL, resolveDns: ResolveDns) => {
+  if (isIpLiteral(url.hostname)) return;
+
+  const results = await Promise.allSettled([
+    resolveDns(url.hostname, "A"),
+    resolveDns(url.hostname, "AAAA"),
+  ]);
+  const addresses = results.flatMap((result) =>
+    result.status === "fulfilled" ? result.value : []
+  );
+
+  if (addresses.length === 0) {
+    throw new HttpError(502, "URL host could not be resolved");
+  }
+  if (
+    addresses.some((address) => isPrivateAddress(normalizeAddress(address)))
+  ) {
+    throw new HttpError(403, "URL host is not allowed");
+  }
+};
+
 type Fetcher<Init extends RequestInit> = (
   input: URL,
   init: Init,
 ) => Promise<Response>;
 
+export interface FetchPublicUrlOptions<Init extends RequestInit> {
+  fetcher?: Fetcher<Init>;
+  resolveDns?: ResolveDns;
+}
+
 /**
- * fetch() for URLs taken from request input: validates the URL and every
- * redirect target, since a public URL can redirect to an internal one.
+ * fetch() for URLs taken from request input: validates the URL, what its host
+ * resolves to, and every redirect target, since a public URL can redirect to
+ * an internal one.
  */
 export const fetchPublicUrl = async <Init extends RequestInit = RequestInit>(
   src: string | URL,
   init: Init = {} as Init,
-  fetcher: Fetcher<Init> = fetch,
+  {
+    fetcher = fetch,
+    resolveDns = Deno.resolveDns,
+  }: FetchPublicUrlOptions<Init> = {},
 ): Promise<Response> => {
   let url = parsePublicUrl(src);
 
   for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+    await assertPublicResolution(url, resolveDns);
+
     const response = await fetcher(url, { ...init, redirect: "manual" });
     const location = response.headers.get("location");
 
@@ -108,8 +161,53 @@ export const fetchPublicUrl = async <Init extends RequestInit = RequestInit>(
     }
 
     await response.body?.cancel();
-    url = parsePublicUrl(new URL(location, url));
+
+    let next: URL;
+    try {
+      next = new URL(location, url);
+    } catch {
+      throw new HttpError(502, "Invalid redirect location");
+    }
+    url = parsePublicUrl(next);
   }
 
   throw new HttpError(502, "Too many redirects");
+};
+
+/**
+ * Reads a response body as text, failing once it grows past `maxBytes` so a
+ * URL from request input cannot exhaust memory.
+ */
+export const readTextWithLimit = async (
+  response: Response,
+  maxBytes: number,
+): Promise<string> => {
+  const tooLarge = () =>
+    new HttpError(413, `Response is larger than ${maxBytes} bytes`);
+
+  if (Number(response.headers.get("content-length")) > maxBytes) {
+    await response.body?.cancel();
+    throw tooLarge();
+  }
+  if (!response.body) return "";
+
+  const decoder = new TextDecoder();
+  const reader = response.body.getReader();
+  let size = 0;
+  let text = "";
+
+  for (
+    let chunk = await reader.read();
+    !chunk.done;
+    chunk = await reader.read()
+  ) {
+    size += chunk.value.byteLength;
+    if (size > maxBytes) {
+      await reader.cancel();
+      throw tooLarge();
+    }
+    text += decoder.decode(chunk.value, { stream: true });
+  }
+
+  return text + decoder.decode();
 };

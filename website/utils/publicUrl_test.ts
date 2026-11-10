@@ -1,6 +1,11 @@
 import { assertEquals, assertRejects, assertThrows } from "@std/assert";
 import { HttpError } from "../../utils/http.ts";
-import { fetchPublicUrl, parsePublicUrl } from "./publicUrl.ts";
+import {
+  fetchPublicUrl,
+  parsePublicUrl,
+  readTextWithLimit,
+  type ResolveDns,
+} from "./publicUrl.ts";
 import { imageRequestHeaders } from "./image/engines/remote/engine.ts";
 import assetLoader from "../loaders/asset.ts";
 import imageLoader from "../loaders/image.ts";
@@ -60,27 +65,137 @@ Deno.test("parsePublicUrl accepts public http(s) sources", () => {
   }
 });
 
-Deno.test("fetchPublicUrl validates redirect targets", async () => {
-  const originalFetch = globalThis.fetch;
+const publicDns: ResolveDns = (_hostname, type) =>
+  Promise.resolve(type === "A" ? ["93.184.215.14"] : []);
+
+const redirectingFetcher = (locations: Record<string, string>) => {
   const requested: string[] = [];
-  globalThis.fetch = (input: string | URL | Request) => {
-    requested.push(String(input));
+  const fetcher = (input: URL) => {
+    requested.push(input.href);
+    const location = locations[input.href];
     return Promise.resolve(
-      new Response(null, {
-        status: 302,
-        headers: { location: "http://169.254.169.254/latest/meta-data/" },
-      }),
+      location
+        ? new Response(null, { status: 302, headers: { location } })
+        : new Response("ok"),
     );
   };
-  try {
+  return { requested, fetcher };
+};
+
+Deno.test("fetchPublicUrl validates every redirect target", async () => {
+  const { requested, fetcher } = redirectingFetcher({
+    "https://example.com/a.png": "https://cdn.example.com/b.png",
+    "https://cdn.example.com/b.png": "http://169.254.169.254/latest/meta-data/",
+  });
+  await assertRejects(
+    () =>
+      fetchPublicUrl("https://example.com/a.png", {}, {
+        fetcher,
+        resolveDns: publicDns,
+      }),
+    HttpError,
+    "URL host is not allowed",
+  );
+  assertEquals(requested, [
+    "https://example.com/a.png",
+    "https://cdn.example.com/b.png",
+  ]);
+});
+
+Deno.test("fetchPublicUrl follows public redirects up to a limit", async () => {
+  const hops = Object.fromEntries(
+    Array.from({ length: 10 }, (_, i) => [
+      `https://example.com/${i}`,
+      `https://example.com/${i + 1}`,
+    ]),
+  );
+  const options = {
+    fetcher: redirectingFetcher(hops).fetcher,
+    resolveDns: publicDns,
+  };
+
+  const response = await fetchPublicUrl("https://example.com/5", {}, options);
+  assertEquals(await response.text(), "ok");
+
+  await assertRejects(
+    () => fetchPublicUrl("https://example.com/0", {}, options),
+    HttpError,
+    "Too many redirects",
+  );
+});
+
+Deno.test("fetchPublicUrl rejects a malformed redirect location", async () => {
+  const { fetcher } = redirectingFetcher({
+    "https://example.com/a.png": "http://[",
+  });
+  await assertRejects(
+    () =>
+      fetchPublicUrl("https://example.com/a.png", {}, {
+        fetcher,
+        resolveDns: publicDns,
+      }),
+    HttpError,
+    "Invalid redirect location",
+  );
+});
+
+Deno.test("fetchPublicUrl rejects hosts that resolve to internal addresses", async () => {
+  for (
+    const records of [
+      { A: ["127.0.0.1"], AAAA: [] },
+      { A: ["93.184.215.14", "169.254.169.254"], AAAA: [] },
+      { A: [], AAAA: ["::1"] },
+      { A: [], AAAA: ["::ffff:127.0.0.1"] },
+      { A: [], AAAA: ["fd00::1"] },
+    ]
+  ) {
+    const { requested, fetcher } = redirectingFetcher({});
     await assertRejects(
-      () => fetchPublicUrl("https://example.com/a.png"),
+      () =>
+        fetchPublicUrl("https://127.0.0.1.nip.io/a.png", {}, {
+          fetcher,
+          resolveDns: (_hostname, type) => Promise.resolve(records[type]),
+        }),
       HttpError,
+      "URL host is not allowed",
     );
-    assertEquals(requested, ["https://example.com/a.png"]);
-  } finally {
-    globalThis.fetch = originalFetch;
+    assertEquals(requested, [], JSON.stringify(records));
   }
+
+  await assertRejects(
+    () =>
+      fetchPublicUrl("https://missing.example.com/a.png", {}, {
+        fetcher: redirectingFetcher({}).fetcher,
+        resolveDns: () => Promise.reject(new Error("NXDOMAIN")),
+      }),
+    HttpError,
+    "URL host could not be resolved",
+  );
+});
+
+Deno.test("readTextWithLimit stops at the byte limit", async () => {
+  assertEquals(await readTextWithLimit(new Response("12345"), 5), "12345");
+
+  await assertRejects(
+    () =>
+      readTextWithLimit(
+        new Response("1", { headers: { "content-length": "6" } }),
+        5,
+      ),
+    HttpError,
+  );
+
+  const chunks = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode("123"));
+      controller.enqueue(new TextEncoder().encode("456"));
+      controller.close();
+    },
+  });
+  await assertRejects(
+    () => readTextWithLimit(new Response(chunks), 5),
+    HttpError,
+  );
 });
 
 Deno.test("imageRequestHeaders drops credentials", () => {
@@ -184,5 +299,23 @@ Deno.test("redirectsFromCsv refuses internal URLs", async () => {
     assertEquals(requested, []);
   } finally {
     restore();
+  }
+});
+
+Deno.test("redirectsFromCsv retries a remote file that failed", async () => {
+  const originalFetch = globalThis.fetch;
+  const responses = [
+    new Response("unavailable", { status: 503 }),
+    new Response("from,to\n/old,/new\n"),
+  ];
+  globalThis.fetch = () => Promise.resolve(responses.shift()!);
+  // An IP literal skips the DNS lookup; 203.0.113.0/24 is a documentation range.
+  const from = "https://203.0.113.10/redirects.csv";
+  try {
+    assertEquals(await redirectsFromCsv({ from, redirects: [] }), []);
+    const routes = await redirectsFromCsv({ from, redirects: [] });
+    assertEquals(routes.map((route) => route.pathTemplate), ["/old"]);
+  } finally {
+    globalThis.fetch = originalFetch;
   }
 });

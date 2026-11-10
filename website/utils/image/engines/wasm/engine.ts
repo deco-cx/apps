@@ -60,7 +60,7 @@ const fetchImage = async (
   const response = await fetchPublicUrl(src, init);
 
   if (!response.ok) {
-    throw new HttpError(502);
+    throw new HttpError(response.status >= 400 ? response.status : 502);
   }
 
   const data = await response.arrayBuffer();

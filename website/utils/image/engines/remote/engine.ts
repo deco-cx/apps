@@ -5,7 +5,7 @@ import { fetchPublicUrl } from "../../../publicUrl.ts";
 /** Request headers worth forwarding to an image origin. */
 export const imageRequestHeaders = (req: Request) => {
   const headers = new Headers({ accept: "image/*" });
-  for (const name of ["accept", "user-agent"]) {
+  for (const name of ["accept", "user-agent", "referer"]) {
     const value = req.headers.get(name);
     if (value) headers.set(name, value);
   }

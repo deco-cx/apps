@@ -8,6 +8,11 @@ import { HttpError } from "../../utils/http.ts";
 import { AppContext } from "../mod.ts";
 import { fetchPublicUrl, parsePublicUrl } from "../utils/publicUrl.ts";
 
+const httpErrorResponse = (error: unknown) => {
+  if (!(error instanceof HttpError)) throw error;
+  return new Response(error.message, { status: error.status });
+};
+
 const fetchWithRetry = (input: URL, init: DecoRequestInit) =>
   retryExceptionOr500.execute(() => fetch(input, init));
 
@@ -31,8 +36,7 @@ const loader = async (
   try {
     url = parsePublicUrl(props.src);
   } catch (error) {
-    if (!(error instanceof HttpError)) throw error;
-    return new Response(error.message, { status: error.status });
+    return httpErrorResponse(error);
   }
 
   if (
@@ -57,11 +61,16 @@ const loader = async (
     }
   }
 
-  const original = await fetchPublicUrl(
-    url,
-    { ...STALE, headers: forwardedHeaders },
-    fetchWithRetry,
-  );
+  let original: Response;
+  try {
+    original = await fetchPublicUrl(
+      url,
+      { ...STALE, headers: forwardedHeaders },
+      { fetcher: fetchWithRetry },
+    );
+  } catch (error) {
+    return httpErrorResponse(error);
+  }
 
   if (!original.ok) {
     await original.body?.cancel();
