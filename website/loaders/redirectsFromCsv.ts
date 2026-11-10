@@ -51,7 +51,7 @@ const readLocalCsv = (from: string) => {
     isAbsolute(fromRoot) ||
     extname(path).toLowerCase() !== ".csv"
   ) {
-    throw new Error(`Redirects file must be a .csv inside the site: ${from}`);
+    throw new Error("Redirects file must be a .csv inside the site");
   }
 
   return Deno.readTextFile(path);
@@ -64,7 +64,7 @@ const fetchRemoteCsv = async (from: string) => {
   const response = await fetchPublicUrl(from, {}, { httpsOnly: true });
   if (!response.ok) {
     await response.body?.cancel();
-    throw new Error(`Redirects file responded ${response.status}: ${from}`);
+    throw new Error(`Redirects file responded ${response.status}`);
   }
   return readTextWithLimit(response, MAX_REMOTE_FILE_BYTES);
 };
@@ -81,7 +81,7 @@ const getRedirectFromFile = async (
       ? await fetchRemoteCsv(from)
       : await readLocalCsv(from);
   } catch (e) {
-    console.error(e);
+    console.error(`Could not read redirects file ${from}:`, e);
     return null;
   }
 

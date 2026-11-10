@@ -317,6 +317,9 @@ Deno.test("redirectsFromCsv only reads .csv files inside the site", async () => 
 
 Deno.test("redirectsFromCsv refuses internal and plain http URLs", async () => {
   const { requested, restore } = stubFetch();
+  const originalError = console.error;
+  const logged: string[] = [];
+  console.error = (...args: unknown[]) => logged.push(String(args[0]));
   try {
     for (
       const from of [
@@ -327,9 +330,13 @@ Deno.test("redirectsFromCsv refuses internal and plain http URLs", async () => {
       ]
     ) {
       assertEquals(await redirectsFromCsv({ from, redirects: [] }), [], from);
+      // The log names the source, so a site with several files knows which
+      // one to fix.
+      assertEquals(logged.pop()?.includes(from), true, from);
     }
     assertEquals(requested, []);
   } finally {
+    console.error = originalError;
     restore();
   }
 });
