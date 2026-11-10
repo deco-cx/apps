@@ -1,5 +1,6 @@
 import { HttpError } from "../../../../../utils/http.ts";
 import type { Engine, Params } from "../../engine.ts";
+import { fetchImageUrl, imageRequestHeaders } from "../../fetch.ts";
 
 type ExternalEngine = {
   name: string;
@@ -15,7 +16,9 @@ export const createEngine = (
   resolve: async (params, _preferredMediaType, req) => {
     const url = external.urlFromParams(params);
 
-    const response = await fetch(url, { headers: new Headers(req.headers) });
+    const response = await fetchImageUrl(url, {
+      headers: imageRequestHeaders(req),
+    });
 
     if (!response.ok) {
       throw new HttpError(502);
