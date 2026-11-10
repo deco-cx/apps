@@ -56,21 +56,39 @@ const isPrivateAddress = (hostname: string) =>
 const isIpLiteral = (hostname: string) =>
   hostname.startsWith("[") || /^\d+\.\d+\.\d+\.\d+$/.test(hostname);
 
+export interface PublicUrlOptions {
+  /** Reject plain http, including on redirect targets. */
+  httpsOnly?: boolean;
+}
+
 /**
  * Parses a URL taken from request input and rejects anything that is not a
  * public http(s) URL, so loaders that fetch it cannot read local files
  * (file://) or reach the runtime's internal network.
  */
-export const parsePublicUrl = (src: string | URL): URL => {
+export const parsePublicUrl = (
+  src: string | URL,
+  { httpsOnly = false }: PublicUrlOptions = {},
+): URL => {
+  const protocolError = () =>
+    new HttpError(
+      400,
+      httpsOnly
+        ? "URL must be an absolute https URL"
+        : "URL must be an absolute http(s) URL",
+    );
+
   let url: URL;
   try {
     url = new URL(src);
   } catch {
-    throw new HttpError(400, "URL must be an absolute http(s) URL");
+    throw protocolError();
   }
 
-  if (url.protocol !== "http:" && url.protocol !== "https:") {
-    throw new HttpError(400, "URL must be an absolute http(s) URL");
+  if (
+    url.protocol !== "https:" && (httpsOnly || url.protocol !== "http:")
+  ) {
+    throw protocolError();
   }
 
   const hostname = url.hostname.toLowerCase().replace(/\.$/, "");
@@ -130,7 +148,8 @@ type Fetcher<Init extends RequestInit> = (
   init: Init,
 ) => Promise<Response>;
 
-export interface FetchPublicUrlOptions<Init extends RequestInit> {
+export interface FetchPublicUrlOptions<Init extends RequestInit>
+  extends PublicUrlOptions {
   fetcher?: Fetcher<Init>;
   resolveDns?: ResolveDns;
 }
@@ -146,9 +165,10 @@ export const fetchPublicUrl = async <Init extends RequestInit = RequestInit>(
   {
     fetcher = fetch,
     resolveDns = Deno.resolveDns,
+    httpsOnly,
   }: FetchPublicUrlOptions<Init> = {},
 ): Promise<Response> => {
-  let url = parsePublicUrl(src);
+  let url = parsePublicUrl(src, { httpsOnly });
 
   for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
     await assertPublicResolution(url, resolveDns);
@@ -168,7 +188,7 @@ export const fetchPublicUrl = async <Init extends RequestInit = RequestInit>(
     } catch {
       throw new HttpError(502, "Invalid redirect location");
     }
-    url = parsePublicUrl(next);
+    url = parsePublicUrl(next, { httpsOnly });
   }
 
   throw new HttpError(502, "Too many redirects");

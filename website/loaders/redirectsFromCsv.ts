@@ -56,8 +56,11 @@ const readLocalCsv = (from: string) => {
   return Deno.readTextFile(path);
 };
 
+const isRemote = (from: string) => /^https?:\/\//i.test(from);
+
+// Plain http is refused, so a remote file is not fetched in clear text.
 const fetchRemoteCsv = async (from: string) => {
-  const response = await fetchPublicUrl(from);
+  const response = await fetchPublicUrl(from, {}, { httpsOnly: true });
   if (!response.ok) {
     await response.body?.cancel();
     throw new Error(`Redirects file responded ${response.status}: ${from}`);
@@ -73,7 +76,7 @@ const getRedirectFromFile = async (
 ): Promise<Route[] | null> => {
   let redirectsRaw: string | null = null;
   try {
-    redirectsRaw = from.startsWith("http")
+    redirectsRaw = isRemote(from)
       ? await fetchRemoteCsv(from)
       : await readLocalCsv(from);
   } catch (e) {

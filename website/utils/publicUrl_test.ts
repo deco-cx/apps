@@ -102,6 +102,33 @@ Deno.test("fetchPublicUrl validates every redirect target", async () => {
   ]);
 });
 
+Deno.test("httpsOnly rejects plain http, including on redirects", async () => {
+  assertThrows(
+    () => parsePublicUrl("http://example.com/a.csv", { httpsOnly: true }),
+    HttpError,
+    "URL must be an absolute https URL",
+  );
+  assertEquals(
+    parsePublicUrl("https://example.com/a.csv", { httpsOnly: true }).href,
+    "https://example.com/a.csv",
+  );
+
+  const { requested, fetcher } = redirectingFetcher({
+    "https://example.com/a.csv": "http://example.com/a.csv",
+  });
+  await assertRejects(
+    () =>
+      fetchPublicUrl("https://example.com/a.csv", {}, {
+        fetcher,
+        resolveDns: publicDns,
+        httpsOnly: true,
+      }),
+    HttpError,
+    "URL must be an absolute https URL",
+  );
+  assertEquals(requested, ["https://example.com/a.csv"]);
+});
+
 Deno.test("fetchPublicUrl follows public redirects up to a limit", async () => {
   const hops = Object.fromEntries(
     Array.from({ length: 10 }, (_, i) => [
@@ -288,17 +315,40 @@ Deno.test("redirectsFromCsv only reads .csv files inside the site", async () => 
   }
 });
 
-Deno.test("redirectsFromCsv refuses internal URLs", async () => {
+Deno.test("redirectsFromCsv refuses internal and plain http URLs", async () => {
   const { requested, restore } = stubFetch();
   try {
-    const routes = await redirectsFromCsv({
-      from: "http://169.254.169.254/redirects.csv",
-      redirects: [],
-    });
-    assertEquals(routes, []);
+    for (
+      const from of [
+        "https://169.254.169.254/redirects.csv",
+        // 203.0.113.0/24 is a public documentation range.
+        "http://203.0.113.10/redirects.csv",
+        "HTTP://203.0.113.10/redirects.csv",
+      ]
+    ) {
+      assertEquals(await redirectsFromCsv({ from, redirects: [] }), [], from);
+    }
     assertEquals(requested, []);
   } finally {
     restore();
+  }
+});
+
+Deno.test("redirectsFromCsv reads a local file whose name starts with http", async () => {
+  const csv = await Deno.makeTempFile({
+    dir: Deno.cwd(),
+    prefix: "http-",
+    suffix: ".csv",
+  });
+  await Deno.writeTextFile(csv, "from,to\n/old,/new\n");
+  try {
+    const routes = await redirectsFromCsv({
+      from: csv.slice(Deno.cwd().length + 1),
+      redirects: [],
+    });
+    assertEquals(routes.map((route) => route.pathTemplate), ["/old"]);
+  } finally {
+    await Deno.remove(csv);
   }
 });
 
