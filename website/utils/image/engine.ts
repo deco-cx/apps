@@ -1,3 +1,5 @@
+import type { AllowUrl } from "../publicUrl.ts";
+
 export interface Params {
   src: string;
   width: number;
@@ -13,6 +15,10 @@ export type Engine = {
     params: Params,
     preferredMediaType: string | undefined,
     req: Request,
+    options?: {
+      /** Applies to every URL fetched for `src`, redirects included. */
+      allowUrl?: AllowUrl;
+    },
   ) => Response | Promise<Response>;
 
   accepts: (src: string) => boolean;

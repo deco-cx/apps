@@ -151,7 +151,7 @@ export interface Props {
 
   /**
    * @title Whilelist URL Patterns
-   * @description Patterns that will be allowed to be proxied through images and assets (example: https://*.deco.cx/images/*). An empty array will allow all URLs.
+   * @description Patterns that will be allowed to be proxied through images and assets, and to be read as remote redirect CSV files (example: https://*.deco.cx/images/*). An empty array will allow all URLs.
    */
   whilelistURLs?: string[];
 

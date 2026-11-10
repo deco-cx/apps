@@ -1,6 +1,6 @@
 import { HttpError } from "../../utils/http.ts";
 import { Params as Props } from "../utils/image/engine.ts";
-import { parsePublicUrl } from "../utils/publicUrl.ts";
+import { allowlist, parsePublicUrl } from "../utils/publicUrl.ts";
 import { engine as cloudflare } from "../utils/image/engines/cloudflare/engine.ts";
 import { engine as deco } from "../utils/image/engines/deco/engine.ts";
 import { engine as passThrough } from "../utils/image/engines/passThrough/engine.ts";
@@ -64,17 +64,16 @@ const handler = async (
     const preferredMediaType = acceptMediaType(req);
     const params = parseParams(props);
 
-    if (
-      ctx.whitelistPatterns &&
-      ctx.whitelistPatterns.length > 0 &&
-      !ctx.whitelistPatterns.some((pattern) => pattern.test(params.src))
-    ) {
+    const allowUrl = allowlist(ctx.whitelistPatterns);
+    if (allowUrl && !allowUrl(params.src)) {
       return new Response("Proxy disabled for this source", { status: 403 });
     }
 
     const engine = ENGINES.find((e) => e.accepts(params.src)) ?? passThrough;
 
-    const response = await engine.resolve(params, preferredMediaType, req);
+    const response = await engine.resolve(params, preferredMediaType, req, {
+      allowUrl,
+    });
 
     response.headers.set("x-img-engine", engine.name);
     response.headers.set("x-cache", "MISS");
