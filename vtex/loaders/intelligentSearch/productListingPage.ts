@@ -306,7 +306,11 @@ const loader = async (
   const isInSeachFormat = Boolean(selected.length) || Boolean(args.query);
   const pathQuery = queryFromPathname(isInSeachFormat, pageTypes, url.pathname);
   const searchArgs = { ...args, query: args.query || pathQuery };
+  const notFound = () => {
+    if (ctx.advancedConfigs?.plpNotFoundStatus) ctx.response.status = 404;
+  };
   if (!isInSeachFormat && !pathQuery) {
+    notFound();
     return null;
   }
   const locale = segment?.payload?.cultureInfo ??
@@ -376,6 +380,11 @@ const loader = async (
   }
   const { products: vtexProducts, pagination, recordsFiltered } =
     productsResult;
+  // A path that matched no page type falls back to a fulltext search on the
+  // slug (queryFromPathname). Zero hits there means the URL doesn't exist.
+  if (!args.query && pathQuery && !vtexProducts?.length) {
+    notFound();
+  }
   const facets = selectPriceFacet(facetsResult.facets, selectedFacets);
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
