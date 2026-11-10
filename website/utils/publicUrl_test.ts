@@ -358,6 +358,16 @@ Deno.test("redirectsFromCsv refuses internal and plain http URLs", async () => {
       // one to fix.
       assertEquals(logged.pop()?.includes(from), true, from);
     }
+
+    // A signed URL keeps its host and path in the log, not its credentials.
+    await redirectsFromCsv({
+      from:
+        "http://user:SYNTHETIC_PASSWORD@203.0.113.10/signed.csv?token=SYNTHETIC_TOKEN",
+      redirects: [],
+    });
+    const message = logged.pop() ?? "";
+    assertEquals(message.includes("http://203.0.113.10/signed.csv"), true);
+    assertEquals(message.includes("SYNTHETIC"), false, message);
     assertEquals(requested, []);
   } finally {
     console.error = originalError;

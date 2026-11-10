@@ -64,6 +64,14 @@ const readLocalCsv = (from: string) => {
 
 const isRemote = (from: string) => /^https?:\/\//i.test(from);
 
+// A remote file can be a signed URL, and fetch errors repeat the URL, so logs
+// drop credentials and query strings from every URL they contain.
+const redactUrls = (text: string) =>
+  text.replace(
+    /(https?:\/\/)(?:[^\s/@]*@)?([^\s?#)]*)[^\s)]*/gi,
+    "$1$2",
+  );
+
 // Plain http is refused, so a remote file is not fetched in clear text.
 const fetchRemoteCsv = async (from: string, allowUrl?: AllowUrl) => {
   const response = await fetchPublicUrl(from, {}, {
@@ -90,7 +98,10 @@ const getRedirectFromFile = async (
       ? await fetchRemoteCsv(from, allowUrl)
       : await readLocalCsv(from);
   } catch (e) {
-    console.error(`Could not read redirects file ${from}:`, e);
+    const reason = e instanceof Error ? e.message : String(e);
+    console.error(
+      redactUrls(`Could not read redirects file ${from}: ${reason}`),
+    );
     return null;
   }
 
@@ -165,7 +176,9 @@ export default async function redirect(
   // restart.
   const allowUrl = allowlist(ctx?.whitelistPatterns);
   if (isRemote(from) && allowUrl && !allowUrl(from)) {
-    console.error(`Redirects file is not in the URL allowlist: ${from}`);
+    console.error(
+      redactUrls(`Redirects file is not in the URL allowlist: ${from}`),
+    );
     return routes;
   }
 
