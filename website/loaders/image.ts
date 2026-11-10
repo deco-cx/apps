@@ -1,6 +1,6 @@
 import { HttpError } from "../../utils/http.ts";
 import { Params as Props } from "../utils/image/engine.ts";
-import { parseImageUrl } from "../utils/image/fetch.ts";
+import { parsePublicUrl } from "../utils/publicUrl.ts";
 import { engine as cloudflare } from "../utils/image/engines/cloudflare/engine.ts";
 import { engine as deco } from "../utils/image/engines/deco/engine.ts";
 import { engine as passThrough } from "../utils/image/engines/passThrough/engine.ts";
@@ -109,7 +109,7 @@ const loader: typeof handler = async (props, req, ctx) => {
   // Validate before the cache lookup so entries cached for a disallowed
   // source are never served.
   try {
-    parseImageUrl(props.src);
+    parsePublicUrl(props.src);
   } catch (error) {
     return errorResponse(error);
   }

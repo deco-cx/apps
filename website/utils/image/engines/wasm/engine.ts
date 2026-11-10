@@ -3,7 +3,7 @@ import { HttpError } from "../../../../../utils/http.ts";
 import { createPool } from "../../../../../utils/pool.ts";
 import { createWorker } from "../../../../../utils/worker.ts";
 import type { Engine } from "../../engine.ts";
-import { fetchImageUrl } from "../../fetch.ts";
+import { fetchPublicUrl } from "../../../publicUrl.ts";
 
 const SKIP = "??" as const;
 
@@ -57,7 +57,7 @@ const fetchImage = async (
   src: string,
   init?: RequestInit | undefined,
 ) => {
-  const response = await fetchImageUrl(src, init);
+  const response = await fetchPublicUrl(src, init);
 
   if (!response.ok) {
     throw new HttpError(502);

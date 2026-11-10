@@ -1,5 +1,8 @@
-import { join } from "std/path/mod.ts";
+import { extname, isAbsolute, join, relative, SEP } from "std/path/mod.ts";
 import { Route } from "../flags/audience.ts";
+import { fetchPublicUrl } from "../utils/publicUrl.ts";
+
+const MAX_CACHED_FILES = 50;
 
 const REDIRECT_TYPE_ENUM = ["temporary", "permanent"];
 const CONCATENATE_PARAMS_VALUES = ["true", "false"];
@@ -33,19 +36,43 @@ function findAndRemove<T>(array: T[], values: T[]): T | null {
   return null;
 }
 
+// `from` reaches this loader through request input, so a local path must stay
+// inside the site and point at a CSV file.
+const readLocalCsv = async (from: string) => {
+  const root = await Deno.realPath(Deno.cwd());
+  const path = await Deno.realPath(join(root, ...from.split("/")));
+  const fromRoot = relative(root, path);
+
+  if (
+    fromRoot === ".." ||
+    fromRoot.startsWith(`..${SEP}`) ||
+    isAbsolute(fromRoot) ||
+    extname(path).toLowerCase() !== ".csv"
+  ) {
+    throw new Error(`Redirects file must be a .csv inside the site: ${from}`);
+  }
+
+  return Deno.readTextFile(path);
+};
+
+const fetchRemoteCsv = async (from: string) => {
+  const response = await fetchPublicUrl(from);
+  if (!response.ok) {
+    await response.body?.cancel();
+    throw new Error(`Redirects file responded ${response.status}: ${from}`);
+  }
+  return response.text();
+};
+
 const getRedirectFromFile = async (
   from: string,
   forcePermanentRedirects?: boolean,
 ) => {
   let redirectsRaw: string | null = null;
   try {
-    if (from.startsWith("http")) {
-      redirectsRaw = await fetch(from).then((resp) => resp.text());
-    } else {
-      redirectsRaw = await Deno.readTextFile(
-        join(Deno.cwd(), join(...from.split("/"))),
-      );
-    }
+    redirectsRaw = from.startsWith("http")
+      ? await fetchRemoteCsv(from)
+      : await readLocalCsv(from);
   } catch (e) {
     console.error(e);
   }
@@ -100,6 +127,9 @@ export default async function redirect({
   const current = routesMap.get(from);
 
   if (!current) {
+    if (routesMap.size >= MAX_CACHED_FILES) {
+      routesMap.delete(routesMap.keys().next().value!);
+    }
     routesMap.set(
       from,
       from

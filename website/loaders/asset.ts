@@ -1,6 +1,15 @@
-import { forbidden } from "@deco/deco";
-import { fetchSafe, STALE } from "../../utils/fetch.ts";
+import { fetch, forbidden } from "@deco/deco";
+import {
+  type DecoRequestInit,
+  retryExceptionOr500,
+  STALE,
+} from "../../utils/fetch.ts";
+import { HttpError } from "../../utils/http.ts";
 import { AppContext } from "../mod.ts";
+import { fetchPublicUrl, parsePublicUrl } from "../utils/publicUrl.ts";
+
+const fetchWithRetry = (input: URL, init: DecoRequestInit) =>
+  retryExceptionOr500.execute(() => fetch(input, init));
 
 interface Props {
   /**
@@ -14,10 +23,16 @@ const loader = async (
   request: Request,
   ctx: AppContext,
 ): Promise<Response> => {
-  const url = new URL(props.src);
-
   if (ctx.disableProxy) {
     return new Response("Proxy disabled", { status: 403 });
+  }
+
+  let url: URL;
+  try {
+    url = parsePublicUrl(props.src);
+  } catch (error) {
+    if (!(error instanceof HttpError)) throw error;
+    return new Response(error.message, { status: error.status });
   }
 
   if (
@@ -26,14 +41,6 @@ const loader = async (
     !ctx.whitelistPatterns.some((pattern) => pattern.test(url))
   ) {
     return new Response("Proxy disabled for this source", { status: 403 });
-  }
-
-  // Whitelist allowed protocols
-  const allowedProtocols = ["https:", "http:"];
-  if (!allowedProtocols.includes(url.protocol)) {
-    forbidden({
-      message: "Only HTTP and HTTPS protocols are allowed",
-    });
   }
 
   // Some origins (notably fonts.gstatic.com, which declares
@@ -50,10 +57,16 @@ const loader = async (
     }
   }
 
-  const original = await fetchSafe(url.href, {
-    ...STALE,
-    headers: forwardedHeaders,
-  });
+  const original = await fetchPublicUrl(
+    url,
+    { ...STALE, headers: forwardedHeaders },
+    fetchWithRetry,
+  );
+
+  if (!original.ok) {
+    await original.body?.cancel();
+    throw new HttpError(original.status);
+  }
   const response = new Response(original.body, original);
 
   // Check if the request's Accept header includes "text/html"

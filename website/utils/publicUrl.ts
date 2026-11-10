@@ -1,4 +1,4 @@
-import { HttpError } from "../../../utils/http.ts";
+import { HttpError } from "../../utils/http.ts";
 
 const MAX_REDIRECTS = 5;
 
@@ -51,20 +51,20 @@ const isPrivateIPv6 = (hostname: string) => {
 };
 
 /**
- * Parses an image source and rejects anything that is not a public
- * http(s) URL, so the image proxy cannot read local files (file://) or reach
- * the runtime's internal network.
+ * Parses a URL taken from request input and rejects anything that is not a
+ * public http(s) URL, so loaders that fetch it cannot read local files
+ * (file://) or reach the runtime's internal network.
  */
-export const parseImageUrl = (src: string | URL): URL => {
+export const parsePublicUrl = (src: string | URL): URL => {
   let url: URL;
   try {
     url = new URL(src);
   } catch {
-    throw new HttpError(400, "src must be an absolute http(s) URL");
+    throw new HttpError(400, "URL must be an absolute http(s) URL");
   }
 
   if (url.protocol !== "http:" && url.protocol !== "https:") {
-    throw new HttpError(400, "src must be an absolute http(s) URL");
+    throw new HttpError(400, "URL must be an absolute http(s) URL");
   }
 
   const hostname = url.hostname.toLowerCase().replace(/\.$/, "");
@@ -77,24 +77,30 @@ export const parseImageUrl = (src: string | URL): URL => {
     isPrivateIPv4(hostname) ||
     isPrivateIPv6(hostname)
   ) {
-    throw new HttpError(403, "src host is not allowed");
+    throw new HttpError(403, "URL host is not allowed");
   }
 
   return url;
 };
 
+type Fetcher<Init extends RequestInit> = (
+  input: URL,
+  init: Init,
+) => Promise<Response>;
+
 /**
- * fetch() for untrusted image sources: validates the URL and every redirect
- * target, since a public URL can redirect to an internal one.
+ * fetch() for URLs taken from request input: validates the URL and every
+ * redirect target, since a public URL can redirect to an internal one.
  */
-export const fetchImageUrl = async (
+export const fetchPublicUrl = async <Init extends RequestInit = RequestInit>(
   src: string | URL,
-  init: RequestInit = {},
+  init: Init = {} as Init,
+  fetcher: Fetcher<Init> = fetch,
 ): Promise<Response> => {
-  let url = parseImageUrl(src);
+  let url = parsePublicUrl(src);
 
   for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
-    const response = await fetch(url, { ...init, redirect: "manual" });
+    const response = await fetcher(url, { ...init, redirect: "manual" });
     const location = response.headers.get("location");
 
     if (response.status < 300 || response.status >= 400 || !location) {
@@ -102,18 +108,8 @@ export const fetchImageUrl = async (
     }
 
     await response.body?.cancel();
-    url = parseImageUrl(new URL(location, url));
+    url = parsePublicUrl(new URL(location, url));
   }
 
   throw new HttpError(502, "Too many redirects");
-};
-
-/** Request headers worth forwarding to an image origin. */
-export const imageRequestHeaders = (req: Request) => {
-  const headers = new Headers({ accept: "image/*" });
-  for (const name of ["accept", "user-agent"]) {
-    const value = req.headers.get(name);
-    if (value) headers.set(name, value);
-  }
-  return headers;
 };
