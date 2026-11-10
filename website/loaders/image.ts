@@ -1,5 +1,6 @@
 import { HttpError } from "../../utils/http.ts";
 import { Params as Props } from "../utils/image/engine.ts";
+import { parsePublicUrl } from "../utils/publicUrl.ts";
 import { engine as cloudflare } from "../utils/image/engines/cloudflare/engine.ts";
 import { engine as deco } from "../utils/image/engines/deco/engine.ts";
 import { engine as passThrough } from "../utils/image/engines/passThrough/engine.ts";
@@ -85,22 +86,34 @@ const handler = async (
 
     return response;
   } catch (error) {
-    const errorObj = error as { message?: string; status: number };
     console.error(error);
-
-    return new Response(errorObj.message ?? Deno.inspect(error), {
-      status: error instanceof HttpError ? errorObj.status : 500,
-      headers: {
-        "cache-control": "no-cache, no-store",
-        "vary": "Accept",
-      },
-    });
+    return errorResponse(error);
   }
+};
+
+const errorResponse = (error: unknown) => {
+  const isHttpError = error instanceof HttpError;
+
+  return new Response(isHttpError ? error.message : "Internal error", {
+    status: isHttpError ? error.status : 500,
+    headers: {
+      "cache-control": "no-cache, no-store",
+      "vary": "Accept",
+    },
+  });
 };
 
 const cache = typeof caches !== "undefined" ? await caches.open(PATH) : null;
 
 const loader: typeof handler = async (props, req, ctx) => {
+  // Validate before the cache lookup so entries cached for a disallowed
+  // source are never served.
+  try {
+    parsePublicUrl(props.src);
+  } catch (error) {
+    return errorResponse(error);
+  }
+
   const cached = await cache?.match(req).catch(() => null);
 
   if (cached) return cached;

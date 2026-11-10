@@ -1,5 +1,9 @@
-import { join } from "std/path/mod.ts";
+import { extname, isAbsolute, join, relative, SEP } from "std/path/mod.ts";
 import { Route } from "../flags/audience.ts";
+import { fetchPublicUrl, readTextWithLimit } from "../utils/publicUrl.ts";
+
+const MAX_CACHED_FILES = 50;
+const MAX_REMOTE_FILE_BYTES = 20 * 1024 * 1024;
 
 const REDIRECT_TYPE_ENUM = ["temporary", "permanent"];
 const CONCATENATE_PARAMS_VALUES = ["true", "false"];
@@ -33,21 +37,48 @@ function findAndRemove<T>(array: T[], values: T[]): T | null {
   return null;
 }
 
+// `from` reaches this loader through request input, so a local path must stay
+// inside the site and point at a CSV file.
+const readLocalCsv = (from: string) => {
+  const root = Deno.cwd();
+  const path = join(root, ...from.split("/"));
+  const fromRoot = relative(root, path);
+
+  if (
+    fromRoot === ".." ||
+    fromRoot.startsWith(`..${SEP}`) ||
+    isAbsolute(fromRoot) ||
+    extname(path).toLowerCase() !== ".csv"
+  ) {
+    throw new Error(`Redirects file must be a .csv inside the site: ${from}`);
+  }
+
+  return Deno.readTextFile(path);
+};
+
+const fetchRemoteCsv = async (from: string) => {
+  const response = await fetchPublicUrl(from);
+  if (!response.ok) {
+    await response.body?.cancel();
+    throw new Error(`Redirects file responded ${response.status}: ${from}`);
+  }
+  return readTextWithLimit(response, MAX_REMOTE_FILE_BYTES);
+};
+
+// Resolves to null when the file could not be read, so the failure is not
+// cached.
 const getRedirectFromFile = async (
   from: string,
   forcePermanentRedirects?: boolean,
-) => {
+): Promise<Route[] | null> => {
   let redirectsRaw: string | null = null;
   try {
-    if (from.startsWith("http")) {
-      redirectsRaw = await fetch(from).then((resp) => resp.text());
-    } else {
-      redirectsRaw = await Deno.readTextFile(
-        join(Deno.cwd(), join(...from.split("/"))),
-      );
-    }
+    redirectsRaw = from.startsWith("http")
+      ? await fetchRemoteCsv(from)
+      : await readLocalCsv(from);
   } catch (e) {
     console.error(e);
+    return null;
   }
 
   if (!redirectsRaw) {
@@ -90,25 +121,29 @@ const getRedirectFromFile = async (
 export const removeTrailingSlash = (path: string) =>
   path.endsWith("/") && path.length > 1 ? path.slice(0, path.length - 1) : path;
 
-const routesMap = new Map<string, Promise<Route[]>>();
+const routesMap = new Map<string, Promise<Route[] | null>>();
 
 export default async function redirect({
   redirects,
   from = "",
   forcePermanentRedirects,
 }: Redirects): Promise<Route[]> {
-  const current = routesMap.get(from);
+  let pending = routesMap.get(from);
 
-  if (!current) {
-    routesMap.set(
-      from,
-      from
-        ? getRedirectFromFile(from, forcePermanentRedirects)
-        : Promise.resolve([]),
-    );
+  if (!pending) {
+    if (routesMap.size >= MAX_CACHED_FILES) {
+      routesMap.delete(routesMap.keys().next().value!);
+    }
+    pending = from
+      ? getRedirectFromFile(from, forcePermanentRedirects)
+      : Promise.resolve([]);
+    routesMap.set(from, pending);
   }
 
-  const redirectsFromFiles: Route[] = await routesMap.get(from)!;
+  const redirectsFromFiles = await pending;
+  if (redirectsFromFiles === null && routesMap.get(from) === pending) {
+    routesMap.delete(from);
+  }
 
   const routes: Route[] = (redirects || []).map((
     { from, to, type, discardQueryParameters },
@@ -125,5 +160,5 @@ export default async function redirect({
     },
   }));
 
-  return [...redirectsFromFiles, ...routes];
+  return [...(redirectsFromFiles ?? []), ...routes];
 }
