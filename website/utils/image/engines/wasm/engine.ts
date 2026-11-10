@@ -3,7 +3,7 @@ import { HttpError } from "../../../../../utils/http.ts";
 import { createPool } from "../../../../../utils/pool.ts";
 import { createWorker } from "../../../../../utils/worker.ts";
 import type { Engine } from "../../engine.ts";
-import { fetchPublicUrl } from "../../../publicUrl.ts";
+import { type AllowUrl, fetchPublicUrl } from "../../../publicUrl.ts";
 
 const SKIP = "??" as const;
 
@@ -55,9 +55,10 @@ const mediaTypeFromHeader = (headers: Headers) => {
 
 const fetchImage = async (
   src: string,
-  init?: RequestInit | undefined,
+  init: RequestInit,
+  allowUrl?: AllowUrl,
 ) => {
-  const response = await fetchPublicUrl(src, init);
+  const response = await fetchPublicUrl(src, init, { allowUrl });
 
   if (!response.ok) {
     throw new HttpError(response.status >= 400 ? response.status : 502);
@@ -97,14 +98,14 @@ const getWorkerPool = async (size = 4) => {
 export const engine: Engine = {
   name: `wasm`,
 
-  resolve: async (params, prefferedMediaType) => {
+  resolve: async (params, prefferedMediaType, _req, options) => {
     const { fit, width, height, quality, src } = params;
 
     const image = await fetchImage(src, {
       headers: {
         accept: "image/*",
       },
-    });
+    }, options?.allowUrl);
 
     const pool = await getWorkerPool();
     const worker = await pool!.acquire();
