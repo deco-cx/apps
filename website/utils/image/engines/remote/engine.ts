@@ -16,6 +16,11 @@ type ExternalEngine = {
   name: string;
   urlFromParams: (params: Params) => URL;
   accepts: (src: string) => boolean;
+  /**
+   * The engine fetches `src` itself, so the URL allowlist applies to it. An
+   * image service that fetches `src` on its own is not checked here.
+   */
+  fetchesSrc?: boolean;
 };
 
 export const createEngine = (
@@ -23,11 +28,13 @@ export const createEngine = (
 ): Engine => ({
   ...external,
 
-  resolve: async (params, _preferredMediaType, req) => {
+  resolve: async (params, _preferredMediaType, req, options) => {
     const url = external.urlFromParams(params);
 
     const response = await fetchPublicUrl(url, {
       headers: imageRequestHeaders(req),
+    }, {
+      allowUrl: external.fetchesSrc ? options?.allowUrl : undefined,
     });
 
     if (!response.ok) {
