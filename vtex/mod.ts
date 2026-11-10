@@ -107,6 +107,17 @@ export interface Props {
      * @default false
      */
     cacheFilteredPLP?: boolean;
+    /**
+     * @title Answer 404 on not-found PLPs
+     * @description When enabled, the PLP loaders set HTTP 404 when the URL
+     * resolves to no page: no catalog page type and no search query, or (for
+     * Intelligent Search) a path-derived fulltext search that returns zero
+     * products. Avoids soft-404s that crawlers re-fetch forever. The page
+     * still renders; only the status changes. Leave off if PLP loaders run on
+     * non-catalog pages (e.g. institutional paths) where 404 would be wrong.
+     * @default false
+     */
+    plpNotFoundStatus?: boolean;
   };
 
   /**
