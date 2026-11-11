@@ -1,15 +1,16 @@
 import { Suggestion } from "../../../commerce/types.ts";
-import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import {
+  searchProducts,
+  searchSuggestions,
   toPath,
+  topSearches,
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
 import {
   getSegmentCacheKeyWithoutUTM,
   getSegmentFromBag,
-  withSegmentCookie,
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
@@ -44,7 +45,6 @@ const loaders = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
-  const { vcsDeprecated } = ctx;
   const { url } = req;
   const { count, query } = props;
   const segment = getSegmentFromBag(ctx);
@@ -52,35 +52,19 @@ const loaders = async (
     ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   const suggestions = () =>
-    vcsDeprecated["GET /api/io/_v/api/intelligent-search/search_suggestions"]({
-      locale,
-      query: query ?? "",
-    }, {
-      // Not adding suggestions to cache since queries are very spread out
-      // deco: { cache: "stale-while-revalidate" },
-      headers: withSegmentCookie(segment),
-    }).then((res) => res.json());
+    searchSuggestions(ctx, segment, { locale, query: query ?? "" });
 
-  const topSearches = () =>
-    vcsDeprecated["GET /api/io/_v/api/intelligent-search/top_searches"]({
-      locale,
-    }, { ...STALE, headers: withSegmentCookie(segment) })
-      .then((res) => res.json());
+  const getTopSearches = () => topSearches(ctx, segment, { locale });
 
   const productSearch = () => {
     const facets = withDefaultFacets([], ctx);
     const params = withDefaultParams({ query, count: count ?? 4, locale });
 
-    return vcsDeprecated
-      ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
-        ...params,
-        facets: toPath(facets),
-      }, { ...STALE, headers: withSegmentCookie(segment) })
-      .then((res) => res.json());
+    return searchProducts(ctx, segment, params, toPath(facets));
   };
 
   const [{ searches }, { products, recordsFiltered }] = await Promise.all([
-    query ? suggestions() : topSearches(),
+    query ? suggestions() : getTopSearches(),
     productSearch(),
   ]);
 

@@ -1,9 +1,17 @@
 import { AppContext } from "../mod.ts";
 import { STALE } from "../../utils/fetch.ts";
+import {
+  withSegmentCookie,
+  withSegmentParams,
+  type WrappedSegment,
+} from "./segment.ts";
 import type {
+  FacetSearchResult,
+  ProductSearchResult,
   SelectedFacet,
   SimulationBehavior,
   Sort,
+  Suggestion,
 } from "../utils/types.ts";
 
 export const SESSION_COOKIE = "vtex_is_session";
@@ -72,6 +80,126 @@ export const withDefaultParams = ({
   hideUnavailableItems: hideUnavailableItems ?? false,
   simulationBehavior,
 });
+
+/**
+ * Whether the store opted in to the VTEX Intelligent Search API v1 (via the
+ * `intelligentSearchV1` app flag). When off, the legacy Intelligent Search
+ * endpoints are used.
+ */
+export const isIntelligentSearchV1 = (ctx: AppContext): boolean =>
+  ctx.intelligentSearchV1 ?? false;
+
+type DefaultParams = ReturnType<typeof withDefaultParams>;
+
+/**
+ * Runs a product search on the Intelligent Search API, picking the v1 or the
+ * legacy endpoint based on the `intelligentSearchV1` flag. v1 forwards the
+ * segment context as explicit query params; the legacy API reads it from the
+ * segment cookie.
+ */
+export const searchProducts = (
+  ctx: AppContext,
+  segment: WrappedSegment | null | undefined,
+  params: DefaultParams,
+  facets: string,
+): Promise<ProductSearchResult> => {
+  const { vcsDeprecated } = ctx;
+
+  if (isIntelligentSearchV1(ctx)) {
+    return vcsDeprecated
+      ["GET /api/intelligent-search/v1/product-search/*facets"]({
+        ...params,
+        ...withSegmentParams(segment),
+        facets,
+      }, STALE).then((res) => res.json());
+  }
+
+  return vcsDeprecated
+    ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+      ...params,
+      facets,
+    }, {
+      ...STALE,
+      headers: segment ? withSegmentCookie(segment) : undefined,
+    }).then((res) => res.json());
+};
+
+/**
+ * Runs a facets search on the Intelligent Search API (v1 or legacy).
+ */
+export const searchFacets = (
+  ctx: AppContext,
+  segment: WrappedSegment | null | undefined,
+  params: DefaultParams,
+  facets: string,
+): Promise<FacetSearchResult> => {
+  const { vcsDeprecated } = ctx;
+
+  if (isIntelligentSearchV1(ctx)) {
+    return vcsDeprecated["GET /api/intelligent-search/v1/facets/*facets"]({
+      ...params,
+      ...withSegmentParams(segment),
+      facets,
+    }, STALE).then((res) => res.json());
+  }
+
+  return vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
+    ...params,
+    facets,
+  }, {
+    ...STALE,
+    headers: segment ? withSegmentCookie(segment) : undefined,
+  }).then((res) => res.json());
+};
+
+/**
+ * Fetches search term suggestions (v1 or legacy). v1 only accepts locale/query.
+ */
+export const searchSuggestions = (
+  ctx: AppContext,
+  segment: WrappedSegment | null | undefined,
+  { locale, query }: { locale: string; query: string },
+): Promise<Suggestion> => {
+  const { vcsDeprecated } = ctx;
+
+  if (isIntelligentSearchV1(ctx)) {
+    return vcsDeprecated["GET /api/intelligent-search/v1/search-suggestions"]({
+      locale,
+      query,
+    }).then((res) => res.json());
+  }
+
+  return vcsDeprecated
+    ["GET /api/io/_v/api/intelligent-search/search_suggestions"]({
+      locale,
+      query,
+    }, { headers: segment ? withSegmentCookie(segment) : undefined })
+    .then((res) => res.json());
+};
+
+/**
+ * Fetches the store's top searches (v1 or legacy). v1 only accepts locale.
+ */
+export const topSearches = (
+  ctx: AppContext,
+  segment: WrappedSegment | null | undefined,
+  { locale }: { locale: string },
+): Promise<Suggestion> => {
+  const { vcsDeprecated } = ctx;
+
+  if (isIntelligentSearchV1(ctx)) {
+    return vcsDeprecated["GET /api/intelligent-search/v1/top-searches"]({
+      locale,
+    }, STALE).then((res) => res.json());
+  }
+
+  return vcsDeprecated["GET /api/io/_v/api/intelligent-search/top_searches"]({
+    locale,
+  }, {
+    ...STALE,
+    headers: segment ? withSegmentCookie(segment) : undefined,
+  }).then((res) => res.json());
+};
 
 const IS_ANONYMOUS = Symbol("segment");
 const IS_SESSION = Symbol("segment");

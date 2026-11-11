@@ -213,6 +213,44 @@ export const withSegmentCookie = (
   return h;
 };
 
+/**
+ * Builds the Intelligent Search API v1 context query parameters from the segment.
+ *
+ * The IS API v1 no longer reads the `vtex_segment` cookie, so sales channel,
+ * region, locale and marketing context must be forwarded explicitly as query
+ * parameters.
+ *
+ * @see https://developers.vtex.com/updates/release-notes/2026-07-08-new-intelligent-search-api-v1
+ */
+export const withSegmentParams = (segment?: WrappedSegment | null) => {
+  const payload = segment?.payload;
+  if (!payload) {
+    return {};
+  }
+
+  const {
+    channel,
+    regionId,
+    countryCode,
+    utm_source,
+    utm_campaign,
+    utmi_campaign,
+    campaigns,
+    priceTables,
+  } = payload;
+
+  return {
+    ...(channel ? { sc: channel } : {}),
+    ...(regionId ? { regionId } : {}),
+    ...(countryCode ? { country: countryCode } : {}),
+    ...(utm_source ? { utmSource: utm_source } : {}),
+    ...(utm_campaign ? { utmCampaign: utm_campaign } : {}),
+    ...(utmi_campaign ? { utmiCampaign: utmi_campaign } : {}),
+    ...(typeof campaigns === "string" ? { campaigns } : {}),
+    ...(priceTables ? { priceTables } : {}),
+  };
+};
+
 export const setSegmentBag = (
   cookies: Record<string, string>,
   req: Request,
