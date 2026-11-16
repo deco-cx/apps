@@ -252,6 +252,66 @@ Deno.test("resolveDnsOverHttps returns only answers of the requested type", asyn
   ]);
 });
 
+Deno.test("resolveDnsOverHttps keeps only AAAA answers for AAAA", async () => {
+  const fetcher = () =>
+    Promise.resolve(Response.json({
+      Status: 0,
+      Answer: [
+        { type: 5, data: "cdn.example.net." },
+        { type: 1, data: "93.184.215.14" },
+        { type: 28, data: "2606:2800:21f:cb07:6820:80da:af6b:8b2c" },
+      ],
+    }));
+
+  assertEquals(
+    await resolveDnsOverHttps("www.example.com", "AAAA", fetcher),
+    ["2606:2800:21f:cb07:6820:80da:af6b:8b2c"],
+  );
+});
+
+Deno.test("fetchPublicUrl falls back to DNS-over-HTTPS without Deno.resolveDns", async () => {
+  const resolveDns = Object.getOwnPropertyDescriptor(Deno, "resolveDns")!;
+  const globalFetch = globalThis.fetch;
+  const lookups: string[] = [];
+  // Workers (workerd) has no Deno.resolveDns.
+  Object.defineProperty(Deno, "resolveDns", {
+    ...resolveDns,
+    value: undefined,
+  });
+  globalThis.fetch = (input: RequestInfo | URL) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    lookups.push(url.searchParams.get("type") ?? "");
+    const answers = url.searchParams.get("type") === "A"
+      ? (url.searchParams.get("name") === "internal.example.com"
+        ? [{ type: 1, data: "10.0.0.1" }]
+        : [{ type: 1, data: "93.184.215.14" }])
+      : [];
+    return Promise.resolve(Response.json({ Status: 0, Answer: answers }));
+  };
+
+  try {
+    const { requested, fetcher } = redirectingFetcher({});
+    const response = await fetchPublicUrl("https://example.com/a.png", {}, {
+      fetcher,
+    });
+    assertEquals(response.status, 200);
+    assertEquals(requested, ["https://example.com/a.png"]);
+    assertEquals(lookups.sort(), ["A", "AAAA"]);
+
+    await assertRejects(
+      () =>
+        fetchPublicUrl("https://internal.example.com/a.png", {}, {
+          fetcher: redirectingFetcher({}).fetcher,
+        }),
+      HttpError,
+      "URL host is not allowed",
+    );
+  } finally {
+    Object.defineProperty(Deno, "resolveDns", resolveDns);
+    globalThis.fetch = globalFetch;
+  }
+});
+
 Deno.test("resolveDnsOverHttps rejects failed lookups", async () => {
   await assertRejects(
     () =>
