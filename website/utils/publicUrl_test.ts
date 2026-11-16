@@ -6,6 +6,7 @@ import {
   parsePublicUrl,
   readTextWithLimit,
   type ResolveDns,
+  resolveDnsOverHttps,
 } from "./publicUrl.ts";
 import { imageRequestHeaders } from "./image/engines/remote/engine.ts";
 import assetLoader from "../loaders/asset.ts";
@@ -221,6 +222,56 @@ Deno.test("fetchPublicUrl rejects hosts that resolve to internal addresses", asy
       }),
     HttpError,
     "URL host could not be resolved",
+  );
+});
+
+Deno.test("resolveDnsOverHttps returns only answers of the requested type", async () => {
+  const requested: string[] = [];
+  const fetcher = (input: URL, init: RequestInit) => {
+    requested.push(input.href);
+    assertEquals(
+      new Headers(init.headers).get("accept"),
+      "application/dns-json",
+    );
+    return Promise.resolve(Response.json({
+      Status: 0,
+      Answer: [
+        { type: 5, data: "cdn.example.net." },
+        { type: 1, data: "93.184.215.14" },
+        { type: 1, data: "93.184.215.15" },
+      ],
+    }));
+  };
+
+  assertEquals(
+    await resolveDnsOverHttps("www.example.com", "A", fetcher),
+    ["93.184.215.14", "93.184.215.15"],
+  );
+  assertEquals(requested, [
+    "https://cloudflare-dns.com/dns-query?name=www.example.com&type=A",
+  ]);
+});
+
+Deno.test("resolveDnsOverHttps rejects failed lookups", async () => {
+  await assertRejects(
+    () =>
+      resolveDnsOverHttps(
+        "missing.example.com",
+        "A",
+        () => Promise.resolve(Response.json({ Status: 3 })),
+      ),
+    Error,
+    "status 3",
+  );
+  await assertRejects(
+    () =>
+      resolveDnsOverHttps(
+        "www.example.com",
+        "AAAA",
+        () => Promise.resolve(new Response("busy", { status: 503 })),
+      ),
+    Error,
+    "503",
   );
 });
 
