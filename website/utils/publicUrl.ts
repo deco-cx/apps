@@ -128,6 +128,53 @@ export type ResolveDns = (
   recordType: "A" | "AAAA",
 ) => Promise<string[]>;
 
+const DOH_ENDPOINT = "https://cloudflare-dns.com/dns-query";
+const DNS_RECORD_TYPE = { A: 1, AAAA: 28 } as const;
+
+/**
+ * Resolves through DNS-over-HTTPS (the JSON API), for runtimes without
+ * Deno.resolveDns, such as Cloudflare Workers. Only answers of the requested
+ * type are returned, so CNAME hops in the chain are skipped.
+ */
+export const resolveDnsOverHttps = async (
+  hostname: string,
+  recordType: "A" | "AAAA",
+  fetcher: (input: URL, init: RequestInit) => Promise<Response> = fetch,
+): Promise<string[]> => {
+  const url = new URL(DOH_ENDPOINT);
+  url.searchParams.set("name", hostname);
+  url.searchParams.set("type", recordType);
+
+  const response = await fetcher(url, {
+    headers: { accept: "application/dns-json" },
+  });
+  if (!response.ok) {
+    await response.body?.cancel();
+    throw new Error(`DNS-over-HTTPS lookup failed: ${response.status}`);
+  }
+
+  const body = await response.json() as {
+    Status?: number;
+    Answer?: { type: number; data: string }[];
+  };
+  // Any non-zero status (NXDOMAIN, SERVFAIL...) is a failed lookup.
+  if (body.Status !== 0) {
+    throw new Error(`DNS-over-HTTPS lookup failed: status ${body.Status}`);
+  }
+  return (body.Answer ?? [])
+    .filter((answer) => answer.type === DNS_RECORD_TYPE[recordType])
+    .map((answer) => answer.data);
+};
+
+/** Deno.resolveDns where the runtime has it, DNS-over-HTTPS otherwise. */
+const resolveDnsDefault: ResolveDns = (hostname, recordType) => {
+  const native = (globalThis as { Deno?: { resolveDns?: unknown } }).Deno
+    ?.resolveDns;
+  return typeof native === "function"
+    ? Deno.resolveDns(hostname, recordType)
+    : resolveDnsOverHttps(hostname, recordType);
+};
+
 // Resolver output goes through the URL parser so it gets the same normalized
 // form (bracketed, hex IPv4-mapped) that the range checks expect.
 const normalizeAddress = (address: string) =>
@@ -181,7 +228,7 @@ export const fetchPublicUrl = async <Init extends RequestInit = RequestInit>(
   init: Init = {} as Init,
   {
     fetcher = fetch,
-    resolveDns = Deno.resolveDns,
+    resolveDns = resolveDnsDefault,
     httpsOnly,
     allowUrl,
   }: FetchPublicUrlOptions<Init> = {},
