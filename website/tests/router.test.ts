@@ -1,6 +1,6 @@
 import { assertEquals } from "@std/assert";
 import { Context } from "@deco/deco";
-import { router } from "./router.ts";
+import { router } from "../handlers/router.ts";
 
 /** Resolves a handler to a Response that echoes what it was asked to run. */
 const resolver =
@@ -53,6 +53,19 @@ Deno.test("exact redirects from the decofile provider come before pages", async 
       }),
       { __resolveType: "decofile-redirect" },
     );
+  } finally {
+    ctx.release = previous;
+  }
+});
+
+Deno.test("a failing exactRedirect never fails the page", async () => {
+  const ctx = Context.active() as { release?: unknown };
+  const previous = ctx.release;
+  ctx.release = { exactRedirect: () => Promise.reject(new Error("KV down")) };
+  try {
+    assertEquals(await serve("https://site.com/old"), {
+      __resolveType: "page",
+    });
   } finally {
     ctx.release = previous;
   }

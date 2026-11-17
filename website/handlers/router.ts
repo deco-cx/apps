@@ -53,9 +53,10 @@ interface ExactRedirectSource {
     } | null
   >;
 }
-const exactRedirect = (pathname: string) =>
-  (Context.active().release as ExactRedirectSource | undefined)
-    ?.exactRedirect?.(pathname) ?? null;
+// A redirect lookup never fails a page that would render, whatever the provider.
+const exactRedirect = async (pathname: string) =>
+  await (Context.active().release as ExactRedirectSource | undefined)
+    ?.exactRedirect?.(pathname).catch(() => null) ?? null;
 export const router = (
   routes: Route[],
   hrefRoutes: Record<string, Resolvable<Handler>> = {},
