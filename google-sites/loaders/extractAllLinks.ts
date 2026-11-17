@@ -1,5 +1,12 @@
 import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.43/deno-dom-wasm.ts";
 import type { ExtractedLink } from "../utils/types.ts";
+import { HttpError } from "../../utils/http.ts";
+import {
+  fetchPublicUrl,
+  readTextWithLimit,
+} from "../../website/utils/publicUrl.ts";
+
+const MAX_HTML_BYTES = 5 * 1024 * 1024;
 
 export interface Props {
   /**
@@ -76,11 +83,21 @@ const loader = async (
 
   if (siteUrlNorm) {
     try {
-      const r = await fetch(siteUrlNorm, { redirect: "follow" });
+      // siteUrl comes from request input: only public http(s) URLs, with
+      // every redirect hop validated.
+      const r = await fetchPublicUrl(siteUrlNorm);
       if (r.ok) {
-        html = await r.text();
+        html = await readTextWithLimit(r, MAX_HTML_BYTES);
+      } else {
+        await r.body?.cancel();
       }
-    } catch (_e) {
+    } catch (e) {
+      if (e instanceof HttpError && (e.status === 400 || e.status === 403)) {
+        const info = "URL não permitida: use a URL pública do site.";
+        return format === "csv"
+          ? { csv: "", total: 0, page, pageSize, info }
+          : { links: [], total: 0, page, pageSize, info };
+      }
       // Ignora e cai para o fallback via Drive
     }
   }
