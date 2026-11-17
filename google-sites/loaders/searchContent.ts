@@ -3,6 +3,12 @@ import type { SearchResult } from "../utils/types.ts";
 import { normalize, PT_STOP_WORDS } from "../utils/helpers.ts";
 import type { CloudSearchResponse } from "../utils/client.ts";
 import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.43/deno-dom-wasm.ts";
+import {
+  fetchPublicUrl,
+  readTextWithLimit,
+} from "../../website/utils/publicUrl.ts";
+
+const MAX_HTML_BYTES = 5 * 1024 * 1024;
 
 export interface Props {
   /**
@@ -241,7 +247,12 @@ async function fetchWithTimeout(
   const id = setTimeout(() => controller.abort(), timeoutMs);
   const startedAt = Date.now();
   try {
-    const res = await fetch(url, { ...opts, signal: controller.signal });
+    // siteUrl comes from request input, and the pages crawled from it come
+    // from its HTML: only public http(s) URLs, with every redirect validated.
+    const res = await fetchPublicUrl(url, {
+      ...opts,
+      signal: controller.signal,
+    });
 
     return res;
   } catch (err) {
@@ -445,7 +456,10 @@ async function searchWithCustomSearch(
       return { results: [], total: 0, invalidSite: true };
     }
 
-    const initialHtml = await initialResponse.text();
+    const initialHtml = await readTextWithLimit(
+      initialResponse,
+      MAX_HTML_BYTES,
+    );
 
     // 2. Extrair todos os links internos únicos da página inicial
     const allLinksExtracted = extractLinksFromHtml(initialHtml, siteUrl);
@@ -507,7 +521,7 @@ async function searchWithCustomSearch(
           return;
         }
 
-        const html = await response.text();
+        const html = await readTextWithLimit(response, MAX_HTML_BYTES);
         const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
         const titleFromHtml = titleMatch
           ? decodeHtmlEntities(titleMatch[1].replace(/\s+/g, " ").trim())
