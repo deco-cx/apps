@@ -17,4 +17,9 @@ const loader = async (
   return await ctx.invoke.vtex.loaders.intelligentSearch.productList(props);
 };
 
+// A pass-through: the VTEX loader it invokes caches (or vetoes the page
+// cache) on its own. Without this, deco's `no-store` default would make every
+// page that uses this loader `no-store`.
+export const cache = "no-cache";
+
 export default loader;
