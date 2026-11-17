@@ -1,4 +1,14 @@
 import { Attachment, FileURL } from "../types.ts";
+import {
+  fetchPublicUrl,
+  readBytesWithLimit,
+  readTextWithLimit,
+} from "../../website/utils/publicUrl.ts";
+
+// Attachment URLs come from request input: they are fetched only when they
+// are public http(s) URLs (every redirect validated), and read up to a cap.
+const MAX_TEXT_BYTES = 5 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 
 // currently handles using anthropic suggested method
 
@@ -53,13 +63,14 @@ async function handleFileAttachments(attachment: FileURL): Promise<string> {
 
 async function readCSVFromURL(url: string): Promise<string> {
   try {
-    const response = await fetch(url);
+    const response = await fetchPublicUrl(url);
 
     if (!response.ok) {
+      await response.body?.cancel();
       throw new Error(`error fetching csv: ${response.status}`);
     }
 
-    const csvData = await response.text();
+    const csvData = await readTextWithLimit(response, MAX_TEXT_BYTES);
 
     return csvData; // Return the full CSV content as a string
   } catch (error) {
@@ -69,13 +80,19 @@ async function readCSVFromURL(url: string): Promise<string> {
 
 async function fetchImageAsBase64(url: string): Promise<string> {
   try {
-    const response = await fetch(url);
+    const response = await fetchPublicUrl(url);
 
     if (!response.ok) {
+      await response.body?.cancel();
       throw new Error(`Failed to fetch image: ${response.status}`);
     }
 
-    const blob = await response.blob();
+    const blob = new Blob(
+      [await readBytesWithLimit(response, MAX_IMAGE_BYTES)],
+      {
+        type: response.headers.get("content-type") ?? "",
+      },
+    );
 
     // Create a FileReader to convert the blob to base64
     return new Promise((resolve, reject) => {
@@ -92,13 +109,15 @@ async function fetchImageAsBase64(url: string): Promise<string> {
 
 async function readJSONFromURL(url: string): Promise<string> {
   try {
-    const response = await fetch(url);
+    const response = await fetchPublicUrl(url);
 
     if (!response.ok) {
+      await response.body?.cancel();
       throw new Error(`Error fetching JSON: ${response.status}`);
     }
 
-    const jsonData = await response.text(); // Retrieve the response as a string
+    // Retrieve the response as a string
+    const jsonData = await readTextWithLimit(response, MAX_TEXT_BYTES);
 
     return jsonData; // Return the JSON data as a string
   } catch (error) {
