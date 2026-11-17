@@ -260,13 +260,13 @@ export const fetchPublicUrl = async <Init extends RequestInit = RequestInit>(
 };
 
 /**
- * Reads a response body as text, failing once it grows past `maxBytes` so a
- * URL from request input cannot exhaust memory.
+ * Reads a response body, failing once it grows past `maxBytes` so a URL from
+ * request input cannot exhaust memory.
  */
-export const readTextWithLimit = async (
+export const readBytesWithLimit = async (
   response: Response,
   maxBytes: number,
-): Promise<string> => {
+): Promise<Uint8Array<ArrayBuffer>> => {
   const tooLarge = () =>
     new HttpError(413, `Response is larger than ${maxBytes} bytes`);
 
@@ -274,12 +274,11 @@ export const readTextWithLimit = async (
     await response.body?.cancel();
     throw tooLarge();
   }
-  if (!response.body) return "";
+  if (!response.body) return new Uint8Array();
 
-  const decoder = new TextDecoder();
   const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
   let size = 0;
-  let text = "";
 
   for (
     let chunk = await reader.read();
@@ -291,8 +290,21 @@ export const readTextWithLimit = async (
       await reader.cancel();
       throw tooLarge();
     }
-    text += decoder.decode(chunk.value, { stream: true });
+    chunks.push(chunk.value);
   }
 
-  return text + decoder.decode();
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
 };
+
+/** readBytesWithLimit, decoded as UTF-8 text. */
+export const readTextWithLimit = async (
+  response: Response,
+  maxBytes: number,
+): Promise<string> =>
+  new TextDecoder().decode(await readBytesWithLimit(response, maxBytes));
