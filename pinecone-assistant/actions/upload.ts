@@ -1,5 +1,12 @@
 import { AppContext } from "../mod.ts";
 import { FileUploadResponse } from "../utils/types.ts";
+import {
+  fetchPublicUrl,
+  readBytesWithLimit,
+} from "../../website/utils/publicUrl.ts";
+
+// Pinecone Assistant accepts files up to 100 MB.
+const MAX_FILE_BYTES = 100 * 1024 * 1024;
 export interface Props {
   /**
    * @description The URL of the file to upload
@@ -50,9 +57,37 @@ const action = async (
   let contentType: string | null = null;
 
   if (props.fileUrl) {
-    const fileResponse = await fetch(props.fileUrl);
+    // fileUrl comes from request input: only public http(s) URLs, with every
+    // redirect validated, so the runtime's internal network stays out of reach.
+    let fileResponse: Response;
+    try {
+      fileResponse = await fetchPublicUrl(props.fileUrl);
+    } catch (error) {
+      return {
+        success: false,
+        file: null,
+        message: `Could not fetch the file URL: ${(error as Error).message}`,
+      };
+    }
+    if (!fileResponse.ok) {
+      await fileResponse.body?.cancel();
+      return {
+        success: false,
+        file: null,
+        message: `Could not fetch the file URL: status ${fileResponse.status}`,
+      };
+    }
     contentType = fileResponse.headers.get("content-type");
-    fileBuffer = await fileResponse.arrayBuffer();
+    try {
+      fileBuffer = (await readBytesWithLimit(fileResponse, MAX_FILE_BYTES))
+        .buffer;
+    } catch (error) {
+      return {
+        success: false,
+        file: null,
+        message: `Could not read the file URL: ${(error as Error).message}`,
+      };
+    }
   }
 
   if (props.fileContent) {
