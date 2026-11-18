@@ -68,7 +68,10 @@ const buildProxyRoutes = (
     const urlToProxy = `https://${hostname}`;
     const hostToUse = hostname;
 
-    const routeFromPath = (pathTemplate: string): Route => {
+    const routeFromPath = (
+      pathTemplate: string,
+      highPriority?: boolean,
+    ): Route => {
       const handlerValue = {
         __resolveType: "website/handlers/proxy.ts",
         url: urlToProxy,
@@ -81,14 +84,24 @@ const buildProxyRoutes = (
 
       return ({
         pathTemplate,
+        highPriority,
         handler: {
           value: handlerValue,
         },
       });
     };
-    const routesFromPaths = [...PATHS_TO_PROXY, ...extraPaths].map(
-      routeFromPath,
-    );
+    const routesFromPaths = [
+      // PATHS_TO_PROXY are VTEX system paths — checkout, account, login, /api,
+      // /_v. They must win over any catch-all: an A/B audience registering `/*`
+      // with priority scores 1000 + rank("/*") = 1003 and would otherwise
+      // outrank rank("/checkout") = 6, breaking cart and login.
+      ...PATHS_TO_PROXY.map((path) => routeFromPath(path, true)),
+      // extraPaths is site configuration and routinely contains its own
+      // catch-alls (`/*`, `/section/*`) used as a fallback for pages the
+      // storefront does not implement. Promoting those would let the fallback
+      // outrank the storefront's own pages and swallow the entire site.
+      ...extraPaths.map((path) => routeFromPath(path)),
+    ];
 
     const [include, routes] = generateDecoSiteMap
       ? [[...(includeSiteMap ?? []), decoSiteMapUrl], [{
