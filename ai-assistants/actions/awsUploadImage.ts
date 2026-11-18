@@ -1,13 +1,12 @@
 import base64ToBlob from "../utils/blobConversion.ts";
 import { AssistantIds } from "../types.ts";
 import { AppContext } from "../mod.ts";
-import { logger, meter, ValueType } from "@deco/deco/o11y";
-const stats = {
-  awsUploadImageError: meter.createCounter("assistant_aws_upload_error", {
-    unit: "1",
-    valueType: ValueType.INT,
-  }),
-};
+import { logger } from "@deco/deco/o11y";
+import {
+  ATTR_ASSISTANT_ID,
+  ATTR_ASSISTANT_OPERATION,
+  stats,
+} from "../observability.ts";
 export interface AWSUploadImageProps {
   file: string | ArrayBuffer | null;
   assistantIds?: AssistantIds;
@@ -49,8 +48,9 @@ export default async function awsUploadImage(
   const uploadURL = await getSignedUrl(blobData.type, ctx);
   const uploadResponse = await uploadFileToS3(uploadURL, blobData);
   if (!uploadResponse.ok) {
-    stats.awsUploadImageError.add(1, {
-      assistantId,
+    stats.errors.add(1, {
+      [ATTR_ASSISTANT_OPERATION]: "aws_upload",
+      [ATTR_ASSISTANT_ID]: assistantId,
     });
     throw new Error(`Failed to upload file: ${uploadResponse.statusText}`);
   }
