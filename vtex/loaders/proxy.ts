@@ -193,3 +193,8 @@ function loader(
 }
 
 export default loader;
+
+// Route loader: the routes depend only on the props. Without a `cache` export
+// it defaults to `no-store`, which makes every page `no-store`; `no-cache`
+// keeps it uncached without vetoing the page cache.
+export const cache = "no-cache";

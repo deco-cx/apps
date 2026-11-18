@@ -13,3 +13,7 @@ export default function ProductsExt(
 ): Promise<Product[] | null> {
   return extend(props);
 }
+
+// Like extensions/*: the extended loader decides the caching; `no-cache` here
+// keeps this wrapper from vetoing the page cache.
+export const cache = "no-cache";

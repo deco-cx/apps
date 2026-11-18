@@ -104,3 +104,8 @@ const loader = async (
 };
 
 export default loader;
+
+// The result depends only on the props and the request URL. Without a `cache`
+// export the loader defaults to `no-store`, which makes the whole page
+// `no-store`; `no-cache` keeps it uncached without vetoing the page cache.
+export const cache = "no-cache";
