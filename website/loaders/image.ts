@@ -102,7 +102,9 @@ const errorResponse = (error: unknown) => {
   });
 };
 
-const cache = typeof caches !== "undefined" ? await caches.open(PATH) : null;
+const imageCache = typeof caches !== "undefined"
+  ? await caches.open(PATH)
+  : null;
 
 const loader: typeof handler = async (props, req, ctx) => {
   // Validate before the cache lookup so entries cached for a disallowed
@@ -113,7 +115,7 @@ const loader: typeof handler = async (props, req, ctx) => {
     return errorResponse(error);
   }
 
-  const cached = await cache?.match(req).catch(() => null);
+  const cached = await imageCache?.match(req).catch(() => null);
 
   if (cached) return cached;
 
@@ -122,10 +124,17 @@ const loader: typeof handler = async (props, req, ctx) => {
   if (response.status === 200) {
     const cloned = response.clone();
     cloned.headers.set("x-cache", "HIT");
-    cache?.put(req, cloned);
+    imageCache?.put(req, cloned);
   }
 
   return response;
 };
 
 export default loader;
+
+// The loader returns a Response with its own Cache-Control. Without a `cache`
+// export it defaults to `no-store`, which vetoes the request's cache decision
+// and makes the runtime overwrite that header with `no-store`, so the CDN and
+// the browser never keep the asset. `no-cache` leaves it uncached by the
+// loader cache without vetoing.
+export const cache = "no-cache";
