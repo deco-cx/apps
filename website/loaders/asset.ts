@@ -110,3 +110,10 @@ const loader = async (
 };
 
 export default loader;
+
+// The loader returns a Response with its own Cache-Control. Without a `cache`
+// export it defaults to `no-store`, which vetoes the request's cache decision
+// and makes the runtime overwrite that header with `no-store`, so the CDN and
+// the browser never keep the asset. `no-cache` leaves it uncached by the
+// loader cache without vetoing.
+export const cache = "no-cache";
