@@ -1,4 +1,5 @@
 import {
+  Context,
   type DecoSiteState,
   type DecoState,
   isDeferred,
@@ -38,6 +39,24 @@ const rankRoute = (pattern: string): number =>
       return acc + 3;
     }, 0);
 const urlPatternCache: Record<string, URLPattern> = {};
+/**
+ * `DecofileProvider.exactRedirect` (@deco/deco >= the version with fast deploy
+ * on workerd). Typed here, not imported, so this app keeps working with an
+ * older deco, whose provider simply has no such method.
+ */
+interface ExactRedirectSource {
+  exactRedirect?(pathname: string): Promise<
+    {
+      to: string;
+      type: "permanent" | "temporary";
+      discardQueryParameters?: boolean;
+    } | null
+  >;
+}
+// A redirect lookup never fails a page that would render, whatever the provider.
+const exactRedirect = async (pathname: string) =>
+  await (Context.active().release as ExactRedirectSource | undefined)
+    ?.exactRedirect?.(pathname).catch(() => null) ?? null;
 export const router = (
   routes: Route[],
   hrefRoutes: Record<string, Resolvable<Handler>> = {},
@@ -76,6 +95,16 @@ export const router = (
       hrefRoutes[url.pathname];
     if (handler) {
       return route(handler, `${url.pathname}${url.search || ""}`);
+    }
+    // Exact redirects kept outside the decofile (fast deploy on Cloudflare
+    // Workers keeps one KV key each): checked where the decofile's exact
+    // redirects are, before every page and pattern.
+    const exact = await exactRedirect(url.pathname);
+    if (exact) {
+      return route(
+        { __resolveType: "website/handlers/redirect.ts", ...exact },
+        url.pathname,
+      );
     }
     for (const { pathTemplate: routePath, handler } of routes) {
       const pattern = urlPatternCache[routePath] ??= (() => {
