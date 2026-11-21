@@ -62,6 +62,7 @@ export default function Nuvemshop({ storeId, accessToken, publicUrl }: Props) {
   headers.set("accept", "application/json");
   headers.set("Authentication", `bearer ${stringAccessToken}`);
   headers.set("content-type", "application/json");
+  headers.set("User-Agent", storeId);
   const api = createHttpClient<NuvemShopAPI>({
     base: `${BASE_URL}`,
     fetcher: fetchSafe,
