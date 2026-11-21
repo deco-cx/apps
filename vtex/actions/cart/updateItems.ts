@@ -13,6 +13,7 @@ export interface Props {
   orderItems: Item[];
   allowedOutdatedData?: Array<"paymentData">;
   noSplitItem?: boolean;
+  sc?: string;
 }
 
 /**
@@ -30,24 +31,33 @@ const action = async (
     orderItems,
     allowedOutdatedData = ["paymentData"],
     noSplitItem,
+    sc,
   } = props;
   const { orderFormId } = parseCookie(req.headers);
   const cookie = req.headers.get("cookie") ?? "";
   const segment = getSegmentFromBag(ctx);
 
-  const response = await vcsDeprecated
-    ["POST /api/checkout/pub/orderForm/:orderFormId/items/update"]({
+  const response = await vcsDeprecated[
+    "POST /api/checkout/pub/orderForm/:orderFormId/items/update"
+  ](
+    {
       orderFormId,
       allowedOutdatedData,
-      sc: segment?.payload.channel,
-    }, {
+      sc:
+        sc ? sc :
+        (ctx.allowMixedSegments
+          ? segment?.payload.channel
+          : ctx.salesChannel),
+    },
+    {
       body: { orderItems, noSplitItem: Boolean(noSplitItem) },
       headers: {
         "content-type": "application/json",
         accept: "application/json",
         cookie,
       },
-    });
+    },
+  );
 
   proxySetCookie(response.headers, ctx.response.headers, req.url);
 
