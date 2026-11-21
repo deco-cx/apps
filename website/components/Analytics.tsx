@@ -13,7 +13,9 @@ export const getGTMIdFromSrc = (src: string | undefined) => {
 interface TagManagerProps {
   trackingId: string;
   src?: string;
+  extraParams?: ExtraParams[];
 }
+
 export function GoogleTagManager(props: TagManagerProps) {
   const _isOnPremises = !!props.src;
   const hasTrackingId = "trackingId" in props;
@@ -29,6 +31,19 @@ export function GoogleTagManager(props: TagManagerProps) {
     `/ns.html?id=${hasTrackingId ? props.trackingId : ""}`,
     hostname,
   );
+  const reservedKeys = new Set(["id", "ns"]);
+
+  for (const { key, value } of (props.extraParams ?? [])) {
+    if (reservedKeys.has(key.toLowerCase())) {
+      continue;
+    }
+
+    if (key) {
+      src.searchParams.append(key, value);
+      noscript.searchParams.append(key, value);
+    }
+  }
+
   return (
     <>
       <Head>
@@ -103,6 +118,19 @@ const snippet = () => {
     });
   });
 };
+
+/** @title {{key}} - {{value}} */
+interface ExtraParams {
+  /**
+   * @description key for extra param.
+   */
+  key: string;
+  /**
+   * @description value for extra param.
+   */
+  value: string;
+}
+
 export interface Props {
   /**
    * @description google tag manager container id. For more info: https://developers.google.com/tag-platform/tag-manager/web#standard_web_page_installation .
@@ -119,12 +147,22 @@ export interface Props {
    */
   src?: string;
   /**
+   * @description extra params for google tag manager url.
+   */
+  extraParams?: ExtraParams[];
+  /**
    * @description Disable forwarding events into dataLayer
    */
   disableAutomaticEventPush?: boolean;
 }
 export default function Analytics(
-  { trackingIds, src, googleAnalyticsIds, disableAutomaticEventPush }: Props,
+  {
+    trackingIds,
+    src,
+    googleAnalyticsIds,
+    disableAutomaticEventPush,
+    extraParams,
+  }: Props,
 ) {
   const isDeploy = !!context.isDeploy;
   // Prevent breacking change. Drop this in next major to only have
@@ -137,14 +175,22 @@ export default function Analytics(
       {isDeploy && (
         <>
           {trackingIds?.map((trackingId) => (
-            <GoogleTagManager src={src} trackingId={trackingId.trim()} />
+            <GoogleTagManager
+              src={src}
+              trackingId={trackingId.trim()}
+              extraParams={extraParams}
+            />
           ))}
           {googleAnalyticsIds?.map((trackingId) => (
             <GTAG trackingId={trackingId.trim()} />
           ))}
           {/*  Drop this in next major to only have trackingId or trackingId and src */}
           {src && !trackingIds?.length && (
-            <GoogleTagManager src={src} trackingId={trackingId} />
+            <GoogleTagManager
+              src={src}
+              trackingId={trackingId}
+              extraParams={extraParams}
+            />
           )}
         </>
       )}
