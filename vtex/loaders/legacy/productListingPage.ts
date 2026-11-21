@@ -245,6 +245,7 @@ const loader = async (
   const isInSeachFormat = ft;
 
   if (!isPage && !hasFilters && !isInSeachFormat) {
+    if (ctx.advancedConfigs?.plpNotFoundStatus) ctx.response.status = 404;
     return null;
   }
 
