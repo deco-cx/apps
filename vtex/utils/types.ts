@@ -565,6 +565,7 @@ export type Sort =
   | "name:asc"
   | "release:desc"
   | "discount:desc"
+  | "random"
   | "";
 
 export interface Suggestion {
