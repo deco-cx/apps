@@ -8,6 +8,7 @@ import * as $$$1 from "./loaders/autocomplete.ts";
 import * as $$$2 from "./loaders/banners.ts";
 import * as $$$0 from "./loaders/PLPBanners.ts";
 import * as $$$3 from "./loaders/productListingPage.ts";
+import * as $$$5 from "./loaders/productList.ts";
 import * as $$$4 from "./loaders/recommendations.ts";
 import * as $$$$$$0 from "./sections/Analytics/SmarthintTracking.tsx";
 
@@ -16,6 +17,7 @@ const manifest = {
     "smarthint/loaders/autocomplete.ts": $$$1,
     "smarthint/loaders/banners.ts": $$$2,
     "smarthint/loaders/PLPBanners.ts": $$$0,
+    "smarthint/loaders/productList.ts": $$$5,
     "smarthint/loaders/productListingPage.ts": $$$3,
     "smarthint/loaders/recommendations.ts": $$$4,
   },
