@@ -50,7 +50,7 @@ const productListLoader = async (
           { key, value },
         ) => [`type_tags[${key}][]`, value]),
       ),
-      "ids[]": props?.ids,
+      ...(props.ids?.length > 1 ? { "ids[]": props.ids } : { "ids": props.ids }),
     }, STALE).then((res) => res.json());
 
   const validProducts = searchResults.filter(({ variants }) => {
