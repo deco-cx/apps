@@ -17,6 +17,7 @@ import * as $$$4 from "./loaders/productDetailsPageVideo.ts";
 import * as $$$5 from "./loaders/productList.ts";
 import * as $$$6 from "./loaders/productListingPage.ts";
 import * as $$$7 from "./loaders/proxy.ts";
+import * as $$$8 from "./loaders/user.ts";
 
 const manifest = {
   "loaders": {
@@ -28,6 +29,7 @@ const manifest = {
     "vnda/loaders/productList.ts": $$$5,
     "vnda/loaders/productListingPage.ts": $$$6,
     "vnda/loaders/proxy.ts": $$$7,
+    "vnda/loaders/user.ts": $$$8,
   },
   "handlers": {
     "vnda/handlers/sitemap.ts": $$$$0,
