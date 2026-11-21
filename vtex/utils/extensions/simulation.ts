@@ -30,10 +30,17 @@ const doSimulate = (items: {
     },
   } = getSegmentFromBag(ctx);
 
+  // When removeUTMFromCacheKey is on the store has declared UTM does not
+  // affect content/price, so the page is cached with UTM stripped from the
+  // cache key. Feeding UTM into the simulation here would let a UTM-triggered
+  // promotion change the price and get cached generically, so skip it to keep
+  // the simulation consistent with the caching contract.
+  const utmInKey = !ctx.advancedConfigs?.removeUTMFromCacheKey;
+
   const md = new Map<string, unknown>();
-  utm_campaign && md.set("utmCampaign", utm_campaign);
-  utm_source && md.set("utmSource", utm_source);
-  utmi_campaign && md.set("utmiCampaign", utmi_campaign);
+  utmInKey && utm_campaign && md.set("utmCampaign", utm_campaign);
+  utmInKey && utm_source && md.set("utmSource", utm_source);
+  utmInKey && utmi_campaign && md.set("utmiCampaign", utmi_campaign);
   campaigns && md.set("campaigns", [{ id: campaigns }]);
   const marketingData = md.size > 0
     ? Object.fromEntries(md.entries())
