@@ -8,6 +8,7 @@ import {
   RouteContext,
 } from "@deco/deco";
 import { isAwaitable } from "@deco/deco/utils";
+import { extname } from "@std/path/extname";
 import { weakcache } from "../../utils/weakcache.ts";
 import { Route, Routes } from "../flags/audience.ts";
 import { isFreshCtx } from "../handlers/fresh.ts";
@@ -19,6 +20,7 @@ export interface SelectionConfig {
 }
 interface MaybePriorityHandler {
   func: Resolvable<Handler>;
+  supportedExtensions?: string[];
   highPriority?: boolean;
 }
 const HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE = 1000;
@@ -38,6 +40,7 @@ const rankRoute = (pattern: string): number =>
       return acc + 3;
     }, 0);
 const urlPatternCache: Record<string, URLPattern> = {};
+
 export const router = (
   routes: Route[],
   hrefRoutes: Record<string, Resolvable<Handler>> = {},
@@ -77,7 +80,14 @@ export const router = (
     if (handler) {
       return route(handler, `${url.pathname}${url.search || ""}`);
     }
-    for (const { pathTemplate: routePath, handler } of routes) {
+    for (
+      const { pathTemplate: routePath, handler, supportedExtensions } of routes
+    ) {
+      // Skip catch-all routes for paths with file extensions
+      const ext = extname(url.pathname).slice(1);
+      if (ext && !supportedExtensions?.includes(ext)) {
+        continue;
+      }
       const pattern = urlPatternCache[routePath] ??= (() => {
         let url;
         if (URL.canParse(routePath)) {
@@ -110,12 +120,21 @@ export const buildRoutes = (audiences: Routes[]): [
   // We should tackle this problem elsewhere
   // check if the audience matches with the given context considering the `isMatch` provided by the cookies.
   for (const audience of audiences.filter(Boolean).flat()) {
-    const { pathTemplate, isHref, highPriority, handler: { value: handler } } =
-      audience;
+    const {
+      pathTemplate,
+      isHref,
+      highPriority,
+      handler: { value: handler },
+      supportedExtensions,
+    } = audience;
     if (isHref) {
       hrefRoutes[pathTemplate] = handler;
     } else {
-      routeMap[pathTemplate] = { func: handler, highPriority };
+      routeMap[pathTemplate] = {
+        func: handler,
+        highPriority,
+        supportedExtensions,
+      };
     }
   }
   return [routeMap, hrefRoutes];
@@ -155,6 +174,7 @@ const prepareRoutes = (audiences: Routes[], ctx: AppContext) => {
     routes: builtRoutes.map((route) => ({
       pathTemplate: route[0],
       handler: { value: route[1].func },
+      supportedExtensions: route[1].supportedExtensions,
     })),
     hrefRoutes,
   };
