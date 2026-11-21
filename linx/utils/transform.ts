@@ -10,6 +10,7 @@ import {
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { CartResponse } from "./types/basketJSON.ts";
 import {
+  MediaGroup,
   Product as LinxProductGroupGridProductsJSON,
 } from "./types/gridProductsJSON.ts";
 import { NavigationInfo as ProductNavigation } from "./types/shared.ts";
@@ -458,10 +459,12 @@ export const toCart = (
 export const toAuction = (
   auction: ProductAuction,
   { cdn }: { cdn: string },
-): ProductAuction => {
+  product: LinxProductGroupGridProductsJSON,
+): ProductAuction & { MediaGroups: MediaGroup[] } => {
   return ({
     ...auction,
     ProductImage: new URL(auction.ProductImage, cdn).href,
+    MediaGroups: product.MediaGroups,
   });
 };
 
