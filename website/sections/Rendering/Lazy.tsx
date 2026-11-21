@@ -6,6 +6,7 @@ import {
 } from "@deco/deco/blocks";
 import { useContext } from "preact/hooks";
 import { shouldForceRender } from "../../../utils/deferred.ts";
+import { newIsolatedRequestState } from "../../utils/isolatedRequestState.ts";
 import type { AppContext } from "../../mod.ts";
 const useSectionContext = () =>
   useContext<SectionContext | undefined>(SectionCtx);
@@ -83,7 +84,14 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
   const resolveSection = isDeferred<Section>(section)
     ? RequestContext.bind({ signal: abortController.signal }, section)
     : () => section;
-  const resolvedSection = await resolveSection({}, {
+  // This resolution only discovers the selected section's loading fallback.
+  // Keep its loaders, matchers and response mutations from affecting the
+  // cache decision of the parent page. The eager partial resolves the section
+  // again with the real request state and remains personalized when needed.
+  const isolatedState = newIsolatedRequestState() as unknown as Parameters<
+    typeof resolveSection
+  >[0];
+  const resolvedSection = await resolveSection(isolatedState, {
     propagateOptions: true,
     hooks: {
       onPropsResolveStart: (resolve, _props, resolver) => {
