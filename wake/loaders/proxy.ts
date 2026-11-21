@@ -31,6 +31,10 @@ export interface Props {
    * @title Other site maps to include
    */
   includeSiteMap?: string[];
+  /**
+  * @title Disable sitemap
+  */
+  disableSitemap?: boolean;
 }
 
 /**
@@ -45,6 +49,7 @@ function loader(
     generateDecoSiteMap = true,
     excludePathsFromDecoSiteMap = [],
     includeSiteMap,
+    disableSitemap,
     extraPathsToProxy = [],
   } = props as Props;
 
@@ -92,7 +97,7 @@ function loader(
     },
   };
 
-  return [...routes, ...checkout, sitemap];
+  return disableSitemap ? [...routes, ...checkout] : [...routes, ...checkout, sitemap];
 }
 
 export default loader;
