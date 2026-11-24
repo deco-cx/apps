@@ -5,6 +5,7 @@ import {
   GTAG,
 } from "../../../website/components/Analytics.tsx";
 import { context } from "@deco/deco";
+import { stripTagSettingsFromRequest } from "../../../website/utils/renderFromRequest.ts";
 declare global {
   interface Window {
     DECO_ANALYTICS: Record<
@@ -47,6 +48,11 @@ export interface Props {
    */
   src?: string;
 }
+// Tag ids and the GTM host decide which third-party code runs on the page, so
+// never take them from request props (see stripTagSettingsFromRequest).
+export const loader = (props: Props, req: Request): Props =>
+  stripTagSettingsFromRequest(props, req);
+
 export default function Analtyics(
   { src, trackingIds, googleAnalyticsIds }: Props,
 ) {
