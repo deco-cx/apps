@@ -12,3 +12,23 @@ export const isRenderedFromRequestProps = (req: Request): boolean => {
     return true;
   }
 };
+
+interface TagSettings {
+  src?: string;
+  trackingIds?: string[];
+  googleAnalyticsIds?: string[];
+}
+
+/** Clears tag settings (GTM/GA ids and GTM host) when props come from the request. */
+export const stripTagSettingsFromRequest = <T extends TagSettings>(
+  props: T,
+  req: Request,
+): T =>
+  isRenderedFromRequestProps(req)
+    ? {
+      ...props,
+      src: undefined,
+      trackingIds: undefined,
+      googleAnalyticsIds: undefined,
+    }
+    : props;
