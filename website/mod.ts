@@ -263,6 +263,11 @@ export const onBeforeResolveProps = <
         ? asResolved(props.abTesting, false)
         : undefined,
       routes: props.routes.map(deferPropsResolve),
+      // The unresolved route config, kept verbatim (`asResolved(_, false)`
+      // short-circuits resolution) so the router can re-run the pages loader
+      // against a Fast Preview draft — `routes` above is resolved once, at
+      // install time, against the published release.
+      __rawRoutes: asResolved(props.routes, false),
     };
     return newRoutes;
   }
