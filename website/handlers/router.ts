@@ -1,4 +1,5 @@
 import {
+  Context,
   type DecoSiteState,
   type DecoState,
   isDeferred,
@@ -12,6 +13,7 @@ import { weakcache } from "../../utils/weakcache.ts";
 import { Route, Routes } from "../flags/audience.ts";
 import { isFreshCtx } from "../handlers/fresh.ts";
 import { AppContext } from "../mod.ts";
+import { draftAppRoutes, RAW_ROUTES_KEY } from "../utils/draftRoutes.ts";
 export type ConnInfo = Deno.ServeHandlerInfo;
 export type Handler = Deno.ServeHandler;
 export interface SelectionConfig {
@@ -130,15 +132,30 @@ const RouterId = {
     ).map((flag) => `${flag.name}@${flag.value}`).join("/");
   },
 };
+
+/**
+ * A Fast Preview request renders against a request-scoped draft release
+ * (`state.release`), while the published one stays on the active context.
+ */
+const isDraftRequest = (connInfo: ConnInfo): boolean => {
+  const release = (connInfo as { state?: { release?: unknown } }).state
+    ?.release;
+  const published = Context.active().release;
+  return release !== undefined && published !== undefined &&
+    release !== published;
+};
 const routerCache = new weakcache.WeakLRUCache({
   cacheSize: 16, // up to 16 different routers stored here.
 });
-const prepareRoutes = (audiences: Routes[], ctx: AppContext) => {
+const prepareRoutes = (
+  audiences: Routes[],
+  appRoutes: AppContext["routes"],
+) => {
   const routesFromProps = Array.isArray(audiences) ? audiences : [];
   // everyone should come first in the list given that we override the everyone value with the upcoming flags.
   const [routes, hrefRoutes] = buildRoutes(
-    Array.isArray(ctx.routes)
-      ? [...ctx.routes, ...routesFromProps]
+    Array.isArray(appRoutes)
+      ? [...appRoutes, ...routesFromProps]
       : routesFromProps,
   );
   // build the router from entries
@@ -179,14 +196,26 @@ export default function RoutesSelection(
       ? connInfo.state.monitoring
       : undefined;
     const timing = monitoring?.timings.start("router");
-    const routerId = `${RouterId.fromFlags(ctx.flags)}/${ctx.revision ?? ""}`;
-    if (!routerCache.has(routerId)) {
-      routerCache.setValue(routerId, prepareRoutes(audiences, ctx));
-    }
-    const { routes, hrefRoutes }: {
+    let prepared: {
       routes: Route[];
       hrefRoutes: Record<string, Resolvable<Handler>>;
-    } = routerCache.getValue(routerId);
+    };
+    if (isDraftRequest(connInfo)) {
+      // Never cached: a draft's revision is per request, and caching it would
+      // evict published routers from the shared LRU.
+      const stash = RAW_ROUTES_KEY in ctx ? ctx[RAW_ROUTES_KEY] : undefined;
+      prepared = prepareRoutes(
+        audiences,
+        await draftAppRoutes(stash, ctx.routes, (entry) => ctx.get(entry)),
+      );
+    } else {
+      const routerId = `${RouterId.fromFlags(ctx.flags)}/${ctx.revision ?? ""}`;
+      if (!routerCache.has(routerId)) {
+        routerCache.setValue(routerId, prepareRoutes(audiences, ctx.routes));
+      }
+      prepared = routerCache.getValue(routerId);
+    }
+    const { routes, hrefRoutes } = prepared;
     const server = router(routes, hrefRoutes, ctx.get, { monitoring }, url);
     timing?.end();
     return await server(req, connInfo);

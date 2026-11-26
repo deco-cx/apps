@@ -5,6 +5,7 @@ import { Routes } from "./flags/audience.ts";
 import { TextReplace } from "./handlers/proxy.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { Script } from "./types.ts";
+import { RAW_ROUTES_KEY, stashRawRoutes } from "./utils/draftRoutes.ts";
 import { type Matcher, type Page, type Section } from "@deco/deco/blocks";
 import {
   type App,
@@ -253,6 +254,7 @@ export const onBeforeResolveProps = <
   },
 >(props: T): T => {
   if (Array.isArray(props?.routes)) {
+    const routes = props.routes.map(deferPropsResolve);
     const newRoutes: T = {
       ...props,
       global: props.global?.map((section) => asResolved(section, false)),
@@ -262,7 +264,10 @@ export const onBeforeResolveProps = <
       abTesting: props.abTesting
         ? asResolved(props.abTesting, false)
         : undefined,
-      routes: props.routes.map(deferPropsResolve),
+      routes,
+      // `routes` resolves once, at app install, against the published
+      // release; the router re-resolves pages from this copy for drafts.
+      [RAW_ROUTES_KEY]: stashRawRoutes(routes),
     };
     return newRoutes;
   }
