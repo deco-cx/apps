@@ -1,9 +1,9 @@
 import { assertEquals } from "@std/assert";
 import { type AppManifest, Deco } from "@deco/deco";
 import * as engine from "@deco/deco/engine";
+import router from "../handlers/router.ts";
 import * as pagesLoader from "../loaders/pages.ts";
 import { onBeforeResolveProps } from "../mod.ts";
-import router from "./router.ts";
 
 // A site app wired like the template: `routes` holds the pages loader plus an
 // inline catch-all, and the catch-all route is this app's router.
