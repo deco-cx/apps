@@ -3,7 +3,6 @@ import {
   type DecoSiteState,
   type DecoState,
   isDeferred,
-  isResolvable,
   type Resolvable,
   ResolveFunc,
   ResolveOptions,
@@ -14,6 +13,7 @@ import { weakcache } from "../../utils/weakcache.ts";
 import { Route, Routes } from "../flags/audience.ts";
 import { isFreshCtx } from "../handlers/fresh.ts";
 import { AppContext } from "../mod.ts";
+import { draftAppRoutes, RAW_ROUTES_KEY } from "../utils/draftRoutes.ts";
 export type ConnInfo = Deno.ServeHandlerInfo;
 export type Handler = Deno.ServeHandler;
 export interface SelectionConfig {
@@ -133,7 +133,6 @@ const RouterId = {
   },
 };
 
-const PAGES_LOADER = "website/loaders/pages.ts";
 /**
  * A Fast Preview request renders against a request-scoped draft release
  * (`state.release`), while the published one stays on the active context.
@@ -144,38 +143,6 @@ const isDraftRequest = (connInfo: ConnInfo): boolean => {
   const published = Context.active().release;
   return release !== undefined && published !== undefined &&
     release !== published;
-};
-/**
- * `ctx.routes` is resolved at app install time against the published release,
- * so a page that exists only in a draft has no route. Re-resolve just the
- * pages loader entries against the draft; every other entry keeps its
- * installed value.
- */
-const draftAppRoutes = async (
-  ctx: AppContext,
-): Promise<AppContext["routes"]> => {
-  const stash = (ctx as { __rawRoutes?: unknown }).__rawRoutes;
-  // Prop resolution follows the decofile's hints, and an injected key has
-  // none, so the stash may still be wrapped in its `resolved` envelope.
-  const raw = typeof stash === "object" && stash !== null &&
-      "__resolveType" in stash && stash.__resolveType === "resolved" &&
-      "data" in stash
-    ? stash.data
-    : stash;
-  const installed = ctx.routes;
-  if (
-    !Array.isArray(raw) || !Array.isArray(installed) ||
-    raw.length !== installed.length
-  ) {
-    return installed;
-  }
-  return await Promise.all(
-    raw.map((entry, i) =>
-      isResolvable(entry) && entry.__resolveType === PAGES_LOADER
-        ? ctx.get<Routes>(entry)
-        : installed[i]
-    ),
-  );
 };
 const routerCache = new weakcache.WeakLRUCache({
   cacheSize: 16, // up to 16 different routers stored here.
@@ -236,7 +203,11 @@ export default function RoutesSelection(
     if (isDraftRequest(connInfo)) {
       // Never cached: a draft's revision is per request, and caching it would
       // evict published routers from the shared LRU.
-      prepared = prepareRoutes(audiences, await draftAppRoutes(ctx));
+      const stash = RAW_ROUTES_KEY in ctx ? ctx[RAW_ROUTES_KEY] : undefined;
+      prepared = prepareRoutes(
+        audiences,
+        await draftAppRoutes(stash, ctx.routes, (entry) => ctx.get(entry)),
+      );
     } else {
       const routerId = `${RouterId.fromFlags(ctx.flags)}/${ctx.revision ?? ""}`;
       if (!routerCache.has(routerId)) {
